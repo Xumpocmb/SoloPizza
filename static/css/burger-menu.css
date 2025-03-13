@@ -1,0 +1,174 @@
+/* Основные стили */
+.burger-menu {
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    position: relative;
+    width: 30px;
+    height: 20px;
+    z-index: 3;
+}
+
+.burger-menu span {
+    position: absolute;
+    background-color: #ffffff;
+    width: 100%;
+    height: 2px;
+    left: 0;
+    transition: all 0.3s ease;
+}
+
+.burger-menu span:nth-child(1) {
+    top: 0;
+}
+
+.burger-menu span:nth-child(2) {
+    top: 9px;
+}
+
+.burger-menu span:nth-child(3) {
+    bottom: 0;
+}
+
+.burger-menu.active span:nth-child(1) {
+    transform: rotate(45deg);
+    top: 9px;
+}
+
+.burger-menu.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.burger-menu.active span:nth-child(3) {
+    transform: rotate(-45deg);
+    bottom: 9px;
+}
+
+.sidebar {
+    width: 100%;
+    height: calc(100% - 80px);
+    background-color: #ffffff;
+    position: fixed;
+    top: -100%;
+    left: 0;
+    transition: top 0.3s;
+    z-index: 11;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+/* Меню слева */
+.left-menu {
+    list-style: none;
+    padding: 0;
+    margin-top: 40px;
+}
+
+.left-menu li {
+    padding: 15px;
+    text-align: left;
+}
+
+.left-menu li a {
+    color: #000;
+    text-decoration: none;
+    display: block;
+    font-size: 18px;
+}
+
+/* Меню справа */
+.right-menu {
+    list-style: none;
+    padding: 0;
+    text-align: right;
+    margin-top: 40px;
+}
+
+.right-menu li {
+    padding: 15px;
+}
+
+.right-menu li a {
+    color: #000;
+    text-decoration: none;
+    display: block;
+    font-size: 18px;
+}
+
+/* Подменю */
+.sidebar ul li .submenu {
+    margin-top: 10px;
+    margin-left: 20px;
+    display: none;
+}
+
+.sidebar ul li .submenu li {
+    padding: 5px 0;
+}
+
+.sidebar ul li .submenu li a {
+    font-size: 16px;
+    color: #474747;
+}
+
+/* Анимация для активного состояния */
+.sidebar.active {
+    top: 60px;
+}
+
+/*.sidebar ul {*/
+/*    list-style: none;*/
+/*    padding: 0;*/
+/*    margin-top: 40px;*/
+/*    display: flex;*/
+/*    flex-direction: column;*/
+/*    height: 100%;*/
+/*}*/
+
+/*.sidebar ul li {*/
+/*    padding: 15px;*/
+/*    text-align: left;*/
+/*}*/
+
+/*.sidebar ul li a {*/
+/*    color: #000;*/
+/*    text-decoration: none;*/
+/*    display: block;*/
+/*    font-size: 18px;*/
+/*}*/
+
+/*.sidebar ul li .submenu {*/
+/*    margin-top: 10px;*/
+/*    margin-left: 20px;*/
+/*    display: none;*/
+/*}*/
+
+/*.sidebar ul li .submenu li {*/
+/*    padding: 5px 0;*/
+/*}*/
+
+/*.sidebar ul li .submenu li a {*/
+/*    font-size: 16px;*/
+/*    color: #474747;*/
+/*}*/
+
+
+/*.sidebar.active {*/
+/*    top: 60px; !* Анимация сверху вниз, начиная от заголовка *!*/
+/*}*/
+
+/*!* Стили для мобильных устройств *!*/
+/*@media (max-width: 768px) {*/
+/*    .sidebar ul li a {*/
+/*        font-size: 16px; !* Уменьшаем размер шрифта для пунктов меню *!*/
+/*    }*/
+
+/*    .sidebar ul li .submenu li a {*/
+/*        font-size: 14px; !* Уменьшаем размер шрифта для подменю *!*/
+/*    }*/
+
+/*    .sidebar .close-btn {*/
+/*        font-size: 20px; !* Уменьшаем размер кнопки закрытия *!*/
+/*    }*/
+/*}*/

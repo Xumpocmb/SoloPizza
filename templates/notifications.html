@@ -1,0 +1,10 @@
+{% load static %}
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="notification {{ message.tags }}" id="notification" role="alert">
+            {{ message }}
+            <span class="alert-close-btn">&times;</span>
+        </div>
+    {% endfor %}
+{% endif %}

@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
+{% endblock %}
+
+{% block main %}
+    <main>
+        <section class="site-greetings">
+            <div class="page_title">
+                <h2>Добро пожаловать в Solo Pizza!</h2>
+            </div>
+        </section>
+        <section class="slides">
+            <div class="swiper-container">
+                <div class="swiper-wrapper">
+                    <div class="swiper-slide"><img src="{% static 'img/slider/kombo_ohota.gif' %}"
+                                                   alt="Описание изображения 1"></div>
+                    <div class="swiper-slide"><img src="{% static 'img/slider/kombo_shef.gif' %}"
+                                                   alt="Описание изображения 1"></div>
+                    <div class="swiper-slide"><img src="{% static 'img/slider/kombo_sochnyj.gif' %}"
+                                                   alt="Описание изображения 1"></div>
+                </div>
+                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
+                <div class="swiper-pagination"></div>
+            </div>
+        </section>
+
+        <section class="section_categories">
+            <div class="categories_container">
+
+                <div class="page_title">
+                    <h2>Наше меню:</h2>
+                </div>
+
+                <div class="categories">
+                    {% for category in categories %}
+                        <a href="{% url 'app_catalog:category_detail' category.slug %}">
+                            <div class="category_card">
+                                {% if category.image %}
+                                    <img src="{{ category.image.url }}" alt="{{ category.name }}">
+                                {% else %}
+                                    <img src="{% static 'img/test.jpg' %}" alt="{{ category.name }}">
+                                {% endif %}
+                                <p class="category_name">{{ category.name }}</p>
+                            </div>
+                        </a>
+
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+        <section class="site-text">
+            <div class="page_text_container">
+
+                <div class="page_text">
+                    <h1>Готовая еда от Solo Pizza</h1>
+                    <p>Сегодня быстрое питание стало неотъемлемой частью жизни многих людей, особенно тех, у кого нет
+                        времени на постоянную готовку. Побаловать себя и близких необычными блюдами из заведений всегда
+                        приятно, особенно когда домашняя еда надоела.</p>
+
+                    <h2>Наши предложения</h2>
+                    <p>Наша готовая еда идеально подходит для праздников, торжественных событий или просто для
+                        повседневных дней. Сервис готовой еды Solo Pizza предлагает несколько выгодных условий:</p>
+                    <ul>
+                        <li>Скидки на дни рождения;</li>
+                        <li>Акционные предложения на определенные пиццы</li>
+                        <li>Скидки на самовынос</li>
+                    </ul>
+
+                    <h2>Почему выбирают нас?</h2>
+                    <p>С развитием интернета и гаджетов заказать еду на дом стало проще. Беларусь не исключение — наш
+                        сервис Solo Pizza готов принять ваши заказы.</p>
+                    <p>Доставка еды на дом или в офис от Solo Pizza подходит для различных ситуаций:</p>
+                    <ul>
+                        <li>Когда не хочется готовить;</li>
+                        <li>Для романтического ужина;</li>
+                        <li>На корпоративные мероприятия;</li>
+                        <li>Чтобы удивить близких;</li>
+                        <li>Когда приходят неожиданные гости;</li>
+                        <li>Если рядом нет доступных кафе или ресторанов;</li>
+                        <li>Когда магазины закрыты.</li>
+                    </ul>
+
+                    <h2>Наше меню</h2>
+                    <p>Мы предлагаем разнообразное меню по оптимальным ценам:</p>
+                    <ul>
+                        <li>Горячие и холодные закуски;</li>
+                        <li>Соусы и гарниры;</li>
+                        <li>Пицца;</li>
+                        <li>Напитки.</li>
+                    </ul>
+
+                    <h2>Как заказать?</h2>
+                    <p>Доставка горячих и холодных блюд в Барановичах осуществляется оперативно. Оплатить заказ можно
+                        наличными или безналичным расчетом.</p>
+                    <p>Если вы спешите, вы можете забрать заказ самостоятельно в любом из наших филиалов в
+                        Барановичах.</p>
+
+                    <p>Будем рады видеть вас среди наших клиентов! Приятного аппетита!</p>
+                </div>
+            </div>
+        </section>
+    </main>
+{% endblock %}
+
+{% block scripts %}
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    <script src="{% static 'js/swiper.js' %}"></script>
+{% endblock %}

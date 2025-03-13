@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'css/auth_register.css' %}">
+{% endblock %}
+
+
+{% block main %}
+    <main>
+        <div class="auth_container">
+            <div class="auth_form_wrapper">
+                <form class="auth_form" action="{% url 'app_user:register' %}" method="post">
+                    {% csrf_token %}
+                    <label for="{{ form.phone_number.id_for_label }}">Номер телефона:</label>
+                    {{ form.phone_number }}
+                    {% if form.phone_number.errors %}
+                        <div class="error">
+                            {{ form.phone_number.errors }}
+                        </div>
+                    {% endif %}
+                    <label for="{{ form.password1.id_for_label }}">Пароль:</label>
+                    {{ form.password1 }}
+                    {% if form.password1.errors %}
+                        <div class="error">
+                            {{ form.password1.errors }}
+                        </div>
+                    {% endif %}
+                    <label for="{{ form.password2.id_for_label }}">Повторите пароль:</label>
+                    {{ form.password2 }}
+                    {% if form.password2.errors %}
+                        <div class="error">
+                            {{ form.password2.errors }}
+                        </div>
+                    {% endif %}
+                    <button class="register-button" type="submit">Зарегистрироваться</button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+
+{% endblock %}

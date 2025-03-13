@@ -1,0 +1,58 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Каталог пицц</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+
+</head>
+<body>
+<header>
+    <div class="burger-menu" id="burger-menu">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+    <h1>Каталог пицц</h1>
+</header>
+
+<nav class="sidebar" id="sidebar">
+    <div class="close-btn" id="close-btn">×</div>
+    <ul>
+        <li><a href="#">Главная</a></li>
+        <li>
+            <a href="#">Меню</a>
+            <ul class="submenu">
+                <li><a href="#">Пицца</a></li>
+                <li><a href="#">Напитки</a></li>
+                <li><a href="#">Бургеры</a></li>
+            </ul>
+        </li>
+        <li><a href="#">Контакты</a></li>
+    </ul>
+</nav>
+
+<main>
+    <div class="pizza-catalog">
+        <!-- Карточка пиццы -->
+        {% for pizza in pizzas %}
+            <div class="pizza-card">
+                <img src="{{ pizza.image.url }}" alt="Маргарита">
+                <h2>{{ pizza.name }}</h2>
+                <p>{{ pizza.description }}</p>
+                <div class="price">от ${{ pizza.pizzabaseprice_set.first.price }}</div>
+                <a class="order-link" href="{% url 'app_catalog:pizza_detail' pizza.id %}">Заказать</a>
+            </div>
+        {% endfor %}
+    </div>
+</main>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="{% static 'js/burger_menu.js' %}"></script>
+</body>
+</html>
+
+

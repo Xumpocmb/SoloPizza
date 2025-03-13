@@ -1,0 +1,36 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title|default:"Solo Pizza" }}</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/burger-menu.css' %}">
+    <link rel="stylesheet" href="{% static 'css/alert.css' %}">
+    {% block styles %}
+
+    {% endblock %}
+</head>
+<body>
+{% include 'header.html' %}
+{% include 'nav.html' %}
+{% include 'notifications.html' %}
+
+{% block main %}
+
+{% endblock %}
+
+
+<footer>
+    <p>&copy; 2025 Solo Pizza. Все права защищены.</p>
+</footer>
+
+{% block scripts %}
+{% endblock %}
+<script src="{% static 'js/jquery-3.6.0.min.js' %}"></script>
+<script src="{% static 'js/burger_menu.js' %}"></script>
+<script src="{% static 'js/hide_alert.js' %}"></script>
+</body>
+</html>

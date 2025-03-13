@@ -1,0 +1,27 @@
+{% load static %}
+<header>
+    <div class="burger-menu" id="burger-menu">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+    <div class="choose-filial_container">
+        <form method="get" action="{% url 'app_home:select_branch' %}" style="z-index: 3;" class="form-filial-select">
+            <label class="choose-filial-title" for="branch-select">Выберите филиал:</label>
+            <select class="choose-filial-select" name="branch_id" id="branch-select" onchange="this.form.submit()">
+                {% for branch in branches %}
+                    <option value="{{ branch.id }}"
+                            {% if branch.id|stringformat:"s" == selected_branch_id %}selected{% endif %}>{{ branch.address }}</option>
+                {% endfor %}
+            </select>
+        </form>
+    </div>
+
+
+    <div class="site_name_container">
+        <img class="img_logo" src="{% static 'img/sp.png' %}" alt="logo">
+        <p class="site_name_text">Solo Pizza</p>
+    </div>
+
+
+</header>
