@@ -1,0 +1,122 @@
+.order-detail-page {
+    width: 90%;
+    padding: 20px;
+    margin: 60px auto;
+}
+
+.order-info {
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.order-info p {
+    margin: 5px 0;
+    color: #333;
+}
+
+.status {
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.status.pending {
+    background-color: #f0ad4e;
+    color: white;
+}
+
+.status.confirmed {
+    background-color: #5bc0de;
+    color: white;
+}
+
+.status.shipped {
+    background-color: #5cb85c;
+    color: white;
+}
+
+.status.delivered {
+    background-color: #5cb85c;
+    color: white;
+}
+
+.status.cancelled {
+    background-color: #d9534f;
+    color: white;
+}
+
+.order-items {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.order-item {
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.order-item h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.order-item p {
+    margin: 5px 0;
+    color: #333;
+}
+
+.addons-list {
+    list-style: none;
+    padding: 0;
+    margin: 5px 0;
+}
+
+.addons-list li {
+    background-color: #f9f9f9;
+    padding: 5px 10px;
+    border-radius: 5px;
+    margin-bottom: 5px;
+    display: inline-block;
+}
+
+/* Анимация появления карточек заказов */
+.orders-grid {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.5s ease forwards;
+}
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Анимация кнопок */
+.view-order-btn, .continue-shopping {
+    position: relative;
+    overflow: hidden;
+}
+
+.view-order-btn::before, .continue-shopping::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.3);
+    transition: left 0.3s ease;
+}
+
+.view-order-btn:hover::before, .continue-shopping:hover::before {
+    left: 100%;
+}

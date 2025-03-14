@@ -1,0 +1,101 @@
+.orders-page {
+    width: 90%;
+    padding: 20px;
+    margin: 60px auto;
+}
+
+.orders-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.order-card {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.order-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.order-card h2 {
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+.order-card p {
+    margin: 5px 0;
+    color: #333;
+}
+
+.status {
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.status.pending {
+    background-color: #f0ad4e;
+    color: white;
+}
+
+.status.confirmed {
+    background-color: #5bc0de;
+    color: white;
+}
+
+.status.shipped {
+    background-color: #5cb85c;
+    color: white;
+}
+
+.status.delivered {
+    background-color: #5cb85c;
+    color: white;
+}
+
+.status.cancelled {
+    background-color: #d9534f;
+    color: white;
+}
+
+.view-order-btn {
+    display: inline-block;
+    background-color: #079b59;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+.view-order-btn:hover {
+    background-color: #068a50;
+}
+
+.empty-orders {
+    text-align: center;
+    margin-top: 50px;
+}
+
+.continue-shopping {
+    display: inline-block;
+    background-color: #079b59;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+.continue-shopping:hover {
+    background-color: #068a50;
+}

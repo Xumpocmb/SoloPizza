@@ -26,7 +26,8 @@
                             <!-- Информация о товаре -->
                             <div class="cart-item-info">
                                 <h2>{{ item.item.name }}</h2>
-                                <p><strong>Размер:</strong> {{ item.item_params.size.name }} {{ item.item_params.get_unit_display }}
+                                <p>
+                                    <strong>Размер:</strong> {{ item.item_params.size.name }} {{ item.item_params.get_unit_display }}
                                     ({{ item.size.price }} руб.)</p>
 
                                 {% if item.board %}
@@ -44,13 +45,17 @@
                                 {% endif %}
 
                                 <!-- Форма для изменения количества -->
-                                <form method="POST" action="{% url 'app_cart:update_quantity' item.id %}" class="quantity-form">
+                                <form method="POST" action="{% url 'app_cart:update_quantity' item.id %}"
+                                      class="quantity-form">
                                     {% csrf_token %}
                                     <label for="quantity_{{ item.id }}">Количество:</label>
-                                    <button type="submit" name="action" value="decrease" class="quantity-btn minus">-</button>
-                                    <input type="number" id="quantity_{{ item.id }}" name="quantity" class="quantity-input"
+                                    <button type="submit" name="action" value="decrease" class="quantity-btn minus">-
+                                    </button>
+                                    <input type="number" id="quantity_{{ item.id }}" name="quantity"
+                                           class="quantity-input"
                                            value="{{ item.quantity }}" min="1" readonly>
-                                    <button type="submit" name="action" value="increase" class="quantity-btn plus">+</button>
+                                    <button type="submit" name="action" value="increase" class="quantity-btn plus">+
+                                    </button>
                                 </form>
 
                                 <!-- Общая цена товара -->
@@ -60,7 +65,8 @@
                                 </p>
 
                                 <!-- Удаление товара -->
-                                <form method="POST" action="{% url 'app_cart:remove_item' item.id %}" class="remove-form">
+                                <form method="POST" action="{% url 'app_cart:remove_item' item.id %}"
+                                      class="remove-form">
                                     {% csrf_token %}
                                     <button type="submit" class="remove-item">Удалить</button>
                                 </form>
@@ -72,8 +78,13 @@
                 <!-- Итоговая сумма -->
                 <div class="cart-summary">
                     <p><strong>Общая сумма:</strong> {{ total_price|floatformat:2 }} руб.</p>
-                    <button class="checkout-btn">Оформить заказ</button>
+                    <!-- Кнопка оформления заказа -->
+                    <form method="POST" action="{% url 'app_order:create_order' %}" class="checkout-form">
+                        {% csrf_token %}
+                        <button type="submit" class="checkout-btn">Оформить заказ</button>
+                    </form>
                 </div>
+
             {% else %}
                 <div class="empty-cart">
                     <p>Корзина пуста.</p>

@@ -60,7 +60,7 @@
     margin: 5px 0;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1268px) {
     .addons-list {
         flex-direction: column;
     }

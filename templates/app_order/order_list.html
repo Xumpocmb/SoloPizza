@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'css/order.css' %}">
+{% endblock %}
+
+{% block main %}
+    <main class="orders-page">
+        <h1>Мои заказы</h1>
+        <hr>
+    <section class="section_order">
+        {% if orders %}
+            <div class="orders-grid">
+                {% for order in orders %}
+                    <div class="order-card">
+                        <h2>Заказ #{{ order.id }}</h2>
+                        <p><strong>Статус:</strong> <span class="status {{ order.status }}">{{ order.get_status_display }}</span></p>
+                        <p><strong>Дата создания:</strong> {{ order.created_at|date:"d.m.Y H:i" }}</p>
+                        <p><strong>Общая сумма:</strong> {{ order.total_price }} руб.</p>
+                        <a href="{% url 'app_order:order_detail' order.id %}" class="view-order-btn">Посмотреть детали</a>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-orders">
+                <p>У вас нет заказов.</p>
+                <a href="{% url 'app_home:home' %}" class="continue-shopping">Продолжить покупки</a>
+            </div>
+        {% endif %}
+    </section>
+    </main>
+{% endblock %}
