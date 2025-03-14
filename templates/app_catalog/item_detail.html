@@ -4,62 +4,6 @@
 
 {% block styles %}
     <link rel="stylesheet" href="{% static 'css/item_detail.css' %}">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-        }
-
-        .card {
-            max-width: 400px;
-            border: 1px solid #ccc;
-            padding: 15px;
-            border-radius: 10px;
-        }
-
-        .card img {
-            width: 100%;
-            border-radius: 10px;
-        }
-
-        .price-options {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 10px;
-        }
-
-        .price-options label {
-            background-color: #f4f4f4;
-            padding: 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            text-align: center;
-            flex: 1;
-            margin: 0 5px;
-        }
-
-        .price-options input {
-            display: none;
-        }
-
-        .price-options input:checked + label {
-            background-color: #007bff;
-            color: white;
-        }
-
-        .extras {
-            margin-top: 10px;
-        }
-
-        button {
-            background-color: blue;
-            color: white;
-            padding: 10px;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-            width: 100%;
-        }
-    </style>
 {% endblock %}
 
 {% block main %}
@@ -109,45 +53,61 @@
                         </div>
                     </div>
 
-                    <!-- Борты -->
-                    <div class="form-group option-selector">
-                        <h3>Выберите борт (один вариант):</h3>
-                        <ul class="custom-radio-list">
-                            {% for board in boards %}
-                                <li>
-                                    <label class="custom-radio">
-                                        <input type="radio" name="board" value="{{ board.id }}" style="display: none;">
-                                        <span class="radio-button"></span>
-                                        {{ board.board.name }} (+{{ board.price }} руб.)
-                                    </label>
-                                </li>
-                            {% empty %}
-                                <li>Борты не доступны</li>
-                            {% endfor %}
-                        </ul>
-                    </div>
+                    <form method="POST" action="{% url 'app_cart:add_to_cart' item.slug %}" class="add-to-cart-form">
+                        {% csrf_token %}
 
-                    <!-- Добавки -->
-                    <div class="form-group option-selector">
-                        <h3>Добавки (можно выбрать несколько):</h3>
-                        <ul class="custom-checkbox-list">
-                            {% for addon in addons %}
-                                <li>
-                                    <label class="custom-checkbox">
-                                        <input type="checkbox" name="addons" value="{{ addon.id }}"
-                                               style="display: none;">
-                                        <span class="checkbox-icon"></span>
-                                        {{ addon.addon.name }} (+{{ addon.price }} руб.)
-                                    </label>
-                                </li>
-                            {% empty %}
-                                <li>Добавки не доступны</li>
-                            {% endfor %}
-                        </ul>
-                    </div>
+                        <!-- Размер -->
+                        <input type="hidden" name="size" value="{{ selected_size.id }}">
 
-                    <!-- Кнопка добавления в заказ -->
-                    <button class="order-link">Добавить в заказ</button>
+                        <!-- Борты -->
+                        {% if boards %}
+                            <div class="form-group option-selector">
+                                <h3>Выберите борт (один вариант):</h3>
+                                <ul class="custom-radio-list">
+                                    {% for board in boards %}
+                                        <li>
+                                            <label class="custom-radio">
+                                                <input type="radio" name="board" value="{{ board.id }}">
+                                                <span class="radio-button"></span>
+                                                {{ board.board.name }} (+{{ board.price }} руб.)
+                                            </label>
+                                        </li>
+                                    {% empty %}
+                                        <li>Борты не доступны</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+
+                        <!-- Добавки -->
+                        {% if addons %}
+                            <div class="form-group option-selector">
+                                <h3>Добавки (можно выбрать несколько):</h3>
+                                <ul class="custom-checkbox-list">
+                                    {% for addon in addons %}
+                                        <li>
+                                            <label class="custom-checkbox">
+                                                <input type="checkbox" name="addons" value="{{ addon.id }}">
+                                                <span class="checkbox-icon"></span>
+                                                {{ addon.addon.name }} (+{{ addon.price }} руб.)
+                                            </label>
+                                        </li>
+                                    {% empty %}
+                                        <li>Добавки не доступны</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+
+                        <!-- Количество -->
+                        <div class="form-group">
+                            <label for="quantity">Количество:</label>
+                            <input type="number" id="quantity" name="quantity" value="1" min="1">
+                        </div>
+
+                        <!-- Кнопка добавления в заказ -->
+                        <button type="submit" class="order-link">Добавить в заказ</button>
+                    </form>
                 </div>
             </div>
 

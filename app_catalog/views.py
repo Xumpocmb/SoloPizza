@@ -1,3 +1,4 @@
+from django.db.models import Min
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
 
@@ -5,8 +6,11 @@ from app_catalog.models import Category, Item, AddonParams, BoardParams, ItemSiz
 
 
 def category_detail(request, slug):
-    category = Category.objects.get(slug=slug)
-    items = Item.objects.filter(category=category)
+    category = get_object_or_404(Category, slug=slug)
+    items = (
+        Item.objects.filter(category=category)
+        .annotate(min_price=Min('itemparams__price'))  # Добавляем минимальную цену
+    )
     context = {
         'title': f'Solo Pizza | Категория: {category.name}',
         'category': category,

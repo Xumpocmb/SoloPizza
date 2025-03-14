@@ -19,10 +19,10 @@ header {
     align-items: center;
     justify-content: space-between;
     box-shadow: 0 5px 5px rgba(0, 0, 0, 0.2);
-    position: fixed; /* Закрепляем заголовок */
-    top: 0; /* Устанавливаем его в верхней части страницы */
-    width: 100%; /* Делаем его ширину 100% */
-    z-index: 12; /* Убедитесь, что он находится выше других элементов */
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 12;
     height: 40px;
 }
 
@@ -76,6 +76,7 @@ h3 {
 
 a {
     text-decoration: none;
+    color: #155724;
 }
 
 .choose-filial-select {

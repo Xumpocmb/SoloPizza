@@ -27,7 +27,7 @@
                     	<li><a href="{% url 'admin:index' %}">Админ-панель</a></li>
                     {% endif %}
                     <li><a href="#">Заказы</a></li>
-                    <li><a href="#">Корзина</a></li>
+                    <li><a href="{% url 'app_cart:view_cart' %}">Корзина</a></li>
                     <li><a href="{% url 'app_user:logout' %}">Выход</a></li>
                 {% endif %}
 

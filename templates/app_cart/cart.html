@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'css/cart.css' %}">
+{% endblock %}
+
+{% block main %}
+    <main class="cart-page">
+        <h1>Корзина</h1>
+        <hr>
+        <section class="section_cart">
+            {% if cart_items %}
+                <div class="cart-items">
+                    {% for item in cart_items %}
+                        <div class="cart-item">
+                            <!-- Изображение товара -->
+                            <div class="cart-item-image">
+                                {% if item.item.image %}
+                                    <img src="{{ item.item.image.url }}" alt="{{ item.item.name }}">
+                                {% else %}
+                                    <img src="{% static 'img/test.jpg' %}" alt="{{ item.item.name }}">
+                                {% endif %}
+                            </div>
+
+                            <!-- Информация о товаре -->
+                            <div class="cart-item-info">
+                                <h2>{{ item.item.name }}</h2>
+                                <p><strong>Размер:</strong> {{ item.item_params.size.name }} {{ item.item_params.get_unit_display }}
+                                    ({{ item.size.price }} руб.)</p>
+
+                                {% if item.board %}
+                                    <p><strong>Борт:</strong> {{ item.board.board.name }} (+{{ item.board.price }} руб.)
+                                    </p>
+                                {% endif %}
+
+                                {% if item.addons.exists %}
+                                    <p><strong>Добавки:</strong></p>
+                                    <ul class="addons-list">
+                                        {% for addon in item.addons.all %}
+                                            <li>{{ addon.addon.name }} (+{{ addon.price }} руб.)</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+
+                                <!-- Форма для изменения количества -->
+                                <form method="POST" action="{% url 'app_cart:update_quantity' item.id %}" class="quantity-form">
+                                    {% csrf_token %}
+                                    <label for="quantity_{{ item.id }}">Количество:</label>
+                                    <button type="submit" name="action" value="decrease" class="quantity-btn minus">-</button>
+                                    <input type="number" id="quantity_{{ item.id }}" name="quantity" class="quantity-input"
+                                           value="{{ item.quantity }}" min="1" readonly>
+                                    <button type="submit" name="action" value="increase" class="quantity-btn plus">+</button>
+                                </form>
+
+                                <!-- Общая цена товара -->
+                                <p class="item-total-price">
+                                    <strong>Итого за товар:</strong>
+                                    <span class="total-price">{{ item.total_price|floatformat:2 }} руб.</span>
+                                </p>
+
+                                <!-- Удаление товара -->
+                                <form method="POST" action="{% url 'app_cart:remove_item' item.id %}" class="remove-form">
+                                    {% csrf_token %}
+                                    <button type="submit" class="remove-item">Удалить</button>
+                                </form>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Итоговая сумма -->
+                <div class="cart-summary">
+                    <p><strong>Общая сумма:</strong> {{ total_price|floatformat:2 }} руб.</p>
+                    <button class="checkout-btn">Оформить заказ</button>
+                </div>
+            {% else %}
+                <div class="empty-cart">
+                    <p>Корзина пуста.</p>
+                    <a href="{% url 'app_home:home' %}" class="continue-shopping">Продолжить покупки</a>
+                </div>
+            {% endif %}
+        </section>
+    </main>
+{% endblock %}
