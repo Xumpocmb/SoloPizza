@@ -17,6 +17,15 @@ class Order(models.Model):
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Дата обновления')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='created', verbose_name='Статус заказа')
     total_price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Общая сумма')
+    latitude = models.FloatField(verbose_name='Широта', null=True, blank=True)
+    longitude = models.FloatField(verbose_name='Долгота', null=True, blank=True)
+    address = models.CharField(max_length=200, blank=True, null=True, verbose_name='Адрес')
+    apartment = models.CharField(max_length=10, blank=True, null=True, verbose_name='Квартира')
+    entrance = models.CharField(max_length=10, blank=True, null=True, verbose_name='Подъезд')
+    floor = models.CharField(max_length=10, blank=True, null=True, verbose_name='Этаж')
+    comment = models.TextField(blank=True, null=True, verbose_name='Комментарий')
+    cafe_branch = models.ForeignKey('app_home.CafeBranch', on_delete=models.SET_NULL, null=True, blank=True,
+                                    verbose_name='Филиал')
 
     class Meta:
         db_table = 'orders'

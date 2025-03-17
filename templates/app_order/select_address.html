@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block styles %}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="{% static 'css/map.css' %}">
+{% endblock %}
+
+{% block scripts %}
+    <script src="https://api-maps.yandex.ru/2.1/?apikey=7ba5ea66-ffa8-4bfe-b142-414f7dc61c5d&lang=ru_RU" defer></script>
+    <script src="{% static 'js/map.js' %}" defer></script>
+{% endblock %}
+
+{% block main %}
+    <main class="map-page">
+        <h1>Выберите адрес доставки</h1>
+        <div id="map"></div>
+        <form method="POST" action="{% url 'app_order:create_order' %}" class="address-form">
+            {% csrf_token %}
+            <input type="hidden" id="address-lat" name="latitude">
+            <input type="hidden" id="address-lng" name="longitude">
+
+            <div class="form-group">
+                <label for="selected-address">Адрес (выберите на карте):</label>
+                <input type="text" id="selected-address" name="selected-address" placeholder="Заполняется автоматически" required readonly>
+            </div>
+
+            <div class="form-group">
+                <label for="entrance">Подъезд:</label>
+                <input type="text" id="entrance" name="entrance" placeholder="Номер подъезда" required>
+            </div>
+
+            <div class="form-group">
+                <label for="floor">Этаж:</label>
+                <input type="text" id="floor" name="floor" placeholder="Номер этажа" required>
+            </div>
+
+            <div class="form-group">
+                <label for="apartment">Квартира:</label>
+                <input type="text" id="apartment" name="apartment" placeholder="Номер квартиры" required>
+            </div>
+
+            <div class="form-group">
+                <label for="comment">Комментарий к заказу:</label>
+                <textarea name="comment" id="comment" cols="30" rows="10" placeholder="Комментарий"></textarea>
+            </div>
+            <button type="submit" class="submit-btn">Подтвердить адрес</button>
+        </form>
+    </main>
+{% endblock %}

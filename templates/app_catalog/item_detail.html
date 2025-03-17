@@ -59,6 +59,12 @@
                         <!-- Размер -->
                         <input type="hidden" name="size" value="{{ selected_size.id }}">
 
+                        <!-- Количество -->
+                        <div class="form-group">
+                            <label for="quantity">Количество:</label>
+                            <input type="number" id="quantity" name="quantity" value="1" min="1">
+                        </div>
+
                         <!-- Борты -->
                         {% if boards %}
                             <div class="form-group option-selector">
@@ -67,7 +73,8 @@
                                     {% for board in boards %}
                                         <li>
                                             <label class="custom-radio">
-                                                <input type="radio" name="board" value="{{ board.id }}">
+                                                <input type="radio" name="board" value="{{ board.id }}"
+                                                       style="display: none;">
                                                 <span class="radio-button"></span>
                                                 {{ board.board.name }} (+{{ board.price }} руб.)
                                             </label>
@@ -87,7 +94,8 @@
                                     {% for addon in addons %}
                                         <li>
                                             <label class="custom-checkbox">
-                                                <input type="checkbox" name="addons" value="{{ addon.id }}">
+                                                <input type="checkbox" name="addons" value="{{ addon.id }}"
+                                                       style="display: none;">
                                                 <span class="checkbox-icon"></span>
                                                 {{ addon.addon.name }} (+{{ addon.price }} руб.)
                                             </label>
@@ -98,12 +106,6 @@
                                 </ul>
                             </div>
                         {% endif %}
-
-                        <!-- Количество -->
-                        <div class="form-group">
-                            <label for="quantity">Количество:</label>
-                            <input type="number" id="quantity" name="quantity" value="1" min="1">
-                        </div>
 
                         <!-- Кнопка добавления в заказ -->
                         <button type="submit" class="order-link">Добавить в заказ</button>

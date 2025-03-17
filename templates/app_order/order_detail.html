@@ -8,33 +8,42 @@
 {% block main %}
     <main class="order-detail-page">
         <h1>Заказ #{{ order.id }}</h1>
-    <section class="section_order">
-        <div class="order-info">
-            <p><strong>Статус:</strong> <span class="status {{ order.status }}">{{ order.get_status_display }}</span></p>
-            <p><strong>Дата создания:</strong> {{ order.created_at|date:"d.m.Y H:i" }}</p>
-            <p><strong>Общая сумма:</strong> {{ order.total_price }} руб.</p>
-        </div>
+        <section class="section_order">
+            <div class="order-info">
+                <p><strong>Филиал:</strong> {{ order.cafe_branch.name }}</p>
+                <p><strong>Статус:</strong> <span
+                        class="status {{ order.status }}">{{ order.get_status_display }}</span></p>
+                <p><strong>Дата создания:</strong> {{ order.created_at|date:"d.m.Y H:i" }}</p>
+                <p><strong>Общая сумма:</strong> {{ order.total_price }} руб.</p>
+                <p><strong>Телефон:</strong> {{ order.user.phone_number }}</p>
+                <p><strong>Адрес:</strong> {{ order.address }}</p>
+                {% if order.comment %}<p><strong>Комментарий:</strong>{{ order.comment }}</p>{% endif %}
+            </div>
+            <hr>
 
-        <h2>Товары в заказе</h2>
-        <div class="order-items">
-            {% for item in order.items.all %}
-                <div class="order-item">
-                    <h3>{{ item.item.name }}</h3>
-                    <p><strong>Размер:</strong> {{ item.item_params.size.name }} ({{ item.price }} руб.) x {{ item.quantity }}</p>
-                    {% if item.board %}
-                        <p><strong>Борт:</strong> {{ item.board.board.name }} (+{{ item.board.price }} руб.)</p>
-                    {% endif %}
-                    {% if item.addons.exists %}
-                        <p><strong>Добавки:</strong></p>
-                        <ul class="addons-list">
-                            {% for addon in item.addons.all %}
-                                <li>{{ addon.addon.name }} (+{{ addon.price }} руб.)</li>
-                            {% endfor %}
-                        </ul>
-                    {% endif %}
-                </div>
-            {% endfor %}
-        </div>
-    </section>
+            <h2>Товары в заказе</h2>
+            <div class="order-items">
+                {% for item in order.items.all %}
+                    <div class="order-item">
+                        <h3>{{ item.item.name }}</h3>
+                        <p><strong>Размер:</strong> {{ item.item_params.size.name }} ({{ item.price }} руб.)
+                            x {{ item.quantity }}</p>
+                        <!-- Борт -->
+                        {% if item.board %}
+                            <p><strong>Борт:</strong> {{ item.board.board.name }} (+{{ item.board.price }} руб.)</p>
+
+                        {% endif %}
+                        {% if item.addons.exists %}
+                            <p><strong>Добавки:</strong></p>
+                            <ul class="addons-list">
+                                {% for addon in item.addons.all %}
+                                    <li>{{ addon.addon.name }} (+{{ addon.price }} руб.)</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
     </main>
 {% endblock %}

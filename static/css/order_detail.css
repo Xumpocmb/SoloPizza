@@ -24,6 +24,11 @@
     font-weight: bold;
 }
 
+.status.created {
+    background-color: #4eddf0;
+    color: white;
+}
+
 .status.pending {
     background-color: #f0ad4e;
     color: white;
