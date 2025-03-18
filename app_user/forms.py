@@ -1,26 +1,34 @@
+import re
+
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.forms import UserCreationForm
 
-from app_user.models import CustomUser
+from .models import CustomUser
+
+
+def clean_phone_number(phone_number):
+    """
+    Очищает номер телефона от всех символов, кроме цифр.
+    """
+    return re.sub(r'[^0-9]', '', phone_number)
 
 
 class PhoneRegistrationForm(UserCreationForm):
     class Meta:
         model = CustomUser
-        fields = ('phone_number',)
+        fields = ('username',)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # Настройка поля phone_number
-        self.fields['phone_number'].widget.attrs.update({
-            'placeholder': 'Введите номер телефона',
-            'name': 'phone_number',
+        # Настройка поля username (номер телефона)
+        self.fields['username'].widget.attrs.update({
+            'placeholder': 'Введите номер телефона (только цифры)',
+            'name': 'username',
             'class': 'input-phone form-control',
         })
 
-        # Настройка поля password1
         self.fields['password1'].widget.attrs.update({
             'type': 'password',
             'name': 'password1',
@@ -28,7 +36,6 @@ class PhoneRegistrationForm(UserCreationForm):
             'class': 'input-password1 form-control',
         })
 
-        # Настройка поля password2
         self.fields['password2'].widget.attrs.update({
             'type': 'password',
             'name': 'password2',
@@ -36,20 +43,43 @@ class PhoneRegistrationForm(UserCreationForm):
             'class': 'input-password2 form-control',
         })
 
+    def clean_username(self):
+        """
+        Валидация: username должен содержать только цифры.
+        """
+        username = clean_phone_number(self.cleaned_data.get('username'))
+        if not username.isdigit():
+            raise forms.ValidationError("Номер телефона должен содержать только цифры.")
+        return username
+
 
 class PhoneAuthenticationForm(AuthenticationForm):
-    username = forms.CharField(label="Phone Number", max_length=15)
+    username = forms.CharField(
+        label="Номер телефона",
+        max_length=15,
+        widget=forms.TextInput(attrs={
+            'placeholder': 'Введите номер телефона (только цифры)',
+            'name': 'username',
+            'class': 'input-phone form-control',
+        })
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['username'].widget.attrs.update({
-            'placeholder': 'Введите номер телефона',
-            'name': 'username',
-            'class': 'input-username form-control',
-        })
+
+        # Настройка поля password
         self.fields['password'].widget.attrs.update({
             'type': 'password',
             'name': 'password',
             'placeholder': 'Введите пароль',
             'class': 'input-password form-control',
         })
+
+    def clean_username(self):
+        """
+        Валидация: username должен содержать только цифры.
+        """
+        username = clean_phone_number(self.cleaned_data.get('username'))
+        if not username.isdigit():
+            raise forms.ValidationError("Номер телефона должен содержать только цифры.")
+        return username

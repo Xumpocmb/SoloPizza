@@ -7,29 +7,35 @@
 
 {% block main %}
     <main>
-    <div class="auth_container">
-    <div class="auth_form_wrapper">
-        <form class="auth_form" action="{% url 'app_user:login' %}" method="post">
-            {% csrf_token %}
-                <label for="{{ form.username.id_for_label }}">Номер телефона:</label>
-                {{ form.username }}
-                {% if form.username.errors %}
-                    <div class="error">
-                        {{ form.username.errors }}
-                    </div>
-                {% endif %}
-                <label for="{{ form.password.id_for_label }}">Пароль:</label>
-                {{ form.password }}
-                {% if form.password.errors %}
-                    <div class="error">
-                        {{ form.password.errors }}
-                    </div>
-                {% endif %}
-            <button class="register-button" type="submit">Login</button>
-        </form>
-    </div>
+        <div class="auth_container">
+            <div class="auth_form_wrapper">
+                <form class="auth_form" action="{% url 'app_user:login' %}" method="post">
+                    {% csrf_token %}
+                    <!-- Скрытый input для параметра next -->
+                    <input type="hidden" name="next" value="{{ next }}">
+                    <label for="{{ form.username.id_for_label }}">Номер телефона:</label>
+                    {{ form.username }}
+                    {% if form.username.errors %}
+                        <div class="error">
+                            {{ form.username.errors }}
+                        </div>
+                    {% endif %}
+                    <label for="{{ form.password.id_for_label }}">Пароль:</label>
+                    {{ form.password }}
+                    {% if form.password.errors %}
+                        <div class="error">
+                            {{ form.password.errors }}
+                        </div>
+                    {% endif %}
+                    <button class="register-button" type="submit">Login</button>
+                </form>
+                <div class="register-link">
+                    <a href="{% url 'app_user:register' %}">Зарегистрироваться</a>
+                </div>
+            </div>
 
-    </div>
+
+        </div>
     </main>
 
 

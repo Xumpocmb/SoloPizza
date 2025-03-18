@@ -8,8 +8,8 @@
 
 .input-phone:focus, .input-username:focus, .input-password:focus, .input-password1:focus, .input-password2:focus {
     outline: none;
-    border-color: #007bff;
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    border-color: #045e36;
+    box-shadow: 0 0 5px rgb(4, 94, 54);
 }
 
 .register-button {
@@ -23,11 +23,11 @@
 }
 
 .register-button:hover {
-    background-color: #007bff;
+    background-color: #045e36;
 }
 
 .register-button:active {
-    background-color: #0062cc;
+    background-color: #045e36;
 }
 
 .register-button:disabled {
@@ -59,4 +59,9 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    margin-bottom: 20px;
+}
+
+.register-link {
+    text-align: center;
 }

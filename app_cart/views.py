@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
 from django.shortcuts import get_object_or_404, redirect
@@ -7,7 +8,6 @@ from app_catalog.models import Item, ItemParams, BoardParams, AddonParams
 from .models import CartItem
 
 
-@login_required
 def add_to_cart(request, slug):
     if request.method == 'POST':
         # Получаем товар
@@ -22,6 +22,15 @@ def add_to_cart(request, slug):
         # Проверяем, что размер выбран
         size = get_object_or_404(ItemParams, id=size_id, item=item)
 
+        # Формируем данные о товаре
+        item_data = {
+            'item_slug': item.slug,
+            'size_id': size_id,
+            'quantity': quantity,
+            'board_id': board_id,
+            'addon_ids': addon_ids,
+        }
+
         # Проверяем, что борт существует (если выбран)
         board = None
         if board_id:
@@ -30,18 +39,41 @@ def add_to_cart(request, slug):
         # Получаем добавки (если выбраны)
         addons = AddonParams.objects.filter(id__in=addon_ids, size=size.size)
 
-        # Создаем или обновляем запись в корзине
-        cart_item, created = CartItem.objects.get_or_create(
-            user=request.user,
-            item=item,
-            item_params=size,
-            board=board,
-        )
-        cart_item.addons.set(addons)  # Обновляем добавки
-        cart_item.quantity = quantity
-        cart_item.save()
+        if request.user.is_authenticated:
+            # Создаем или обновляем запись в корзине
+            cart_item, created = CartItem.objects.get_or_create(
+                user=request.user,
+                item=item,
+                item_params=size,
+                board=board,
+            )
+            cart_item.addons.set(addons)  # Обновляем добавки
+            cart_item.quantity = quantity
+            cart_item.save()
+        else:
+            # Если пользователь не авторизован, сохраняем товар в сессии
+            cart_in_session = request.session.get('cart_in_session', [])
+            for cart_item in cart_in_session:
+                if (cart_item['item_slug'] == item.slug and
+                        cart_item['size_id'] == size_id and
+                        cart_item['board_id'] == board_id and
+                        set(cart_item['addon_ids']) == set(addon_ids)):
+                    # Если такой товар уже есть, увеличиваем количество
+                    cart_item['quantity'] += quantity
+                    break
+            else:
+                # Иначе добавляем новый товар
+                cart_in_session.append(item_data)
+
+            request.session['cart_in_session'] = cart_in_session
+            messages.info(request, f'Товар "{item.name}" будет добавлен в корзину после авторизации.')
+
+            # Перенаправляем на страницу входа
+            return redirect('app_user:login')
 
         return redirect('app_cart:view_cart')  # Перенаправляем в корзину
+    else:
+        return redirect('app_cart:view_cart')
 
 
 @login_required

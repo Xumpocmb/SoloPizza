@@ -2,27 +2,32 @@
 {% load static %}
 
 {% block styles %}
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
     <link rel="stylesheet" href="{% static 'css/map.css' %}">
 {% endblock %}
 
 {% block scripts %}
-    <script src="https://api-maps.yandex.ru/2.1/?apikey=7ba5ea66-ffa8-4bfe-b142-414f7dc61c5d&lang=ru_RU" defer></script>
+    <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU&apikey=7ba5ea66-ffa8-4bfe-b142-414f7dc61c5d&suggest_apikey=7b1cd3ea-8fb0-4be5-b6be-48ed9e921920" defer></script>
+    <p>7b1cd3ea-8fb0-4be5-b6be-48ed9e921920</p>
     <script src="{% static 'js/map.js' %}" defer></script>
 {% endblock %}
 
 {% block main %}
     <main class="map-page">
         <h1>Выберите адрес доставки</h1>
-        <div id="map"></div>
+        <div id="map-container">
+            <div id="map"></div>
+            <div id="center-marker"></div>
+        </div>
         <form method="POST" action="{% url 'app_order:create_order' %}" class="address-form">
             {% csrf_token %}
             <input type="hidden" id="address-lat" name="latitude">
             <input type="hidden" id="address-lng" name="longitude">
 
             <div class="form-group">
-                <label for="selected-address">Адрес (выберите на карте):</label>
-                <input type="text" id="selected-address" name="selected-address" placeholder="Заполняется автоматически" required readonly>
+                <label for="suggest">Адрес (выберите на карте или введите вручную, начиная с улицы, к примеру, "ул Ленина 9/1"):</label>
+                <input type="text" id="suggest" name="selected-address" placeholder="Адрес"
+                       required>
             </div>
 
             <div class="form-group">

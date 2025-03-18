@@ -73,8 +73,6 @@ DATABASES = {
 }
 
 AUTHENTICATION_BACKENDS = [
-    # 'app_user.backends.PhoneNumberBackend',
-    'app_user.backends.PhoneNumberAuthBackend',
     'django.contrib.auth.backends.ModelBackend',
 ]
 
@@ -109,3 +107,5 @@ MEDIA_ROOT = BASE_DIR / 'media'
 AUTH_USER_MODEL = 'app_user.CustomUser'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+LOGIN_URL = '/user/login/'

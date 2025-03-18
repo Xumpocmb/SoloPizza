@@ -11,11 +11,11 @@
             <div class="auth_form_wrapper">
                 <form class="auth_form" action="{% url 'app_user:register' %}" method="post">
                     {% csrf_token %}
-                    <label for="{{ form.phone_number.id_for_label }}">Номер телефона:</label>
-                    {{ form.phone_number }}
-                    {% if form.phone_number.errors %}
+                    <label for="{{ form.username.id_for_label }}">Номер телефона:</label>
+                    {{ form.username }}
+                    {% if form.username.errors %}
                         <div class="error">
-                            {{ form.phone_number.errors }}
+                            {{ form.username.errors }}
                         </div>
                     {% endif %}
                     <label for="{{ form.password1.id_for_label }}">Пароль:</label>
@@ -34,6 +34,9 @@
                     {% endif %}
                     <button class="register-button" type="submit">Зарегистрироваться</button>
                 </form>
+                <div class="register-link">
+                    <a href="{% url 'app_user:login' %}">Авторизоваться</a>
+                </div>
             </div>
         </div>
     </main>

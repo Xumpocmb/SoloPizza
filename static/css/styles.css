@@ -140,3 +140,8 @@ a {
         font-size: 14px;
     }
 }
+
+.form-group {
+    margin-top: 5px;
+    margin-bottom: 20px;
+}
