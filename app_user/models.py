@@ -26,3 +26,17 @@ class CustomUser(AbstractUser):
         db_table = 'users'
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
+
+    def clean_phone_number(self):
+        """
+        Очищает номер телефона от всех символов, кроме цифр.
+        """
+        return re.sub(r'[^0-9]', '', self.username)
+
+    def save(self, *args, **kwargs):
+        # Очищаем номер телефона перед сохранением
+        self.username = self.clean_phone_number()
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f'Телефон: {self.username}'

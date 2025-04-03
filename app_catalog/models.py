@@ -1,6 +1,8 @@
 from django.db import models
 from app_home.models import CafeBranch
-
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
+import os
 
 class Category(models.Model):
     name = models.CharField(max_length=50, unique=True, verbose_name='Название категории')
@@ -118,5 +120,18 @@ class AddonParams(models.Model):
     size = models.ForeignKey(ItemSizes, on_delete=models.CASCADE, verbose_name='Размер')
     price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Цена в руб.')
 
+    def get_display_name(self):
+        """Возвращает человекочитаемое описание добавки."""
+        return f'{self.addon.name} ({self.size.name}): {self.price} руб.'
+
     def __str__(self):
-        return f'Добавка: {self.addon.name} | Размер: {self.size.name} | Цена: {self.price}'
+        return self.get_display_name()
+
+
+@receiver(post_delete, sender=Category)
+@receiver(post_delete, sender=Item)
+def delete_image_file(sender, instance, **kwargs):
+    """Удаляет файл изображения при удалении объекта."""
+    if instance.image:
+        if os.path.isfile(instance.image.path):
+            os.remove(instance.image.path)

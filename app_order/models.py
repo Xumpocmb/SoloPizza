@@ -35,6 +35,22 @@ class Order(models.Model):
     def __str__(self):
         return f'Заказ #{self.id} | Пользователь: {self.user.username}'
 
+    def calculate_total_price(self):
+        """Рассчитывает общую стоимость заказа на основе всех товаров."""
+        total = sum(
+            item.price * item.quantity for item in self.items.all()
+        )
+        return total
+
+    def update_total_price(self):
+        """Обновляет поле total_price текущим значением."""
+        self.total_price = self.calculate_total_price()
+        self.save(update_fields=['total_price'])
+
+    def get_status_display(self):
+        """Возвращает человекочитаемое описание статуса."""
+        return dict(self.STATUS_CHOICES).get(self.status, 'Неизвестный статус')
+
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items', verbose_name='Заказ')
     item = models.ForeignKey('app_catalog.Item', on_delete=models.CASCADE, verbose_name='Товар')
@@ -51,3 +67,11 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f'{self.item.name} | Заказ #{self.order.id}'
+
+    def get_addons_display(self):
+        """Возвращает строку с названиями всех добавок."""
+        return ', '.join(addon.addon.name for addon in self.addons.all()) or 'Нет добавок'
+
+    def calculate_total_addon_price(self):
+        """Рассчитывает общую стоимость всех добавок."""
+        return sum(addon.price for addon in self.addons.all())
