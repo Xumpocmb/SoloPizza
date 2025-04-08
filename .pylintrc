@@ -1,0 +1,81 @@
+[MASTER]
+# Игнорируемые файлы и директории (например, миграции или виртуальное окружение)
+ignore = migrations,venv,__pycache__
+
+# Дополнительные пути для поиска модулей
+init-hook='import sys; sys.path.append(".")'
+
+# Вывод статистики по категориям ошибок
+reports = no
+
+# Максимальная длина строки (PEP 8 рекомендует 79, но можно увеличить до 120)
+max-line-length = 120
+
+# Разрешить использование глобальных переменных (если это необходимо)
+allow-global-unused-variables = yes
+
+[MESSAGES CONTROL]
+# Отключение определенных сообщений
+disable = 
+    missing-module-docstring,
+    missing-class-docstring,
+    missing-function-docstring,
+    too-few-public-methods,
+    too-many-arguments,
+    too-many-locals,
+    too-many-instance-attributes,
+    too-many-statements,
+    too-many-branches,
+    too-many-return-statements,
+    too-many-public-methods,
+    duplicate-code,
+    unused-import,
+    unused-variable,
+    unused-wildcard-import,
+    wildcard-import,
+    invalid-name,
+    redefined-outer-name,
+    consider-using-f-string,
+    line-too-long,
+    fixme
+
+[BASIC]
+# Минимальное количество символов для имени переменной
+variable-rgx = [a-z_][a-z0-9_]{1,30}$
+# Минимальное количество символов для имени функции
+function-rgx = [a-z_][a-z0-9_]{2,30}$
+# Минимальное количество символов для имени класса
+class-rgx = [A-Z_][a-zA-Z0-9]+$
+# Минимальное количество символов для имени модуля
+module-rgx = [a-z_][a-z0-9_]*$
+
+[FORMAT]
+# Проверка отступов (4 пробела)
+indent-string = '    '
+
+[DESIGN]
+# Максимальное количество аргументов в функции
+max-args = 6
+# Максимальное количество локальных переменных в функции
+max-locals = 15
+# Максимальное количество атрибутов в классе
+max-attributes = 10
+
+[TYPECHECK]
+# Игнорировать импорты из __init__.py
+ignored-modules =
+    django
+    rest_framework
+    celery
+
+[VARIABLES]
+# Игнорировать переменные, начинающиеся с _
+dummy-variables-rgx = ^_+$
+
+[SIMILARITIES]
+# Минимальный размер повторяющегося блока кода (для обнаружения дубликатов)
+min-similarity-lines = 4
+
+[LOGGING]
+# Игнорировать проверку логирования
+logging-format-style = new

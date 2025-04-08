@@ -4,7 +4,7 @@ from django.db.models import Sum
 from django.shortcuts import get_object_or_404, redirect
 from django.shortcuts import render
 
-from app_catalog.models import Item, ItemParams, BoardParams, AddonParams
+from app_catalog.models import Item, ItemParams, BoardParams, AddonParams, PizzaSauce
 from .models import CartItem
 
 
@@ -38,6 +38,11 @@ def add_to_cart(request, slug):
         if board_id:
             board = get_object_or_404(BoardParams, id=board_id, size=size.size)
 
+        # Проверяем, что соус существует (если выбран)
+        sauce = None
+        if sauce_id:
+            sauce = get_object_or_404(PizzaSauce, id=sauce_id)
+
         # Получаем добавки (если выбраны)
         addons = AddonParams.objects.filter(id__in=addon_ids, size=size.size)
 
@@ -48,7 +53,7 @@ def add_to_cart(request, slug):
                 item=item,
                 item_params=size,
                 board=board,
-                sauce=sauce_id,
+                sauce=sauce,
             )
             cart_item.addons.set(addons)  # Обновляем добавки
             cart_item.quantity = quantity

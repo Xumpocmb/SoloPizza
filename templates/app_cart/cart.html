@@ -35,6 +35,10 @@
                                     </p>
                                 {% endif %}
 
+                                {% if item.sauce %}
+                                <p><strong>Соус:</strong> {{ item.sauce.name }}</p>
+                                {% endif %}
+
                                 {% if item.addons.exists %}
                                     <p><strong>Добавки:</strong></p>
                                     <ul class="addons-list">
@@ -45,7 +49,7 @@
                                 {% endif %}
 
                                 <!-- Форма для изменения количества -->
-                                <form method="POST" action="{% url 'app_cart:update_quantity' item.id %}"
+                                <form method="post" action="{% url 'app_cart:update_quantity' item.id %}"
                                       class="quantity-form">
                                     {% csrf_token %}
                                     <label for="quantity_{{ item.id }}">Количество:</label>
