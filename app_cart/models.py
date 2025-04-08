@@ -1,6 +1,6 @@
 from django.db import models
 from django.conf import settings
-from app_catalog.models import Item, ItemParams, BoardParams, AddonParams
+from app_catalog.models import Item, ItemParams, BoardParams, AddonParams, PizzaSauce
 
 class CartItem(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name='Пользователь')
@@ -9,6 +9,7 @@ class CartItem(models.Model):
     quantity = models.PositiveIntegerField(default=1, verbose_name='Количество')
     board = models.ForeignKey(BoardParams, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='Борт')
     addons = models.ManyToManyField(AddonParams, blank=True, verbose_name='Добавки')
+    sauce = models.ForeignKey(PizzaSauce, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='Соус')
 
     class Meta:
         db_table = 'cart_items'

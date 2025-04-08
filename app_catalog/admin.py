@@ -1,5 +1,6 @@
 from django.contrib import admin
-from app_catalog.models import Category, Item, ItemParams, ItemSizes, BoardParams, PizzaBoard, AddonParams, PizzaAddon
+from app_catalog.models import Category, Item, ItemParams, ItemSizes, BoardParams, PizzaBoard, AddonParams, PizzaAddon, \
+    PizzaSauce
 
 
 class ItemParamsInline(admin.TabularInline):
@@ -13,6 +14,13 @@ class BoardParamsInline(admin.TabularInline):
 @admin.register(PizzaBoard)
 class PizzaBoardAdmin(admin.ModelAdmin):
     inlines = [BoardParamsInline]
+    list_display = ['__str__']
+    prepopulated_fields = {"slug": ("name",)}
+    search_fields = ['name']
+
+
+@admin.register(PizzaSauce)
+class PizzaSauceAdmin(admin.ModelAdmin):
     list_display = ['__str__']
     prepopulated_fields = {"slug": ("name",)}
     search_fields = ['name']

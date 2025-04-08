@@ -2,8 +2,9 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from shapely.geometry import Point, Polygon
 
-from app_catalog.models import AddonParams
+from app_catalog.models import AddonParams, PizzaSauce
 from app_home.models import CafeBranch
+from app_order.forms import OrderItemForm
 from app_order.models import Order, OrderItem
 from django.db.models import Sum
 from app_cart.models import CartItem
@@ -42,10 +43,10 @@ def create_order(request):
         if not branch:
             return redirect('app_order:select_address')  # Адрес вне зоны доставки
 
-        total_price = cart_items.aggregate(total=Sum('item_params__price'))['total']
+        # Создаем заказ с нулевой стоимостью
         order = Order.objects.create(
             user=request.user,
-            total_price=total_price,
+            total_price=0,  # Сигналы обновят стоимость позже
             latitude=float(latitude),
             longitude=float(longitude),
             address=address,
@@ -56,6 +57,7 @@ def create_order(request):
             cafe_branch=branch,
         )
 
+        # Создаем элементы заказа
         for cart_item in cart_items:
             order_item = OrderItem.objects.create(
                 order=order,
@@ -64,11 +66,13 @@ def create_order(request):
                 quantity=cart_item.quantity,
                 price=cart_item.item_params.price,
                 board=cart_item.board,
+                sauce=cart_item.sauce,
             )
 
-            # Получаем выбранные добавки для товара
+            # Добавляем выбранные добавки
             order_item.addons.set(cart_item.addons.all())
 
+        # Очищаем корзину
         cart_items.delete()
 
         return redirect('app_order:order_list')  # Перенаправляем на список заказов
@@ -79,13 +83,56 @@ def create_order(request):
 @login_required
 def order_detail(request, order_id):
     order = get_object_or_404(
-        Order.objects.prefetch_related('items__addons', 'items__board').filter(user=request.user),
+        Order.objects.prefetch_related('items__addons', 'items__board', 'items__sauce').filter(user=request.user),
         id=order_id
     )
     context = {
         'order': order,
     }
     return render(request, 'app_order/order_detail.html', context)
+
+@login_required
+def order_detail_editor(request, order_id):
+    order = get_object_or_404(
+        Order.objects.prefetch_related('items__addons', 'items__board').filter(user=request.user),
+        id=order_id
+    )
+
+    if request.method == 'POST':
+        for item in order.items.all():
+            form = OrderItemForm(request.POST, prefix=f'item-{item.id}', instance=item)
+            if form.is_valid():
+                form.save()
+        order.update_total_price()
+        return redirect('app_order:order_detail', order_id=order.id)
+
+    else:
+        # Создаем словарь форм для каждого товара
+        forms = {
+            item.id: OrderItemForm(instance=item, prefix=f'item-{item.id}')
+            for item in order.items.all()
+        }
+
+    sauces = PizzaSauce.objects.filter(is_active=True)
+
+    context = {
+        'order': order,
+        'forms': forms,
+        'sauces': sauces,
+    }
+    return render(request, 'app_order/order_detail_editor.html', context)
+
+
+@login_required
+def remove_item(request, item_id):
+    if request.method == 'POST':
+        item = get_object_or_404(OrderItem, id=item_id, order__user=request.user)
+        order = item.order
+        item.delete()
+
+        # Пересчитываем общую стоимость заказа
+        order.update_total_price()
+        return redirect('order_detail', order_id=order.id)
 
 
 def determine_branch(user_latitude, user_longitude):

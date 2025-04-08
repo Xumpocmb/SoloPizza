@@ -15,8 +15,9 @@ def add_to_cart(request, slug):
 
         # Получаем выбранные параметры из POST-данных
         size_id = request.POST.get('size')
+        sauce_id = request.POST.get('sauce')
         board_id = request.POST.get('board')
-        addon_ids = request.POST.getlist('addons')  # Может быть несколько добавок
+        addon_ids = request.POST.getlist('addons')
         quantity = int(request.POST.get('quantity', 1))
 
         # Проверяем, что размер выбран
@@ -27,6 +28,7 @@ def add_to_cart(request, slug):
             'item_slug': item.slug,
             'size_id': size_id,
             'quantity': quantity,
+            'sauce_id': sauce_id,
             'board_id': board_id,
             'addon_ids': addon_ids,
         }
@@ -46,6 +48,7 @@ def add_to_cart(request, slug):
                 item=item,
                 item_params=size,
                 board=board,
+                sauce=sauce_id,
             )
             cart_item.addons.set(addons)  # Обновляем добавки
             cart_item.quantity = quantity
@@ -57,7 +60,8 @@ def add_to_cart(request, slug):
                 if (cart_item['item_slug'] == item.slug and
                         cart_item['size_id'] == size_id and
                         cart_item['board_id'] == board_id and
-                        set(cart_item['addon_ids']) == set(addon_ids)):
+                        set(cart_item['addon_ids']) == set(addon_ids) and
+                        cart_item.get('sauce_id') == sauce_id):  # Учитываем соус
                     # Если такой товар уже есть, увеличиваем количество
                     cart_item['quantity'] += quantity
                     break

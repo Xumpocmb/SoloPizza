@@ -2,7 +2,7 @@ from django.db.models import Min
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
 
-from app_catalog.models import Category, Item, AddonParams, BoardParams, ItemSizes, ItemParams
+from app_catalog.models import Category, Item, AddonParams, BoardParams, ItemSizes, ItemParams, PizzaSauce
 
 
 def category_detail(request, slug):
@@ -34,11 +34,13 @@ def item_detail(request, slug):
     else:
         selected_size = sizes.first()
     if selected_size:
+        sauces = PizzaSauce.objects.all()
         boards = BoardParams.objects.filter(size=selected_size.size)
         addons = AddonParams.objects.filter(size=selected_size.size)
         min_price = selected_size.price
     else:
         # Если размеров нет, возвращаем пустые списки и None для цены
+        sauces = []
         boards = []
         addons = []
         min_price = None
@@ -47,6 +49,7 @@ def item_detail(request, slug):
         "item": item,
         "sizes": sizes,  # Все доступные размеры
         "selected_size": selected_size,  # Выбранный размер
+        "sauces": sauces,
         "boards": boards,  # Борты для выбранного размера
         "addons": addons,  # Добавки для выбранного размера
         "min_price": min_price,  # Минимальная цена (цена выбранного размера)

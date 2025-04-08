@@ -89,6 +89,20 @@ class PizzaBoard(models.Model):
     def __str__(self):
         return f'Борт: {self.name}'
 
+
+class PizzaSauce(models.Model):
+    name = models.CharField(max_length=100, verbose_name='Название соуса')
+    slug = models.SlugField(max_length=100, unique=True, blank=True, null=True, verbose_name='URL')
+    is_active = models.BooleanField(default=True, verbose_name='Активен')
+
+    class Meta:
+        db_table = 'pizza_sauces'
+        verbose_name = 'Соус для пиццы'
+        verbose_name_plural = 'Соусы для пиццы'
+
+    def __str__(self):
+        return f'Соус для пиццы: {self.name}'
+
 class BoardParams(models.Model):
     board = models.ForeignKey(PizzaBoard, on_delete=models.CASCADE, verbose_name='Борт')
     size = models.ForeignKey(ItemSizes, on_delete=models.CASCADE, verbose_name='Размер')

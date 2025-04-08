@@ -8,13 +8,14 @@
 {% block main %}
     <main class="order-detail-page">
         <h1>Заказ #{{ order.id }}</h1>
+        <p><a href="{% url "app_order:order_detail_editor" order.id %}">Редактировать</a></p>
         <section class="section_order">
             <div class="order-info">
                 <p><strong>Филиал:</strong> {{ order.cafe_branch.name }}</p>
                 <p><strong>Статус:</strong> <span
                         class="status {{ order.status }}">{{ order.get_status_display }}</span></p>
                 <p><strong>Дата создания:</strong> {{ order.created_at|date:"d.m.Y H:i" }}</p>
-                <p><strong>Общая сумма:</strong> {{ order.total_price }} руб.</p>
+                <p><strong>Общая сумма:</strong> {{ order.calculate_total_price }} руб.</p>
                 <p><strong>Телефон:</strong> {{ order.user.phone_number }}</p>
                 <p><strong>Адрес:</strong> {{ order.address }}</p>
                 {% if order.comment %}<p><strong>Комментарий:</strong>{{ order.comment }}</p>{% endif %}
@@ -31,8 +32,13 @@
                         <!-- Борт -->
                         {% if item.board %}
                             <p><strong>Борт:</strong> {{ item.board.board.name }} (+{{ item.board.price }} руб.)</p>
-
                         {% endif %}
+                        <!-- Соус -->
+                        {% if item.sauce %}
+                            <p><strong>Соус:</strong> {{ item.sauce.name }}</p>
+                        {% endif %}
+
+
                         {% if item.addons.exists %}
                             <p><strong>Добавки:</strong></p>
                             <ul class="addons-list">
