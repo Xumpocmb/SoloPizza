@@ -65,9 +65,6 @@ def login_view(request):
             else:
                 messages.error(request, 'Ошибка аутентификации. Пожалуйста, попробуйте снова.', extra_tags='error')
         else:
-            print("Form errors:", form.errors)
-            print("Form cleaned data:", form.cleaned_data)
-            print("Form is valid:", form.is_valid())
             messages.error(request, 'Неверный номер телефона или пароль. Пожалуйста, попробуйте снова.',
                            extra_tags='error')
     else:
