@@ -29,6 +29,8 @@
                     {% for item in order.items.all %}
                         <div class="order-item">
                             <h3>{{ item.item.name }}</h3>
+                            <p><strong>Размер:</strong> {{ item.item_params.size.name }} ({{ item.price }} руб.)
+                                x {{ item.quantity }}</p>
                             <div class="form-group">
                                 <label for="id_item-{{ item.id }}-quantity">Количество:</label>
                                 {% with form=forms|get:item.id %}

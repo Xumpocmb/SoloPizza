@@ -10,7 +10,6 @@ from django.db.models import Sum
 from app_cart.models import CartItem
 
 
-
 @login_required
 def order_list(request):
     orders = Order.objects.filter(user=request.user).order_by('-created_at')
@@ -22,62 +21,106 @@ def order_list(request):
 
 @login_required
 def create_order(request):
-    cart_items = CartItem.objects.filter(user=request.user)
+    cart_items = (
+        CartItem.objects.filter(user=request.user)
+        .select_related("item", "item_params", "board", "sauce")
+        .prefetch_related("addons")
+    )
 
     if not cart_items.exists():
-        return redirect('app_cart:view_cart')  # Перенаправляем, если корзина пуста
+        return redirect("app_cart:view_cart")  # Перенаправляем, если корзина пуста
 
-    if request.method == 'POST':
-        latitude = request.POST.get('latitude')
-        longitude = request.POST.get('longitude')
-        address = request.POST.get('selected-address')
-        apartment = request.POST.get('apartment')
-        entrance = request.POST.get('entrance')
-        floor = request.POST.get('floor')
-        order_comment = request.POST.get('comment')
+    if request.method == "POST":
+        # Получаем данные из формы
+        delivery_method = request.POST.get("delivery_method")
+        latitude = request.POST.get("latitude")
+        longitude = request.POST.get("longitude")
+        address = request.POST.get("selected-address")
+        apartment = request.POST.get("apartment")
+        entrance = request.POST.get("entrance")
+        floor = request.POST.get("floor")
+        order_comment = request.POST.get("comment")
 
-        if not latitude or not longitude:
-            return redirect('app_order:select_address')  # Перенаправляем, если координаты не переданы
+        # Проверяем выбранный метод доставки
+        if delivery_method not in ["delivery", "pickup"]:
+            return redirect("app_order:select_address")  # Некорректный метод доставки
 
-        branch = determine_branch(float(latitude), float(longitude))
-        if not branch:
-            return redirect('app_order:select_address')  # Адрес вне зоны доставки
-
-        # Создаем заказ с нулевой стоимостью
-        order = Order.objects.create(
-            user=request.user,
-            total_price=0,  # Сигналы обновят стоимость позже
-            latitude=float(latitude),
-            longitude=float(longitude),
-            address=address,
-            apartment=apartment,
-            entrance=entrance,
-            floor=floor,
-            comment=order_comment,
-            cafe_branch=branch,
-        )
-
-        # Создаем элементы заказа
-        for cart_item in cart_items:
-            order_item = OrderItem.objects.create(
-                order=order,
-                item=cart_item.item,
-                item_params=cart_item.item_params,
-                quantity=cart_item.quantity,
-                price=cart_item.item_params.price,
-                board=cart_item.board,
-                sauce=cart_item.sauce,
+        try:
+            # Получаем выбранный филиал из сессии
+            selected_branch_id = request.session.get(
+                "selected_branch_id", 1
             )
+            try:
+                selected_branch = CafeBranch.objects.get(id=selected_branch_id)
+            except CafeBranch.DoesNotExist:
+                selected_branch = CafeBranch.objects.get(id=1)
 
-            # Добавляем выбранные добавки
-            order_item.addons.set(cart_item.addons.all())
+            if delivery_method == "delivery":
+                # Для доставки нужны координаты и адрес
+                if not latitude or not longitude:
+                    return redirect(
+                        "app_order:select_address"
+                    )  # Перенаправляем, если координаты не переданы
 
-        # Очищаем корзину
-        cart_items.delete()
+                branch = determine_branch(float(latitude), float(longitude))
+                if not branch:
+                    return redirect(
+                        "app_order:select_address"
+                    )  # Адрес вне зоны доставки
 
-        return redirect('app_order:order_list')  # Перенаправляем на список заказов
+                # Создаем заказ с данными доставки
+                order = Order.objects.create(
+                    user=request.user,
+                    total_price=0,  # Сигналы обновят стоимость позже
+                    delivery_method="delivery",
+                    latitude=float(latitude),
+                    longitude=float(longitude),
+                    address=address,
+                    apartment=apartment,
+                    entrance=entrance,
+                    floor=floor,
+                    comment=order_comment,
+                    cafe_branch=branch,
+                )
+            elif delivery_method == "pickup":
+                # Для самовывоза используем выбранный филиал из сессии
+                order = Order.objects.create(
+                    user=request.user,
+                    total_price=0,  # Сигналы обновят стоимость позже
+                    delivery_method="pickup",
+                    comment=order_comment,
+                    cafe_branch=selected_branch,  # Филиал из сессии
+                )
 
-    return redirect('app_order:select_address')
+            # Создаем элементы заказа
+            for cart_item in cart_items:
+                order_item = OrderItem.objects.create(
+                    order=order,
+                    item=cart_item.item,
+                    item_params=cart_item.item_params,
+                    quantity=cart_item.quantity,
+                    price=cart_item.item_params.price,
+                    board=cart_item.board,
+                    sauce=cart_item.sauce,
+                )
+
+                # Добавляем выбранные добавки
+                order_item.addons.set(cart_item.addons.all())
+
+            # Очищаем корзину
+            cart_items.delete()
+
+            # Обновляем общую стоимость заказа
+            order.calculate_total_price()
+
+            return redirect("app_order:order_list")  # Перенаправляем на список заказов
+
+        except Exception as e:
+            # Логируем ошибку и перенаправляем пользователя
+            print(f"Ошибка при создании заказа: {e}")
+            return redirect("app_order:select_address")
+
+    return redirect("app_order:select_address")
 
 
 @login_required
@@ -103,7 +146,7 @@ def order_detail_editor(request, order_id):
             form = OrderItemForm(request.POST, prefix=f'item-{item.id}', instance=item)
             if form.is_valid():
                 form.save()
-        order.update_total_price()
+        order.calculate_total_price()
         return redirect('app_order:order_detail', order_id=order.id)
 
     else:
@@ -131,7 +174,7 @@ def remove_item(request, item_id):
         item.delete()
 
         # Пересчитываем общую стоимость заказа
-        order.update_total_price()
+        order.calculate_total_price()
         return redirect('order_detail', order_id=order.id)
 
 

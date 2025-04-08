@@ -67,23 +67,23 @@
 
                         <!-- Соус -->
                         {% if sauces %}
-                            <div class="form-group option-selector">
-                                <h3>Выберите соус (один вариант):</h3>
-                                <ul class="custom-radio-list">
-                                    {% for sauce in sauces %}
-                                        <li>
-                                            <label class="custom-radio">
-                                                <input type="radio" name="sauce" value="{{ sauce.id }}"
-                                                       style="display: none;">
-                                                <span class="radio-button"></span>
-                                                {{ sauce.name }}
-                                            </label>
-                                        </li>
-                                    {% empty %}
-                                        <li>Соусы не доступны</li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
+                        <div class="form-group option-selector">
+                            <h3>Выберите соус (один вариант):</h3>
+                            <ul class="custom-radio-list">
+                                {% for sauce in sauces %}
+                                <li>
+                                    <label class="custom-radio">
+                                        <input type="radio" name="sauce" value="{{ sauce.id }}" {% if forloop.first %}checked{% endif %}
+                                            style="display: none;">
+                                        <span class="radio-button"></span>
+                                        {{ sauce.name }}
+                                    </label>
+                                </li>
+                                {% empty %}
+                                <li>Соусы не доступны</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
                         {% endif %}
 
                         <!-- Борты -->

@@ -34,15 +34,39 @@ class OrderAdmin(admin.ModelAdmin):
     inlines = [OrderItemInline]  # Добавляем инлайн для товаров в заказе
 
     fieldsets = (
-        ('Основная информация', {
-            'fields': ('user', 'status', 'total_price', 'created_at', 'updated_at'),
-        }),
-        ('Адрес доставки', {
-            'fields': ('latitude', 'longitude', 'address', 'apartment', 'entrance', 'floor'),
-        }),
-        ('Дополнительно', {
-            'fields': ('comment', 'cafe_branch'),
-        }),
+        (
+            "Основная информация",
+            {
+                "fields": (
+                    "user",
+                    "status",
+                    "delivery_method",
+                    "delivery_cost",
+                    "total_price",
+                    "created_at",
+                    "updated_at",
+                ),
+            },
+        ),
+        (
+            "Адрес доставки",
+            {
+                "fields": (
+                    "latitude",
+                    "longitude",
+                    "address",
+                    "apartment",
+                    "entrance",
+                    "floor",
+                ),
+            },
+        ),
+        (
+            "Дополнительно",
+            {
+                "fields": ("comment", "cafe_branch"),
+            },
+        ),
     )
 
     def save_model(self, request, obj, form, change):

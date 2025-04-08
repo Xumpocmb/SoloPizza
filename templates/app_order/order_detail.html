@@ -15,6 +15,8 @@
                 <p><strong>Статус:</strong> <span
                         class="status {{ order.status }}">{{ order.get_status_display }}</span></p>
                 <p><strong>Дата создания:</strong> {{ order.created_at|date:"d.m.Y H:i" }}</p>
+                <p><strong>Метод доставки:</strong> {{ order.delivery_method.name|default:"Не выбран" }}</p>
+                <p><strong>Стоимость доставки</strong> {{ order.delivery_cost|default:"0" }}</p>
                 <p><strong>Общая сумма:</strong> {{ order.calculate_total_price }} руб.</p>
                 <p><strong>Телефон:</strong> {{ order.user.username }}</p>
                 <p><strong>Адрес:</strong> {{ order.address }}</p>

@@ -82,11 +82,7 @@
                 <!-- Итоговая сумма -->
                 <div class="cart-summary">
                     <p><strong>Общая сумма:</strong> {{ total_price|floatformat:2 }} руб.</p>
-                    <!-- Кнопка оформления заказа -->
-                    <form method="POST" action="{% url 'app_order:create_order' %}" class="checkout-form">
-                        {% csrf_token %}
-                        <button type="submit" class="checkout-btn">Оформить заказ</button>
-                    </form>
+                    <a href="{% url 'app_order:select_address' %}"><button type="submit" class="checkout-btn">Оформить заказ</button></a>
                 </div>
 
             {% else %}

@@ -128,3 +128,68 @@ textarea:focus {
     background-color: #068a50;
 }
 
+/* Общие стили для группы выбора */
+.delivery-method {
+    margin-bottom: 20px;
+}
+
+.delivery-method label {
+    font-size: 16px;
+    font-weight: bold;
+    display: block;
+    margin-bottom: 10px;
+}
+
+/* Стили для контейнера с опциями */
+.delivery-options {
+    display: flex;
+    gap: 15px;
+}
+
+/* Стили для каждой опции */
+.delivery-option {
+    position: relative;
+    padding: 15px 20px;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    flex: 1;
+}
+
+.delivery-option:hover {
+    border-color: #007bff;
+}
+
+.delivery-option input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.delivery-option span {
+    font-size: 14px;
+    color: #333;
+    display: block;
+    margin-top: 5px;
+}
+
+/* Стили для выбранной опции */
+.delivery-option input[type="radio"]:checked+span {
+    color: #fff;
+}
+
+.delivery-option input[type="radio"]:checked {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.delivery-option input[type="radio"]:checked+span {
+    color: #fff;
+}
+
+.delivery-option input[type="radio"]:checked {
+    background-color: #007bff;
+    border-color: #007bff;
+}

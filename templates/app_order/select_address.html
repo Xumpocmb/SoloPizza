@@ -15,41 +15,92 @@
 {% block main %}
     <main class="map-page">
         <h1>Выберите адрес доставки</h1>
-        <div id="map-container">
+        <div id="map-container" style="display: none;">
             <div id="map"></div>
             <div id="center-marker"></div>
         </div>
-        <form method="POST" action="{% url 'app_order:create_order' %}" class="address-form">
+        <form method="post" action="{% url 'app_order:create_order' %}" class="address-form">
             {% csrf_token %}
             <input type="hidden" id="address-lat" name="latitude">
             <input type="hidden" id="address-lng" name="longitude">
-
-            <div class="form-group">
-                <label for="suggest">Адрес (выберите на карте или введите вручную, начиная с улицы, к примеру, "ул Ленина 9/1"):</label>
-                <input type="text" id="suggest" name="selected-address" placeholder="Адрес"
-                       required>
+        
+            <div class="form-group delivery-method">
+                <label>Выберите метод доставки:</label>
+                <div class="delivery-options">
+                    <label class="delivery-option">
+                        <input type="radio" name="delivery_method" value="pickup" checked required>
+                        <span>Самовывоз</span>
+                    </label>
+                    <label class="delivery-option">
+                        <input type="radio" name="delivery_method" value="delivery" required>
+                        <span>Доставка</span>
+                    </label>
+                </div>
             </div>
-
-            <div class="form-group">
-                <label for="entrance">Подъезд:</label>
-                <input type="text" id="entrance" name="entrance" placeholder="Номер подъезда" required>
+        
+            <!-- Блок с полями для доставки -->
+            <div id="delivery-fields" style="display: none;">
+                <div class="form-group">
+                    <label for="suggest">Адрес (выберите на карте или введите вручную, начиная с улицы, к примеру, "ул Ленина
+                        9/1"):</label>
+                    <input type="text" id="suggest" name="selected-address" placeholder="Адрес" required>
+                </div>
+        
+                <div class="form-group">
+                    <label for="entrance">Подъезд:</label>
+                    <input type="text" id="entrance" name="entrance" placeholder="Номер подъезда" required>
+                </div>
+        
+                <div class="form-group">
+                    <label for="floor">Этаж:</label>
+                    <input type="text" id="floor" name="floor" placeholder="Номер этажа" required>
+                </div>
+        
+                <div class="form-group">
+                    <label for="apartment">Квартира:</label>
+                    <input type="text" id="apartment" name="apartment" placeholder="Номер квартиры" required>
+                </div>
             </div>
-
-            <div class="form-group">
-                <label for="floor">Этаж:</label>
-                <input type="text" id="floor" name="floor" placeholder="Номер этажа" required>
-            </div>
-
-            <div class="form-group">
-                <label for="apartment">Квартира:</label>
-                <input type="text" id="apartment" name="apartment" placeholder="Номер квартиры" required>
-            </div>
-
+        
             <div class="form-group">
                 <label for="comment">Комментарий к заказу:</label>
                 <textarea name="comment" id="comment" cols="30" rows="10" placeholder="Комментарий"></textarea>
             </div>
-            <button type="submit" class="submit-btn">Подтвердить адрес</button>
+            <button type="submit" class="submit-btn">Оформить заказ</button>
         </form>
     </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+                const deliveryOptions = document.querySelectorAll('.delivery-option input[type="radio"]');
+                const deliveryFields = document.getElementById('delivery-fields');
+
+                // Функция для показа/скрытия полей доставки
+                function toggleDeliveryFields() {
+                    const isDelivery = Array.from(deliveryOptions).some(option => option.checked && option.value === 'delivery');
+                    if (isDelivery) {
+                        deliveryFields.style.display = 'block';
+                        document.getElementById('map-container').style.display = 'block';
+                        Array.from(deliveryFields.querySelectorAll('input, textarea')).forEach(field => {
+                            field.required = true;
+                        });
+                    } else {
+                        deliveryFields.style.display = 'none';
+                        document.getElementById('map-container').style.display = 'none';
+                        Array.from(deliveryFields.querySelectorAll('input, textarea')).forEach(field => {
+                            field.required = false;
+                        });
+                    }
+                }
+
+                // Инициализация при загрузке страницы
+                toggleDeliveryFields();
+
+                // Обработчик изменения выбора метода доставки
+                deliveryOptions.forEach(option => {
+                    option.addEventListener('change', toggleDeliveryFields);
+                });
+            });
+    </script>
+
 {% endblock %}

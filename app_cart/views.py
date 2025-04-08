@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
 from django.shortcuts import render
 
@@ -58,6 +59,7 @@ def add_to_cart(request, slug):
             cart_item.addons.set(addons)  # Обновляем добавки
             cart_item.quantity = quantity
             cart_item.save()
+            messages.info(request,f'Товар "{item.name}" успешно добавлен в корзину.', extra_tags='success')
         else:
             # Если пользователь не авторизован, сохраняем товар в сессии
             cart_in_session = request.session.get('cart_in_session', [])
@@ -80,7 +82,7 @@ def add_to_cart(request, slug):
             # Перенаправляем на страницу входа
             return redirect('app_user:login')
 
-        return redirect('app_cart:view_cart')  # Перенаправляем в корзину
+        return HttpResponseRedirect(request.META.get("HTTP_REFERER", "/"))
     else:
         return redirect('app_cart:view_cart')
 

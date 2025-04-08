@@ -3,6 +3,8 @@ from django.conf import settings
 from app_cart.models import CartItem
 from django.db.models.signals import post_save, post_delete, m2m_changed
 from django.dispatch import receiver
+from decimal import Decimal
+
 
 class Order(models.Model):
     STATUS_CHOICES = [
@@ -12,6 +14,11 @@ class Order(models.Model):
         ('shipped', 'Отправлен'),
         ('delivered', 'Доставлен'),
         ('cancelled', 'Отменен'),
+    ]
+
+    DELIVERY_METHOD_CHOICES = [
+        ("pickup", "Самовывоз"),
+        ("delivery", "Доставка"),
     ]
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name='Пользователь')
@@ -28,6 +35,8 @@ class Order(models.Model):
     comment = models.TextField(blank=True, null=True, verbose_name='Комментарий')
     cafe_branch = models.ForeignKey('app_home.CafeBranch', on_delete=models.SET_NULL, null=True, blank=True,
                                     verbose_name='Филиал')
+    delivery_method = models.CharField(max_length=20, choices=DELIVERY_METHOD_CHOICES, default="pickup", verbose_name="Метод доставки", null=True, blank=True)
+    delivery_cost = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal(0), verbose_name="Стоимость доставки", null=True, blank=True)
 
     class Meta:
         db_table = 'orders'
@@ -37,27 +46,29 @@ class Order(models.Model):
     def __str__(self):
         return f'Заказ #{self.id} | Пользователь: {self.user.username}'
 
-    def calculate_total_price(self):
+    def calculate_total_price(self) -> Decimal:
         """
-        Рассчитывает общую стоимость заказа на основе всех товаров.
+        Рассчитывает общую стоимость заказа, включая доставку.
         """
-        total = sum(
-            item.calculate_total_price() for item in self.items.all()
-        )
-        print(f"Debug: Order ID={self.id}")
-        print(f"  Items total: {total}")
-        return total
+        # Стоимость товаров в заказе
+        items_total = sum(item.calculate_total_price() for item in self.items.all())
 
-    def update_total_price(self):
-        """
-        Обновляет поле total_price текущим значением.
-        """
-        self.total_price = self.calculate_total_price()
-        self.save(update_fields=['total_price'])
+        # Стоимость доставки
+        self.delivery_cost = (
+            Decimal(3)
+            if self.delivery_method == "delivery" and items_total < Decimal(20)
+            else Decimal(0)
+        )
+
+        # Общая стоимость заказа
+        self.total_price = items_total + self.delivery_cost
+        self.save(update_fields=["total_price", "delivery_cost"])
+        return self.total_price
 
     def get_status_display(self):
         """Возвращает человекочитаемое описание статуса."""
         return dict(self.STATUS_CHOICES).get(self.status, 'Неизвестный статус')
+
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items', verbose_name='Заказ')
@@ -81,24 +92,16 @@ class OrderItem(models.Model):
         """Возвращает строку с названиями всех добавок."""
         return ', '.join(addon.addon.name for addon in self.addons.all()) or 'Нет добавок'
 
-    def calculate_total_price(self):
+    def calculate_item_total_price(self):
         """
         Рассчитывает полную стоимость товара, включая добавки и борт.
         """
         base_price = self.price * self.quantity
-        addons_price = self.calculate_total_addon_price()  # Стоимость добавок для одного экземпляра
+        addons_price = self.calculate_total_addon_price()
         board_price = self.board.price if self.board else 0
 
         # Итоговая стоимость: базовая цена + борт + добавки, все умноженные на количество
         total = (base_price + board_price + addons_price) * self.quantity
-
-        print(f"Debug: OrderItem ID={self.id}")
-        print(f"  Base price: {base_price}")
-        print(f"  Addons price: {addons_price}")
-        print(f"  Board price: {board_price}")
-        print(f"  Quantity: {self.quantity}")
-        print(f"  Total: {total}")
-
         return total
 
     def calculate_total_addon_price(self):
@@ -123,20 +126,23 @@ def update_order_total_price(sender, instance, **kwargs):
     """
     Автоматически обновляет total_price заказа при изменении OrderItem.
     """
-    instance.order.update_total_price()
+    instance.order.calculate_total_price()
+
 
 @receiver(m2m_changed, sender=OrderItem.addons.through)
 def update_order_total_price_on_addons_change(sender, instance, action, **kwargs):
     """
     Автоматически обновляет total_price заказа при изменении добавок.
     """
-    if action in ['post_add', 'post_remove', 'post_clear']:
-        instance.order.update_total_price()
+    if action in ["post_add", "post_remove", "post_clear"]:
+        instance.order.calculate_total_price()
+
 
 @receiver(post_save, sender=OrderItem)
 def update_order_total_price_on_board_change(sender, instance, **kwargs):
     """
     Автоматически обновляет total_price заказа при изменении борта.
     """
-    if 'board' in instance.get_deferred_fields():
-        instance.order.update_total_price()
+    if "board" in instance.get_deferred_fields():
+        instance.order.calculate_total_price()
+
