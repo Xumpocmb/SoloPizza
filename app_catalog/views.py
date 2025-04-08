@@ -34,9 +34,18 @@ def item_detail(request, slug):
     else:
         selected_size = sizes.first()
     if selected_size:
-        sauces = PizzaSauce.objects.all()
-        boards = BoardParams.objects.filter(size=selected_size.size)
-        addons = AddonParams.objects.filter(size=selected_size.size)
+        sauces = (PizzaSauce.objects.all() if item.category.name in ["Пицца", "Кальцоне"] else [])
+        boards = (
+            BoardParams.objects.filter(size=selected_size.size)
+            if item.category.name == "Пицца"
+            else []
+        )
+        addons = (
+            AddonParams.objects.filter(size=selected_size.size)
+            if item.category.name == "Пицца"
+            else []
+        )
+        drinks = ["Кола 1л.", "Sprite 1л."] if item.category.name in ["Комбо"] else []
         min_price = selected_size.price
     else:
         # Если размеров нет, возвращаем пустые списки и None для цены
@@ -52,6 +61,7 @@ def item_detail(request, slug):
         "sauces": sauces,
         "boards": boards,  # Борты для выбранного размера
         "addons": addons,  # Добавки для выбранного размера
+        "drinks": drinks,
         "min_price": min_price,  # Минимальная цена (цена выбранного размера)
     }
 
@@ -59,6 +69,7 @@ def item_detail(request, slug):
 
 
 def get_product_data(request, slug):
+    print("get_product_data")
     """Возвращает данные о размерах, бортах и добавках для карточки товара."""
     item = get_object_or_404(Item, slug=slug)  # Теперь ищем товар по slug
 
@@ -104,6 +115,7 @@ def get_product_data(request, slug):
     })
 
 def update_prices(request):
+    print("update_prices")
     """Обновляет цены борта и добавок при изменении размера товара."""
     size_id = request.GET.get('size')
     size = get_object_or_404(ItemSizes, id=size_id)

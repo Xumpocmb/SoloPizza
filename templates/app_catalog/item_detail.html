@@ -62,7 +62,7 @@
                         <!-- Количество -->
                         <div class="form-group">
                             <label for="quantity">Количество:</label>
-                            <input type="number" id="quantity" name="quantity" value="1" min="1">
+                            <input type="number" id="quantity" name="quantity" value="1" min="1" max="10">
                         </div>
 
                         <!-- Соус -->
@@ -126,6 +126,27 @@
                                     {% endfor %}
                                 </ul>
                             </div>
+                        {% endif %}
+
+                        <!-- Напитки для комбо -->
+                        {% if drinks %}
+                        <div class="form-group option-selector">
+                            <h3>Выберите напиток (один вариант):</h3>
+                            <ul class="custom-radio-list">
+                                {% for drink in drinks %}
+                                <li>
+                                    <label class="custom-radio">
+                                        <input type="radio" name="drink" value="{{ drink }}" {% if forloop.first %}checked{% endif %}
+                                            style="display: none;">
+                                        <span class="radio-button"></span>
+                                        {{ drink }}
+                                    </label>
+                                </li>
+                                {% empty %}
+                                <li>Соусы не доступны</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
                         {% endif %}
 
                         <!-- Кнопка добавления в заказ -->
