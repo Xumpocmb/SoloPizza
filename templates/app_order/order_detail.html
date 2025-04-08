@@ -15,7 +15,7 @@
                 <p><strong>Статус:</strong> <span
                         class="status {{ order.status }}">{{ order.get_status_display }}</span></p>
                 <p><strong>Дата создания:</strong> {{ order.created_at|date:"d.m.Y H:i" }}</p>
-                <p><strong>Метод доставки:</strong> {{ order.delivery_method.name|default:"Не выбран" }}</p>
+                <p><strong>Метод доставки:</strong> {{ order.get_delivery_method_display }}</p>
                 <p><strong>Стоимость доставки</strong> {{ order.delivery_cost|default:"0" }}</p>
                 <p><strong>Общая сумма:</strong> {{ order.calculate_total_price }} руб.</p>
                 <p><strong>Телефон:</strong> {{ order.user.username }}</p>
@@ -31,6 +31,7 @@
                         <h3>{{ item.item.name }}</h3>
                         <p><strong>Размер:</strong> {{ item.item_params.size.name }} ({{ item.price }} руб.)
                             x {{ item.quantity }}</p>
+                        
                         <!-- Борт -->
                         {% if item.board %}
                             <p><strong>Борт:</strong> {{ item.board.board.name }} (+{{ item.board.price }} руб.)</p>
@@ -49,6 +50,16 @@
                                 {% endfor %}
                             </ul>
                         {% endif %}
+
+                        <!-- Скидка -->
+                        {% if item.item_discount > 0 %}
+                        <p>
+                            <strong>Скидка:</strong> {{ item.item_discount_percent }}% (-{{ item.item_discount|floatformat:2 }} руб.)
+                        </p>
+                        {% endif %}
+                        
+                        <!-- Итоговая стоимость товара -->
+                        <p><strong>Итоговая стоимость:</strong> {{ item.calculate_item_total_price }} руб.</p>
                     </div>
                 {% endfor %}
             </div>
