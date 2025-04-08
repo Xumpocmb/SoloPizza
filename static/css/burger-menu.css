@@ -1,4 +1,12 @@
 /* Основные стили */
+.burger_cart_wrapper {
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+    align-items: center;
+}
+
+
 .burger-menu {
     display: flex;
     flex-direction: column;
@@ -115,6 +123,11 @@
 /* Анимация для активного состояния */
 .sidebar.active {
     top: 60px;
+}
+
+.cart_link {
+    text-decoration: none;
+    color: #ffffff;
 }
 
 /*.sidebar ul {*/

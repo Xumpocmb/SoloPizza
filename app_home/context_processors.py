@@ -1,5 +1,7 @@
+from decimal import Decimal
 from app_home.models import CafeBranch
 from app_catalog.models import Category
+from app_cart.models import CartItem
 
 DEFAULT_BRANCH_ID = 1
 
@@ -17,9 +19,23 @@ def site_context_processor(request):
     else:
         categories = Category.objects.filter(is_active=True, branch=selected_branch, is_for_admin=False)
 
-
     return {
         'branches': branches,
         'categories': categories,
         'selected_branch_id': str(selected_branch_id)
+    }
+
+
+def carts_total(request):
+    if request.user.is_authenticated:
+        cart_items = CartItem.objects.filter(user=request.user)
+        total_quantity = cart_items.total_quantity()
+        total_sum = cart_items.total_sum()
+    else:
+        total_quantity = 0
+        total_sum = Decimal("0.00")
+
+    return {
+        "cart_total_quantity": total_quantity,
+        "cart_total_sum": total_sum,
     }

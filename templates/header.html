@@ -1,10 +1,22 @@
 {% load static %}
 <header>
-    <div class="burger-menu" id="burger-menu">
-        <span></span>
-        <span></span>
-        <span></span>
+    <div class="burger_cart_wrapper">
+        <div class="burger-menu" id="burger-menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+        <a class="cart_link" href="{% url 'app_cart:view_cart' %}">
+            <div class="cart-summary">
+                <p>{{ cart_total_quantity }} шт. | {{ cart_total_sum }} руб.</p>
+                <p></p>
+            </div>
+        </a>
+        
     </div>
+    
+
     <div class="choose-filial_container">
         <form method="get" action="{% url 'app_home:select_branch' %}" style="z-index: 3;" class="form-filial-select">
             <label class="choose-filial-title" for="branch-select">Выберите филиал:</label>
