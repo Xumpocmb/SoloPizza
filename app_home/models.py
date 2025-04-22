@@ -26,3 +26,7 @@ class CafeBranchPhone(models.Model):
     branch = models.ForeignKey(CafeBranch, on_delete=models.CASCADE, related_name='branch_phones', verbose_name="Филиал")
     phone = models.CharField(max_length=20, blank=True, null=True, verbose_name="Номер телефона")
 
+    class Meta:
+        db_table = 'branch_phones'
+        verbose_name = 'Телефон филиала'
+        verbose_name_plural = 'Телефоны филиалов'
