@@ -125,3 +125,168 @@
 .view-order-btn:hover::before, .continue-shopping:hover::before {
     left: 100%;
 }
+
+
+/* Стили для кнопки "Удалить" */
+.remove-item {
+    background-color: #d9534f; /* Красный цвет фона */
+    color: white; /* Белый текст */
+    border: none; /* Без границ */
+    padding: 10px 15px; /* Внутренние отступы */
+    border-radius: 5px; /* Закругленные углы */
+    font-size: 14px; /* Размер текста */
+    cursor: pointer; /* Указатель мыши при наведении */
+    transition: background-color 0.3s ease, transform 0.2s ease; /* Плавные переходы */
+}
+
+.remove-item:hover {
+    background-color: #c9302c; /* Темно-красный при наведении */
+    transform: scale(1.05); /* Небольшое увеличение при наведении */
+}
+
+.remove-item:focus {
+    outline: none; /* Убираем стандартное выделение */
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.5); /* Добавляем легкую тень при фокусе */
+}
+
+/* Стили для кнопки "Сохранить изменения" */
+.save-changes {
+    background-color: #5cb85c; /* Зеленый цвет фона */
+    color: white; /* Белый текст */
+    border: none; /* Без границ */
+    padding: 12px 20px; /* Внутренние отступы */
+    border-radius: 5px; /* Закругленные углы */
+    font-size: 16px; /* Размер текста */
+    cursor: pointer; /* Указатель мыши при наведении */
+    transition: background-color 0.3s ease, transform 0.2s ease; /* Плавные переходы */
+    margin-top: 20px; /* Отступ сверху */
+    align-self: flex-end; /* Выравнивание по правому краю */
+}
+
+.save-changes:hover {
+    background-color: #4cae4c; /* Темно-зеленый при наведении */
+    transform: scale(1.05); /* Небольшое увеличение при наведении */
+}
+
+.save-changes:focus {
+    outline: none; /* Убираем стандартное выделение */
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.5); /* Добавляем легкую тень при фокусе */
+}
+
+
+/* Общие стили для всех select */
+select {
+    width: 100%; /* Занимает всю доступную ширину */
+    padding: 10px; /* Внутренние отступы */
+    border: 1px solid #ccc; /* Светлая граница */
+    border-radius: 5px; /* Закругленные углы */
+    font-size: 14px; /* Размер текста */
+    background-color: #fff; /* Белый фон */
+    color: #333; /* Цвет текста */
+    appearance: none; /* Убираем стандартные стрелки браузера */
+    -webkit-appearance: none; /* Для Safari */
+    -moz-appearance: none; /* Для Firefox */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='16' height='16'%3E%3Cpath fill='%23333' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E"); /* Кастомная стрелка */
+    background-repeat: no-repeat;
+    background-position: right 10px center; /* Позиция стрелки */
+    cursor: pointer; /* Указатель мыши при наведении */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Плавные переходы */
+}
+
+/* При фокусе */
+select:focus {
+    border-color: #5cb85c; /* Зеленая граница */
+    outline: none; /* Убираем стандартное выделение */
+    box-shadow: 0 0 5px rgba(92, 184, 92, 0.5); /* Легкая тень */
+}
+
+/* При наведении */
+select:hover {
+    border-color: #4cae4c; /* Темно-зеленая граница */
+}
+
+/* Стили для select с ошибками (если нужно) */
+select.error {
+    border-color: #d9534f; /* Красная граница */
+}
+
+select.error:focus {
+    border-color: #c9302c; /* Темно-красная граница */
+    box-shadow: 0 0 5px rgba(217, 83, 79, 0.5); /* Легкая красная тень */
+}
+
+
+/* Общие стили для всех текстовых полей */
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="tel"],
+textarea {
+    /*width: 100%;*/
+    padding: 10px; /* Внутренние отступы */
+    border: 1px solid #ccc; /* Светлая граница */
+    border-radius: 5px; /* Закругленные углы */
+    font-size: 14px; /* Размер текста */
+    background-color: #fff; /* Белый фон */
+    color: #333; /* Цвет текста */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Плавные переходы */
+    outline: none; /* Убираем стандартное выделение при фокусе */
+}
+
+/* При фокусе */
+input[type="text"]:focus,
+input[type="number"]:focus,
+input[type="email"]:focus,
+input[type="tel"]:focus,
+textarea:focus {
+    border-color: #5cb85c; /* Зеленая граница */
+    box-shadow: 0 0 5px rgba(92, 184, 92, 0.5); /* Легкая тень */
+}
+
+/* При наведении */
+input[type="text"]:hover,
+input[type="number"]:hover,
+input[type="email"]:hover,
+input[type="tel"]:hover,
+textarea:hover {
+    border-color: #4cae4c; /* Темно-зеленая граница */
+}
+
+/* Стили для текстовых полей с ошибками (если нужно) */
+input[type="text"].error,
+input[type="number"].error,
+input[type="email"].error,
+input[type="tel"].error,
+textarea.error {
+    border-color: #d9534f; /* Красная граница */
+}
+
+input[type="text"].error:focus,
+input[type="number"].error:focus,
+input[type="email"].error:focus,
+input[type="tel"].error:focus,
+textarea.error:focus {
+    border-color: #c9302c; /* Темно-красная граница */
+    box-shadow: 0 0 5px rgba(217, 83, 79, 0.5); /* Легкая красная тень */
+}
+
+/* Стили для textarea */
+textarea {
+    resize: vertical; /* Разрешаем изменять высоту только по вертикали */
+    min-height: 80px; /* Минимальная высота */
+}
+
+
+
+/* Кастомные радиокнопки */
+/* Кастомные радиокнопки */
+input[type="radio"] {
+    cursor: pointer;
+}
+
+
+input[type="radio"]:checked {
+    accent-color: #4cae4c;
+}
+
+

@@ -21,7 +21,7 @@
                 {% if order.comment %}<p><strong>Комментарий:</strong>{{ order.comment }}</p>{% endif %}
             </div>
             <hr>
-
+        <p><a href="{% url 'app_order:add_to_order' order.id %}">Добавить товары в заказ</a></p>
             <h2>Товары в заказе</h2>
             <form method="post" action="">
                 {% csrf_token %}
@@ -61,6 +61,7 @@
                 </div>
                 <button type="submit" class="save-changes">Сохранить изменения</button>
             </form>
+            
         </section>
     </main>
 
@@ -70,7 +71,7 @@
             button.addEventListener('click', function () {
                 const itemId = this.dataset.itemId;
                 if (confirm('Вы уверены, что хотите удалить этот товар?')) {
-                    fetch(`/remove-item/${itemId}/`, {
+                    fetch(`/order/remove-item/${itemId}/`, {
                         method: 'POST',
                         headers: {
                             'X-CSRFToken': '{{ csrf_token }}',

@@ -1,10 +1,11 @@
+from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from shapely.geometry import Point, Polygon
 
-from app_catalog.models import AddonParams, PizzaSauce
+from app_catalog.models import AddonParams, PizzaSauce, ItemParams, BoardParams
 from app_home.models import CafeBranch
-from app_order.forms import OrderItemForm
+from app_order.forms import OrderItemForm, AddToOrderForm
 from app_order.models import Order, OrderItem
 from django.db.models import Sum
 from app_cart.models import CartItem
@@ -150,18 +151,14 @@ def order_detail_editor(request, order_id):
         return redirect('app_order:order_detail', order_id=order.id)
 
     else:
-        # Создаем словарь форм для каждого товара
         forms = {
             item.id: OrderItemForm(instance=item, prefix=f'item-{item.id}')
             for item in order.items.all()
         }
 
-    sauces = PizzaSauce.objects.filter(is_active=True)
-
     context = {
         'order': order,
         'forms': forms,
-        'sauces': sauces,
     }
     return render(request, 'app_order/order_detail_editor.html', context)
 
@@ -175,7 +172,7 @@ def remove_item(request, item_id):
 
         # Пересчитываем общую стоимость заказа
         order.calculate_total_price()
-        return redirect('order_detail', order_id=order.id)
+        return redirect('app_order:order_detail_editor', order_id=order.id)
 
 
 def determine_branch(user_latitude, user_longitude):
@@ -204,3 +201,79 @@ def select_address(request):
             }
             return redirect('app_order:create_order')
     return render(request, 'app_order/select_address.html')
+
+
+
+@login_required
+def add_to_order(request, order_id):
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+
+    if request.method == "POST":
+        form = AddToOrderForm(request.POST)
+        if form.is_valid():
+            # Получаем данные из формы
+            item = form.cleaned_data['item']
+            size = form.cleaned_data['size']
+            quantity = form.cleaned_data['quantity']
+            board = form.cleaned_data['board']
+            sauce = form.cleaned_data['sauce']
+            addons = form.cleaned_data['addons']
+
+            # Создаем новый элемент заказа
+            order_item = OrderItem.objects.create(
+                order=order,
+                item=item,
+                item_params=size,
+                quantity=quantity,
+                price=size.price,
+                board=board,
+                sauce=sauce,
+            )
+            order_item.addons.set(addons)
+
+            # Обновляем общую стоимость заказа
+            order.calculate_total_price()
+
+            return redirect('app_order:order_detail_editor', order_id=order.id)
+    else:
+        form = AddToOrderForm()
+
+    context = {
+        "order": order,
+        "form": form,
+    }
+    return render(request, "app_order/order_add_items.html", context)
+
+
+
+def item_sizes_api(request, item_id):
+    # Получаем параметры товара
+    params = ItemParams.objects.filter(item_id=item_id).values('id', 'size__id', 'size__name', 'value', 'unit')
+
+    data = []
+    for param in params:
+        if param['size__id']:
+            data.append({
+                'id': param['id'],
+                'name': param['size__name']
+            })
+        elif param['value']:
+            data.append({
+                'id': param['id'],
+                'name': f"{param['value']} {param['unit']}"
+            })
+
+    return JsonResponse(data, safe=False)
+
+
+def board_params_api(request, size_id):
+    boards = BoardParams.objects.filter(size_id=size_id).values('id', 'board__name', 'price')
+    data = [{'id': board['id'], 'name': board['board__name'], 'price': str(board['price'])} for board in boards]
+    return JsonResponse(data, safe=False)
+
+
+def addon_params_api(request, size_id):
+    addons = AddonParams.objects.filter(size_id=size_id).values('id', 'addon__name', 'price')
+    data = [{'id': addon['id'], 'name': addon['addon__name'], 'price': str(addon['price'])} for addon in addons]
+    return JsonResponse(data, safe=False)
+
