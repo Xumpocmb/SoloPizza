@@ -6,7 +6,119 @@ from django.dispatch import receiver
 from decimal import Decimal
 
 
+
+class OrderManager(models.Manager):
+    def calculate_total_price(self, order_id):
+        """
+        Рассчитывает общую стоимость заказа, включая доставку.
+        """
+        order = self.get(id=order_id)
+        items_total = sum(
+            item.calculate_item_total_price() for item in order.items.all()
+        )
+
+        # Стоимость доставки
+        delivery_cost = (
+            Decimal(3) if order.delivery_method == "delivery" and items_total < Decimal(20) else Decimal(0)
+        )
+
+        # Общая стоимость заказа
+        total_price = items_total + delivery_cost
+
+        # Обновляем поля заказа
+        order.total_price = total_price
+        order.delivery_cost = delivery_cost
+        order.save(update_fields=["total_price", "delivery_cost"])
+
+        return total_price
+
+    def get_order_summary(self, order_id):
+        """
+        Возвращает краткое описание заказа (статус, общая стоимость и т.д.).
+        """
+        order = self.get(id=order_id)
+        return {
+            "id": order.id,
+            "status": dict(order.STATUS_CHOICES).get(order.status),
+            "total_price": order.total_price,
+            "delivery_cost": order.delivery_cost,
+            "items_count": order.items.count(),
+        }
+
+
+class OrderItemManager(models.Manager):
+    def calculate_item_total_price(self, order_item_id):
+        """
+        Рассчитывает полную стоимость товара, включая добавки и борт.
+        """
+        order_item = self.get(id=order_item_id)
+
+        base_price = order_item.price * order_item.quantity
+        addons_price = self.calculate_total_addon_price(order_item)
+        board_price = order_item.board.price if order_item.board else Decimal(0)
+
+        # Итоговая стоимость без скидки
+        total_without_discount = base_price + board_price + addons_price
+
+        # Рассчитываем скидку
+        discount = self.calculate_discount(order_item)
+
+        # Итоговая стоимость с учетом скидки
+        total_with_discount = total_without_discount - (discount or Decimal(0))
+        return total_with_discount.quantize(Decimal(".01"))
+
+    def calculate_total_addon_price(self, order_item):
+        """
+        Рассчитывает общую стоимость всех добавок.
+        """
+        addons = order_item.addons.all()
+        addon_prices = [addon.price for addon in addons]
+        return sum(addon_prices)
+
+    def calculate_discount(self, order_item):
+        """
+        Рассчитывает скидку на товар.
+        """
+        item_discount = Decimal(0)
+        item_discount_percent = Decimal(0)
+
+        # Скидка только для пиццы
+        if order_item.item.category.name == "Пицца":
+            # Если доставка - самовывоз
+            if order_item.order.delivery_method == "pickup":
+                if order_item.item.is_weekly_special and order_item.item_params.size.size == 32:
+                    # Акция "Пицца недели" (20% скидка при самовывозе)
+                    weekly_discount_percent = Decimal("20.0")
+                    item_discount = (
+                        order_item.price * (weekly_discount_percent / Decimal("100"))
+                    ) * order_item.quantity
+                    item_discount_percent = weekly_discount_percent
+                else:
+                    # Скидка 10% для самовывоза
+                    pickup_discount_percent = Decimal("10.0")
+                    item_discount = (
+                        order_item.price * (pickup_discount_percent / Decimal("100"))
+                    ) * order_item.quantity
+                    item_discount_percent = pickup_discount_percent
+            elif order_item.order.partner_discount:
+                # Скидка 10% для партнеров
+                partner_discount_percent = Decimal("10.0")
+                item_discount = (
+                    order_item.price * (partner_discount_percent / Decimal("100"))
+                ) * order_item.quantity
+                item_discount_percent = partner_discount_percent
+
+        # Обновляем скидку
+        order_item.item_discount = item_discount
+        order_item.item_discount_percent = item_discount_percent
+        order_item.save(update_fields=["item_discount", "item_discount_percent"])
+
+        return item_discount
+
+
 class Order(models.Model):
+    objects = OrderManager()
+
     STATUS_CHOICES = [
         ("created", "Создан"),
         ("pending", "В обработке"),
@@ -87,22 +199,26 @@ class Order(models.Model):
         """
         Рассчитывает общую стоимость заказа, включая доставку.
         """
-        # Стоимость товаров в заказе
-        items_total = sum(
-            item.calculate_item_total_price() for item in self.items.all()
-        )
+        if not hasattr(self, '_is_calculating'):
+            self._is_calculating = True
+            try:
+                items_total = sum(
+                    item.calculate_item_total_price() for item in self.items.all()
+                )
 
-        # Стоимость доставки
-        self.delivery_cost = (
-            Decimal(3)
-            if self.delivery_method == "delivery" and items_total < Decimal(20)
-            else Decimal(0)
-        )
+                # Стоимость доставки
+                self.delivery_cost = (
+                    Decimal(3)
+                    if self.delivery_method == "delivery" and items_total < Decimal(20)
+                    else Decimal(0)
+                )
 
-        # Общая стоимость заказа
-        self.total_price = items_total + self.delivery_cost
-        self.save(update_fields=["total_price", "delivery_cost"])
-        return self.total_price
+                # Общая стоимость заказа
+                self.total_price = items_total + self.delivery_cost
+                self.save(update_fields=["total_price", "delivery_cost"])
+                return self.total_price
+            finally:
+                del self._is_calculating
 
     def get_status_display(self):
         """Возвращает человекочитаемое описание статуса."""
@@ -110,6 +226,8 @@ class Order(models.Model):
 
 
 class OrderItem(models.Model):
+    objects = OrderItemManager()
+
     order = models.ForeignKey(
         Order, on_delete=models.CASCADE, related_name="items", verbose_name="Заказ"
     )
@@ -168,23 +286,28 @@ class OrderItem(models.Model):
         """
         Рассчитывает полную стоимость товара, включая добавки и борт.
         """
-        base_price = self.price * self.quantity
-        addons_price = self.calculate_total_addon_price()
-        board_price = self.board.price if self.board else 0
+        if not hasattr(self, '_is_calculating'):
+            self._is_calculating = True
+            try:
+                base_price = self.price * self.quantity
+                addons_price = self.calculate_total_addon_price()
+                board_price = self.board.price if self.board else 0
 
-        # Итоговая стоимость без скидки
-        total_without_discount = (
-            base_price + board_price + addons_price
-        ) * self.quantity
+                # Итоговая стоимость без скидки
+                total_without_discount = (
+                    base_price + board_price + addons_price
+                ) * self.quantity
 
-        # Рассчитываем скидку
-        self.calculate_discount()
+                # Рассчитываем скидку
+                self.calculate_discount()
 
-        # Итоговая стоимость с учетом скидки
-        total_with_discount = total_without_discount - (
-            self.item_discount or Decimal(0)
-        )
-        return total_with_discount.quantize(Decimal(".01"))
+                # Итоговая стоимость с учетом скидки
+                total_with_discount = total_without_discount - (
+                    self.item_discount or Decimal(0)
+                )
+                return total_with_discount.quantize(Decimal(".01"))
+            finally:
+                del self._is_calculating
 
     def calculate_total_addon_price(self):
         """
@@ -199,37 +322,42 @@ class OrderItem(models.Model):
         """
         Рассчитывает скидку на товар.
         """
-        self.item_discount = Decimal(0)
-        self.item_discount_percent = Decimal(0)
+        if not hasattr(self, '_is_calculating'):
+            self._is_calculating = True
+            try:
+                self.item_discount = Decimal(0)
+                self.item_discount_percent = Decimal(0)
 
-        # Скидка только для пиццы
-        if self.item.category.name == "Пицца":
-            # Если доставка - самовывоз
-            if self.order.delivery_method == "pickup":
-                if self.item.is_weekly_special and self.item_params.size.size == 32:
-                    # Акция "Пицца недели" (20% скидка при самовывозе)
-                    weekly_discount_percent = Decimal("20.0")
-                    self.item_discount = (
-                        self.price * (weekly_discount_percent / Decimal("100"))
-                    ) * self.quantity
-                    self.item_discount_percent = weekly_discount_percent
-                else:
-                    # Скидка 10% для самовывоза
-                    pickup_discount_percent = Decimal("10.0")
-                    self.item_discount = (
-                        self.price * (pickup_discount_percent / Decimal("100"))
-                    ) * self.quantity
-                    self.item_discount_percent = pickup_discount_percent
-            elif self.order.partner_discount:
-                # Скидка 10% для партнеров
-                partner_discount_percent = Decimal("10.0")
-                self.item_discount = (
-                    self.price * (partner_discount_percent / Decimal("100"))
-                ) * self.quantity
-                self.item_discount_percent = partner_discount_percent
+                # Скидка только для пиццы
+                if self.item.category.name == "Пицца":
+                    # Если доставка - самовывоз
+                    if self.order.delivery_method == "pickup":
+                        if self.item.is_weekly_special and self.item_params.size.size == 32:
+                            # Акция "Пицца недели" (20% скидка при самовывозе)
+                            weekly_discount_percent = Decimal("20.0")
+                            self.item_discount = (
+                                self.price * (weekly_discount_percent / Decimal("100"))
+                            ) * self.quantity
+                            self.item_discount_percent = weekly_discount_percent
+                        else:
+                            # Скидка 10% для самовывоза
+                            pickup_discount_percent = Decimal("10.0")
+                            self.item_discount = (
+                                self.price * (pickup_discount_percent / Decimal("100"))
+                            ) * self.quantity
+                            self.item_discount_percent = pickup_discount_percent
+                    elif self.order.partner_discount:
+                        # Скидка 10% для партнеров
+                        partner_discount_percent = Decimal("10.0")
+                        self.item_discount = (
+                            self.price * (partner_discount_percent / Decimal("100"))
+                        ) * self.quantity
+                        self.item_discount_percent = partner_discount_percent
 
-        # Сохраняем скидку
-        self.save(update_fields=["item_discount", "item_discount_percent"])
+                # Сохраняем скидку
+                self.save(update_fields=["item_discount", "item_discount_percent"])
+            finally:
+                del self._is_calculating
 
 
 # @receiver(post_save, sender=OrderItem)

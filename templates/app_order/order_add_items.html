@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
 
-
 {% block styles %}
     <link rel="stylesheet" href="{% static 'css/order_detail.css' %}">
 {% endblock %}
@@ -24,8 +23,45 @@
             <h2>Добавить товар</h2>
             <form method="post" action="{% url 'app_order:add_to_order' order.id %}">
                 {% csrf_token %}
-                {{ form.as_p }}
+
+                <!-- Поле выбора товара -->
+                <label for="id_item">Товар:</label>
+                <select name="item" id="id_item" required>
+                    <option value="">Выберите товар</option>
+                    {% for item in items %}
+                        <option value="{{ item.id }}">{{ item.name }}</option>
+                    {% endfor %}
+                </select>
+
+                <!-- Поле выбора размера -->
+                <label for="id_size">Размер:</label>
+                <select name="size" id="id_size" required>
+                    <option value="">Выберите размер</option>
+                </select>
+
+                <!-- Поле выбора количества -->
+                <label for="id_quantity">Количество:</label>
+                <input type="number" name="quantity" id="id_quantity" value="1" min="1" required>
+
+                <!-- Поле выбора борта -->
+                <label for="id_board">Борт:</label>
+                <select name="board" id="id_board">
+                    <option value="">Борты недоступны</option>
+                </select>
+
+                <!-- Поле выбора соуса -->
+                <label for="id_sauce">Соус:</label>
+                <select name="sauce" id="id_sauce">
+                    <option value="">Выберите соус</option>
+                    {% for sauce in sauces %}
+                        <option value="{{ sauce.id }}">{{ sauce.name }}</option>
+                    {% endfor %}
+                </select>
+
+                <!-- Поле выбора добавок -->
                 <div id="addon-options"></div>
+
+                <!-- Кнопка отправки формы -->
                 <button class="save-changes" type="submit">Добавить</button>
             </form>
         </section>
@@ -38,31 +74,39 @@
             const boardSelect = document.getElementById('id_board');
             const addonContainer = document.getElementById('addon-options');
 
+            // При изменении товара
+            itemSelect.addEventListener('change', function () {
+                const itemId = itemSelect.value;
+
+                // Очищаем зависимые поля
+                sizeSelect.innerHTML = '<option value="">Выберите размер</option>';
+                boardSelect.innerHTML = '<option value="">Борты недоступны</option>';
+                addonContainer.innerHTML = '<p>Добавки недоступны</p>';
+
+                if (itemId) {
+                    fetch(`/order/api/item-sizes/${itemId}/`)
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log("API response:", data); // Логируем данные из API
+                            sizeSelect.innerHTML = '<option value="">Выберите размер</option>';
+                            data.forEach(size => {
+                                const option = document.createElement('option');
+                                option.value = size.id;
+                                option.textContent = size.name;
+                                sizeSelect.appendChild(option);
+                            });
+                        });
+                }
+            });
+
+            // При изменении размера
             sizeSelect.addEventListener('change', function () {
                 const sizeId = sizeSelect.value;
                 loadBoards(sizeId);
                 loadAddons(sizeId);
             });
 
-            itemSelect.addEventListener('change', function () {
-                const itemId = itemSelect.value;
-                if (itemId) {
-                    fetch(`/order/api/item-sizes/${itemId}/`)
-                        .then(response => response.json())
-                        .then(data => {
-                            sizeSelect.innerHTML = '<option value="">Выберите размер</option>';
-                            data.forEach(size => {
-                                const option = document.createElement('option');
-                                option.value = size.id;
-                                option.textContent = size.name; // Отображаем название размера
-                                sizeSelect.appendChild(option);
-                            });
-                        });
-                } else {
-                    sizeSelect.innerHTML = '<option value="">Выберите размер</option>';
-                }
-            });
-
+            // Загрузка бортов
             function loadBoards(sizeId) {
                 const boardSelect = document.getElementById('id_board');
                 if (sizeId) {
@@ -82,6 +126,7 @@
                 }
             }
 
+            // Загрузка добавок
             function loadAddons(sizeId) {
                 const addonContainer = document.getElementById('addon-options');
                 if (sizeId) {
@@ -106,7 +151,4 @@
             }
         });
     </script>
-
 {% endblock %}
-
-

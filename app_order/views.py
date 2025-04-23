@@ -1,11 +1,12 @@
+from django.contrib import messages
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from shapely.geometry import Point, Polygon
 
-from app_catalog.models import AddonParams, PizzaSauce, ItemParams, BoardParams
+from app_catalog.models import AddonParams, PizzaSauce, ItemParams, BoardParams, Item
 from app_home.models import CafeBranch
-from app_order.forms import OrderItemForm, AddToOrderForm
+from app_order.forms import OrderItemForm
 from app_order.models import Order, OrderItem
 from django.db.models import Sum
 from app_cart.models import CartItem
@@ -164,6 +165,62 @@ def order_detail_editor(request, order_id):
 
 
 @login_required
+def add_to_order(request, order_id):
+    # Получаем заказ пользователя
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+    items = Item.objects.all()
+    sauces = PizzaSauce.objects.all()
+    if request.method == "POST":
+        try:
+            # Извлекаем данные из POST-запроса
+            item_id = request.POST.get('item')
+            size_id = request.POST.get('size')
+            quantity = request.POST.get('quantity', 1)
+            board_id = request.POST.get('board')
+            sauce_id = request.POST.get('sauce')
+            addon_ids = request.POST.getlist('addons')
+
+            # Валидация данных
+            item = Item.objects.get(id=item_id)
+            size = ItemParams.objects.get(size_id=size_id, item_id=item_id)
+            quantity = int(quantity)
+
+            # Опциональные поля
+            board = BoardParams.objects.get(id=board_id) if board_id else None
+            sauce = PizzaSauce.objects.get(id=sauce_id) if sauce_id else None
+            addons = AddonParams.objects.filter(id__in=addon_ids)
+
+            # Создаем новый элемент заказа
+            order_item = OrderItem.objects.create(
+                order=order,
+                item=item,
+                item_params=size,
+                quantity=quantity,
+                price=size.price,
+                board=board,
+                sauce=sauce,
+            )
+
+            order_item.addons.set(addons)
+
+            order.calculate_total_price()
+
+            messages.success(request, f"Товар '{item.name}' успешно добавлен в заказ.", extra_tags='success')
+
+            return redirect('app_order:order_detail_editor', order_id=order.id)
+
+        except Exception as e:
+            messages.error(request, "Ошибка при добавлении товара", extra_tags='error')
+            return redirect('app_order:add_to_order', order_id=order.id)
+
+    context = {
+        "order": order,
+        "items": items,
+        "sauces": sauces,
+    }
+    return render(request, "app_order/order_add_items.html", context)
+
+@login_required
 def remove_item(request, item_id):
     if request.method == 'POST':
         item = get_object_or_404(OrderItem, id=item_id, order__user=request.user)
@@ -189,6 +246,7 @@ def determine_branch(user_latitude, user_longitude):
     return None
 
 
+
 def select_address(request):
     if request.method == 'POST':
         latitude = request.POST.get('latitude')
@@ -204,48 +262,6 @@ def select_address(request):
 
 
 
-@login_required
-def add_to_order(request, order_id):
-    order = get_object_or_404(Order, id=order_id, user=request.user)
-
-    if request.method == "POST":
-        form = AddToOrderForm(request.POST)
-        if form.is_valid():
-            # Получаем данные из формы
-            item = form.cleaned_data['item']
-            size = form.cleaned_data['size']
-            quantity = form.cleaned_data['quantity']
-            board = form.cleaned_data['board']
-            sauce = form.cleaned_data['sauce']
-            addons = form.cleaned_data['addons']
-
-            # Создаем новый элемент заказа
-            order_item = OrderItem.objects.create(
-                order=order,
-                item=item,
-                item_params=size,
-                quantity=quantity,
-                price=size.price,
-                board=board,
-                sauce=sauce,
-            )
-            order_item.addons.set(addons)
-
-            # Обновляем общую стоимость заказа
-            order.calculate_total_price()
-
-            return redirect('app_order:order_detail_editor', order_id=order.id)
-    else:
-        form = AddToOrderForm()
-
-    context = {
-        "order": order,
-        "form": form,
-    }
-    return render(request, "app_order/order_add_items.html", context)
-
-
-
 def item_sizes_api(request, item_id):
     # Получаем параметры товара
     params = ItemParams.objects.filter(item_id=item_id).values('id', 'size__id', 'size__name', 'value', 'unit')
@@ -254,12 +270,12 @@ def item_sizes_api(request, item_id):
     for param in params:
         if param['size__id']:
             data.append({
-                'id': param['id'],
+                'id': param['size__id'],  # Используем size__id вместо id
                 'name': param['size__name']
             })
         elif param['value']:
             data.append({
-                'id': param['id'],
+                'id': param['id'],  # Для товаров без size_id оставляем id
                 'name': f"{param['value']} {param['unit']}"
             })
 
