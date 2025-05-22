@@ -1,4 +1,4 @@
-.input-phone, .input-username, .input-password, .input-password1, .input-password2 {
+.form-control{
     margin-bottom: 10px;
     padding: 10px;
     border-radius: 5px;
@@ -6,7 +6,7 @@
     font-size: 16px;
 }
 
-.input-phone:focus, .input-username:focus, .input-password:focus, .input-password1:focus, .input-password2:focus {
+.form-control:focus {
     outline: none;
     border-color: #045e36;
     box-shadow: 0 0 5px rgb(4, 94, 54);

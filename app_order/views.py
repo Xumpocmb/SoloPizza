@@ -136,6 +136,7 @@ def order_detail(request, order_id):
     }
     return render(request, 'app_order/order_detail.html', context)
 
+
 @login_required
 def order_detail_editor(request, order_id):
     order = get_object_or_404(
@@ -220,6 +221,7 @@ def add_to_order(request, order_id):
     }
     return render(request, "app_order/order_add_items.html", context)
 
+
 @login_required
 def remove_item(request, item_id):
     if request.method == 'POST':
@@ -246,7 +248,6 @@ def determine_branch(user_latitude, user_longitude):
     return None
 
 
-
 def select_address(request):
     if request.method == 'POST':
         latitude = request.POST.get('latitude')
@@ -259,7 +260,6 @@ def select_address(request):
             }
             return redirect('app_order:create_order')
     return render(request, 'app_order/select_address.html')
-
 
 
 def item_sizes_api(request, item_id):

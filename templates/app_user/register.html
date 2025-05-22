@@ -1,5 +1,8 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load user_filters %}
+
+
 {% block styles %}
     <link rel="stylesheet" href="{% static 'css/auth_register.css' %}">
 {% endblock %}
@@ -7,39 +10,56 @@
 
 {% block main %}
     <main>
-        <div class="auth_container">
-            <div class="auth_form_wrapper">
-                <form class="auth_form" action="{% url 'app_user:register' %}" method="post">
-                    {% csrf_token %}
-                    <label for="{{ form.username.id_for_label }}">Номер телефона:</label>
-                    {{ form.username }}
-                    {% if form.username.errors %}
-                        <div class="error">
-                            {{ form.username.errors }}
-                        </div>
-                    {% endif %}
-                    <label for="{{ form.password1.id_for_label }}">Пароль:</label>
-                    {{ form.password1 }}
-                    {% if form.password1.errors %}
-                        <div class="error">
-                            {{ form.password1.errors }}
-                        </div>
-                    {% endif %}
-                    <label for="{{ form.password2.id_for_label }}">Повторите пароль:</label>
-                    {{ form.password2 }}
-                    {% if form.password2.errors %}
-                        <div class="error">
-                            {{ form.password2.errors }}
-                        </div>
-                    {% endif %}
-                    <button class="register-button" type="submit">Зарегистрироваться</button>
-                </form>
-                <div class="register-link">
-                    <a href="{% url 'app_user:login' %}">Авторизоваться</a>
-                </div>
+    <div class="auth_container">
+        <div class="auth_form_wrapper">
+            <form class="auth_form" action="{% url 'app_user:register' %}" method="post">
+                {% csrf_token %}
+
+                <!-- Общие ошибки -->
+                {% if form.non_field_errors %}
+                    <div class="error">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                <!-- Поле "Имя пользователя" -->
+                <label for="{{ form.username.id_for_label }}">Имя пользователя:</label>
+                {{ form.username|add_class:"form-control" }}
+                {% if form.username.errors %}
+                    <div class="error">
+                        {{ form.username.errors }}
+                    </div>
+                {% endif %}
+
+                <!-- Поле "Пароль" -->
+                <label for="{{ form.password1.id_for_label }}">Пароль:</label>
+                {{ form.password1|add_class:"form-control" }}
+                {% if form.password1.errors %}
+                    <div class="error">
+                        {{ form.password1.errors }}
+                    </div>
+                {% endif %}
+
+                <!-- Поле "Повторите пароль" -->
+                <label for="{{ form.password2.id_for_label }}">Повторите пароль:</label>
+                {{ form.password2|add_class:"form-control" }}
+                {% if form.password2.errors %}
+                    <div class="error">
+                        {{ form.password2.errors }}
+                    </div>
+                {% endif %}
+
+                <!-- Кнопка отправки -->
+                <button class="register-button" type="submit">Зарегистрироваться</button>
+            </form>
+
+            <!-- Ссылка на авторизацию -->
+            <div class="register-link">
+                <a href="{% url 'app_user:login' %}">Авторизоваться</a>
             </div>
         </div>
-    </main>
+    </div>
+</main>
 
 
 {% endblock %}
