@@ -130,3 +130,4 @@ db.sqlite3
 
 /fixtures/
 /static/admin/
+/secrets
