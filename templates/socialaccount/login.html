@@ -1,36 +1,27 @@
 {% extends "base.html" %}
 {% load static %}
-
 {% block main %}
-<div class="social-login-confirm">
-  <div class="social-login-card">
-    <div class="social-login-header">
-      <h1 class="social-login-title">Вход через Google</h1>
-      <div class="social-login-icon">
-        <img src="{% static 'images/google-icon.png' %}" alt="Google">
+  <div class="social-login-confirm">
+    <div class="social-login-card">
+      <div class="social-login-header">
+        <h1 class="social-login-title">Вход через Google</h1>
+        <div class="social-login-icon">
+          <img src="{% static 'img/google.png' %}" alt="Google">
+        </div>
+      </div>
+      <div class="social-login-body">
+        <p class="social-login-message">Вы собираетесь войти, используя стороннюю учетную запись из Google.</p>
+        <form method="post" class="social-login-form">
+          {% csrf_token %}
+          <button type="submit" class="social-login-button">Продолжить</button>
+        </form>
+      </div>
+      <div class="social-login-footer">
+        <a href="/" class="social-login-cancel">Отмена</a>
       </div>
     </div>
-    
-    <div class="social-login-body">
-      <p class="social-login-message">
-        Вы собираетесь войти, используя стороннюю учетную запись из Google.
-      </p>
-      
-      <form method="post" class="social-login-form">
-        {% csrf_token %}
-        <button type="submit" class="social-login-button">
-          Продолжить
-        </button>
-      </form>
-    </div>
-    
-    <div class="social-login-footer">
-      <a href="/" class="social-login-cancel">Отмена</a>
-    </div>
   </div>
-</div>
-
-<style>
+  <style>
   .social-login-confirm {
     display: flex;
     justify-content: center;
@@ -130,5 +121,5 @@
     opacity: 1;
     text-decoration: underline;
 }
-</style>
+  </style>
 {% endblock %}
