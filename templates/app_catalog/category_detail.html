@@ -28,7 +28,7 @@
                             <div class="cart_price_section">
                                 <div class="price">
                                     {% if item.min_price %}
-                                        от {{ item.min_price }} руб.
+                                        от {{ item.min_price|floatformat:2 }} руб.
                                     {% else %}
                                         Цена не указана
                                     {% endif %}

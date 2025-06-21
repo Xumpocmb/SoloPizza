@@ -23,14 +23,14 @@
 }
 
 .item-card {
-    background-color: white;
+    background-color: var(--card-bg);
     border-radius: 10px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     overflow: hidden;
     transition: transform 0.3s, box-shadow 0.3s;
     display: flex;
     flex-direction: column;
-    height: 100%; /* Убедитесь, что карточка занимает всю высоту */
+    height: 100%;
 }
 
 .item-card:hover {
@@ -50,24 +50,24 @@
 .item-card h2 {
     font-size: 20px;
     margin: 15px;
-    color: #333;
-    flex-grow: 1; /* Позволяет заголовку расти и занимать доступное пространство */
+    color: var(--text-color);
+    flex-grow: 1;
 }
 
 .item-card p {
     font-size: 16px;
     margin: 0 15px 10px;
-    color: #666;
-    flex-grow: 1; /* Позволяет описанию расти и занимать доступное пространство */
+    color: var(--text-color);
+    flex-grow: 1;
 }
 
 .cart_price_section .price {
     font-size: 18px;
-    color: #079b59;
+    color: var(--accent-color);
 }
 
 .cart_price_section .order-link {
-    background-color: #079b59;
+    background-color: var(--accent-color);
     color: white;
     padding: 10px 20px;
     border-radius: 5px;
@@ -82,15 +82,16 @@
 
 .cart_price_section {
     display: flex;
-    justify-content: space-between; /* Размещает элементы с максимальным расстоянием между ними */
-    align-items: center; /* Выравнивает элементы по вертикали */
-    margin-top: auto; /* Прижимает секцию к нижней части карточки */
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
     padding: 10px 15px;
-    background-color: #f9f9f9;
-    border-top: 1px solid #eee;
+    background-color: var(--hover-bg);
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .page_title {
     text-align: center;
     margin-bottom: 20px;
+    color: var(--text-color);
 }

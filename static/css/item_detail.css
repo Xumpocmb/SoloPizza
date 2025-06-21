@@ -1,10 +1,10 @@
 .item_container {
     display: flex;
     flex-direction: row;
-    align-items: center;
+    align-items: start;
     gap: 20px;
     padding: 20px;
-    background-color: #fff;
+    background-color: var(--card-bg); /* Цвет фона карточки */
     border-radius: 10px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     margin: 20px auto;
@@ -14,47 +14,36 @@
 @media (max-width: 1024px) {
     .item_container {
         flex-direction: column;
+        align-items: center;
     }
 }
 
 .item-image {
-    width: 50%; /* Уменьшаем ширину блока с изображением */
-    height: auto; /* Автоматическая высота для сохранения пропорций */
+    width: 50%;
+    height: auto;
     margin-bottom: 20px;
 }
 
-.item-image img {
-    max-width: 100%; /* Изображение занимает всю доступную ширину блока */
-    height: auto; /* Сохраняем пропорции */
-    border: 3px solid #28a745; /* Зеленая рамка */
-    border-radius: 10px; /* Скругленные углы */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Легкая тень для эффекта объема */
-    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Анимация при наведении */
-}
-
-.item-image img:hover {
-    transform: scale(1.05); /* Небольшое увеличение картинки при наведении */
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Усиление тени */
-}
-
+.item-image img,
 .item-image-border {
     max-width: 100%;
     height: auto;
-    border: 3px solid #28a745; /* Зеленая рамка */
-    border-radius: 10px; /* Скругленные углы */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Легкая тень для эффекта объема */
-    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Анимация при наведении */
+    border: 3px solid var(--accent-color); /* Акцентный цвет */
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
+.item-image img:hover,
 .item-image-border:hover {
-    transform: scale(1.05); /* Небольшое увеличение картинки при наведении */
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Усиление тени */
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
 .item_name {
     font-size: 20px;
     margin: 15px;
-    color: #333;
+    color: var(--text-color); /* Цвет текста */
     flex-grow: 1;
 }
 
@@ -63,27 +52,27 @@
     text-align: center;
 }
 
-
 .item-info h1 {
     font-size: 28px;
     margin-bottom: 10px;
+    color: var(--text-color);
 }
 
 .item-info p {
     font-size: 16px;
-    color: #666;
+    color: #888; /* Можно использовать оттенок текста из темы */
     margin-bottom: 20px;
 }
 
 .item-price {
     font-size: 22px;
-    color: #079b59;
+    color: var(--accent-color); /* Акцентный цвет */
     margin-bottom: 20px;
 }
 
 .order-link {
     display: inline-block;
-    background-color: #079b59;
+    background-color: var(--accent-color);
     color: white;
     padding: 15px 30px;
     border-radius: 5px;
@@ -93,7 +82,7 @@
 }
 
 .order-link:hover {
-    background-color: #068a50;
+    background-color: #068a50; /* Темнее акцента */
 }
 
 @media (max-width: 768px) {
@@ -102,8 +91,8 @@
     }
 
     .item-image {
-        width: 100%; /* На маленьких экранах изображение занимает всю ширину */
-        max-width: 100%; /* Убираем ограничение по ширине */
+        width: 100%;
+        max-width: 100%;
         margin-bottom: 10px;
     }
 
@@ -135,27 +124,27 @@
 
 .size-selector .size-option {
     padding: 10px 20px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--hover-bg); /* Цвет границы */
     border-radius: 5px;
     text-decoration: none;
-    color: #333;
+    color: var(--text-color);
     cursor: pointer;
     transition: all 0.3s ease;
 }
 
 .size-selector .size-option:hover {
-    background-color: #f0f0f0;
+    background-color: var(--hover-bg);
 }
 
 .size-selector .size-option.selected {
-    background-color: #28a745;
+    background-color: var(--accent-color);
     color: white;
-    border-color: #28a745;
+    border-color: var(--accent-color);
 }
 
-/* Стили для бортов и добавок */
 .form-group h3 {
     margin-bottom: 5px;
+    color: var(--text-color);
 }
 
 .form-group ul {
@@ -165,6 +154,7 @@
 
 .form-group li {
     margin-bottom: 5px;
+    color: var(--text-color);
 }
 
 .option-selector {
@@ -175,35 +165,39 @@
     align-items: center;
 }
 
-/* Кастомные радио-кнопки */
-.custom-radio-list {
+.custom-radio-list,
+.custom-checkbox-list {
     list-style: none;
     padding: 0;
 }
 
-.custom-radio {
+.custom-radio,
+.custom-checkbox {
     display: flex;
     align-items: center;
     cursor: pointer;
     margin-bottom: 10px;
 }
 
-.radio-button {
+.radio-button,
+.checkbox-icon {
     width: 20px;
     height: 20px;
-    border: 2px solid #ccc;
+    border: 2px solid var(--hover-bg);
     border-radius: 50%;
     margin-right: 10px;
     position: relative;
     transition: all 0.3s ease;
 }
 
-.custom-radio input[type="radio"]:checked + .radio-button {
-    border-color: #28a745;
-    background-color: #28a745;
+.custom-radio input[type="radio"]:checked + .radio-button,
+.custom-checkbox input[type="checkbox"]:checked + .checkbox-icon {
+    border-color: var(--accent-color);
+    background-color: var(--accent-color);
 }
 
-.custom-radio input[type="radio"]:checked + .radio-button::after {
+.custom-radio input[type="radio"]:checked + .radio-button::after,
+.custom-checkbox input[type="checkbox"]:checked + .checkbox-icon::after {
     content: '';
     position: absolute;
     top: 50%;
@@ -215,53 +209,17 @@
     background-color: white;
 }
 
-/* Кастомные чекбоксы */
-.custom-checkbox-list {
-    list-style: none;
-    padding: 0;
-}
-
-.custom-checkbox {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    margin-bottom: 10px;
-}
-
-.checkbox-icon {
-    width: 20px;
-    height: 20px;
-    border: 2px solid #ccc;
-    border-radius: 4px;
-    margin-right: 10px;
-    position: relative;
-    transition: all 0.3s ease;
-}
-
-.custom-checkbox input[type="checkbox"]:checked + .checkbox-icon {
-    border-color: #28a745;
-    background-color: #28a745;
-}
-
-.custom-checkbox input[type="checkbox"]:checked + .checkbox-icon::after {
-    content: '✔';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 14px;
-    color: white;
-}
-
 input[type="number"] {
     width: 100px;
     padding: 10px;
     font-size: 16px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--hover-bg);
     border-radius: 5px;
+    color: var(--text-color);
+    background-color: var(--card-bg);
     transition: border-color 0.3s;
 }
 
 input[type="number"]:focus {
-    border-color: #28a745;
+    border-color: var(--accent-color);
 }

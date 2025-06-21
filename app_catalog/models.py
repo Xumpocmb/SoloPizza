@@ -1,8 +1,12 @@
+import os
+
 from django.db import models
-from app_home.models import CafeBranch
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
-import os
+from django.utils.text import slugify
+
+from app_home.models import CafeBranch
+
 
 class Category(models.Model):
     name = models.CharField(max_length=50, unique=True, verbose_name='Название категории')
@@ -12,48 +16,61 @@ class Category(models.Model):
     is_for_admin = models.BooleanField(default=False, verbose_name='Для администратора',
                                        help_text='Установите, если хотите скрыть эту категорию от пользователей. Она будет видна только администраторам')
     slug = models.SlugField(max_length=100, unique=True, blank=True, null=True, verbose_name='URL')
-    time_update = models.DateTimeField(auto_now=True)
+    order = models.PositiveIntegerField('Порядок', default=0)
 
     class Meta:
         db_table = 'categories'
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
+        ordering = ['order']
 
     def __str__(self):
         return f'Категория: {self.name}'
 
-class Item(models.Model):
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, blank=True, null=True, verbose_name='Категория')
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
 
-    name = models.CharField(max_length=100, verbose_name='Название товара')
-    description = models.TextField(verbose_name='Описание товара')
+
+class Product(models.Model):
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products')
+    name = models.CharField('Название', max_length=255)
+    slug = models.SlugField('URL-адрес', unique=True)
+    description = models.TextField('Описание', blank=True)
     image = models.ImageField(upload_to='item_images', blank=True, null=True, verbose_name='Изображение')
     is_weekly_special = models.BooleanField(default=False, verbose_name='Акция: Пицца недели', blank=False, null=False)
-
-    slug = models.SlugField(max_length=100, unique=True, blank=True, null=True, verbose_name='URL')
-    is_active = models.BooleanField(default=True, verbose_name='Активен')
-
-    def __str__(self):
-        return f'Категория: {self.category.name} | Товар: {self.name}'
+    is_active = models.BooleanField('Активен', default=True)
+    created_at = models.DateTimeField('Дата создания', auto_now_add=True)
 
     class Meta:
-        db_table = 'items'
+        db_table = 'products'
         verbose_name = 'Товар'
         verbose_name_plural = 'Товары'
-        ordering = ['id']
+        ordering = ['name']
 
-class ItemSizes(models.Model):
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
+
+class PizzaSizes(models.Model):
     name = models.CharField(default='Размер', max_length=50, verbose_name='Размер')
 
     class Meta:
-        db_table = 'item_sizes'
+        db_table = 'pizza_sizes'
         verbose_name = 'Размер пиццы и кальцоне'
         verbose_name_plural = 'Размеры пиццы и кальцоне'
 
     def __str__(self):
         return f'Размер: {self.name}'
 
-class ItemParams(models.Model):
+
+class ProductVariant(models.Model):
     UNIT_CHOICES = [
         ('pcs', 'шт'),
         ('cm', 'см'),
@@ -61,20 +78,23 @@ class ItemParams(models.Model):
         ('g', 'гр'),
         ('l', 'л'),
     ]
-
-    item = models.ForeignKey(Item, on_delete=models.CASCADE, verbose_name='Товар')
-    size = models.ForeignKey(ItemSizes, on_delete=models.CASCADE, verbose_name='Размер для пиццы или кальцоне', blank=True, null=True)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='variants')
     value = models.CharField(null=True, blank=True, max_length=50, verbose_name='Значение')
-    unit = models.CharField(null=True, blank=True, choices=UNIT_CHOICES, max_length=50, verbose_name='Единица измерения')
-    price = models.DecimalField(default=0, max_digits=10, decimal_places=2, verbose_name='Цена в руб.', blank=False, null=False)
+    unit = models.CharField(max_length=10, choices=UNIT_CHOICES, default='pcs', verbose_name='Единица измерения')
+    price = models.DecimalField('Цена', max_digits=10, decimal_places=2)
+
+    is_spicy = models.BooleanField('Острый', default=False, blank=True)
+    is_alcoholic = models.BooleanField('Алкогольный', default=False, blank=True)
+    is_combo = models.BooleanField('Комбо-набор', default=False, blank=True)
+    is_sweet = models.BooleanField('Сладкий', default=False, blank=True)
 
     class Meta:
-        db_table = 'item_params'
-        verbose_name = 'Параметры товара'
-        verbose_name_plural = 'Параметры товара'
+        verbose_name = 'Вариант товара'
+        verbose_name_plural = 'Варианты товаров'
 
     def __str__(self):
-        return f'Параметры товара {self.item.name}'
+        return f"{self.product.name} - ({self.price}₽)"
+
 
 class PizzaBoard(models.Model):
     name = models.CharField(max_length=100, verbose_name='Название борта')
@@ -103,9 +123,10 @@ class PizzaSauce(models.Model):
     def __str__(self):
         return f'Соус для пиццы: {self.name}'
 
+
 class BoardParams(models.Model):
     board = models.ForeignKey(PizzaBoard, on_delete=models.CASCADE, verbose_name='Борт')
-    size = models.ForeignKey(ItemSizes, on_delete=models.CASCADE, verbose_name='Размер')
+    size = models.ForeignKey(PizzaSizes, on_delete=models.CASCADE, verbose_name='Размер')
     price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Цена в руб.')
 
     def __str__(self):
@@ -115,6 +136,7 @@ class BoardParams(models.Model):
         db_table = 'board_params'
         verbose_name = 'Параметр борта'
         verbose_name_plural = 'Параметры бортов'
+
 
 class PizzaAddon(models.Model):
     name = models.CharField(max_length=100, verbose_name='Название добавки')
@@ -129,10 +151,16 @@ class PizzaAddon(models.Model):
     def __str__(self):
         return f'Добавка: {self.name}'
 
+
 class AddonParams(models.Model):
     addon = models.ForeignKey(PizzaAddon, on_delete=models.CASCADE, verbose_name='Добавка')
-    size = models.ForeignKey(ItemSizes, on_delete=models.CASCADE, verbose_name='Размер')
+    size = models.ForeignKey(PizzaSizes, on_delete=models.CASCADE, verbose_name='Размер')
     price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Цена в руб.')
+
+    class Meta:
+        db_table = 'addon_params'
+        verbose_name = 'Параметр добавки'
+        verbose_name_plural = 'Параметры добавок'
 
     def get_display_name(self):
         """Возвращает человекочитаемое описание добавки."""
@@ -142,8 +170,42 @@ class AddonParams(models.Model):
         return self.get_display_name()
 
 
+class RollTopping(models.Model):
+    name = models.CharField(max_length=100, verbose_name='Название шапочки')
+    slug = models.SlugField(max_length=100, unique=True, blank=True, null=True, verbose_name='URL')
+    is_active = models.BooleanField(default=True, verbose_name='Активен')
+
+    class Meta:
+        db_table = 'roll_toppings'
+        verbose_name = 'Шапочка для запеченных роллов'
+        verbose_name_plural = 'Шапочки для запеченных роллов'
+
+    def __str__(self):
+        return f'Шапочка для запеченных роллов: {self.name}'
+
+
+class IceCreamTopping(models.Model):
+    name = models.CharField(max_length=50)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+
+    slug = models.SlugField(max_length=100, unique=True, blank=True, null=True, verbose_name='URL')
+    is_active = models.BooleanField(default=True, verbose_name='Активен')
+
+    class Meta:
+        db_table = 'ice_cream_toppings'
+        verbose_name = 'Топпинг для мороженного'
+        verbose_name_plural = 'Топпинги для мороженного'
+
+    def __str__(self):
+        return f'Топпинг для мороженного: {self.name}'
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(f"topping-{self.name}")
+        super().save(*args, **kwargs)
+
+
 @receiver(post_delete, sender=Category)
-@receiver(post_delete, sender=Item)
+@receiver(post_delete, sender=Product)
 def delete_image_file(sender, instance, **kwargs):
     """Удаляет файл изображения при удалении объекта."""
     if instance.image:

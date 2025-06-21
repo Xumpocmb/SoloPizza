@@ -13,8 +13,6 @@
 }
 
 .register-button {
-    background-color: #079b59;
-    color: #fff;
     padding: 10px 20px;
     border-radius: 5px;
     border: none;
@@ -52,6 +50,7 @@
     width: 80%;
     padding: 50px;
     box-shadow: 0 5px 5px rgba(0, 0, 0, 0.2);
+    text-align: center;
 }
 
 .auth_form {
@@ -62,6 +61,27 @@
     margin-bottom: 20px;
 }
 
+.auth_form_title {
+    margin-bottom: 20px;
+    color: var(--accent-color);
+}
+
 .register-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     text-align: center;
+}
+
+.register-link p {
+    margin-bottom: 10px;
+    color: var(--text-color);
+}
+
+.register-link a {
+    margin-right: 10px;
+    text-decoration: none;
+    color: var(--accent-color);
+
 }

@@ -4,9 +4,6 @@ from django.contrib.auth import logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.shortcuts import redirect, render
 
-from app_cart.models import CartItem
-from app_catalog.models import Item, ItemParams
-
 
 def register_view(request):
     if request.method == "POST":
@@ -30,8 +27,7 @@ def login_view(request):
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
-                next_url = request.POST.get("next") or "app_home:home"
-                return redirect(next_url)
+                return redirect("app_home:home")
             else:
                 form.add_error(None, "Неверное имя пользователя или пароль.")
     else:

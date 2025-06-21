@@ -2,6 +2,10 @@
     text-align: center;
 }
 
+.categories_title {
+    margin-bottom: 20px;
+}
+
 .page_text_container {
     display: flex;
     justify-content: center;
@@ -46,62 +50,48 @@
     }
 }
 
-.category_card {
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+.category-card {
+    position: relative;
     display: flex;
     flex-direction: column;
-    padding: 15px;
-    box-sizing: border-box;
-}
-
-.category_card img {
-    display: block;
-    margin: auto;
-    width: 100%;
-    height: 200px;
-    object-fit: contain;
+    align-items: center;
+    text-align: center;
+    background-color: var(--card-bg);
     border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    padding: 1rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    color: var(--text-color);
+    min-height: 200px;
 }
 
-.category_card p {
-    font-size: 1.5em;
-    margin: 0;
+.category-card:hover {
+    box-shadow: 0 8px 20px var(--accent-color-rgba);
 }
 
-.swiper-container {
-    width: 80%;
-    margin: auto;
+.category-card__image {
+    flex: 1;
+    width: 100%;
+    height: 150px;
     overflow: hidden;
-    position: relative;
-    --swiper-navigation-color: #079b59;
-    --swiper-pagination-color: #079b59;
-}
-
-.swiper-slide img {
-    width: 100%;
-    height: auto;
-    display: block;
     border-radius: 10px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    margin-bottom: 1rem;
 }
 
-.swiper-button-next,
-.swiper-button-prev {
-    color: #079b59;
+.category-card__image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+    border-radius: 10px;
 }
 
-.swiper-button-next::after, .swiper-button-prev::after {
-    font-size: 20px;
+.category-card__image img:hover {
+    transform: scale(1.1);
 }
 
-.swiper-pagination-bullet {
-    background: #fff;
-    opacity: 0.6;
-}
-
-.swiper-pagination-bullet-active {
-    background: #007bff;
-    opacity: 1;
+.category-card__name {
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin: 0;
 }

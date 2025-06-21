@@ -1,0 +1,70 @@
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--switch-bg);
+    transition: 0.3s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 2px;
+    bottom: 2px;
+    background-color: var(--switch-thumb);
+    transition: 0.3s;
+    border-radius: 50%;
+}
+
+input:checked + .slider:before {
+    transform: translateX(20px);
+}
+
+input:checked + .slider {
+    background-color: var(--accent-color);
+}
+
+.swiper-container {
+    position: relative;
+    width: 80%;
+    max-width: 1000px;
+    margin: 2rem auto;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    --swiper-navigation-color: var(--accent-color);
+    --swiper-pagination-color: var(--accent-color);
+}
+
+.swiper-slide img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+    border-radius: 12px;
+}
+
+.swiper-button-next,
+.swiper-button-prev {
+    color: var(--accent-color);
+}
+
+.swiper-button-next::after, .swiper-button-prev::after {
+    font-size: 20px;
+}
+
+.swiper-pagination-bullet {
+    background: var(--switch-bg);
+    opacity: 0.6;
+}
+
+.swiper-pagination-bullet-active {
+    background: var(--accent-color);
+    opacity: 1;
+}

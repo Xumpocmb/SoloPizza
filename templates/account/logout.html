@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block main %}
+    <div class="logout-container">
+        <div class="logout-card">
+            <div class="logout-header">
+                <h1 class="logout-title">Выход из аккаунта</h1>
+                <div class="logout-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                         stroke="#dc3545" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="logout-body">
+                <p class="logout-message">
+                    Вы уверены, что хотите выйти?
+                </p>
+
+                <form method="post" class="logout-form">
+                    {% csrf_token %}
+                    <button type="submit" class="logout-button">
+                        Да, выйти
+                    </button>
+                </form>
+            </div>
+
+            <div class="logout-footer">
+                <a href="/" class="logout-cancel">Нет, остаться</a>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .logout-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: var(--bg-color); /* Цвет фона из темы */
+            padding: 20px;
+        }
+
+        .logout-card {
+            background: var(--card-bg); /* Фон карточки */
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 450px;
+            overflow: hidden;
+        }
+
+        .logout-header {
+            background: var(--accent-color); /* Акцентный цвет вместо #dc3545 */
+            color: white;
+            padding: 25px;
+            text-align: center;
+            position: relative;
+        }
+
+        .logout-title {
+            margin: 0;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .logout-icon {
+            width: 60px;
+            height: 60px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 15px auto;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .logout-icon svg {
+            width: 40px;
+            height: 40px;
+        }
+
+        .logout-body {
+            padding: 30px;
+            text-align: center;
+        }
+
+        .logout-message {
+            color: var(--text-color); /* Цвет текста из темы */
+            margin-bottom: 25px;
+            line-height: 1.5;
+            font-size: 1.1rem;
+        }
+
+        .logout-form {
+            text-align: center;
+        }
+
+        .logout-button {
+            background: var(--accent-color); /* Акцентный цвет */
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 12px 24px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            max-width: 200px;
+        }
+
+        .logout-button:hover {
+            background: #068a50; /* Темнее акцента */
+            transform: translateY(-2px);
+        }
+
+        .logout-footer {
+            text-align: center;
+            padding: 15px;
+            border-top: 1px solid var(--hover-bg); /* Линия из темы */
+        }
+
+        .logout-cancel {
+            color: var(--text-color); /* Цвет текста */
+            opacity: 0.7;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .logout-cancel:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
+    </style>
+{% endblock %}

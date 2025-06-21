@@ -5,14 +5,14 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
 from django.shortcuts import render
 
-from app_catalog.models import Item, ItemParams, BoardParams, AddonParams, PizzaSauce
+from app_catalog.models import Product, ProductVariant, BoardParams, AddonParams, PizzaSauce
 from .models import CartItem
 
 
 def add_to_cart(request, slug):
     if request.method == 'POST':
         # Получаем товар
-        item = get_object_or_404(Item, slug=slug)
+        item = get_object_or_404(Product, slug=slug)
 
         # Получаем выбранные параметры из POST-данных
         size_id = request.POST.get('size')
@@ -22,7 +22,7 @@ def add_to_cart(request, slug):
         quantity = int(request.POST.get('quantity', 1))
 
         # Проверяем, что размер выбран
-        size = get_object_or_404(ItemParams, id=size_id, item=item)
+        size = get_object_or_404(ProductVariant, id=size_id, item=item)
 
         # Формируем данные о товаре
         item_data = {

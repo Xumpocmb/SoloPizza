@@ -1,26 +1,39 @@
-$(document).ready(function () {
-    const $burgerMenu = $('#burger-menu');
-    const $sidebar = $('#sidebar');
-    const $sidebarOverlay = $('.sidebar-overlay');
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    sidebar.classList.toggle('open');
+    overlay.classList.toggle('show');
+  }
 
-    $burgerMenu.click(function () {
-        $burgerMenu.toggleClass('active');
-        $sidebar.toggleClass('active');
-        $('body').toggleClass('lock');
-    });
+  function toggleSubmenu(id) {
+    const submenu = document.getElementById(id);
+    submenu.classList.toggle('open');
+  }
 
-    $('.sidebar-overlay').click(function () {
-        $sidebar.removeClass('active');
-        $sidebarOverlay.removeClass('active');
-        $('body').removeClass('lock');
+document.addEventListener('DOMContentLoaded', () => {
+    const sidebarLinks = document.querySelectorAll('.sidebar a');
+    sidebarLinks.forEach(link => {
+      link.addEventListener('click', () => {
+        document.getElementById('sidebar').classList.remove('open');
+        document.getElementById('overlay').classList.remove('show');
+      });
     });
+  });
 
-    // Открытие подменю при клике
-    $('.sidebar ul li > a').click(function (event) {
-        if ($(this).next('.submenu').length) {
-            $(this).next('.submenu').slideToggle();
-            event.stopPropagation();
-            event.preventDefault();
-        }
-    });
+const themeToggle = document.getElementById('themeToggle');
+
+// Проверяем предпочтения пользователя
+if (localStorage.getItem('theme') === 'dark') {
+    document.documentElement.classList.add('dark');
+    themeToggle.checked = true;
+}
+
+themeToggle.addEventListener('change', function () {
+    if (this.checked) {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+    } else {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+    }
 });

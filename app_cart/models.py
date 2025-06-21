@@ -1,7 +1,7 @@
 from decimal import Decimal
 from django.db import models
 from django.conf import settings
-from app_catalog.models import Item, ItemParams, BoardParams, AddonParams, PizzaSauce
+from app_catalog.models import Product, ProductVariant, BoardParams, AddonParams, PizzaSauce
 
 
 class CartQuerySet(models.QuerySet):
@@ -14,15 +14,15 @@ class CartQuerySet(models.QuerySet):
 
 class CartItem(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name='Пользователь')
-    item = models.ForeignKey(Item, on_delete=models.CASCADE, verbose_name='Товар')
-    item_params = models.ForeignKey(ItemParams, on_delete=models.CASCADE, verbose_name='Размер')
+    item = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='Товар')
+    item_params = models.ForeignKey(ProductVariant, on_delete=models.CASCADE, verbose_name='Размер')
     quantity = models.PositiveIntegerField(default=1, verbose_name='Количество')
     board = models.ForeignKey(BoardParams, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='Борт')
     addons = models.ManyToManyField(AddonParams, blank=True, verbose_name='Добавки')
     sauce = models.ForeignKey(PizzaSauce, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='Соус')
 
     objects = CartQuerySet.as_manager()
-    
+
     class Meta:
         db_table = 'cart_items'
         verbose_name = 'Товар в корзине'
