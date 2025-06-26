@@ -75,12 +75,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "SoloPizza.wsgi.application"
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
-}
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.sqlite3",
+#         "NAME": BASE_DIR / "db.sqlite3",
+#     }
+# }
 
 DATABASES = {
     "default": {
@@ -111,7 +111,7 @@ LANGUAGE_CODE = "ru-RU"
 TIME_ZONE = "Europe/Moscow"
 
 USE_I18N = True
-USE_TZ = False
+USE_TZ = True
 
 STATIC_URL = "static/"
 if DEBUG:

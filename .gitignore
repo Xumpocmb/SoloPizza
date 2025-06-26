@@ -118,15 +118,12 @@ static/video
 
 
 # Исключаем файлы миграций
-*/migrations/*
-!*/migrations/__init__.py
+**/migrations/*.py
+!**/migrations/__init__.py
 
 # Исключаем базу данных SQLite
 db.sqlite3
 
-
-
-/*/migrations/
 
 /fixtures/
 /static/admin/
