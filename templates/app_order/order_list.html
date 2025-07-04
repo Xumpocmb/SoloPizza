@@ -2,32 +2,129 @@
 {% load static %}
 
 {% block styles %}
-    <link rel="stylesheet" href="{% static 'css/order.css' %}">
+    <link rel="stylesheet" href="{% static 'css/order_list.css' %}">
 {% endblock %}
 
 {% block main %}
-    <main class="orders-page">
-        <h1>Мои заказы</h1>
-        <hr>
-    <section class="section_order">
-        {% if orders %}
-            <div class="orders-grid">
-                {% for order in orders %}
-                    <div class="order-card">
-                        <h2>Заказ #{{ order.id }}</h2>
-                        <p><strong>Статус:</strong> <span class="status {{ order.status }}">{{ order.get_status_display }}</span></p>
-                        <p><strong>Дата создания:</strong> {{ order.created_at|date:"d.m.Y H:i" }}</p>
-                        <p><strong>Общая сумма:</strong> {{ order.total_price }} руб.</p>
-                        <a href="{% url 'app_order:order_detail' order.id %}" class="view-order-btn">Посмотреть детали</a>
+    <main class="order-list-page">
+        <div class="order-list-container">
+            <h1 class="page-title">Мои заказы</h1>
+
+            <!-- Панель фильтров и поиска -->
+            <div class="order-controls">
+                <form method="get" class="search-form">
+                    <div class="search-group">
+                        <input type="text"
+                               name="search"
+                               placeholder="Поиск по ID, имени или телефону"
+                               value="{{ search_query }}"
+                               class="search-input">
+                        <button type="submit" class="search-button">
+                            <i class="fas fa-search"></i>
+                        </button>
                     </div>
+
+                    <div class="filter-group">
+                        <select name="status" class="status-filter">
+                            <option value="">Все статусы</option>
+                            {% for status in status_choices %}
+                                <option value="{{ status.0 }}"
+                                        {% if status_filter == status.0 %}selected{% endif %}>
+                                    {{ status.1 }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="filter-button">Применить</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Таблица заказов -->
+            <div class="orders-table">
+                <div class="table-header">
+                    <div class="header-cell">ID</div>
+                    <div class="header-cell">Дата</div>
+                    <div class="header-cell">Статус</div>
+                    <div class="header-cell">Сумма</div>
+                    <div class="header-cell">Способ получения</div>
+                    <div class="header-cell">Оплата</div>
+                    <div class="header-cell">Действия</div>
+                </div>
+
+                {% for order in page_obj %}
+                <div class="table-row">
+                    <div class="table-cell">#{{ order.id }}</div>
+                    <div class="table-cell">{{ order.created_at|date:"d.m.Y H:i" }}</div>
+                    <div class="table-cell">
+                        <span class="status-badge {{ order.status }}">
+                            {{ order.get_status_display }}
+                        </span>
+                    </div>
+                    <div class="table-cell">{{ order.total_price|floatformat:2 }} руб.</div>
+                    <div class="table-cell">{{ order.get_delivery_type_display }}</div>
+                    <div class="table-cell">
+                        {% if order.payment_status %}
+                            <span class="payment-paid">Оплачено</span>
+                        {% else %}
+                            <span class="payment-unpaid">Не оплачено</span>
+                        {% endif %}
+                    </div>
+                    <div class="table-cell actions-cell">
+                        <a href="{% url 'app_order:order_detail' order.id %}"
+                           class="view-button"
+                           title="Просмотреть">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="no-orders">
+                    <p>Заказы не найдены</p>
+                </div>
                 {% endfor %}
             </div>
-        {% else %}
-            <div class="empty-orders">
-                <p>У вас нет заказов.</p>
-                <a href="{% url 'app_home:home' %}" class="continue-shopping">Продолжить покупки</a>
+
+            <!-- Пагинация -->
+            {% if page_obj.paginator.num_pages > 1 %}
+            <div class="pagination">
+                {% if page_obj.has_previous %}
+                    <a href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}"
+                       class="page-link first-page">
+                        <i class="fas fa-angle-double-left"></i>
+                    </a>
+                    <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}"
+                       class="page-link">
+                        <i class="fas fa-angle-left"></i>
+                    </a>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                        <span class="page-link current-page">{{ num }}</span>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <a href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}"
+                           class="page-link">
+                            {{ num }}
+                        </a>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}"
+                       class="page-link">
+                        <i class="fas fa-angle-right"></i>
+                    </a>
+                    <a href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}"
+                       class="page-link last-page">
+                        <i class="fas fa-angle-double-right"></i>
+                    </a>
+                {% endif %}
             </div>
-        {% endif %}
-    </section>
+            {% endif %}
+        </div>
     </main>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static 'js/order_list.js' %}"></script>
 {% endblock %}

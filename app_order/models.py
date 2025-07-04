@@ -147,6 +147,10 @@ class OrderItem(models.Model):
         """Возвращает итоговую цену позиции с учетом скидки"""
         return (self.price * self.quantity) - self.discount_amount
 
+    def is_editable(self):
+        """Можно ли редактировать этот товар в заказе"""
+        return self.order.status in self.order.EDITABLE_STATUSES
+
 class OrderItemAddon(models.Model):
     order_item = models.ForeignKey(
         OrderItem,

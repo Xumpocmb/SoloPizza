@@ -1,0 +1,286 @@
+/* Основные стили страницы */
+.order-list-page {
+    width: 90%;
+    max-width: 1400px;
+    padding: 20px;
+    margin: 60px auto;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+
+.order-list-container {
+    background-color: var(--card-bg);
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.page-title {
+    font-size: 1.8rem;
+    margin-bottom: 25px;
+    color: var(--text-color);
+}
+
+/* Панель управления */
+.order-controls {
+    margin-bottom: 25px;
+}
+
+.search-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: center;
+}
+
+.search-group {
+    display: flex;
+    flex: 1;
+    min-width: 250px;
+}
+
+.search-input {
+    flex: 1;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px 0 0 5px;
+    background-color: var(--card-bg);
+    color: var(--text-color);
+}
+
+.search-button {
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 0 15px;
+    border-radius: 0 5px 5px 0;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.search-button:hover {
+    background-color: #068a50;
+}
+
+.filter-group {
+    display: flex;
+    min-width: 300px;
+}
+
+.status-filter {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px 0 0 5px;
+    background-color: var(--card-bg);
+    color: var(--text-color);
+}
+
+.filter-button {
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 0 15px;
+    border-radius: 0 5px 5px 0;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.filter-button:hover {
+    background-color: #068a50;
+}
+
+/* Таблица заказов */
+.orders-table {
+    margin-bottom: 30px;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.table-header {
+    display: grid;
+    grid-template-columns: 80px 120px 140px 120px 150px 120px 100px;
+    background-color: var(--accent-color);
+    color: white;
+    font-weight: 600;
+    padding: 12px 15px;
+}
+
+.header-cell {
+    padding: 5px;
+}
+
+.table-row {
+    display: grid;
+    grid-template-columns: 80px 120px 140px 120px 150px 120px 100px;
+    padding: 12px 15px;
+    border-bottom: 1px solid var(--hover-bg);
+    transition: background-color 0.2s;
+    align-items: center;
+}
+
+.table-row:hover {
+    background-color: var(--hover-bg);
+}
+
+.table-cell {
+    padding: 5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Бейджи статусов */
+.status-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.status-badge.new {
+    background-color: #3498db;
+    color: white;
+}
+
+.status-badge.confirmed {
+    background-color: #2ecc71;
+    color: white;
+}
+
+.status-badge.cooking {
+    background-color: #f39c12;
+    color: white;
+}
+
+.status-badge.delivering {
+    background-color: #9b59b6;
+    color: white;
+}
+
+.status-badge.completed {
+    background-color: #27ae60;
+    color: white;
+}
+
+.status-badge.canceled {
+    background-color: #e74c3c;
+    color: white;
+}
+
+/* Статус оплаты */
+.payment-paid {
+    color: #2ecc71;
+    font-weight: 600;
+}
+
+.payment-unpaid {
+    color: #e74c3c;
+    font-weight: 600;
+}
+
+/* Кнопки действий */
+.actions-cell {
+    display: flex;
+    gap: 10px;
+}
+
+.view-button, .edit-button {
+    color: var(--text-color);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 5px;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.view-button {
+    color: var(--accent-color);
+}
+
+.view-button:hover {
+    background-color: var(--accent-color-rgba);
+}
+
+.edit-button {
+    color: #f39c12;
+}
+
+.edit-button:hover {
+    background-color: rgba(243, 156, 18, 0.2);
+}
+
+/* Пагинация */
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    margin-top: 30px;
+}
+
+.page-link {
+    padding: 8px 12px;
+    border: 1px solid var(--hover-bg);
+    border-radius: 4px;
+    color: var(--text-color);
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.page-link:hover {
+    background-color: var(--hover-bg);
+}
+
+.current-page {
+    background-color: var(--accent-color);
+    color: white;
+    border-color: var(--accent-color);
+}
+
+.first-page, .last-page {
+    padding: 8px 10px;
+}
+
+/* Нет заказов */
+.no-orders {
+    padding: 30px;
+    text-align: center;
+    color: var(--text-color);
+    opacity: 0.7;
+}
+
+/* Адаптивность */
+@media (max-width: 1200px) {
+    .table-header, .table-row {
+        grid-template-columns: 80px 120px 140px 120px 120px 100px 80px;
+    }
+}
+
+@media (max-width: 992px) {
+    .orders-table {
+        overflow-x: auto;
+    }
+
+    .table-header, .table-row {
+        grid-template-columns: repeat(7, minmax(100px, 1fr));
+        width: 900px;
+    }
+}
+
+@media (max-width: 768px) {
+    .search-form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search-group, .filter-group {
+        min-width: 100%;
+    }
+}

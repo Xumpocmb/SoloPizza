@@ -1,6 +1,7 @@
 from django import forms
 
-from app_order.models import Order
+from app_catalog.models import ProductVariant, BoardParams
+from app_order.models import Order, OrderItem
 
 
 class CheckoutForm(forms.Form):
@@ -102,7 +103,7 @@ class OrderEditForm(forms.ModelForm):
             'address': forms.TextInput(attrs={
                 'class': 'form-input',
                 'placeholder': 'ул. Ленина, д. 1, кв. 1',
-                'id': 'address-input'
+                'id': 'id_address'
             }),
         }
         labels = {
@@ -115,13 +116,51 @@ class OrderEditForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['payment_status'].label = "Заказ оплачен"
 
+        # Устанавливаем начальное значение для адреса при самовывозе
+        if self.instance.delivery_type == 'pickup' and not self.instance.address:
+            self.instance.address = 'Самовывоз'
+
+        self.fields['address'].required = False
+        if self.initial.get('delivery_type') == 'delivery':
+            self.fields['address'].required = True
+
     def clean(self):
         cleaned_data = super().clean()
         delivery_type = cleaned_data.get('delivery_type')
         address = cleaned_data.get('address')
 
-        # Если выбрана доставка, адрес становится обязательным
         if delivery_type == 'delivery' and not address:
             self.add_error('address', 'Укажите адрес для доставки')
+        elif delivery_type == 'pickup':
+            cleaned_data['address'] = 'Самовывоз'
 
         return cleaned_data
+
+
+class OrderItemEditForm(forms.ModelForm):
+    class Meta:
+        model = OrderItem
+        fields = ['variant', 'quantity', 'board', 'sauce']
+        widgets = {
+            'variant': forms.Select(attrs={'class': 'form-select'}),
+            'quantity': forms.NumberInput(attrs={
+                'class': 'form-input',
+                'min': 1,
+                'max': 20
+            }),
+            'board': forms.Select(attrs={'class': 'form-select'}),
+            'sauce': forms.Select(attrs={'class': 'form-select'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Фильтруем варианты только для этого товара
+        if self.instance:
+            self.fields['variant'].queryset = ProductVariant.objects.filter(
+                product=self.instance.product
+            )
+            # Фильтруем борты по размеру
+            if self.instance.variant.size:
+                self.fields['board'].queryset = BoardParams.objects.filter(
+                    size=self.instance.variant.size
+                )

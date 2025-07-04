@@ -50,7 +50,7 @@
                 {% endif %}
                 <a href="{% url 'socialaccount_connections' %}">Управление социальными аккаунтами</a>
                 <a href="{% url 'app_cart:view_cart' %}">Корзина</a>
-                {% comment %} <a href="{% url 'app_order:order_list' %}">Заказы</a> {% endcomment %}
+                <a href="{% url 'app_order:order_list' %}">Заказы</a>
                 <a href="{% url 'app_user:logout' %}">Выход</a>
             {% else %}
                 <a href="{% url 'app_user:login' %}">Вход</a>

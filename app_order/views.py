@@ -2,10 +2,12 @@ from decimal import Decimal
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
+from django.db.models import Q
 from django.shortcuts import redirect, render, get_object_or_404
 
 from app_cart.models import CartItem
-from app_order.forms import CheckoutForm, OrderEditForm
+from app_order.forms import CheckoutForm, OrderEditForm, OrderItemEditForm
 from app_order.models import OrderItemAddon, OrderItem, Order
 
 
@@ -95,6 +97,16 @@ def order_detail(request, order_id):
     )
     is_editable = order.is_editable()
 
+    if request.method == 'POST' and 'edit_item' in request.POST:
+        item_id = request.POST.get('item_id')
+        item = get_object_or_404(OrderItem, id=item_id, order=order)
+        if item.is_editable():
+            form = OrderItemEditForm(request.POST, instance=item)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Изменения сохранены')
+                return redirect('app_order:order_detail', order_id=order.id)
+
     if request.method == 'POST' and is_editable:
         form = OrderEditForm(request.POST, instance=order)
         if form.is_valid():
@@ -102,11 +114,59 @@ def order_detail(request, order_id):
             messages.success(request, 'Изменения сохранены')
             return redirect('app_order:order_detail', order_id=order.id)
     else:
-        form = OrderEditForm(instance=order)
+        form = OrderEditForm(instance=order, initial={
+            'delivery_type': order.delivery_type,
+            'address': order.address if order.delivery_type == 'delivery' else 'Самовывоз'
+        })
+
+    item_forms = []
+    for item in order.items.all():
+        item_forms.append({
+            'item': item,
+            'form': OrderItemEditForm(instance=item),
+            'is_editable': item.is_editable()
+        })
 
     return render(request, 'app_order/order_detail.html', {
         'order': order,
         'order_items': order.items.all(),
         'form': form,
+        'item_forms': item_forms,
         'is_editable': is_editable,
     })
+
+
+@login_required
+def order_list(request):
+    # Фильтрация заказов для пользователя (админы видят все)
+    if request.user.is_staff:
+        orders = Order.objects.all().order_by('-created_at')
+    else:
+        orders = Order.objects.filter(user=request.user).order_by('-created_at')
+
+    # Поиск и фильтрация
+    search_query = request.GET.get('search', '')
+    status_filter = request.GET.get('status', '')
+
+    if search_query:
+        orders = orders.filter(
+            Q(id__icontains=search_query) |
+            Q(customer_name__icontains=search_query) |
+            Q(phone_number__icontains=search_query)
+        )
+
+    if status_filter:
+        orders = orders.filter(status=status_filter)
+
+    # Пагинация
+    paginator = Paginator(orders, 15)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'page_obj': page_obj,
+        'status_choices': Order.STATUS_CHOICES,
+        'search_query': search_query,
+        'status_filter': status_filter,
+    }
+    return render(request, 'app_order/order_list.html', context)
