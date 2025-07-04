@@ -79,7 +79,8 @@ class ProductVariant(models.Model):
         ('l', 'л'),
     ]
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='variants')
-    value = models.CharField(null=True, blank=True, max_length=50, verbose_name='Значение')
+    value = models.CharField(null=True, blank=True, max_length=50, verbose_name='Значение', help_text="Значение для товаров")
+    size = models.ForeignKey(PizzaSizes, on_delete=models.SET_NULL, blank=True, null=True, verbose_name='Размер', help_text="Размер для пиццы и кальцоне")
     unit = models.CharField(max_length=10, choices=UNIT_CHOICES, default='pcs', verbose_name='Единица измерения')
     price = models.DecimalField('Цена', max_digits=10, decimal_places=2)
 

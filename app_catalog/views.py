@@ -23,8 +23,6 @@ def category_detail(request, slug):
 def item_detail(request, slug):
     """Страница карточки товара без формы, просто отображаем данные."""
     item = get_object_or_404(Product, slug=slug)
-
-    # Получаем все варианты товара (ProductVariant) по полю product
     variants = ProductVariant.objects.filter(product=item)
 
     selected_variant_id = request.GET.get('size')
@@ -37,22 +35,22 @@ def item_detail(request, slug):
     else:
         selected_variant = variants.first()
 
+    # Определяем, является ли товар пиццей или кальцоне
+    is_pizza_or_calzone = item.category.name in ["Пицца", "Кальцоне"]
+
     if selected_variant:
-        sauces = PizzaSauce.objects.all() if item.category.name in ["Пицца", "Кальцоне"] else []
+        sauces = PizzaSauce.objects.all() if is_pizza_or_calzone else []
 
-        # Пример: если размер хранится как строка в `value`, например "30 см"
-        size_name = selected_variant.value
+        # Получаем размеры в зависимости от типа товара
+        if is_pizza_or_calzone:
+            # Для пиццы/кальцоне используем поле size
+            size_name = selected_variant.size.name if selected_variant.size else None
+        else:
+            # Для других товаров используем поле value + unit
+            size_name = f"{selected_variant.value} {selected_variant.get_unit_display()}" if selected_variant.value else None
 
-        boards = (
-            BoardParams.objects.filter(size__name=size_name)
-            if item.category.name == "Пицца"
-            else []
-        )
-        addons = (
-            AddonParams.objects.filter(size__name=size_name)
-            if item.category.name == "Пицца"
-            else []
-        )
+        boards = BoardParams.objects.filter(size=selected_variant.size) if is_pizza_or_calzone else []
+        addons = AddonParams.objects.filter(size=selected_variant.size) if is_pizza_or_calzone else []
         drinks = ["Кола 1л.", "Sprite 1л."] if item.category.name in ["Комбо"] else []
         min_price = selected_variant.price
     else:
@@ -64,13 +62,14 @@ def item_detail(request, slug):
 
     context = {
         "item": item,
-        "variants": variants,
+        "variants": variants,  # Это все варианты товара
         "selected_variant": selected_variant,
         "sauces": sauces,
         "boards": boards,
         "addons": addons,
         "drinks": drinks,
         "min_price": min_price,
+        "is_pizza_or_calzone": is_pizza_or_calzone,  # Флаг для шаблона
     }
 
     return render(request, "app_catalog/item_detail.html", context)

@@ -7,90 +7,141 @@
 
 {% block main %}
     <main class="cart-page">
-        <h1>Корзина</h1>
-        <hr>
-        <section class="section_cart">
+        <div class="cart-container">
+            <h1 class="cart-title">Ваша корзина</h1>
+
             {% if cart_items %}
-                <div class="cart-items">
+                <div class="cart-items-list">
                     {% for item in cart_items %}
-                        <div class="cart-item">
+                        <div class="cart-item-card">
                             <!-- Изображение товара -->
                             <div class="cart-item-image">
                                 {% if item.item.image %}
-                                    <img src="{{ item.item.image.url }}" alt="{{ item.item.name }}">
+                                    <img src="{{ item.item.image.url }}" alt="{{ item.item.name }}" class="item-img">
                                 {% else %}
-                                    <img src="{% static 'img/test.jpg' %}" alt="{{ item.item.name }}">
+                                    <img src="{% static 'img/test.jpg' %}" alt="{{ item.item.name }}" class="item-img">
                                 {% endif %}
                             </div>
 
                             <!-- Информация о товаре -->
-                            <div class="cart-item-info">
-                                <h2>{{ item.item.name }}</h2>
-                                <p>
-                                    <strong>Размер:</strong> {{ item.item_params.size.name }} {{ item.item_params.get_unit_display }}
-                                    ({{ item.size.price }} руб.)</p>
+                            <div class="cart-item-details">
+                                <div class="item-header">
+                                    <h2 class="item-name">{{ item.item.name }}</h2>
+                                    {% if item.item.is_weekly_special and item.item.category.name == "Пицца" %}
+                                        <span class="discount-badge">Акция: -10%</span>
+                                    {% endif %}
+                                </div>
 
-                                {% if item.board %}
-                                    <p><strong>Борт:</strong> {{ item.board.board.name }} (+{{ item.board.price }} руб.)
-                                    </p>
-                                {% endif %}
+                                <div class="item-options">
+                                    <!-- Размер -->
+                                    <div class="item-option">
+                                        <span class="option-label">Размер:</span>
+                                        <span class="option-value">
+                                            {% if item.item_variant.size %}
+                                                {{ item.item_variant.size.name }}
+                                            {% else %}
+                                                {{ item.item_variant.value }} {{ item.item_variant.get_unit_display }}
+                                            {% endif %}
+                                            ({{ item.item_variant.price }} руб.)
+                                        </span>
+                                    </div>
 
-                                {% if item.sauce %}
-                                <p><strong>Соус:</strong> {{ item.sauce.name }}</p>
-                                {% endif %}
+                                    <!-- Борт -->
+                                    {% if item.board %}
+                                        <div class="item-option">
+                                            <span class="option-label">Борт:</span>
+                                            <span class="option-value">
+                                            {{ item.board.board.name }} (+{{ item.board.price }} руб.)
+                                        </span>
+                                        </div>
+                                    {% endif %}
 
-                                {% if item.addons.exists %}
-                                    <p><strong>Добавки:</strong></p>
-                                    <ul class="addons-list">
-                                        {% for addon in item.addons.all %}
-                                            <li>{{ addon.addon.name }} (+{{ addon.price }} руб.)</li>
-                                        {% endfor %}
-                                    </ul>
-                                {% endif %}
+                                    <!-- Соус -->
+                                    {% if item.sauce %}
+                                        <div class="item-option">
+                                            <span class="option-label">Соус:</span>
+                                            <span class="option-value">{{ item.sauce.name }}</span>
+                                        </div>
+                                    {% endif %}
 
-                                <!-- Форма для изменения количества -->
-                                <form method="post" action="{% url 'app_cart:update_quantity' item.id %}"
-                                      class="quantity-form">
-                                    {% csrf_token %}
-                                    <label for="quantity_{{ item.id }}">Количество:</label>
-                                    <button type="submit" name="action" value="decrease" class="quantity-btn minus">-
-                                    </button>
-                                    <input type="number" id="quantity_{{ item.id }}" name="quantity"
-                                           class="quantity-input"
-                                           value="{{ item.quantity }}" min="1" readonly>
-                                    <button type="submit" name="action" value="increase" class="quantity-btn plus">+
-                                    </button>
-                                </form>
+                                    <!-- Добавки -->
+                                    {% if item.addons.exists %}
+                                        <div class="item-option">
+                                            <span class="option-label">Добавки:</span>
+                                            <ul class="addons-list">
+                                                {% for addon in item.addons.all %}
+                                                    <li>{{ addon.addon.name }} (+{{ addon.price }} руб.)</li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                    {% endif %}
+                                </div>
 
-                                <!-- Общая цена товара -->
-                                <p class="item-total-price">
-                                    <strong>Итого за товар:</strong>
-                                    <span class="total-price">{{ item.total_price|floatformat:2 }} руб.</span>
-                                </p>
+                                <!-- Управление количеством и удалением -->
+                                <div class="item-controls">
+                                    <form method="post" action="{% url 'app_cart:update_quantity' item.id %}"
+                                          class="quantity-form">
+                                        {% csrf_token %}
+                                        <div class="quantity-selector">
+                                            <button type="submit" name="action" value="decrease"
+                                                    class="quantity-btn minus">-
+                                            </button>
+                                            <span class="quantity-value">{{ item.quantity }}</span>
+                                            <button type="submit" name="action" value="increase"
+                                                    class="quantity-btn plus">+
+                                            </button>
+                                        </div>
+                                    </form>
 
-                                <!-- Удаление товара -->
-                                <form method="POST" action="{% url 'app_cart:remove_item' item.id %}"
-                                      class="remove-form">
-                                    {% csrf_token %}
-                                    <button type="submit" class="remove-item">Удалить</button>
-                                </form>
+                                    <form method="POST" action="{% url 'app_cart:remove_item' item.id %}"
+                                          class="remove-form">
+                                        {% csrf_token %}
+                                        <button type="submit" class="remove-btn">
+                                            <i class="fas fa-trash-alt"></i> Удалить
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <!-- Итоговая цена за позицию -->
+                            <div class="item-total">
+                                <span class="total-price">{{ item.calculate_cart_total|floatformat:2 }} руб.</span>
                             </div>
                         </div>
                     {% endfor %}
                 </div>
 
-                <!-- Итоговая сумма -->
+                <!-- Итоговая сумма и кнопка оформления -->
                 <div class="cart-summary">
-                    <p><strong>Общая сумма:</strong> {{ total_price|floatformat:2 }} руб.</p>
-                    <a href="{% url 'app_order:select_address' %}"><button type="submit" class="checkout-btn">Оформить заказ</button></a>
+                    <div class="summary-row">
+                        <span class="summary-label">Сумма без скидки:</span>
+                        <span class="summary-value">{{ subtotal|floatformat:2 }} руб.</span>
+                    </div>
+                    {% if discount_amount > 0 %}
+                        <div class="summary-row discount-row">
+                            <span class="summary-label">Скидка на пиццу недели:</span>
+                            <span class="summary-value">-{{ discount_amount|floatformat:2 }} руб.</span>
+                        </div>
+                    {% endif %}
+                    <div class="summary-row total-row">
+                        <span class="summary-label">Общая сумма:</span>
+                        <span class="summary-value">{{ total_price|floatformat:2 }} руб.</span>
+                    </div>
+                    <a href="{% url 'app_order:checkout' %}" class="checkout-btn">Оформить заказ</a>
                 </div>
 
             {% else %}
-                <div class="empty-cart">
-                    <p>Корзина пуста.</p>
-                    <a href="{% url 'app_home:home' %}" class="continue-shopping">Продолжить покупки</a>
+                <!-- Пустая корзина -->
+                <div class="empty-cart-message">
+                    <div class="empty-cart-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <p class="empty-text">Ваша корзина пуста</p>
+                    <a href="{% url 'app_home:home' %}" class="continue-shopping-btn">
+                        <i class="fas fa-arrow-left"></i> Вернуться к покупкам
+                    </a>
                 </div>
             {% endif %}
-        </section>
+        </div>
     </main>
 {% endblock %}

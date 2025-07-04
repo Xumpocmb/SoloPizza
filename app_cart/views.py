@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
@@ -9,102 +11,72 @@ from app_catalog.models import Product, ProductVariant, BoardParams, AddonParams
 from .models import CartItem
 
 
+@login_required()
 def add_to_cart(request, slug):
     if request.method == 'POST':
-        # Получаем товар
         item = get_object_or_404(Product, slug=slug)
-
-        # Получаем выбранные параметры из POST-данных
-        size_id = request.POST.get('size')
-        sauce_id = request.POST.get('sauce')
-        board_id = request.POST.get('board')
-        addon_ids = request.POST.getlist('addons')
+        variant_id = request.POST.get('variant_id')
         quantity = int(request.POST.get('quantity', 1))
+        sauce_id = request.POST.get('sauce_id')
+        board_id = request.POST.get('board_id')
+        addon_ids = request.POST.getlist('addon_ids')
 
-        # Проверяем, что размер выбран
-        size = get_object_or_404(ProductVariant, id=size_id, item=item)
+        variant = get_object_or_404(ProductVariant, id=variant_id, product=item)
+        sauce = get_object_or_404(PizzaSauce, id=sauce_id) if sauce_id else None
+        board = get_object_or_404(BoardParams, id=board_id) if board_id else None
+        addons = AddonParams.objects.filter(id__in=addon_ids) if addon_ids else []
 
-        # Формируем данные о товаре
-        item_data = {
-            'item_slug': item.slug,
-            'size_id': size_id,
-            'quantity': quantity,
-            'sauce_id': sauce_id,
-            'board_id': board_id,
-            'addon_ids': addon_ids,
-        }
+        cart_item, created = CartItem.objects.get_or_create(
+            user=request.user,
+            item=item,
+            item_variant=variant,
+            sauce=sauce,
+            board=board,
+            defaults={'quantity': quantity}
+        )
 
-        # Проверяем, что борт существует (если выбран)
-        board = None
-        if board_id:
-            board = get_object_or_404(BoardParams, id=board_id, size=size.size)
-
-        # Проверяем, что соус существует (если выбран)
-        sauce = None
-        if sauce_id:
-            sauce = get_object_or_404(PizzaSauce, id=sauce_id)
-
-        # Получаем добавки (если выбраны)
-        addons = AddonParams.objects.filter(id__in=addon_ids, size=size.size)
-
-        if request.user.is_authenticated:
-            # Создаем или обновляем запись в корзине
-            cart_item, created = CartItem.objects.get_or_create(
-                user=request.user,
-                item=item,
-                item_params=size,
-                board=board,
-                sauce=sauce,
-            )
-            cart_item.addons.set(addons)  # Обновляем добавки
-            cart_item.quantity = quantity
+        if not created:
+            cart_item.quantity += quantity
             cart_item.save()
-            messages.info(request,f'Товар "{item.name}" успешно добавлен в корзину.', extra_tags='success')
-        else:
-            # Если пользователь не авторизован, сохраняем товар в сессии
-            cart_in_session = request.session.get('cart_in_session', [])
-            for cart_item in cart_in_session:
-                if (cart_item['item_slug'] == item.slug and
-                        cart_item['size_id'] == size_id and
-                        cart_item['board_id'] == board_id and
-                        set(cart_item['addon_ids']) == set(addon_ids) and
-                        cart_item.get('sauce_id') == sauce_id):  # Учитываем соус
-                    # Если такой товар уже есть, увеличиваем количество
-                    cart_item['quantity'] += quantity
-                    break
-            else:
-                # Иначе добавляем новый товар
-                cart_in_session.append(item_data)
 
-            request.session['cart_in_session'] = cart_in_session
-            messages.info(request, f'Товар "{item.name}" будет добавлен в корзину после авторизации.')
+        cart_item.addons.set(addons)
 
-            # Перенаправляем на страницу входа
-            return redirect('app_user:login')
+        messages.success(request, f'Товар "{item.name}" добавлен в корзину!')
+        return redirect('app_catalog:item_detail', slug=slug)
 
-        return HttpResponseRedirect(request.META.get("HTTP_REFERER", "/"))
-    else:
-        return redirect('app_cart:view_cart')
+    return redirect('app_catalog:item_detail', slug=slug)
 
 
 @login_required
 def view_cart(request):
-    cart_items = CartItem.objects.filter(user=request.user).select_related('item_params', 'board').prefetch_related('addons')
+    # Получаем все товары в корзине для текущего пользователя
+    cart_items = CartItem.objects.filter(user=request.user).select_related(
+        'item',
+        'item_variant',
+        'board',
+        'board__board',
+        'sauce'
+    ).prefetch_related('addons', 'addons__addon')
 
-    # Добавляем общую цену для каждого товара
+    # Рассчитываем общую сумму корзины
+    total_price = Decimal('0.00')
+    discount_amount = Decimal('0.00')
     for item in cart_items:
-        base_price = item.item_params.price
-        board_price = item.board.price if item.board else 0
-        addons_price = item.addons.aggregate(total=Sum('price'))['total'] or 0
-        item.total_price = (base_price + board_price + addons_price) * item.quantity  # Умножаем на количество
+        item_total = item.calculate_cart_total()
+        total_price += item_total
 
-    # Общая сумма корзины
-    total_price = sum(item.total_price for item in cart_items)
+        # Рассчитываем сумму скидки (только для пицц недели)
+        if item.item.is_weekly_special and item.item.category.name == "Пицца":
+            original_price = item.item_variant.price * item.quantity
+            discount_amount += original_price * Decimal('0.1')  # 10% от оригинальной цены
 
     context = {
         'cart_items': cart_items,
         'total_price': total_price,
+        'discount_amount': discount_amount,
+        'subtotal': total_price + discount_amount,  # Цена без учета скидки
     }
+
     return render(request, 'app_cart/cart.html', context)
 
 

@@ -35,16 +35,13 @@
                     <div class="form-group size-selector">
                         <h3>Выберите размер:</h3>
                         <div class="size-options">
-                            {% for size in sizes %}
-                                <a href="?size={{ size.size.id }}"
-                                   class="size-option {% if selected_size and selected_size.size.id == size.size.id %}selected{% endif %}">
-                                    {% if size.size.name %}
-                                        {{ size.size.name }}
-                                    {% elif size.value %}
-                                        {{ size.value }}
-                                    {% endif %}
-                                    {% if size.unit %}
-                                        {{ size.get_unit_display }}
+                            {% for variant in variants %}
+                                <a href="?size={{ variant.id }}"
+                                   class="size-option {% if selected_variant and selected_variant.id == variant.id %}selected{% endif %}">
+                                    {% if is_pizza_or_calzone and variant.size %}
+                                        {{ variant.size.name }}
+                                    {% elif variant.value %}
+                                        {{ variant.value }} {{ variant.get_unit_display }}
                                     {% endif %}
                                 </a>
                             {% empty %}
@@ -57,7 +54,7 @@
                         {% csrf_token %}
 
                         <!-- Размер -->
-                        <input type="hidden" name="size" value="{{ selected_size.id }}">
+                        <input type="hidden" name="variant_id" value="{{ selected_variant.id }}">
 
                         <!-- Количество -->
                         <div class="form-group">
@@ -67,23 +64,24 @@
 
                         <!-- Соус -->
                         {% if sauces %}
-                        <div class="form-group option-selector">
-                            <h3>Выберите соус (один вариант):</h3>
-                            <ul class="custom-radio-list">
-                                {% for sauce in sauces %}
-                                <li>
-                                    <label class="custom-radio">
-                                        <input type="radio" name="sauce" value="{{ sauce.id }}" {% if forloop.first %}checked{% endif %}
-                                            style="display: none;">
-                                        <span class="radio-button"></span>
-                                        {{ sauce.name }}
-                                    </label>
-                                </li>
-                                {% empty %}
-                                <li>Соусы не доступны</li>
-                                {% endfor %}
-                            </ul>
-                        </div>
+                            <div class="form-group option-selector">
+                                <h3>Выберите соус (один вариант):</h3>
+                                <ul class="custom-radio-list">
+                                    {% for sauce in sauces %}
+                                        <li>
+                                            <label class="custom-radio">
+                                                <input type="radio" name="sauce_id" value="{{ sauce.id }}"
+                                                       {% if forloop.first %}checked{% endif %}
+                                                       style="display: none;">
+                                                <span class="radio-button"></span>
+                                                {{ sauce.name }}
+                                            </label>
+                                        </li>
+                                    {% empty %}
+                                        <li>Соусы не доступны</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
                         {% endif %}
 
                         <!-- Борты -->
@@ -94,7 +92,7 @@
                                     {% for board in boards %}
                                         <li>
                                             <label class="custom-radio">
-                                                <input type="radio" name="board" value="{{ board.id }}"
+                                                <input type="radio" name="board_id" value="{{ board.id }}"
                                                        style="display: none;">
                                                 <span class="radio-button"></span>
                                                 {{ board.board.name }} (+{{ board.price }} руб.)
@@ -115,7 +113,7 @@
                                     {% for addon in addons %}
                                         <li>
                                             <label class="custom-checkbox">
-                                                <input type="checkbox" name="addons" value="{{ addon.id }}"
+                                                <input type="checkbox" name="addon_ids" value="{{ addon.id }}"
                                                        style="display: none;">
                                                 <span class="checkbox-icon"></span>
                                                 {{ addon.addon.name }} (+{{ addon.price }} руб.)
@@ -130,23 +128,24 @@
 
                         <!-- Напитки для комбо -->
                         {% if drinks %}
-                        <div class="form-group option-selector">
-                            <h3>Выберите напиток (один вариант):</h3>
-                            <ul class="custom-radio-list">
-                                {% for drink in drinks %}
-                                <li>
-                                    <label class="custom-radio">
-                                        <input type="radio" name="drink" value="{{ drink }}" {% if forloop.first %}checked{% endif %}
-                                            style="display: none;">
-                                        <span class="radio-button"></span>
-                                        {{ drink }}
-                                    </label>
-                                </li>
-                                {% empty %}
-                                <li>Соусы не доступны</li>
-                                {% endfor %}
-                            </ul>
-                        </div>
+                            <div class="form-group option-selector">
+                                <h3>Выберите напиток (один вариант):</h3>
+                                <ul class="custom-radio-list">
+                                    {% for drink in drinks %}
+                                        <li>
+                                            <label class="custom-radio">
+                                                <input type="radio" name="drink" value="{{ drink }}"
+                                                       {% if forloop.first %}checked{% endif %}
+                                                       style="display: none;">
+                                                <span class="radio-button"></span>
+                                                {{ drink }}
+                                            </label>
+                                        </li>
+                                    {% empty %}
+                                        <li>Соусы не доступны</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
                         {% endif %}
 
                         <!-- Кнопка добавления в заказ -->

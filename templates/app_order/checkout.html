@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'css/checkout.css' %}">
+{% endblock %}
+
+{% block main %}
+    <main class="checkout-page">
+        <div class="checkout-container">
+            <h1 class="checkout-title">Оформление заказа</h1>
+
+            <div class="checkout-content">
+                <form method="POST" class="checkout-form">
+                    {% csrf_token %}
+
+                    <div class="form-section">
+                        <h2 class="section-title">Контактные данные</h2>
+
+                        <div class="form-group">
+                            <label for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>
+                            {{ form.name }}
+                            {{ form.name.errors }}
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.phone.id_for_label }}">{{ form.phone.label }}</label>
+                            {{ form.phone }}
+                            {{ form.phone.errors }}
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h2 class="section-title">Способ получения</h2>
+
+                        <div class="options-group">
+                            {% for choice in form.delivery_type %}
+                                <div class="option-item">
+                                    {{ choice.tag }}
+                                    <label for="{{ choice.id_for_label }}" class="option-label">
+                                        <span class="option-title">{{ choice.choice_label }}</span>
+                                        {% if choice.data.value == 'delivery' %}
+                                            <span class="option-description">Доставим ваш заказ по указанному адресу</span>
+                                        {% else %}
+                                            <span class="option-description">Заберите заказ в нашем кафе</span>
+                                        {% endif %}
+                                    </label>
+                                </div>
+                            {% endfor %}
+                            {{ form.delivery_type.errors }}
+                        </div>
+
+                        <div class="form-group address-group" id="address-field">
+                            <label for="{{ form.address.id_for_label }}">{{ form.address.label }}</label>
+                            {{ form.address }}
+                            {{ form.address.errors }}
+                        </div>
+                    </div>
+
+
+                    <div class="form-section">
+                        <h2 class="section-title">Способ оплаты</h2>
+
+                        <div class="options-group">
+                            {% for choice in form.payment_method %}
+                                <div class="option-item">
+                                    {{ choice.tag }}
+                                    <label for="{{ choice.id_for_label }}" class="option-label">
+                                        <span class="option-title">{{ choice.choice_label }}</span>
+                                        {% if choice.data.value == 'cash' %}
+                                            <span class="option-description">Оплата наличными при получении</span>
+                                        {% else %}
+                                            <span class="option-description">Оплата картой онлайн</span>
+                                        {% endif %}
+                                    </label>
+                                </div>
+                            {% endfor %}
+                            {{ form.payment_method.errors }}
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h2 class="section-title">Комментарий к заказу</h2>
+                        <div class="form-group">
+                            {{ form.comment }}
+                            {{ form.comment.errors }}
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <a href="{% url 'app_cart:view_cart' %}" class="back-link">Вернуться в корзину</a>
+                        <button type="submit" class="submit-order-btn">Подтвердить заказ</button>
+                    </div>
+                </form>
+
+                <div class="order-summary">
+                    <h2 class="section-title">Ваш заказ</h2>
+
+                    <div class="summary-items">
+                        {% for item in cart_items %}
+                            <div class="summary-item">
+                                <div class="item-info">
+                                    <span class="item-name">{{ item.item.name }}</span>
+                                    <span class="item-quantity">×{{ item.quantity }}</span>
+                                </div>
+                                <span class="item-price">{{ item.calculate_cart_total|floatformat:2 }} руб.</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="summary-total">
+                        <span class="total-label">Итого:</span>
+                        <span class="total-price">
+                            {% with total=cart_items.total_sum %}
+                                {{ total|floatformat:2 }} руб.
+                            {% endwith %}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Показываем/скрываем поле адреса в зависимости от выбранного способа доставки
+            const deliveryOptions = document.querySelectorAll('input[name="delivery_type"]');
+            const addressField = document.getElementById('address-field');
+
+            function toggleAddressField() {
+                const selectedOption = document.querySelector('input[name="delivery_type"]:checked');
+                addressField.style.display = selectedOption && selectedOption.value === 'delivery' ? 'block' : 'none';
+            }
+
+            deliveryOptions.forEach(option => {
+                option.addEventListener('change', toggleAddressField);
+            });
+
+            // Инициализация при загрузке страницы
+            toggleAddressField();
+        });
+    </script>
+{% endblock %}

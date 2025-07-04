@@ -66,6 +66,15 @@
     color: var(--accent-color);
 }
 
+.discount-badge {
+    background-color: var(--accent-color);
+    color: white;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
 .cart_price_section .order-link {
     background-color: var(--accent-color);
     color: white;

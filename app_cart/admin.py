@@ -1,36 +1,57 @@
-# from django.contrib import admin
-# from app_cart.models import CartItem
-#
-# class CartItemAdmin(admin.ModelAdmin):
-#     # Поля, которые будут отображаться в списке объектов
-#     list_display = ('user', 'item', 'item_params', 'quantity', 'total_price')
-#
-#     # Поля, по которым можно фильтровать записи
-#     list_filter = ('user', 'item', 'item_params')
-#
-#     # Поля, по которым можно выполнять поиск
-#     search_fields = ('user__username', 'item__name', 'item_params__size__name')
-#
-#     # Поля, которые можно редактировать прямо в списке
-#     list_editable = ('quantity',)
-#
-#     # Поля, которые будут отображаться в форме редактирования
-#     fieldsets = (
-#         ('Основная информация', {
-#             'fields': ('user', 'item', 'item_params', 'quantity')
-#         }),
-#         ('Дополнительные параметры', {
-#             'fields': ('board', 'addons'),
-#         }),
-#     )
-#
-#     # Метод для расчета общей цены товара
-#     @admin.display(description='Общая цена')
-#     def total_price(self, obj):
-#         base_price = obj.item_params.price
-#         board_price = obj.board.price if obj.board else 0
-#         addons_price = sum(addon.price for addon in obj.addons.all())
-#         return base_price + board_price + addons_price
-#
-# # Регистрация модели
-# admin.site.register(CartItem, CartItemAdmin)
+from django.contrib import admin
+
+from app_cart.models import CartItem
+
+
+class AddonInline(admin.TabularInline):
+    model = CartItem.addons.through
+    extra = 0
+    verbose_name = "Добавка"
+    verbose_name_plural = "Добавки"
+
+
+@admin.register(CartItem)
+class CartItemAdmin(admin.ModelAdmin):
+    list_display = ('user', 'item_info', 'quantity', 'total_price', 'created_at')
+    list_filter = ('user', 'created_at')
+    search_fields = ('user__username', 'item__name')
+    readonly_fields = ('created_at', 'updated_at')
+    inlines = [AddonInline]
+
+    fieldsets = (
+        (None, {
+            'fields': ('user', 'item', 'item_variant', 'quantity')
+        }),
+        ('Дополнительные опции', {
+            'fields': ('board', 'sauce'),
+            'classes': ('collapse',)
+        }),
+        ('Даты', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+
+    def item_info(self, obj):
+        size = obj.get_size_display()
+        info = f"{obj.item.name}"
+        if size:
+            info += f" ({size})"
+        if obj.board:
+            info += f" | Борт: {obj.board.board.name}"
+        if obj.sauce:
+            info += f" | Соус: {obj.sauce.name}"
+        if obj.addons.exists():
+            addons = ", ".join(a.addon.name for a in obj.addons.all())
+            info += f" | Добавки: {addons}"
+        return info
+
+    item_info.short_description = "Товар"
+
+    def total_price(self, obj):
+        return f"{obj.calculate_cart_total()} руб."
+
+    total_price.short_description = "Сумма"
+
+    def get_exclude(self, request, obj=None):
+        return ['addons'] if obj else []

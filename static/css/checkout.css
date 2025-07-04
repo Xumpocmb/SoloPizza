@@ -1,0 +1,292 @@
+/* Основные стили страницы оформления */
+.checkout-page {
+    width: 90%;
+    max-width: 1200px;
+    padding: 20px;
+    margin: 60px auto;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+
+.checkout-container {
+    background-color: var(--card-bg);
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.checkout-title {
+    font-size: 1.8rem;
+    margin-bottom: 30px;
+    color: var(--text-color);
+}
+
+.checkout-content {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 30px;
+}
+
+@media (max-width: 768px) {
+    .checkout-content {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Стили для формы */
+.form-section {
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--hover-bg);
+}
+
+.section-title {
+    font-size: 1.3rem;
+    margin-bottom: 20px;
+    color: var(--text-color);
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.form-input, .form-textarea {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+    background-color: var(--card-bg);
+    color: var(--text-color);
+}
+
+.form-input:focus, .form-textarea:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px var(--accent-color-rgba);
+}
+
+.form-textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* Стили для выбора способа доставки */
+.delivery-options-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.delivery-option {
+    display: flex;
+    align-items: center;
+}
+
+.delivery-option input[type="radio"] {
+    margin-right: 10px;
+}
+
+.delivery-label {
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 5px;
+    transition: background-color 0.2s;
+    flex-grow: 1;
+}
+
+.delivery-label:hover {
+    background-color: var(--hover-bg);
+}
+
+.delivery-type {
+    font-weight: 600;
+    margin-bottom: 3px;
+    color: var(--text-color);
+}
+
+.delivery-description {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    color: var(--text-color);
+}
+
+.address-group {
+    display: none;
+    margin-top: 15px;
+}
+
+/* Кнопки */
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 30px;
+}
+
+.back-link {
+    color: var(--accent-color);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+
+.back-link:hover {
+    color: #068a50;
+}
+
+.submit-order-btn {
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.submit-order-btn:hover {
+    background-color: #068a50;
+}
+
+/* Стили для блока с товарами */
+.order-summary {
+    background-color: var(--card-bg);
+    border-radius: 8px;
+    padding: 20px;
+    align-self: start;
+    position: sticky;
+    top: 20px;
+}
+
+.summary-items {
+    margin-bottom: 20px;
+}
+
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px dashed var(--hover-bg);
+}
+
+.item-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.item-name {
+    font-weight: 600;
+    margin-bottom: 3px;
+    color: var(--text-color);
+}
+
+.item-quantity {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    color: var(--text-color);
+}
+
+.item-price {
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.summary-total {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.2rem;
+    font-weight: 700;
+    padding-top: 10px;
+    border-top: 2px solid var(--hover-bg);
+}
+
+.total-label {
+    color: var(--text-color);
+}
+
+.total-price {
+    color: var(--accent-color);
+}
+
+/* Ошибки формы */
+.errorlist {
+    list-style: none;
+    padding: 0;
+    margin: 5px 0 0 0;
+    color: #e74c3c;
+    font-size: 0.9rem;
+}
+
+/* Общие стили для групп опций */
+.options-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.option-item {
+    display: flex;
+    align-items: center;
+}
+
+.option-item input[type="radio"] {
+    margin-right: 10px;
+}
+
+.option-label {
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid var(--hover-bg);
+    background-color: var(--card-bg);
+    transition: all 0.2s;
+    flex-grow: 1;
+}
+
+.option-item input[type="radio"]:checked + .option-label {
+    border-color: var(--accent-color);
+    background-color: var(--accent-color-rgba);
+}
+
+.option-label:hover {
+    background-color: var(--hover-bg);
+}
+
+.option-title {
+    font-weight: 600;
+    margin-bottom: 3px;
+    color: var(--text-color);
+}
+
+.option-description {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    color: var(--text-color);
+}
+
+/* Специфичные стили для способа оплаты */
+.payment-options {
+    margin-top: 15px;
+}
+
+.payment-icon {
+    margin-right: 8px;
+    font-size: 1.2rem;
+}

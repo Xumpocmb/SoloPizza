@@ -82,16 +82,16 @@ WSGI_APPLICATION = "SoloPizza.wsgi.application"
 #     }
 # }
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("POSTGRES_DB", "solopizza"),
-        "USER": os.getenv("POSTGRES_USER", "soloadmin"),
-        "PASSWORD": os.getenv("POSTGRES_PASSWORD", "1234"),
-        "HOST": os.getenv("DB_HOST", "db"),
-        "PORT": os.getenv("DB_PORT", "5432"),
-    }
-}
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql",
+#         "NAME": os.getenv("POSTGRES_DB", "solopizza"),
+#         "USER": os.getenv("POSTGRES_USER", "soloadmin"),
+#         "PASSWORD": os.getenv("POSTGRES_PASSWORD", "1234"),
+#         "HOST": os.getenv("DB_HOST", "db"),
+#         "PORT": os.getenv("DB_PORT", "5432"),
+#     }
+# }
 
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
