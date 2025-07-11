@@ -37,22 +37,25 @@ def item_detail(request, slug):
 
     # Определяем, является ли товар пиццей или кальцоне
     is_pizza_or_calzone = item.category.name in ["Пицца", "Кальцоне"]
-
+    
     if selected_variant:
-        sauces = PizzaSauce.objects.all() if is_pizza_or_calzone else []
-
         # Получаем размеры в зависимости от типа товара
         if is_pizza_or_calzone:
             # Для пиццы/кальцоне используем поле size
             size_name = selected_variant.size.name if selected_variant.size else None
-        else:
-            # Для других товаров используем поле value + unit
-            size_name = f"{selected_variant.value} {selected_variant.get_unit_display()}" if selected_variant.value else None
-
-        boards = BoardParams.objects.filter(size=selected_variant.size) if is_pizza_or_calzone else []
-        addons = AddonParams.objects.filter(size=selected_variant.size) if is_pizza_or_calzone else []
-        drinks = ["Кола 1л.", "Sprite 1л."] if item.category.name in ["Комбо"] else []
+            sauces = PizzaSauce.objects.all() if is_pizza_or_calzone else []
+            boards = BoardParams.objects.filter(size=selected_variant.size) if is_pizza_or_calzone else []
+            addons = AddonParams.objects.filter(size=selected_variant.size) if is_pizza_or_calzone else []
+            drinks = []
+        if item.category.name in ["Комбо"]:
+            is_pizza_or_calzone = True
+            boards = BoardParams.objects.filter(size=selected_variant.size) if is_pizza_or_calzone else []
+            drinks = ["Кола 1л.", "Sprite 1л."] if item.category.name in ["Комбо"] else []
+            sauces = []
+            addons = []
+        
         min_price = selected_variant.price
+
     else:
         sauces = []
         boards = []

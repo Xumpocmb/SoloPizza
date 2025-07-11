@@ -23,7 +23,7 @@ class CartItemAdmin(admin.ModelAdmin):
             'fields': ('user', 'item', 'item_variant', 'quantity')
         }),
         ('Дополнительные опции', {
-            'fields': ('board', 'sauce'),
+            'fields': ('board1', 'board2', 'sauce'),
             'classes': ('collapse',)
         }),
         ('Даты', {
@@ -37,8 +37,10 @@ class CartItemAdmin(admin.ModelAdmin):
         info = f"{obj.item.name}"
         if size:
             info += f" ({size})"
-        if obj.board:
-            info += f" | Борт: {obj.board.board.name}"
+        if obj.board1:
+            info += f" | Борт1: {obj.board1.board.name}"
+        if obj.board2:
+            info += f" | Борт2: {obj.board2.board.name}"
         if obj.sauce:
             info += f" | Соус: {obj.sauce.name}"
         if obj.addons.exists():
@@ -49,7 +51,7 @@ class CartItemAdmin(admin.ModelAdmin):
     item_info.short_description = "Товар"
 
     def total_price(self, obj):
-        return f"{obj.calculate_cart_total()} руб."
+        return f"{obj.calculate_cart_item_total()} руб."
 
     total_price.short_description = "Сумма"
 

@@ -5,21 +5,32 @@ from app_catalog.models import AddonParams
 
 class AddToCartForm(forms.Form):
     variant_id = forms.IntegerField(widget=forms.HiddenInput())
-    quantity = forms.IntegerField(min_value=1, max_value=20, initial=1,
-                                  widget=forms.NumberInput(attrs={'class': 'form-control'}))
+    quantity = forms.IntegerField(
+        min_value=1,
+        max_value=10,
+        initial=1,
+        widget=forms.NumberInput(attrs={'class': 'form-control'})
+    )
 
-    # Поля для пиццы
-    board_id = forms.IntegerField(required=False, widget=forms.HiddenInput())
+    # Поля для пиццы / кальцоне
     sauce_id = forms.IntegerField(required=False, widget=forms.HiddenInput())
+    board1_id = forms.IntegerField(required=False, widget=forms.HiddenInput())
+    board2_id = forms.IntegerField(required=False, widget=forms.HiddenInput())
     addons = forms.MultipleChoiceField(required=False, widget=forms.CheckboxSelectMultiple())
 
     def __init__(self, *args, **kwargs):
-        product = kwargs.pop('product', None)
-        variant = kwargs.pop('variant', None)
+        self.product = kwargs.pop('product', None)
+        self.variant = kwargs.pop('variant', None)
         super().__init__(*args, **kwargs)
 
-        if product and product.category.name in ["Пицца", "Кальцоне"]:
+        # Если это не пицца или кальцоне — скрываем все специфичные поля
+        if not (self.product and self.product.category.name in ["Пицца", "Кальцоне"]):
+            for field in ['sauce_id', 'board1_id', 'board2_id', 'addons']:
+                if field in self.fields:
+                    del self.fields[field]
+        else:
+            # Только если это пицца — добавляем опции для addons
             self.fields['addons'].choices = [
                 (addon.id, f"{addon.addon.name} (+{addon.price} руб.)")
-                for addon in AddonParams.objects.filter(size=variant.size)
+                for addon in AddonParams.objects.filter(size=self.variant.size)
             ]

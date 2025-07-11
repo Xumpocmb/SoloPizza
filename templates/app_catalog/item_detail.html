@@ -86,22 +86,32 @@
 
                         <!-- Борты -->
                         {% if boards %}
-                            <div class="form-group option-selector">
-                                <h3>Выберите борт (один вариант):</h3>
-                                <ul class="custom-radio-list">
-                                    {% for board in boards %}
-                                        <li>
-                                            <label class="custom-radio">
-                                                <input type="radio" name="board_id" value="{{ board.id }}"
-                                                       style="display: none;">
-                                                <span class="radio-button"></span>
+                            <div class="form-group board-selector">
+                                <h3>Выберите борт:</h3>
+
+                                <div class="board-pair">
+                                    <label for="board1">Первый борт:</label>
+                                    <select name="board1_id" id="board1" class="custom-select">
+                                        <option value="">Не выбран</option>
+                                        {% for board in boards %}
+                                            <option value="{{ board.id }}">
                                                 {{ board.board.name }} (+{{ board.price }} руб.)
-                                            </label>
-                                        </li>
-                                    {% empty %}
-                                        <li>Борты не доступны</li>
-                                    {% endfor %}
-                                </ul>
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <div class="board-pair">
+                                    <label for="board2">Второй борт:</label>
+                                    <select name="board2_id" id="board2" class="custom-select">
+                                        <option value="">Не выбран</option>
+                                        {% for board in boards %}
+                                            <option value="{{ board.id }}">
+                                                {{ board.board.name }} (+{{ board.price }} руб.)
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
                             </div>
                         {% endif %}
 
@@ -113,7 +123,7 @@
                                     {% for addon in addons %}
                                         <li>
                                             <label class="custom-checkbox">
-                                                <input type="checkbox" name="addon_ids" value="{{ addon.id }}"
+                                                <input type="checkbox" name="addons" value="{{ addon.id }}"
                                                        style="display: none;">
                                                 <span class="checkbox-icon"></span>
                                                 {{ addon.addon.name }} (+{{ addon.price }} руб.)

@@ -4,7 +4,8 @@
     align-items: start;
     gap: 20px;
     padding: 20px;
-    background-color: var(--card-bg); /* Цвет фона карточки */
+    background-color: var(--card-bg);
+    /* Цвет фона карточки */
     border-radius: 10px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     margin: 20px auto;
@@ -28,7 +29,8 @@
 .item-image-border {
     max-width: 100%;
     height: auto;
-    border: 3px solid var(--accent-color); /* Акцентный цвет */
+    border: 3px solid var(--accent-color);
+    /* Акцентный цвет */
     border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -43,7 +45,8 @@
 .item_name {
     font-size: 20px;
     margin: 15px;
-    color: var(--text-color); /* Цвет текста */
+    color: var(--text-color);
+    /* Цвет текста */
     flex-grow: 1;
 }
 
@@ -60,13 +63,15 @@
 
 .item-info p {
     font-size: 16px;
-    color: #888; /* Можно использовать оттенок текста из темы */
+    color: #888;
+    /* Можно использовать оттенок текста из темы */
     margin-bottom: 20px;
 }
 
 .item-price {
     font-size: 22px;
-    color: var(--accent-color); /* Акцентный цвет */
+    color: var(--accent-color);
+    /* Акцентный цвет */
     margin-bottom: 20px;
 }
 
@@ -82,7 +87,8 @@
 }
 
 .order-link:hover {
-    background-color: #068a50; /* Темнее акцента */
+    background-color: #068a50;
+    /* Темнее акцента */
 }
 
 @media (max-width: 768px) {
@@ -124,7 +130,8 @@
 
 .size-selector .size-option {
     padding: 10px 20px;
-    border: 1px solid var(--hover-bg); /* Цвет границы */
+    border: 1px solid var(--hover-bg);
+    /* Цвет границы */
     border-radius: 5px;
     text-decoration: none;
     color: var(--text-color);
@@ -190,14 +197,14 @@
     transition: all 0.3s ease;
 }
 
-.custom-radio input[type="radio"]:checked + .radio-button,
-.custom-checkbox input[type="checkbox"]:checked + .checkbox-icon {
+.custom-radio input[type="radio"]:checked+.radio-button,
+.custom-checkbox input[type="checkbox"]:checked+.checkbox-icon {
     border-color: var(--accent-color);
     background-color: var(--accent-color);
 }
 
-.custom-radio input[type="radio"]:checked + .radio-button::after,
-.custom-checkbox input[type="checkbox"]:checked + .checkbox-icon::after {
+.custom-radio input[type="radio"]:checked+.radio-button::after,
+.custom-checkbox input[type="checkbox"]:checked+.checkbox-icon::after {
     content: '';
     position: absolute;
     top: 50%;
@@ -222,4 +229,41 @@ input[type="number"] {
 
 input[type="number"]:focus {
     border-color: var(--accent-color);
+}
+
+
+.custom-select {
+    width: 50%;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    border: 1px solid var(--text-color);
+    border-radius: 8px;
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    appearance: none;
+    /* Убираем стандартную стрелку */
+    position: relative;
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%23666' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 12px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.custom-select:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px var(--accent-color-rgba);
+}
+
+/* Добавляем отступы между парами селектов */
+.board-pair {
+    margin-bottom: 1.5rem;
+}
+
+.board-pair label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--text-color);
 }

@@ -2,16 +2,35 @@ from decimal import Decimal
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
-
+from django.db.models import Sum
 from app_catalog.models import Product, ProductVariant, BoardParams, AddonParams, PizzaSauce
 
 
-class CartQuerySet(models.QuerySet):
-    def total_quantity(self):
-        return sum(item.quantity for item in self)
 
-    def total_sum(self):
-        return sum(item.calculate_cart_total() for item in self)
+class CartItemManager(models.Manager):
+    def total_quantity(self, user):
+        return self.filter(user=user).aggregate(total=Sum('quantity'))['total'] or 0
+    
+    def get_cart_totals(self, user):
+        cart_items = self.filter(user=user).select_related(
+            'item', 'item_variant', 'sauce', 'board1', 'board2'
+        ).prefetch_related('addons')
+        
+        totals = {
+            'total_price': Decimal('0.00'),
+            'total_original_price': Decimal('0.00'),
+            'total_discount': Decimal('0.00'),
+            'items': []
+        }
+        
+        for item in cart_items:
+            calculation = item.calculate_cart_item_total()
+            totals['total_price'] += calculation['final_total']
+            totals['total_original_price'] += calculation['original_total']
+            totals['total_discount'] += calculation['discount_amount']
+            totals['items'].append((item, calculation))
+        
+        return totals
 
 
 class CartItem(models.Model):
@@ -26,13 +45,23 @@ class CartItem(models.Model):
         blank=True
     ) #TODO: remove null and blank
     quantity = models.PositiveIntegerField(default=1, verbose_name='Количество')
-    board = models.ForeignKey(
+    board1 = models.ForeignKey(
         BoardParams,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        verbose_name='Борт',
-        help_text='Только для пиццы'
+        verbose_name='Борт1',
+        help_text='Только для пиццы',
+        related_name='cartitem_board1_set'
+    )
+    board2 = models.ForeignKey(
+        BoardParams,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name='Борт2',
+        help_text='Только для пиццы',
+        related_name='cartitem_board2_set'
     )
     addons = models.ManyToManyField(
         AddonParams,
@@ -50,16 +79,16 @@ class CartItem(models.Model):
     )
     created_at = models.DateTimeField(default=timezone.now, verbose_name='Дата добавления')
     updated_at = models.DateTimeField(default=timezone.now, verbose_name='Дата обновления')
-
-    objects = CartQuerySet.as_manager()
-
+    
+    objects = CartItemManager()
+    
     class Meta:
         db_table = 'cart_items'
         verbose_name = 'Товар в корзине'
         verbose_name_plural = 'Товары в корзине'
         ordering = ['-created_at']
         unique_together = [
-            ['user', 'item', 'item_variant', 'board', 'sauce'],
+            ['user', 'item', 'item_variant', 'board1', 'board2', 'sauce'],
         ]
 
     def __str__(self):
@@ -70,28 +99,6 @@ class CartItem(models.Model):
             size_info = f" | {self.item_variant.value} {self.item_variant.get_unit_display()}"
 
         return f'Корзина {self.user.username} | Товар: {self.item.name}{size_info}'
-
-    def calculate_cart_total(self):
-        """
-        Рассчитывает полную стоимость товара в корзине с учетом скидки на пиццу недели
-        """
-        # Базовая цена товара
-        base_price = self.item_variant.price
-
-        # Применяем скидку 10% если это пицца недели
-        if self.item.is_weekly_special and self.item.category.name == "Пицца":
-            base_price *= Decimal('0.9')  # 10% скидка
-
-        # Цена борта (если есть)
-        board_price = self.board.price if self.board else Decimal('0.00')
-
-        # Сумма цен всех добавок
-        addons_price = sum(addon.price for addon in self.addons.all()) if self.addons.exists() else Decimal('0.00')
-
-        # Общая стоимость = (базовая цена + борт + добавки) * количество
-        total_price = (base_price + board_price + addons_price) * self.quantity
-
-        return total_price.quantize(Decimal(".01"))
 
     def get_size_display(self):
         """Возвращает отображаемое название размера/варианта"""
@@ -120,3 +127,25 @@ class CartItem(models.Model):
             desc.append(f"Добавки: {addons}")
 
         return " | ".join(desc)
+    
+    def calculate_cart_item_total(self):
+        base_price = self.item_variant.price
+        quantity = self.quantity
+        
+        board1_price = self.board1.price if self.board1 else Decimal('0')
+        board2_price = self.board2.price if self.board2 else Decimal('0')
+        addons_price = sum(addon.price for addon in self.addons.all()) if self.addons.exists() else Decimal('0')
+        
+        original_total = (base_price + board1_price + board2_price + addons_price) * quantity
+        
+        is_weekly_pizza = self.item.is_weekly_special and getattr(self.item.category, 'name', '') == "Пицца"
+        discount_amount = (base_price * quantity * Decimal('0.1')) if is_weekly_pizza else Decimal('0')
+        
+        final_total = original_total - discount_amount
+        
+        return {
+            'original_total': original_total.quantize(Decimal(".01")),
+            'final_total': final_total.quantize(Decimal(".01")),
+            'discount_amount': discount_amount.quantize(Decimal(".01")),
+            'is_weekly_pizza': is_weekly_pizza,
+        }

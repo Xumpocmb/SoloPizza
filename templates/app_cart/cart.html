@@ -10,9 +10,10 @@
         <div class="cart-container">
             <h1 class="cart-title">Ваша корзина</h1>
 
-            {% if cart_items %}
+            {% if items %}
                 <div class="cart-items-list">
-                    {% for item in cart_items %}
+                    {% for item_data in items %}
+                        {% with item=item_data.object %}
                         <div class="cart-item-card">
                             <!-- Изображение товара -->
                             <div class="cart-item-image">
@@ -46,14 +47,23 @@
                                         </span>
                                     </div>
 
-                                    <!-- Борт -->
-                                    {% if item.board %}
-                                        <div class="item-option">
-                                            <span class="option-label">Борт:</span>
-                                            <span class="option-value">
-                                            {{ item.board.board.name }} (+{{ item.board.price }} руб.)
-                                        </span>
-                                        </div>
+                                    <!-- Борты -->
+                                    {% if item.board1 or item.board2 %}
+                                    <div class="item-option">
+                                        <span class="option-label">Борты:</span>
+                                        <ul class="board-list">
+                                            {% if item.board1 %}
+                                                <li>Борт 1: {{ item.board1.board.name }} (+{{ item.board1.price }} руб.)</li>
+                                            {% else %}
+                                                <li>Борт 1: Не выбран</li>
+                                            {% endif %}
+                                            {% if item.board2 %}
+                                                <li>Борт 2: {{ item.board2.board.name }} (+{{ item.board2.price }} руб.)</li>
+                                            {% else %}
+                                                <li>Борт 2: Не выбран</li>
+                                            {% endif %}
+                                        </ul>
+                                    </div>
                                     {% endif %}
 
                                     <!-- Соус -->
@@ -103,15 +113,21 @@
                                 </div>
                             </div>
 
-                            <!-- Итоговая цена за позицию -->
+                            <!-- Цена с учетом скидки -->
                             <div class="item-total">
-                                <span class="total-price">{{ item.calculate_cart_total|floatformat:2 }} руб.</span>
+                                <span class="total-price">{{ item_data.item_total|floatformat:2 }} руб.</span>
+                                {% if item_data.has_discount %}
+                                    <div class="original-price">
+                                        <s>{{ item_data.original_total|floatformat:2 }} руб.</s>
+                                    </div>
+                                {% endif %}
                             </div>
                         </div>
+                        {% endwith %}
                     {% endfor %}
                 </div>
 
-                <!-- Итоговая сумма и кнопка оформления -->
+                <!-- Итоговая сумма -->
                 <div class="cart-summary">
                     <div class="summary-row">
                         <span class="summary-label">Сумма без скидки:</span>
@@ -119,16 +135,17 @@
                     </div>
                     {% if discount_amount > 0 %}
                         <div class="summary-row discount-row">
-                            <span class="summary-label">Скидка на пиццу недели:</span>
+                            <span class="summary-label">Скидка:</span>
                             <span class="summary-value">-{{ discount_amount|floatformat:2 }} руб.</span>
                         </div>
                     {% endif %}
                     <div class="summary-row total-row">
-                        <span class="summary-label">Общая сумма:</span>
+                        <span class="summary-label">Итого к оплате:</span>
                         <span class="summary-value">{{ total_price|floatformat:2 }} руб.</span>
                     </div>
                     <a href="{% url 'app_order:checkout' %}" class="checkout-btn">Оформить заказ</a>
                 </div>
+                    
 
             {% else %}
                 <!-- Пустая корзина -->
