@@ -2,6 +2,7 @@ from django.db import models
 from django.conf import settings
 from app_catalog.models import ProductVariant, BoardParams, PizzaSauce, PizzaAddon
 
+
 class Order(models.Model):
     STATUS_CHOICES = [
         ('new', 'Новый'),

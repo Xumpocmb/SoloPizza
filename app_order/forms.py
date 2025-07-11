@@ -1,4 +1,5 @@
 from django import forms
+from django.forms import inlineformset_factory
 
 from app_catalog.models import ProductVariant, BoardParams
 from app_order.models import Order, OrderItem
@@ -154,13 +155,23 @@ class OrderItemEditForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Фильтруем варианты только для этого товара
-        if self.instance:
+        if self.instance and hasattr(self.instance, 'product'):
             self.fields['variant'].queryset = ProductVariant.objects.filter(
                 product=self.instance.product
             )
-            # Фильтруем борты по размеру
-            if self.instance.variant.size:
+            if self.instance.variant and self.instance.variant.size:
                 self.fields['board'].queryset = BoardParams.objects.filter(
                     size=self.instance.variant.size
                 )
+            else:
+                self.fields['board'].queryset = BoardParams.objects.none()
+
+
+OrderItemFormSet = inlineformset_factory(
+    Order,
+    OrderItem,
+    form=OrderItemEditForm,
+    extra=0,
+    can_delete=False,
+    fields=['variant', 'quantity', 'board', 'sauce']
+)

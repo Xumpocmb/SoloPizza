@@ -17,141 +17,138 @@
             </div>
 
             <div class="order-content">
-                <div class="order-items">
+                <!-- Форма редактирования товаров -->
+                <form method="POST" action="{% url 'app_order:update_order_items' order.id %}" class="order-items-form">
+                    {% csrf_token %}
+                    {{ item_formset.management_form }}
+
                     <h2 class="section-title">Состав заказа</h2>
 
-                    {% for item_form in item_forms %}
-                        <div class="order-item">
-                            <div class="item-header">
-                                <h3 class="item-name">
-                                    {{ item_form.item.product.name }}
-                                    {% if item_form.is_editable %}
-                                        <button class="edit-item-btn" data-item-id="{{ item_form.item.id }}"
-                                                aria-label="Редактировать товар">
-                                            <i class="fas fa-pencil-alt"></i>
-                                        </button>
-                                    {% endif %}
-                                </h3>
-                            </div>
+                    <div class="order-items">
+                        {% for form in item_formset %}
+                            <div class="order-item">
+                                <div class="item-view-mode" id="item-view-{{ form.instance.id }}">
+                                    <div class="item-header">
+                                        <h3 class="item-name">
+                                            {{ form.instance.product.name }}
+                                            {% if form.instance.is_weekly_special %}
+                                                <span class="discount-badge">Акция: -10%</span>
+                                            {% endif %}
+                                            {% if is_editable %}
+                                                <button type="button" class="edit-item-btn"
+                                                        data-item-id="{{ form.instance.id }}">
+                                                    <i class="fas fa-pencil-alt"></i>
+                                                </button>
+                                            {% endif %}
+                                        </h3>
+                                    </div>
 
-                            <!-- Режим просмотра -->
-                            <div class="item-view-mode" id="item-view-{{ item_form.item.id }}">
-                                <div class="item-image">
-                                    {% if item_form.item.product.image %}
-                                        <img src="{{ item_form.item.product.image.url }}"
-                                             alt="{{ item_form.item.product.name }}">
-                                    {% else %}
-                                        <img src="{% static 'img/test.jpg' %}" alt="{{ item_form.item.product.name }}">
-                                    {% endif %}
-                                </div>
-
-                                <div class="item-details">
-                                    <h3 class="item-name">
-                                        {{ item_form.item.product.name }}
-                                        {% if item_form.item.is_weekly_special %}
-                                            <span class="discount-badge">Акция: -10%</span>
+                                    <div class="item-image">
+                                        {% if form.instance.product.image %}
+                                            <img src="{{ form.instance.product.image.url }}"
+                                                 alt="{{ form.instance.product.name }}">
+                                        {% else %}
+                                            <img src="{% static 'img/test.jpg' %}"
+                                                 alt="{{ form.instance.product.name }}">
                                         {% endif %}
-                                    </h3>
+                                    </div>
 
-                                    <div class="item-options">
-            <div class="item-option">
-                <span class="option-label">Размер:</span>
-                <span class="option-value">
-                    {% if item_form.item.variant.size %}
-                        {{ item_form.item.variant.size.name }}
-                    {% else %}
-                        {{ item_form.item.variant.value }} {{ item_form.item.variant.get_unit_display }}
-                    {% endif %}
-                    ({{ item_form.item.price }} руб.)
-                </span>
-            </div>
+                                    <div class="item-details">
+                                        <div class="item-options">
+                                            <div class="item-option">
+                                                <span class="option-label">Размер:</span>
+                                                <span class="option-value">
+                                            {% if form.instance.variant.size %}
+                                                {{ form.instance.variant.size.name }}
+                                            {% else %}
+                                                {{ form.instance.variant.value }}
+                                                {{ form.instance.variant.get_unit_display }}
+                                            {% endif %}
+                                                    ({{ form.instance.price }} руб.)
+                                        </span>
+                                            </div>
 
-            {% if item_form.item.board %}
-                <div class="item-option">
-                    <span class="option-label">Борт:</span>
-                    <span class="option-value">
-                        {{ item_form.item.board.board.name }} (+{{ item_form.item.board.price }} руб.)
-                    </span>
-                </div>
-            {% endif %}
+                                            {% if form.instance.board %}
+                                                <div class="item-option">
+                                                    <span class="option-label">Борт:</span>
+                                                    <span class="option-value">
+                                                {{ form.instance.board.board.name }} (+{{ form.instance.board.price }} руб.)
+                                            </span>
+                                                </div>
+                                            {% endif %}
 
-            {% if item_form.item.sauce %}
-                <div class="item-option">
-                    <span class="option-label">Соус:</span>
-                    <span class="option-value">{{ item_form.item.sauce.name }}</span>
-                </div>
-            {% endif %}
+                                            {% if form.instance.sauce %}
+                                                <div class="item-option">
+                                                    <span class="option-label">Соус:</span>
+                                                    <span class="option-value">{{ form.instance.sauce.name }}</span>
+                                                </div>
+                                            {% endif %}
 
-            {% if item_form.item.addons.exists %}
-                <div class="item-option">
-                    <span class="option-label">Добавки:</span>
-                    <ul class="addons-list">
-                        {% for addon in item_form.item.addons.all %}
-                            <li>{{ addon.addon.name }} (+{{ addon.price }} руб.)</li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            {% endif %}
-        </div>
+                                            {% if form.instance.addons.exists %}
+                                                <div class="item-option">
+                                                    <span class="option-label">Добавки:</span>
+                                                    <ul class="addons-list">
+                                                        {% for addon in form.instance.addons.all %}
+                                                            <li>{{ addon.addon.name }} (+{{ addon.price }} руб.)</li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                </div>
+                                            {% endif %}
+                                        </div>
 
-                                    <div class="item-quantity-price">
-            <span class="quantity">×{{ item_form.item.quantity }}</span>
-            <span class="item-total">
-                {% if item_form.item.is_weekly_special %}
-                    <span class="original-price">{{ item_form.item.price|floatformat:2 }} руб.</span>
-                    <span class="discounted-price">{{ item_form.item.get_final_price|floatformat:2 }} руб.</span>
-                {% else %}
-                    {{ item_form.item.get_final_price|floatformat:2 }} руб.
-                {% endif %}
-            </span>
-        </div>
+                                        <div class="item-quantity-price">
+                                            <span class="quantity">×{{ form.instance.quantity }}</span>
+                                            <span class="item-total">
+                                        {% if form.instance.is_weekly_special %}
+                                            <span class="original-price">{{ form.instance.price|floatformat:2 }} руб.</span>
+                                            <span class="discounted-price">{{ form.instance.get_final_price|floatformat:2 }} руб.</span>
+                                        {% else %}
+                                            {{ form.instance.get_final_price|floatformat:2 }} руб.
+                                        {% endif %}
+                                    </span>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <!-- Режим редактирования (изначально скрыт) -->
-                            {% if item_form.is_editable %}
-                                <div class="item-edit-mode" id="item-edit-{{ item_form.item.id }}"
+                                <!-- Режим редактирования товара -->
+                                <div class="item-edit-mode" id="item-edit-{{ form.instance.id }}"
                                      style="display: none;">
-                                    <form method="POST" class="item-edit-form">
-                                        <input type="hidden" name="item_id" value="{{ item_form.item.id }}">
-                                        <input type="hidden" name="edit_item" value="1">
-                                        {% csrf_token %}
+                                    {{ form.id }}
+                                    <div class="form-group">
+                                        <label>Размер:</label>
+                                        {{ form.variant }}
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Количество:</label>
+                                        {{ form.quantity }}
+                                    </div>
+
+                                    {% if form.instance.product.category.name == "Пицца" %}
+                                        <div class="form-group">
+                                            <label>Борт:</label>
+                                            {{ form.board }}
+                                        </div>
 
                                         <div class="form-group">
-                                            <label>Размер:</label>
-                                            {{ item_form.form.variant }}
+                                            <label>Соус:</label>
+                                            {{ form.sauce }}
                                         </div>
+                                    {% endif %}
 
-                                        <div class="form-group">
-                                            <label>Количество:</label>
-                                            {{ item_form.form.quantity }}
-                                        </div>
-
-                                        {% if item_form.item.product.category.name == "Пицца" %}
-                                            <div class="form-group">
-                                                <label>Борт:</label>
-                                                {{ item_form.form.board }}
-                                            </div>
-
-                                            <div class="form-group">
-                                                <label>Соус:</label>
-                                                {{ item_form.form.sauce }}
-                                            </div>
-                                        {% endif %}
-
-                                        <div class="form-actions">
-                                            <button type="button" class="cancel-item-edit"
-                                                    data-item-id="{{ item_form.item.id }}">Отмена
-                                            </button>
-                                            <button type="submit" class="save-item-button">Сохранить</button>
-                                        </div>
-                                    </form>
+                                    <div class="form-actions">
+                                        <button type="button" class="cancel-button cancel-item-edit"
+                                                data-item-id="{{ form.instance.id }}">Отмена
+                                        </button>
+                                        <button type="submit" class="save-button">Сохранить</button>
+                                    </div>
                                 </div>
-                            {% endif %}
-                        </div>
-                    {% endfor %}
-                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </form>
 
+                <!-- Блок информации о заказе -->
                 <div class="order-summary">
                     <div class="summary-card">
                         <div class="section-header">
@@ -163,9 +160,10 @@
                             {% endif %}
                         </div>
 
-                        <!-- Режим редактирования (изначально скрыт) -->
+                        <!-- Форма редактирования заказа -->
                         <div class="edit-mode" id="editOrderForm" style="display: none;">
-                            <form method="POST" class="order-edit-form">
+                            <form method="POST" action="{% url 'app_order:update_order' order.id %}"
+                                  class="order-edit-form">
                                 {% csrf_token %}
 
                                 <div class="form-group">
@@ -177,7 +175,6 @@
                                      style="display: {% if form.delivery_type.value == 'delivery' %}block{% else %}none{% endif %};">
                                     <label for="{{ form.address.id_for_label }}">Адрес доставки:</label>
                                     {{ form.address }}
-                                    {{ form.address.errors }}
                                 </div>
 
                                 <div class="form-group">
@@ -212,7 +209,7 @@
                             </form>
                         </div>
 
-                        <!-- Режим просмотра (по умолчанию виден) -->
+                        <!-- Режим просмотра заказа -->
                         <div class="view-mode" id="viewOrderDetails">
                             <div class="summary-row">
                                 <span class="summary-label">Способ получения:</span>
@@ -234,12 +231,12 @@
                             <div class="summary-row">
                                 <span class="summary-label">Статус оплаты:</span>
                                 <span class="summary-value">
-                                    {% if order.payment_status %}
-                                        <span class="payment-paid">Оплачено</span>
-                                    {% else %}
-                                        <span class="payment-unpaid">Не оплачено</span>
-                                    {% endif %}
-                                </span>
+                                {% if order.payment_status %}
+                                    <span class="payment-paid">Оплачено</span>
+                                {% else %}
+                                    <span class="payment-unpaid">Не оплачено</span>
+                                {% endif %}
+                            </span>
                             </div>
 
                             <div class="summary-row">
@@ -260,7 +257,7 @@
                             {% endif %}
                         </div>
 
-                        <!-- Блок с суммой (всегда в режиме просмотра) -->
+                        <!-- Блок с суммой -->
                         <div class="summary-total">
                             <div class="summary-row">
                                 <span class="summary-label">Сумма заказа:</span>
@@ -283,39 +280,33 @@
                 </div>
             </div>
         </div>
+
         <script>
             document.addEventListener('DOMContentLoaded', function () {
+                // Обработка редактирования заказа
                 const editBtn = document.getElementById('editOrderBtn');
                 const cancelBtn = document.getElementById('cancelEditBtn');
                 const editForm = document.getElementById('editOrderForm');
                 const viewDetails = document.getElementById('viewOrderDetails');
                 const deliveryOptions = document.querySelectorAll('input[name="delivery_type"]');
                 const addressField = document.getElementById('address-field');
-                const addressInput = document.getElementById('id_address');
 
-                // Функция для переключения видимости поля адреса
                 function toggleAddressField() {
                     const selectedDelivery = document.querySelector('input[name="delivery_type"]:checked');
                     if (selectedDelivery && selectedDelivery.value === 'delivery') {
                         addressField.style.display = 'block';
-                        if (addressInput) addressInput.required = true;
                     } else {
                         addressField.style.display = 'none';
-                        if (addressInput) addressInput.required = false;
                     }
                 }
 
                 if (editBtn && editForm && viewDetails) {
-                    // Инициализация при загрузке
                     toggleAddressField();
 
-                    // Переключение режимов
                     editBtn.addEventListener('click', function () {
                         viewDetails.style.display = 'none';
                         editForm.style.display = 'block';
                         editBtn.style.display = 'none';
-                        // Принудительно обновляем поле адреса при входе в редактирование
-                        toggleAddressField();
                     });
 
                     if (cancelBtn) {
@@ -326,43 +317,28 @@
                         });
                     }
 
-                    // Обработка изменения способа доставки
                     if (deliveryOptions.length && addressField) {
                         deliveryOptions.forEach(option => {
                             option.addEventListener('change', toggleAddressField);
                         });
                     }
                 }
-            });
 
-            // Управление редактированием товаров
-            document.querySelectorAll('.edit-item-btn').forEach(btn => {
-                btn.addEventListener('click', function () {
-                    const itemId = this.getAttribute('data-item-id');
-                    document.getElementById(`item-view-${itemId}`).style.display = 'none';
-                    document.getElementById(`item-edit-${itemId}`).style.display = 'block';
+                // Обработка редактирования товаров
+                document.querySelectorAll('.edit-item-btn').forEach(btn => {
+                    btn.addEventListener('click', function () {
+                        const itemId = this.dataset.itemId;
+                        document.getElementById(`item-view-${itemId}`).style.display = 'none';
+                        document.getElementById(`item-edit-${itemId}`).style.display = 'block';
+                    });
                 });
-            });
 
-            document.querySelectorAll('.cancel-item-edit').forEach(btn => {
-                btn.addEventListener('click', function () {
-                    const itemId = this.getAttribute('data-item-id');
-                    document.getElementById(`item-view-${itemId}`).style.display = 'block';
-                    document.getElementById(`item-edit-${itemId}`).style.display = 'none';
-                });
-            });
-
-            // Обновление списка бортов при изменении размера
-            document.querySelectorAll('select[name="variant"]').forEach(select => {
-                select.addEventListener('change', function () {
-                    const form = this.closest('form');
-                    const sizeId = this.options[this.selectedIndex].getAttribute('data-size-id');
-                    const boardSelect = form.querySelector('select[name="board"]');
-
-                    if (boardSelect) {
-                        // Здесь можно добавить AJAX-запрос для загрузки бортов по размеру
-                        // или предзагрузить все варианты и фильтровать на клиенте
-                    }
+                document.querySelectorAll('.cancel-item-edit').forEach(btn => {
+                    btn.addEventListener('click', function () {
+                        const itemId = this.dataset.itemId;
+                        document.getElementById(`item-view-${itemId}`).style.display = 'block';
+                        document.getElementById(`item-edit-${itemId}`).style.display = 'none';
+                    });
                 });
             });
         </script>

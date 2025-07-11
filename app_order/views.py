@@ -4,10 +4,13 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Q
+from django.http import JsonResponse, HttpResponseForbidden
 from django.shortcuts import redirect, render, get_object_or_404
+from django.views.decorators.http import require_POST
 
 from app_cart.models import CartItem
-from app_order.forms import CheckoutForm, OrderEditForm, OrderItemEditForm
+from app_catalog.models import BoardParams
+from app_order.forms import CheckoutForm, OrderEditForm, OrderItemEditForm, OrderItemFormSet
 from app_order.models import OrderItemAddon, OrderItem, Order
 
 
@@ -87,53 +90,99 @@ def checkout(request):
 def order_detail(request, order_id):
     order = get_object_or_404(
         Order.objects.select_related('user')
-        .prefetch_related('items__product',
-                          'items__variant',
-                          'items__board',
-                          'items__sauce',
-                          'items__addons__addon'),
+             .prefetch_related(
+                 'items__product',
+                 'items__variant',
+                 'items__board',
+                 'items__sauce',
+                 'items__addons__addon'
+             ),
         id=order_id,
         user=request.user
     )
     is_editable = order.is_editable()
 
-    if request.method == 'POST' and 'edit_item' in request.POST:
-        item_id = request.POST.get('item_id')
-        item = get_object_or_404(OrderItem, id=item_id, order=order)
-        if item.is_editable():
-            form = OrderItemEditForm(request.POST, instance=item)
-            if form.is_valid():
-                form.save()
-                messages.success(request, 'Изменения сохранены')
-                return redirect('app_order:order_detail', order_id=order.id)
-
-    if request.method == 'POST' and is_editable:
-        form = OrderEditForm(request.POST, instance=order)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Изменения сохранены')
-            return redirect('app_order:order_detail', order_id=order.id)
-    else:
-        form = OrderEditForm(instance=order, initial={
-            'delivery_type': order.delivery_type,
-            'address': order.address if order.delivery_type == 'delivery' else 'Самовывоз'
-        })
-
-    item_forms = []
-    for item in order.items.all():
-        item_forms.append({
-            'item': item,
-            'form': OrderItemEditForm(instance=item),
-            'is_editable': item.is_editable()
-        })
+    order_form = OrderEditForm(instance=order)
+    items_formset = OrderItemFormSet(instance=order)
 
     return render(request, 'app_order/order_detail.html', {
         'order': order,
-        'order_items': order.items.all(),
-        'form': form,
-        'item_forms': item_forms,
+        'form': order_form,
+        'item_formset': items_formset,
         'is_editable': is_editable,
     })
+
+
+
+@login_required
+@require_POST
+def update_order(request, order_id):
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+    if not order.is_editable():
+        return HttpResponseForbidden("Заказ нельзя редактировать")
+
+    form = OrderEditForm(request.POST, instance=order)
+    if form.is_valid():
+        form.save()
+        messages.success(request, 'Изменения в заказе сохранены')
+    else:
+        messages.error(request, 'Ошибка при сохранении заказа')
+
+    return redirect('app_order:order_detail', order_id=order.id)
+
+
+@login_required
+@require_POST
+def update_order_items(request, order_id):
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+    if not order.is_editable():
+        return HttpResponseForbidden("Заказ нельзя редактировать")
+
+    formset = OrderItemFormSet(request.POST, instance=order)
+    if formset.is_valid():
+        formset.save()
+        update_order_totals(order)
+        messages.success(request, 'Изменения в товарах сохранены')
+    else:
+        messages.error(request, 'Ошибка при сохранении товаров')
+
+    return redirect('app_order:order_detail', order_id=order.id)
+
+
+def update_order_totals(order):
+    """Обновляет суммы заказа на основе текущих товаров с учетом бортов и добавок"""
+    order.subtotal = Decimal('0')
+    order.discount_amount = Decimal('0')
+    order.total_price = Decimal('0')
+
+    for item in order.items.all():
+        # Базовая стоимость товара (вариант * количество)
+        item_price = item.price * item.quantity
+        item_subtotal = item_price
+
+        # Добавляем стоимость борта, если есть
+        if item.board:
+            item_subtotal += item.board.price * item.quantity
+
+        # Добавляем стоимость всех добавок
+        for addon in item.addons.all():
+            item_subtotal += addon.price * item.quantity
+
+        # Рассчитываем скидку (если есть акция)
+        if item.is_weekly_special:
+            item.discount_amount = Decimal('0.1') * item_price  # 10% от базовой стоимости
+        else:
+            item.discount_amount = Decimal('0')
+
+        item.save()
+
+        # Обновляем суммы заказа
+        order.subtotal += item_subtotal
+        order.discount_amount += item.discount_amount
+
+    # Итоговая сумма с учетом скидки
+    order.total_price = order.subtotal - order.discount_amount
+    order.save()
 
 
 @login_required
@@ -170,3 +219,22 @@ def order_list(request):
         'status_filter': status_filter,
     }
     return render(request, 'app_order/order_list.html', context)
+
+
+def get_boards_by_size(request):
+    print("get_boards_by_size")
+    size_id = request.GET.get('size_id')
+    if size_id:
+        boards = BoardParams.objects.filter(size_id=size_id).select_related('board')
+        data = {
+            'boards': [
+                {
+                    'id': board.id,
+                    'name': board.board.name,
+                    'price': str(board.price)
+                }
+                for board in boards
+            ]
+        }
+        return JsonResponse(data)
+    return JsonResponse({'boards': []})
