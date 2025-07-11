@@ -1,141 +1,141 @@
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth import get_user_model
-from app_catalog.models import Product, ProductVariant, BoardParams, PizzaSauce, AddonParams, Addon
+from app_catalog.models import Category, PizzaAddon, PizzaBoard, PizzaSizes, Product, ProductVariant, BoardParams, PizzaSauce, AddonParams, Addon
 
 User = get_user_model()
 
 
 def create_test_data():
+    # Создаем пользователя
     user = User.objects.create_user(username='testuser', password='password')
 
-    # Создаем товары
+    # Категории
+    category_pizza = Category.objects.create(name="Пицца", slug="pizza")
+    category_drink = Category.objects.create(name="Напитки", slug="drinks")
+
+    # Размеры пиццы
+    size_large = PizzaSizes.objects.create(name="Большая")
+    size_medium = PizzaSizes.objects.create(name="Средняя")
+
+    # Продукты
     product_pizza = Product.objects.create(
         name="Пепперони",
         slug="pepperoni",
-        description="Пицца Пепперони",
-        category=Product.CATEGORY_PIZZA,
-        is_weekly_special=False
+        description="Острая пицца",
+        category=category_pizza
     )
 
     product_drink = Product.objects.create(
         name="Кола",
         slug="cola",
         description="Газировка",
-        category=Product.CATEGORY_DRINK
+        category=category_drink
     )
 
-    # Размеры
+    # Варианты товара
     variant_pizza = ProductVariant.objects.create(
         product=product_pizza,
-        size_name="Большая",
+        size=size_large,
         price=500
     )
 
     variant_drink = ProductVariant.objects.create(
         product=product_drink,
-        value=0.5,
-        unit=ProductVariant.UNIT_LITER,
+        value="0.5",
+        unit="l",
         price=80
     )
 
     # Борты
-    board1 = BoardParams.objects.create(
-        board_name="Обычный борт",
-        price=0
-    )
-    board2 = BoardParams.objects.create(
-        board_name="Сырный борт",
-        price=50
-    )
+    board_cheese = PizzaBoard.objects.create(name="Сырный борт", slug="cheese")
+    board_regular = PizzaBoard.objects.create(name="Обычный", slug="regular")
 
-    # Соус
-    sauce = PizzaSauce.objects.create(name="Томатный")
+    BoardParams.objects.create(board=board_cheese, size=size_large, price=50)
+    BoardParams.objects.create(board=board_regular, size=size_large, price=0)
+
+    # Соусы
+    sauce_tomato = PizzaSauce.objects.create(name="Томатный", slug="tomato")
 
     # Добавки
-    addon_type = Addon.objects.create(name="Маслины")
-    addon = AddonParams.objects.create(addon=addon_type, price=30, size=variant_pizza.size)
+    addon_olives = PizzaAddon.objects.create(name="Маслины", slug="olives")
+    AddonParams.objects.create(addon=addon_olives, size=size_large, price=30)
 
     return {
         'user': user,
-        'pizza': product_pizza,
-        'drink': product_drink,
-        'pizza_variant': variant_pizza,
-        'drink_variant': variant_drink,
-        'board1': board1,
-        'board2': board2,
-        'sauce': sauce,
-        'addon': addon
+        'product_pizza': product_pizza,
+        'product_drink': product_drink,
+        'variant_pizza': variant_pizza,
+        'variant_drink': variant_drink,
+        'sauce_tomato': sauce_tomato,
+        'board_cheese': board_cheese,
+        'board_regular': board_regular,
+        'addon_olives': addon_olives
     }
     
 
 
-class AddToCartTests(TestCase):
+class AddToCartViewTest(TestCase):
     def setUp(self):
         self.client = Client()
         self.data = create_test_data()
         self.user = self.data['user']
         self.client.login(username='testuser', password='password')
 
-    def test_add_drink_to_cart(self):
-        drink = self.data['drink']
-        variant = self.data['drink_variant']
-
-        response = self.client.post(reverse('app_cart:add_to_cart', args=[drink.slug]), {
-            'variant_id': variant.id,
-            'quantity': 2
-        })
-
-        self.assertEqual(response.status_code, 302)
-        self.assertTrue(self.user.cart_items.filter(item=drink, item_variant=variant).exists())
-
-        cart_item = self.user.cart_items.get(item=drink)
-        self.assertEqual(cart_item.quantity, 2)
-        
-
     def test_add_pizza_with_options_to_cart(self):
-        pizza = self.data['pizza']
-        variant = self.data['pizza_variant']
-        board1 = self.data['board1']
-        board2 = self.data['board2']
-        sauce = self.data['sauce']
-        addon = self.data['addon']
+        data = self.data
+        pizza = data['product_pizza']
+        variant = data['variant_pizza']
+        sauce = data['sauce_tomato']
+        board_cheese = data['board_cheese']
+        board_regular = data['board_regular']
+        addon_olives = data['addon_olives']
+
+        board_params_cheese = BoardParams.objects.get(board=board_cheese, size=variant.size)
+        board_params_regular = BoardParams.objects.get(board=board_regular, size=variant.size)
 
         response = self.client.post(reverse('app_cart:add_to_cart', args=[pizza.slug]), {
             'variant_id': variant.id,
-            'quantity': 1,
-            'board1_id': board1.id,
-            'board2_id': board2.id,
+            'quantity': 2,
+            'board1_id': board_params_cheese.id,
+            'board2_id': board_params_regular.id,
             'sauce_id': sauce.id,
-            'addon_ids': [addon.id]
+            'addon_ids': [addon_olives.id]
         })
 
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 302)  # Редирект после POST
+
         cart_item = self.user.cart_items.get(item=pizza)
 
-        self.assertEqual(cart_item.board1, board1)
-        self.assertEqual(cart_item.board2, board2)
+        self.assertEqual(cart_item.quantity, 2)
+        self.assertEqual(cart_item.board1, board_params_cheese)
+        self.assertEqual(cart_item.board2, board_params_regular)
         self.assertEqual(cart_item.sauce, sauce)
-        self.assertIn(addon, cart_item.addons.all())
+        self.assertIn(addon_olives, cart_item.addons.all())
+    
+    
+    
+    def test_cannot_add_same_board_twice(self):
+        data = self.data
+        pizza = data['product_pizza']
+        variant = data['variant_pizza']
+        board_cheese = data['board_cheese']
 
-    def test_cannot_add_same_boards(self):
-        pizza = self.data['pizza']
-        variant = self.data['pizza_variant']
-        board1 = self.data['board1']
+        board_params_cheese = BoardParams.objects.get(board=board_cheese, size=variant.size)
 
         response = self.client.post(reverse('app_cart:add_to_cart', args=[pizza.slug]), {
             'variant_id': variant.id,
-            'board1_id': board1.id,
-            'board2_id': board1.id,  # Одинаковые борты
+            'board1_id': board_params_cheese.id,
+            'board2_id': board_params_cheese.id,
         }, follow=True)
 
-        messages = list(response.context.get('messages', []))
+        messages = list(response.context['messages'])
         self.assertTrue(any("одинаковые борты" in m.message for m in messages))
-        
     
     def test_adding_same_item_increases_quantity(self):
-        pizza = self.data['pizza']
-        variant = self.data['pizza_variant']
+        data = self.data
+        pizza = data['product_pizza']
+        variant = data['variant_pizza']
 
         # Первый раз
         self.client.post(reverse('app_cart:add_to_cart', args=[pizza.slug]), {
@@ -151,3 +151,21 @@ class AddToCartTests(TestCase):
 
         cart_item = self.user.cart_items.get(item=pizza)
         self.assertEqual(cart_item.quantity, 3)
+    
+    def test_add_drink_without_options(self):
+        data = self.data
+        drink = data['product_drink']
+        variant = data['variant_drink']
+
+        response = self.client.post(reverse('app_cart:add_to_cart', args=[drink.slug]), {
+            'variant_id': variant.id,
+            'quantity': 2
+        })
+
+        self.assertEqual(response.status_code, 302)
+        cart_item = self.user.cart_items.get(item=drink)
+        self.assertEqual(cart_item.quantity, 2)
+        self.assertIsNone(cart_item.board1)
+        self.assertIsNone(cart_item.board2)
+        self.assertIsNone(cart_item.sauce)
+        self.assertEqual(cart_item.addons.count(), 0)

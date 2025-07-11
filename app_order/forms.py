@@ -1,139 +1,106 @@
 from django import forms
 from django.forms import inlineformset_factory
 
-from app_catalog.models import ProductVariant, BoardParams
+from app_catalog.models import PizzaSauce, ProductVariant, BoardParams
 from app_order.models import Order, OrderItem
 
 
-class CheckoutForm(forms.Form):
-    DELIVERY_CHOICES = [
-        ('pickup', 'Самовывоз'),
-        ('delivery', 'Доставка'),
-    ]
+from .models import Order
 
-    PAYMENT_CHOICES = [
-        ('cash', 'Наличные'),
-        ('card', 'Карта'),
-    ]
 
-    name = forms.CharField(
-        label='Ваше имя',
-        max_length=100,
-        widget=forms.TextInput(attrs={
-            'class': 'form-input',
-            'placeholder': 'Иван Иванов'
-        })
-    )
+class CheckoutForm(forms.ModelForm):
+    DELIVERY_CHOICES = Order.DELIVERY_CHOICES
+    PAYMENT_CHOICES = Order.PAYMENT_CHOICES
 
-    phone = forms.CharField(
-        label='Телефон',
-        max_length=20,
-        widget=forms.TextInput(attrs={
-            'class': 'form-input',
-            'placeholder': '+7 (999) 123-45-67'
-        })
-    )
+    name = forms.CharField(label="Ваше имя", max_length=100, widget=forms.TextInput(attrs={"class": "form-input", "placeholder": "Иван Иванов"}))
 
-    address = forms.CharField(
-        label='Адрес доставки',
-        required=False,
-        widget=forms.TextInput(attrs={
-            'class': 'form-input',
-            'placeholder': 'ул. Ленина, д. 1, кв. 1'
-        })
-    )
+    phone = forms.CharField(label="Телефон", max_length=20, widget=forms.TextInput(attrs={"class": "form-input", "placeholder": "+7 (999) 123-45-67"}))
 
-    delivery_type = forms.ChoiceField(
-        label='Способ получения',
-        choices=DELIVERY_CHOICES,
-        widget=forms.RadioSelect(attrs={'class': 'delivery-options'})
-    )
+    address = forms.CharField(label="Адрес доставки", required=False, widget=forms.TextInput(attrs={"class": "form-input", "placeholder": "ул. Ленина, д. 1, кв. 1"}))
 
-    payment_method = forms.ChoiceField(
-        label='Способ оплаты',
-        choices=PAYMENT_CHOICES,
-        widget=forms.RadioSelect(),
-        initial='cash'
-    )
+    delivery_type = forms.ChoiceField(label="Способ получения", choices=DELIVERY_CHOICES, widget=forms.RadioSelect(attrs={"class": "delivery-options"}))
 
-    comment = forms.CharField(
-        label='Комментарий к заказу',
-        required=False,
-        widget=forms.Textarea(attrs={
-            'class': 'form-textarea',
-            'placeholder': 'Ваши пожелания...',
-            'rows': 3
-        })
-    )
+    payment_method = forms.ChoiceField(label="Способ оплаты", choices=PAYMENT_CHOICES, widget=forms.RadioSelect(), initial="cash")
+
+    comment = forms.CharField(label="Комментарий к заказу", required=False, widget=forms.Textarea(attrs={"class": "form-textarea", "placeholder": "Ваши пожелания...", "rows": 3}))
+
+    class Meta:
+        model = Order
+        fields = ["customer_name", "phone_number", "address", "delivery_type", "payment_method", "comment"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["customer_name"].widget = self.fields["name"].widget
+        self.fields["phone_number"].widget = self.fields["phone"].widget
+        del self.fields["name"]
+        del self.fields["phone"]
 
     def clean(self):
         cleaned_data = super().clean()
-        delivery_type = cleaned_data.get('delivery_type')
-        payment_method = cleaned_data.get('payment_method')
-        address = cleaned_data.get('address')
+        delivery_type = cleaned_data.get("delivery_type")
+        address = cleaned_data.get("address")
 
-        if delivery_type == 'delivery' and not address:
-            self.add_error('address', 'Укажите адрес для доставки')
+        if delivery_type == "delivery" and not address:
+            self.add_error("address", "Укажите адрес для доставки")
+
+        # Автоматическое заполнение адреса для самовывоза
+        if delivery_type == "pickup":
+            cleaned_data["address"] = "Самовывоз"
 
         return cleaned_data
+
+    def save(self, commit=True, user=None):
+        order = super().save(commit=False)
+        if user:
+            order.user = user
+            order.payment_status = False  # По умолчанию не оплачено
+            order.status = "new"  # Новый заказ
+
+        if commit:
+            order.save()
+        return order
 
 
 class OrderEditForm(forms.ModelForm):
     class Meta:
         model = Order
-        fields = [
-            'delivery_type',
-            'payment_method',
-            'payment_status',
-            'customer_name',
-            'phone_number',
-            'address',
-            'comment'
-        ]
+        fields = ["delivery_type", "payment_method", "payment_status", "customer_name", "phone_number", "address", "comment"]
         widgets = {
-            'delivery_type': forms.RadioSelect(attrs={'class': 'delivery-options'}),
-            'payment_method': forms.RadioSelect(attrs={'class': 'payment-options'}),
-            'payment_status': forms.CheckboxInput(attrs={'class': 'payment-status'}),
-            'customer_name': forms.TextInput(attrs={'class': 'form-input'}),
-            'phone_number': forms.TextInput(attrs={'class': 'form-input'}),
-            'comment': forms.Textarea(attrs={
-                'class': 'form-textarea',
-                'rows': 3,
-                'placeholder': 'Ваши пожелания...'
-            }),
-            'address': forms.TextInput(attrs={
-                'class': 'form-input',
-                'placeholder': 'ул. Ленина, д. 1, кв. 1',
-                'id': 'id_address'
-            }),
+            "delivery_type": forms.RadioSelect(attrs={"class": "delivery-options"}),
+            "payment_method": forms.RadioSelect(attrs={"class": "payment-options"}),
+            "payment_status": forms.CheckboxInput(attrs={"class": "payment-status"}),
+            "customer_name": forms.TextInput(attrs={"class": "form-input"}),
+            "phone_number": forms.TextInput(attrs={"class": "form-input"}),
+            "comment": forms.Textarea(attrs={"class": "form-textarea", "rows": 3, "placeholder": "Ваши пожелания..."}),
+            "address": forms.TextInput(attrs={"class": "form-input", "placeholder": "ул. Ленина, д. 1, кв. 1", "id": "id_address"}),
         }
         labels = {
-            'customer_name': 'Имя заказчика',
-            'phone_number': 'Телефон',
-            'comment': 'Комментарий',
+            "customer_name": "Имя заказчика",
+            "phone_number": "Телефон",
+            "comment": "Комментарий",
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['payment_status'].label = "Заказ оплачен"
+        self.fields["payment_status"].label = "Заказ оплачен"
 
         # Устанавливаем начальное значение для адреса при самовывозе
-        if self.instance.delivery_type == 'pickup' and not self.instance.address:
-            self.instance.address = 'Самовывоз'
+        if self.instance.delivery_type == "pickup" and not self.instance.address:
+            self.instance.address = "Самовывоз"
 
-        self.fields['address'].required = False
-        if self.initial.get('delivery_type') == 'delivery':
-            self.fields['address'].required = True
+        self.fields["address"].required = False
+        if self.initial.get("delivery_type") == "delivery":
+            self.fields["address"].required = True
 
     def clean(self):
         cleaned_data = super().clean()
-        delivery_type = cleaned_data.get('delivery_type')
-        address = cleaned_data.get('address')
+        delivery_type = cleaned_data.get("delivery_type")
+        address = cleaned_data.get("address")
 
-        if delivery_type == 'delivery' and not address:
-            self.add_error('address', 'Укажите адрес для доставки')
-        elif delivery_type == 'pickup':
-            cleaned_data['address'] = 'Самовывоз'
+        if delivery_type == "delivery" and not address:
+            self.add_error("address", "Укажите адрес для доставки")
+        elif delivery_type == "pickup":
+            cleaned_data["address"] = "Самовывоз"
 
         return cleaned_data
 
@@ -141,37 +108,30 @@ class OrderEditForm(forms.ModelForm):
 class OrderItemEditForm(forms.ModelForm):
     class Meta:
         model = OrderItem
-        fields = ['variant', 'quantity', 'board', 'sauce']
+        fields = ["variant", "quantity", "board1", "board2", "sauce", "addons"]
         widgets = {
-            'variant': forms.Select(attrs={'class': 'form-select'}),
-            'quantity': forms.NumberInput(attrs={
-                'class': 'form-input',
-                'min': 1,
-                'max': 20
-            }),
-            'board': forms.Select(attrs={'class': 'form-select'}),
-            'sauce': forms.Select(attrs={'class': 'form-select'}),
+            "variant": forms.Select(attrs={"class": "form-select"}),
+            "quantity": forms.NumberInput(attrs={"class": "form-input", "min": 1, "max": 20}),
+            "board1": forms.Select(attrs={"class": "form-select"}),
+            "board2": forms.Select(attrs={"class": "form-select"}),
+            "sauce": forms.Select(attrs={"class": "form-select"}),
+            "addons": forms.SelectMultiple(attrs={"class": "form-select"}),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if self.instance and hasattr(self.instance, 'product'):
-            self.fields['variant'].queryset = ProductVariant.objects.filter(
-                product=self.instance.product
-            )
+        if self.instance and hasattr(self.instance, "product"):
+            # Фильтрация вариантов по продукту
+            self.fields["variant"].queryset = ProductVariant.objects.filter(product=self.instance.product)
+
+            # Фильтрация бортов по размеру (если есть)
             if self.instance.variant and self.instance.variant.size:
-                self.fields['board'].queryset = BoardParams.objects.filter(
-                    size=self.instance.variant.size
-                )
+                size_filter = {"size": self.instance.variant.size}
+                self.fields["board1"].queryset = BoardParams.objects.filter(**size_filter)
+                self.fields["board2"].queryset = BoardParams.objects.filter(**size_filter)
             else:
-                self.fields['board'].queryset = BoardParams.objects.none()
+                self.fields["board1"].queryset = BoardParams.objects.none()
+                self.fields["board2"].queryset = BoardParams.objects.none()
 
 
-OrderItemFormSet = inlineformset_factory(
-    Order,
-    OrderItem,
-    form=OrderItemEditForm,
-    extra=0,
-    can_delete=False,
-    fields=['variant', 'quantity', 'board', 'sauce']
-)
+OrderItemFormSet = inlineformset_factory(Order, OrderItem, form=OrderItemEditForm, extra=0, can_delete=False, fields=["variant", "quantity", "board1", "board2", "sauce", "addons"])
