@@ -1,0 +1,242 @@
+/* Container for all pages */
+.reviews-container,
+.moderation-container,
+.moderation-form-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Common card style */
+.review-card,
+.moderation-item,
+.moderation-form-container {
+    background-color: var(--card-bg);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.moderation-item {
+    border-left: 4px solid #ffc107;
+}
+
+/* Review header */
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.review-author {
+    font-weight: bold;
+    color: var(--accent-color);
+}
+
+.review-date {
+    font-size: 0.9rem;
+    opacity: 0.7;
+}
+
+/* Rating stars */
+.review-rating {
+    display: flex;
+    gap: 0.2rem;
+    font-size: 1.2rem;
+}
+
+.star {
+    color: #ccc;
+}
+
+.star.filled {
+    color: gold;
+}
+
+.rating-stars {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    margin: 10px 0;
+}
+
+.rating-stars input[type="radio"] {
+    display: none;
+}
+
+.rating-stars .star-label {
+    font-size: 2rem;
+    color: #ddd;
+    cursor: pointer;
+    transition: color 0.2s;
+    margin-right: 5px;
+}
+
+.rating-stars input[type="radio"]:checked~.star-label,
+.rating-stars input[type="radio"]:hover~.star-label,
+.rating-stars .star-label:hover,
+.rating-stars .star-label:hover~.star-label {
+    color: gold;
+}
+
+/* Review text */
+.review-text {
+    white-space: pre-wrap;
+    word-break: break-word;
+    background-color: rgba(0 0 0 / 5%);
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 1rem;
+}
+
+.read-more {
+    color: var(--accent-color);
+    text-decoration: none;
+}
+
+.read-more:hover {
+    text-decoration: underline;
+}
+
+.your-review {
+    border: 2px solid var(--accent-color);
+}
+
+.review-status {
+    font-size: 0.9em;
+    color: #666;
+    margin-top: 10px;
+    font-style: italic;
+}
+
+/* Form elements */
+.form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: flex-start;
+    margin-top: 1.5rem;
+}
+
+.moderation-form p {
+    margin-bottom: 1rem;
+}
+
+.moderation-form label {
+    display: block;
+    margin-bottom: 0.3rem;
+    font-weight: 500;
+}
+
+select.form-select,
+textarea.form-textarea {
+    width: 100%;
+    padding: 0.6rem 0.8rem;
+    font-size: 1rem;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    transition: border-color 0.3s ease;
+}
+
+select.form-select:focus,
+textarea.form-textarea:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px var(--accent-color-rgba);
+}
+
+/* Buttons */
+.btn {
+    display: inline-block;
+    padding: 0.6rem 1.2rem;
+    font-size: 1rem;
+    font-weight: 500;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+    margin: 0.3rem 0;
+}
+
+.btn-primary {
+    background-color: var(--accent-color);
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background-color: #05a962;
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background-color: var(--hover-bg);
+    color: var(--text-color);
+}
+
+.btn-secondary:hover {
+    background-color: #777777;
+    transform: translateY(-1px);
+}
+
+.btn-danger {
+    background-color: #e74c3c;
+    color: #fff;
+}
+
+.btn-danger:hover {
+    background-color: #c0392b;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    .review-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .btn {
+        width: 100%;
+        text-align: center;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+}
+
+/* Dark theme overrides */
+.dark .review-date,
+.dark .review-status {
+    color: #aaa;
+}
+
+.dark .review-card,
+.dark .moderation-item,
+.dark .moderation-form-container {
+    background-color: var(--card-bg);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.dark .moderation-item {
+    border-left-color: #ffc107;
+}
+
+.dark .rating-stars .star-label {
+    color: #555;
+}
+
+.dark .rating-stars input[type="radio"]:checked~.star-label,
+.dark .rating-stars input[type="radio"]:hover~.star-label,
+.dark .rating-stars .star-label:hover,
+.dark .rating-stars .star-label:hover~.star-label {
+    color: gold;
+}

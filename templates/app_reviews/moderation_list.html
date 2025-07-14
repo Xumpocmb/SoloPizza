@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'css/reviews.css' %}">
+{% endblock %}
+
+{% block main %}
+<main>
+    <div class="moderation-container">
+        <h1 class="review-title">Модерация отзывов</h1>
+        
+        <div class="moderation-list">
+            {% for review in page_obj %}
+            <div class="moderation-item">
+                <div class="moderation-header">
+                    <span class="review-author">{{ review.user.username }}</span>
+                    <span class="review-date">{{ review.created_at|date:"d.m.Y" }}</span>
+                    <div class="review-rating">
+                        {% for i in "12345" %}
+                            <span class="star{% if forloop.counter <= review.rating %} filled{% endif %}">★</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="review-text">{{ review.text|truncatewords:30 }}</div>
+                <a href="{% url 'app_reviews:moderate_review' review.pk %}" class="moderate-button">
+                    Модерировать
+                </a>
+            </div>
+            {% empty %}
+            <p>Нет отзывов для модерации</p>
+            {% endfor %}
+        </div>
+    </div>
+</main>
+
+{% endblock %}

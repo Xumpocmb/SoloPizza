@@ -30,6 +30,19 @@
 <!-- Sidebar -->
 <div class="sidebar" id="sidebar">
   <a href="{% url 'app_home:home' %}">Главная</a>
+  <a href="{% url 'app_home:home' %}">Акции</a>
+  
+  <div class="has-submenu">
+    <button onclick="toggleSubmenu('catalogSub')">О нас ▾</button>
+    <div class="submenu" id="catalogSub">
+        <a href="#">Информация</a>
+        <a href="{% url 'app_reviews:review_list' %}">Отзывы</a>
+        <a href="{% url 'app_reviews:moderation_list' %}">Модерация</a>
+    </div>
+  </div>
+
+  
+  
   <div class="has-submenu">
     <button onclick="toggleSubmenu('catalogSub')">Каталог ▾</button>
     <div class="submenu" id="catalogSub">

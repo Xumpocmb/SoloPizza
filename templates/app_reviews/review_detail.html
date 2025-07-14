@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'css/reviews.css' %}">
+{% endblock %}
+
+{% block main %}
+<main>
+    <div class="review-detail">
+        <div class="review-card">
+            <div class="review-header">
+                <span class="review-author">{{ review.user.username }}</span>
+                <span class="review-date">{{ review.created_at|date:"d.m.Y H:i" }}</span>
+                    <div class="review-rating">
+                        {% for i in "12345" %}
+                            <span class="star{% if forloop.counter <= review.rating %} filled{% endif %}">★</span>
+                        {% endfor %}
+                    </div>
+            </div>
+            <div class="review-text">{{ review.text|linebreaks }}</div>
+        </div>
+        
+        <a href="{% url 'app_reviews:review_list' %}" class="btn btn-secondary">
+            Вернуться к списку отзывов
+        </a>
+    </div>
+</main>
+
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'css/reviews.css' %}">
+{% endblock %}
+
+{% block main %}
+
+<main>
+    <div class="reviews-container">
+
+        <div class="reviews-header">
+            <h1 class="review-title">Отзывы наших клиентов</h1>
+            {% if request.user.is_authenticated %}
+            <a href="{% url 'app_reviews:add_review' %}" class="btn btn-primary">
+                Оставить отзыв
+            </a>
+            {% endif %}
+        </div>
+        
+    
+        <div class="reviews-list">
+            {% for review in reviews %}
+                {% if review.status == 'approved' or review.user == request.user %}
+                <div class="review-card {% if review.user == request.user %}your-review{% endif %}">
+                    <div class="review-card">
+                        <div class="review-header">
+                            <span class="review-author">{{ review.user.username }}</span>
+                            <span class="review-date">{{ review.created_at|date:"d.m.Y" }}</span>
+                            <div class="review-rating">
+                                {% for i in "12345" %}
+                                    <span class="star{% if forloop.counter <= review.rating %} filled{% endif %}">★</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="review-text">{{ review.text }}</div>
+                        <a href="{% url 'app_reviews:review_detail' review.pk %}" class="read-more">
+                            Подробнее
+                        </a>
+                    </div>
+                    {% if review.user == request.user %}
+                        <div class="review-status">
+                            Статус: {{ review.get_status_display }}
+                            {% if review.status == 'rejected' and review.moderation_comment %}
+                                ({{ review.moderation_comment }})
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+            {% empty %}
+            <p>Пока нет отзывов. Будьте первым!</p>
+            {% endfor %}
+        </div>
+    </div>
+</main>
+
+{% endblock %}

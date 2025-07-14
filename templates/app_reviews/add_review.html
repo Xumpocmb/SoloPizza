@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'css/reviews.css' %}">
+{% endblock %}
+
+{% block main %}
+<main>
+    <div class="moderation-form-container">
+        <h1 class="review-title">Оставить отзыв</h1>
+
+        {% if not request.user.is_authenticated %}
+            <div class="alert alert-info">
+                Чтобы оставить отзыв, пожалуйста <a href="{% url 'login' %}">войдите</a>.
+            </div>
+        {% else %}
+            <div class="moderation-notice">
+                Ваш отзыв будет опубликован после проверки модератором.
+            </div>
+        
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label>Ваша оценка:</label>
+                    <div class="rating-stars">
+                        {% for i in "54321" %}
+                            <input type="radio" 
+                                   id="star{{ i }}" 
+                                   name="rating" 
+                                   value="{{ i }}"
+                                   {% if form.rating.value == i %}checked{% endif %}>
+                            <label for="star{{ i }}" class="star-label">★</label>
+                        {% endfor %}
+                    </div>
+                    {{ form.rating.errors }}
+                </div>
+                
+                <div class="form-group">
+                    {{ form.text.label_tag }}
+                    {{ form.text }}
+                    {{ form.text.errors }}
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Отправить отзыв</button>
+                    <a href="{% url 'app_reviews:review_list' %}" class="btn btn-secondary">
+                        Вернуться к списку отзывов
+                    </a>
+                </div>
+            </form>
+        {% endif %}
+    </div>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const stars = document.querySelectorAll('.rating-stars .star-label');
+    
+    stars.forEach(star => {
+        star.addEventListener('click', function() {
+            const value = this.getAttribute('for').replace('star', '');
+            document.querySelector('input[name="rating"]').value = value;
+        });
+    });
+});
+</script>
+{% endblock %}
