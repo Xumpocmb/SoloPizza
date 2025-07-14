@@ -139,7 +139,7 @@ class OrderItemEditForm(forms.ModelForm):
         if size:
             self.fields["board1"].queryset = BoardParams.objects.filter(size=size)
             self.fields["board2"].queryset = BoardParams.objects.filter(size=size)
-            self.fields["addons"].queryset = AddonParams.objects.filter(addon__is_active=True, size=size)
+            self.fields["addons"].queryset = AddonParams.objects.filter(addon__is_active=True, size=size).select_related("addon")
         else:
             self.fields["board1"].queryset = BoardParams.objects.none()
             self.fields["board2"].queryset = BoardParams.objects.none()
@@ -155,25 +155,58 @@ class OrderItemEditForm(forms.ModelForm):
         """Находит борт того же типа для нового размера"""
         if not original_board or not new_size:
             return None
-        return BoardParams.objects.filter(board__name=original_board.board.name, size=new_size).first()
+        return BoardParams.objects.filter(
+            board__name=original_board.board.name,
+            size=new_size
+        ).first()
+
+    def _find_addon_replacement(self, original_addon, new_size):
+        """Находит добавку того же типа для нового размера"""
+        if not original_addon or not new_size:
+            return None
+        return AddonParams.objects.filter(
+            addon__name=original_addon.addon.name,
+            size=new_size
+        ).first()
 
     def clean(self):
         cleaned_data = super().clean()
         variant = cleaned_data.get("variant")
-
-        if variant and hasattr(variant, "size"):
+        
+        if variant and hasattr(variant, 'size'):
+            # Если меняется размер пиццы
             if self.instance.variant and (variant.size != self.instance.variant.size):
                 new_size = variant.size
-                cleaned_data["board1"] = self._find_board_replacement(self.instance.board1, new_size)
-                cleaned_data["board2"] = self._find_board_replacement(self.instance.board2, new_size)
-
+                
+                # Автоматически подбираем борты для нового размера
+                cleaned_data["board1"] = self._find_board_replacement(
+                    self.instance.board1, new_size
+                )
+                cleaned_data["board2"] = self._find_board_replacement(
+                    self.instance.board2, new_size
+                )
+                
+                # Переносим добавки на новый размер
+                if self.instance.addons.exists():
+                    new_addons = []
+                    for addon in self.instance.addons.all():
+                        replacement = self._find_addon_replacement(addon, new_size)
+                        if replacement:
+                            new_addons.append(replacement.id)
+                    
+                    cleaned_data["addons"] = new_addons
+                
+                # Обновляем queryset'ы для формы
                 self.instance.variant = variant
                 self._update_size_dependent_fields()
-
+                
                 # Добавляем сообщение
                 if self.request:
-                    messages.info(self.request, f"Борты автоматически изменены для размера {new_size.name}")
-
+                    messages.info(
+                        self.request,
+                        f"Борты и добавки автоматически изменены для размера {new_size.name}"
+                    )
+        
         return cleaned_data
 
 

@@ -141,6 +141,12 @@
                     <div class="form-group">
                       <label>Добавки:</label>
                       {{ form.addons }}
+                      {% if form.addons.errors %}
+                        <div class="error">{{ form.addons.errors }}</div>
+                      {% endif %}
+                      <small class="form-text text-muted">
+                        Удерживайте Ctrl для выбора нескольких добавок
+                      </small>
                     </div>
                   {% endif %}
 
