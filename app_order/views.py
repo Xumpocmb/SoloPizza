@@ -1,16 +1,13 @@
 from decimal import Decimal
-
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Q
-from django.http import JsonResponse, HttpResponseForbidden
+from django.http import HttpResponseForbidden
 from django.shortcuts import redirect, render, get_object_or_404
 from django.views.decorators.http import require_POST
-
 from app_cart.models import CartItem
-from app_catalog.models import BoardParams
-from app_order.forms import CheckoutForm, OrderEditForm, OrderItemEditForm, OrderItemFormSet
+from app_order.forms import CheckoutForm, OrderEditForm, OrderItemFormSet
 from app_order.models import OrderItem, Order
 
 
@@ -115,10 +112,11 @@ def update_order_items(request, order_id):
     if not order.is_editable():
         return HttpResponseForbidden("Заказ нельзя редактировать")
 
-    formset = OrderItemFormSet(request.POST, instance=order)
+    formset = OrderItemFormSet(request.POST, instance=order, form_kwargs={"request": request})  # Ключевое изменение - передаем request
+
     if formset.is_valid():
         formset.save()
-        update_order_totals(order)
+        order.recalculate_totals()
         messages.success(request, "Изменения в товарах сохранены")
     else:
         messages.error(request, "Ошибка при сохранении товаров")
@@ -192,13 +190,3 @@ def order_list(request):
         "status_filter": status_filter,
     }
     return render(request, "app_order/order_list.html", context)
-
-
-def get_boards_by_size(request):
-    print("get_boards_by_size")
-    size_id = request.GET.get("size_id")
-    if size_id:
-        boards = BoardParams.objects.filter(size_id=size_id).select_related("board")
-        data = {"boards": [{"id": board.id, "name": board.board.name, "price": str(board.price)} for board in boards]}
-        return JsonResponse(data)
-    return JsonResponse({"boards": []})

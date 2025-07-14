@@ -411,8 +411,15 @@
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .form-actions {
@@ -529,4 +536,137 @@
     cursor: pointer;
     font-weight: 600;
     flex: 1;
+}
+
+/* Стили для формы редактирования */
+.item-edit-mode {
+    background-color: var(--card-bg);
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 15px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--text-color);
+    font-weight: 500;
+}
+
+/* Стили для обычных select */
+.form-select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.form-select:focus {
+    border-color: var(--accent-color);
+    outline: none;
+    box-shadow: 0 0 0 2px var(--accent-color-rgba);
+}
+
+/* Стили для поля количества */
+.form-input.quantity-edit {
+    width: 60px;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    text-align: center;
+}
+
+/* Стили для мультиселекта добавок */
+.form-select.multiple-select {
+    height: auto;
+    min-height: 210px;
+    padding: 5px;
+}
+
+.form-select.multiple-select option {
+    padding: 8px 12px;
+    margin: 2px 0;
+    border-radius: 4px;
+    background-color: var(--card-bg);
+    color: var(--text-color);
+}
+
+.form-select.multiple-select option:hover {
+    background-color: var(--hover-bg);
+}
+
+.form-select.multiple-select option:checked {
+    background-color: var(--accent-color);
+    color: white;
+}
+
+/* Стили для кнопок формы */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.cancel-button,
+.save-button {
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.cancel-button {
+    background-color: #f0f0f0;
+    color: #333;
+    border: 1px solid #ddd;
+}
+
+.dark .cancel-button {
+    background-color: #444;
+    color: #f1f1f1;
+    border-color: #555;
+}
+
+.save-button {
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+}
+
+.cancel-button:hover {
+    background-color: #e0e0e0;
+}
+
+.dark .cancel-button:hover {
+    background-color: #555;
+}
+
+.save-button:hover {
+    background-color: #068c4d;
+}
+
+/* Адаптация для темного режима */
+.dark .form-select,
+.dark .form-input.quantity-edit {
+    border-color: #555;
+    background-color: #444;
+    color: #f1f1f1;
+}
+
+.dark .form-select:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px var(--accent-color-rgba);
 }

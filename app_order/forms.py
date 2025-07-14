@@ -1,11 +1,8 @@
 from django import forms
 from django.forms import inlineformset_factory
-
-from app_catalog.models import PizzaSauce, ProductVariant, BoardParams
+from django.contrib import messages
+from app_catalog.models import AddonParams, PizzaSauce, ProductVariant, BoardParams
 from app_order.models import Order, OrderItem
-
-
-from .models import Order
 
 
 class CheckoutForm(forms.ModelForm):
@@ -111,27 +108,73 @@ class OrderItemEditForm(forms.ModelForm):
         fields = ["variant", "quantity", "board1", "board2", "sauce", "addons"]
         widgets = {
             "variant": forms.Select(attrs={"class": "form-select"}),
-            "quantity": forms.NumberInput(attrs={"class": "form-input", "min": 1, "max": 20}),
-            "board1": forms.Select(attrs={"class": "form-select"}),
-            "board2": forms.Select(attrs={"class": "form-select"}),
-            "sauce": forms.Select(attrs={"class": "form-select"}),
-            "addons": forms.SelectMultiple(attrs={"class": "form-select"}),
+            "quantity": forms.NumberInput(attrs={"class": "form-input quantity-edit", "min": 1, "max": 20}),
+            "board1": forms.Select(attrs={"class": "form-select board1-edit"}),
+            "board2": forms.Select(attrs={"class": "form-select board2-edit"}),
+            "sauce": forms.Select(attrs={"class": "form-select sauce-edit"}),
+            "addons": forms.SelectMultiple(attrs={"class": "form-select multiple-select"}),
         }
 
     def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop("request", None)  # Получаем request из kwargs
         super().__init__(*args, **kwargs)
         if self.instance and hasattr(self.instance, "product"):
-            # Фильтрация вариантов по продукту
-            self.fields["variant"].queryset = ProductVariant.objects.filter(product=self.instance.product)
+            self._initialize_form_fields()
 
-            # Фильтрация бортов по размеру (если есть)
-            if self.instance.variant and self.instance.variant.size:
-                size_filter = {"size": self.instance.variant.size}
-                self.fields["board1"].queryset = BoardParams.objects.filter(**size_filter)
-                self.fields["board2"].queryset = BoardParams.objects.filter(**size_filter)
-            else:
-                self.fields["board1"].queryset = BoardParams.objects.none()
-                self.fields["board2"].queryset = BoardParams.objects.none()
+    def _initialize_form_fields(self):
+        """Инициализирует все поля формы на основе продукта"""
+        product = self.instance.product
+        self.fields["variant"].queryset = ProductVariant.objects.filter(product=product)
+
+        # Для пицц и кальцоне
+        if product.category.name in ["Пицца", "Кальцоне"]:
+            self.fields["sauce"].queryset = PizzaSauce.objects.filter(is_active=True)
+            self._update_size_dependent_fields()
+        else:
+            self._hide_pizza_specific_fields()
+
+    def _update_size_dependent_fields(self):
+        """Обновляет поля, зависящие от размера (борты и добавки)"""
+        size = self.instance.variant.size if self.instance.variant else None
+        if size:
+            self.fields["board1"].queryset = BoardParams.objects.filter(size=size)
+            self.fields["board2"].queryset = BoardParams.objects.filter(size=size)
+            self.fields["addons"].queryset = AddonParams.objects.filter(addon__is_active=True, size=size)
+        else:
+            self.fields["board1"].queryset = BoardParams.objects.none()
+            self.fields["board2"].queryset = BoardParams.objects.none()
+            self.fields["addons"].queryset = AddonParams.objects.none()
+
+    def _hide_pizza_specific_fields(self):
+        """Скрывает поля, специфичные для пиццы"""
+        for field in ["sauce", "board1", "board2", "addons"]:
+            self.fields[field].queryset = self.fields[field].queryset.model.objects.none()
+            self.fields[field].widget = forms.HiddenInput()
+
+    def _find_board_replacement(self, original_board, new_size):
+        """Находит борт того же типа для нового размера"""
+        if not original_board or not new_size:
+            return None
+        return BoardParams.objects.filter(board__name=original_board.board.name, size=new_size).first()
+
+    def clean(self):
+        cleaned_data = super().clean()
+        variant = cleaned_data.get("variant")
+
+        if variant and hasattr(variant, "size"):
+            if self.instance.variant and (variant.size != self.instance.variant.size):
+                new_size = variant.size
+                cleaned_data["board1"] = self._find_board_replacement(self.instance.board1, new_size)
+                cleaned_data["board2"] = self._find_board_replacement(self.instance.board2, new_size)
+
+                self.instance.variant = variant
+                self._update_size_dependent_fields()
+
+                # Добавляем сообщение
+                if self.request:
+                    messages.info(self.request, f"Борты автоматически изменены для размера {new_size.name}")
+
+        return cleaned_data
 
 
 OrderItemFormSet = inlineformset_factory(Order, OrderItem, form=OrderItemEditForm, extra=0, can_delete=False, fields=["variant", "quantity", "board1", "board2", "sauce", "addons"])

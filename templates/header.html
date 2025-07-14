@@ -1,62 +1,59 @@
 <header>
-    <!-- Burger -->
-    <div class="burger" onclick="toggleSidebar()">
-        <span></span>
-        <span></span>
-        <span></span>
-    </div>
-    <!-- Right controls -->
-    <label class="theme-toggle-switch">
-        <input type="checkbox" id="themeToggle"/>
-        <span class="toggle-slider"></span>
-        <span class="icon sun">☀️</span>
-        <span class="icon moon">🌙</span>
-    </label>
-    <div class="right">
-        <select class="branch-select">
-            <option>Ленина</option>
-            <option>Тексер</option>
-        </select>
-        <div class="cart-wrapper">
-            <a href="{% url 'app_cart:view_cart' %}">
-                <div class="cart-icon">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M7 4h-2l-3 9v2a1 1 0 001 1h1a3 3 0 006 0h4a3 3 0 006 0h1a1 1 0 001-1v-2l-3-9h-2m-1 2h-8l1.5 4h5l1.5-4z"/>
-                    </svg>
-                    <div class="cart-count">{{ cart_total_quantity }}</div>
-                </div>
-            </a>
+  <!-- Burger -->
+  <div class="burger" onclick="toggleSidebar()">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+  <!-- Right controls -->
+  <label class="theme-toggle-switch">
+    <input type="checkbox" id="themeToggle" />
+    <span class="toggle-slider"></span>
+    <span class="icon sun">☀️</span>
+    <span class="icon moon">🌙</span>
+  </label>
+  <div class="right">
+    <select class="branch-select">
+      <option>Ленина</option>
+      <option>Тексер</option>
+    </select>
+    <div class="cart-wrapper">
+      <a href="{% url 'app_cart:view_cart' %}">
+        <div class="cart-icon">
+          <i class="fas fa-shopping-cart"></i>
+          <div class="cart-count">{{ cart_total_quantity }}</div>
         </div>
+      </a>
     </div>
+  </div>
 </header>
 <!-- Sidebar -->
 <div class="sidebar" id="sidebar">
-    <a href="{% url 'app_home:home' %}">Главная</a>
-    <div class="has-submenu">
-        <button onclick="toggleSubmenu('catalogSub')">Каталог ▾</button>
-        <div class="submenu" id="catalogSub">
-            {% for category in categories %}
-                <a href="{% url 'app_catalog:category_detail' category.slug %}">{{ category.name }}</a>
-                </li>
-            {% endfor %}
-        </div>
+  <a href="{% url 'app_home:home' %}">Главная</a>
+  <div class="has-submenu">
+    <button onclick="toggleSubmenu('catalogSub')">Каталог ▾</button>
+    <div class="submenu" id="catalogSub">
+      {% for category in categories %}
+        <a href="{% url 'app_catalog:category_detail' category.slug %}">{{ category.name }}</a>
+      {% endfor %}
     </div>
-    <div class="has-submenu">
-        <button onclick="toggleSubmenu('profileSub')">Профиль ▾</button>
-        <div class="submenu" id="profileSub">
-            {% if user.is_authenticated %}
-                {% if user.is_superuser %}
-                    <a href="{% url 'admin:index' %}">Админ-панель</a>
-                {% endif %}
-                <a href="{% url 'socialaccount_connections' %}">Управление социальными аккаунтами</a>
-                <a href="{% url 'app_cart:view_cart' %}">Корзина</a>
-                <a href="{% url 'app_order:order_list' %}">Заказы</a>
-                <a href="{% url 'app_user:logout' %}">Выход</a>
-            {% else %}
-                <a href="{% url 'app_user:login' %}">Вход</a>
-            {% endif %}
-        </div>
+  </div>
+  <div class="has-submenu">
+    <button onclick="toggleSubmenu('profileSub')">Профиль ▾</button>
+    <div class="submenu" id="profileSub">
+      {% if user.is_authenticated %}
+        {% if user.is_superuser %}
+          <a href="{% url 'admin:index' %}">Админ-панель</a>
+        {% endif %}
+        <a href="{% url 'socialaccount_connections' %}">Управление социальными аккаунтами</a>
+        <a href="{% url 'app_cart:view_cart' %}">Корзина</a>
+        <a href="{% url 'app_order:order_list' %}">Заказы</a>
+        <a href="{% url 'app_user:logout' %}">Выход</a>
+      {% else %}
+        <a href="{% url 'app_user:login' %}">Вход</a>
+      {% endif %}
     </div>
+  </div>
 </div>
 <!-- Overlay -->
 <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>

@@ -14,8 +14,9 @@
         <p class="order-date">Дата: {{ order.created_at|date:'d.m.Y H:i' }}</p>
       </div>
 
+      <!-- Содержимое заказа -->
       <div class="order-content">
-        <!-- Форма редактирования товаров -->
+        <!-- Товары заказа -->
         <form method="POST" action="{% url 'app_order:update_order_items' order.id %}" class="order-items-form">
           {% csrf_token %}
           {{ item_formset.management_form }}
@@ -136,6 +137,11 @@
                       <label>Соус:</label>
                       {{ form.sauce }}
                     </div>
+
+                    <div class="form-group">
+                      <label>Добавки:</label>
+                      {{ form.addons }}
+                    </div>
                   {% endif %}
 
                   <div class="form-actions">
@@ -148,7 +154,7 @@
           </div>
         </form>
 
-        <!-- Блок информации о заказе -->
+        <!-- Детали заказа -->
         <div class="order-summary">
           <div class="summary-card">
             <div class="section-header">
@@ -172,11 +178,35 @@
                   id="address-field"
                   style="display: {% if form.delivery_type.value == 'delivery' %}
                     
+                    
+                    
+                    
+                    
+                    
+                    
                     block
+
+
+
+
+
+
 
                   {% else %}
                     
+                    
+                    
+                    
+                    
+                    
+                    
                     none
+
+
+
+
+
+
 
                   {% endif %};">
                   <label for="{{ form.address.id_for_label }}">Адрес доставки:</label>
