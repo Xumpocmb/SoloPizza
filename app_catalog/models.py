@@ -37,7 +37,7 @@ class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products')
     name = models.CharField('Название', max_length=255)
     slug = models.SlugField('URL-адрес', unique=True)
-    description = models.TextField('Описание', blank=True)
+    description = models.TextField('Описание', null=True, blank=True)
     image = models.ImageField(upload_to='item_images', blank=True, null=True, verbose_name='Изображение')
     is_weekly_special = models.BooleanField(default=False, verbose_name='Акция: Пицца недели', blank=False, null=False)
     is_active = models.BooleanField('Активен', default=True)

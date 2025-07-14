@@ -174,11 +174,9 @@ class OrderItemEditForm(forms.ModelForm):
         variant = cleaned_data.get("variant")
         
         if variant and hasattr(variant, 'size'):
-            # Если меняется размер пиццы
             if self.instance.variant and (variant.size != self.instance.variant.size):
                 new_size = variant.size
                 
-                # Автоматически подбираем борты для нового размера
                 cleaned_data["board1"] = self._find_board_replacement(
                     self.instance.board1, new_size
                 )
@@ -186,7 +184,6 @@ class OrderItemEditForm(forms.ModelForm):
                     self.instance.board2, new_size
                 )
                 
-                # Переносим добавки на новый размер
                 if self.instance.addons.exists():
                     new_addons = []
                     for addon in self.instance.addons.all():
@@ -196,7 +193,6 @@ class OrderItemEditForm(forms.ModelForm):
                     
                     cleaned_data["addons"] = new_addons
                 
-                # Обновляем queryset'ы для формы
                 self.instance.variant = variant
                 self._update_size_dependent_fields()
                 

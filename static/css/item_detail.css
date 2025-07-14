@@ -267,3 +267,8 @@ input[type="number"]:focus {
     font-weight: 500;
     color: var(--text-color);
 }
+
+
+.form-group {
+    margin-bottom: 20px;
+}

@@ -190,3 +190,21 @@ def order_list(request):
         "status_filter": status_filter,
     }
     return render(request, "app_order/order_list.html", context)
+
+
+@require_POST
+@login_required
+def update_order_status(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    new_status = request.POST.get("status")
+    
+    print(new_status)
+
+    if new_status in dict(Order.STATUS_CHOICES):
+        order.status = new_status
+        order.save()
+        messages.success(request, f"Статус заказа #{order_id} изменен на «{order.get_status_display()}»")
+    else:
+        messages.error(request, "Неверный статус заказа")
+
+    return redirect(request.META.get("HTTP_REFERER", "app_order:order_list"))

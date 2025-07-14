@@ -99,7 +99,7 @@
 
 .table-header {
     display: grid;
-    grid-template-columns: 80px 120px 140px 120px 150px 120px 100px;
+    grid-template-columns: 80px 100px 120px 140px 120px 150px 120px 100px;
     background-color: var(--accent-color);
     color: white;
     font-weight: 600;
@@ -112,7 +112,7 @@
 
 .table-row {
     display: grid;
-    grid-template-columns: 80px 120px 140px 120px 150px 120px 100px;
+    grid-template-columns: 80px 100px 120px 140px 120px 150px 120px 100px;
     padding: 12px 15px;
     border-bottom: 1px solid var(--hover-bg);
     transition: background-color 0.2s;
@@ -284,3 +284,122 @@
         min-width: 100%;
     }
 }
+
+
+.status-form {
+    display: inline-block;
+    margin: 0;
+    min-width: 120px;
+}
+
+.status-select {
+    width: 100%;
+    padding: 6px 10px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    background-color: white;
+    cursor: pointer;
+    font-size: 14px;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 14px;
+}
+
+.status-select:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px var(--accent-color-rgba);
+}
+
+.status-select:disabled {
+    opacity: 0.7;
+    background-image: none;
+    position: relative;
+}
+
+.status-select:disabled::after {
+    content: "";
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    width: 14px;
+    height: 14px;
+    border: 2px solid #ccc;
+    border-top-color: var(--accent-color);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+
+.table-row {
+    transition: background-color 0.3s ease;
+}
+
+/* Цвета строк для разных статусов */
+.table-row.status-new {
+    background-color: rgba(33, 150, 243, 0.2);
+    border-left: 4px solid #2196f3;
+}
+
+.table-row.status-confirmed {
+    background-color: rgba(255, 193, 7, 0.2);
+    border-left: 4px solid #ffc107;
+}
+
+.table-row.status-cooking {
+    background-color: rgba(76, 175, 80, 0.2);
+    border-left: 4px solid #4caf50;
+}
+
+.table-row.status-delivering {
+    background-color: rgba(3, 169, 244, 0.2);
+    border-left: 4px solid #03a9f4;
+}
+
+.table-row.status-completed {
+    background-color: rgba(46, 125, 50, 0.2);
+    border-left: 4px solid #2e7d32;
+}
+
+.table-row.status-canceled {
+    background-color: rgba(198, 40, 40, 0.2);
+    border-left: 4px solid #c62828;
+}
+
+/* Темная тема */
+.dark .table-row.status-new {
+    background-color: rgba(33, 150, 243, 0.3);
+}
+
+.dark .table-row.status-confirmed {
+    background-color: rgba(255, 193, 7, 0.3);
+}
+
+.dark .table-row.status-cooking {
+    background-color: rgba(76, 175, 80, 0.3);
+}
+
+.dark .table-row.status-delivering {
+    background-color: rgba(3, 169, 244, 0.3);
+}
+
+.dark .table-row.status-completed {
+    background-color: rgba(46, 125, 50, 0.3);
+}
+
+.dark .table-row.status-canceled {
+    background-color: rgba(198, 40, 40, 0.3);
+}
+
+.table-cell {
+    transition: background-color 0.3s ease;
+}
+
