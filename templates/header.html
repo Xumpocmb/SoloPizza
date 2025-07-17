@@ -13,10 +13,16 @@
     <span class="icon moon">🌙</span>
   </label>
   <div class="right">
-    <select class="branch-select">
-      <option>Ленина</option>
-      <option>Тексер</option>
-    </select>
+    <form action="{% url 'app_home:select_branch' %}" method="post">
+      {% csrf_token %}
+      <select class="branch-select" name="branch_id" id="branch-select" onchange="this.form.submit()">
+        {% for branch in branches %}
+          <option value="{{ branch.id }}"
+          {% if branch.id|stringformat:"s" == selected_branch_id %}selected{% endif %}>{{ branch.address }}</option>
+        {% endfor %}
+      </select>
+    </form>
+    
     <div class="cart-wrapper">
       <a href="{% url 'app_cart:view_cart' %}">
         <div class="cart-icon">
@@ -30,7 +36,7 @@
 <!-- Sidebar -->
 <div class="sidebar" id="sidebar">
   <a href="{% url 'app_home:home' %}">Главная</a>
-  <a href="{% url 'app_home:home' %}">Акции</a>
+  <a href="{% url 'app_home:discounts' %}">Акции</a>
   
   <div class="has-submenu">
     <button onclick="toggleSubmenu('aboutSub')">О нас ▾</button>

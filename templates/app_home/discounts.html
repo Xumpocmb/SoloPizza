@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'css/promo_page.css' %}">
+{% endblock %}
+
+{% block main %}
+<main>
+    <section class="promo-section">
+        <div class="container">
+            <div class="promo-header">
+                <h1 class="promo-title">Наши акции</h1>
+                <div class="divider"></div>
+            </div>
+    
+            <div class="promo-cards">
+                <!-- Акция 1: Пицца недели -->
+                <div class="promo-card">
+                    <div class="promo-card-header">
+                        <h2 class="promo-card-title">Пицца недели</h2>
+                        <div class="promo-badge">-10%</div>
+                    </div>
+                    <div class="promo-card-content">
+                        <p class="promo-description">
+                            <i class="fas fa-info-circle"></i> Акция доступна <strong>только по будням</strong> на
+                            определенную пиццу размером 32см.
+                        </p>
+                        {% if pizza_weekly %}
+                        <a href="{% url 'app_catalog:item_detail' pizza_weekly.slug %}">Перейти к пицце недели</a>
+                        {% endif %}
+                    </div>
+                </div>
+    
+                <!-- Акция 2: Комбо -->
+                <div class="promo-card">
+                    <div class="promo-card-header">
+                        <h2 class="promo-card-title">Выгодные КОМБО</h2>
+                        <div class="promo-badge">ХИТ</div>
+                    </div>
+                    <div class="promo-card-content">
+                        <p class="promo-description">
+                            <i class="fas fa-clock"></i> Акция доступна только по будням, с 11:00 до 17:00
+                        </p>
+                        <a href="{% url 'app_catalog:category_detail' 'kombo' %}">Перейти к КОМБО</a>
+                    </div>
+                </div>
+    
+                <!-- Акция 3: День рождения -->
+                <div class="promo-card">
+                    <div class="promo-card-header">
+                        <h2 class="promo-card-title">Скидка на День Рождения</h2>
+                        <div class="promo-badge">-10%</div>
+                    </div>
+                    <div class="promo-card-content">
+                        <p class="promo-description">
+                            <i class="fas fa-gift"></i> Скидка именинникам при предъявлении документа.
+                            Действует за 3 дня до и 3 дня после даты рождения.
+                        </p>
+                        <div class="restriction-banner">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span>СКИДКА ДЕЙСТВУЕТ ТОЛЬКО НА САМОВЫВОЗ И ЗАЛ!</span>
+                        </div>
+                    </div>
+                </div>
+    
+                <!-- Акция 4: Самовывоз -->
+                <div class="promo-card">
+                    <div class="promo-card-header">
+                        <h2 class="promo-card-title">Скидка на самовывоз</h2>
+                        <div class="promo-badge">-10%</div>
+                    </div>
+                    <div class="promo-card-content">
+                        <p class="promo-description">
+                            <i class="fas fa-car"></i> Постоянная скидка при заказе с самовывозом.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+{% endblock %}
