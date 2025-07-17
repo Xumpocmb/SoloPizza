@@ -1,7 +1,10 @@
 from decimal import Decimal
 from django.db import models
 from django.conf import settings
-from app_catalog.models import AddonParams, ProductVariant, BoardParams, PizzaSauce, PizzaAddon
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
+from app_catalog.models import AddonParams, ProductVariant, BoardParams, PizzaSauce
+from app_home.models import CafeBranch
 
 
 class OrderManager(models.Manager):
@@ -9,16 +12,55 @@ class OrderManager(models.Manager):
         order = self.get_queryset().get(id=order_id)
         items = order.items.all()
 
-        totals = {"subtotal": Decimal("0.00"), "discount_amount": Decimal("0.00"), "total_price": Decimal("0.00"), "items": []}
+        totals = {
+            "subtotal": Decimal("0.00"),
+            "discount_amount": Decimal("0.00"),
+            "delivery_cost": self._calculate_delivery_cost(order),
+            "items": [],
+            "pickup_discount_applied": False,
+        }
 
         for item in items:
             calculation = item.calculate_item_total()
             totals["subtotal"] += calculation["original_total"]
             totals["discount_amount"] += calculation["discount_amount"]
-            totals["total_price"] += calculation["final_total"]
+
+            if calculation["is_pickup_discount"]:
+                totals["pickup_discount_applied"] = True
+
             totals["items"].append((item, calculation))
 
+        order.subtotal = totals["subtotal"]
+        order.discount_amount = totals["discount_amount"]
+        order.delivery_cost = totals["delivery_cost"]
+        order.total_price = totals["subtotal"] - totals["discount_amount"] + totals["delivery_cost"]
+        order.save()
+
         return totals
+
+    def _calculate_delivery_cost(self, order):
+        """Динамический расчет стоимости доставки"""
+        if order.delivery_type != "delivery":
+            return Decimal("0.00")
+
+        items = order.items.all().select_related("product__category")
+        if not items:
+            return Decimal("0.00")
+
+        # Сумма товаров без учета доставки
+        subtotal = sum(item.calculate_item_total()["final_total"] for item in items)
+
+        # Проверяем, все ли товары в заказе относятся к фастфуду
+        is_all_fastfood = True
+        for item in items:
+            if item.product.category.name != "Фастфуд":
+                is_all_fastfood = False
+                break
+
+        # Устанавливаем минимальную сумму для бесплатной доставки
+        free_delivery_threshold = Decimal("30.00") if is_all_fastfood else Decimal("20.00")
+
+        return Decimal("3.00") if subtotal < free_delivery_threshold else Decimal("0.00")
 
 
 class Order(models.Model):
@@ -51,6 +93,7 @@ class Order(models.Model):
         related_name="orders",
         verbose_name="Пользователь",
     )
+    branch = models.ForeignKey(CafeBranch, on_delete=models.SET_NULL, verbose_name="Филиал", null=True, blank=True)
     customer_name = models.CharField(max_length=255, verbose_name="Имя заказчика")
     phone_number = models.CharField(max_length=20, verbose_name="Номер телефона")
     address = models.TextField(verbose_name="Адрес доставки")
@@ -62,9 +105,14 @@ class Order(models.Model):
 
     comment = models.TextField(blank=True, verbose_name="Комментарий к заказу")
 
+    subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal("0.00"), verbose_name="Сумма без скидок")
+    discount_amount = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal("0.00"), verbose_name="Сумма скидки")
+    delivery_cost = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal("0.00"), verbose_name="Стоимость доставки")
+    total_price = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal("0.00"), verbose_name="Итоговая сумма")
+
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата обновления")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
-    
+
     objects = OrderManager()
 
     class Meta:
@@ -72,20 +120,34 @@ class Order(models.Model):
         verbose_name_plural = "Заказы"
         ordering = ["-created_at"]
 
+    def save(self, *args, **kwargs):
+        if self.pk and any(field in kwargs.get("update_fields", []) for field in ["delivery_type", "status"]):
+            self.recalculate_totals()
+
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f"Заказ #{self.id} от {self.created_at.strftime('%d.%m.%Y')}"
 
     def recalculate_totals(self):
         """Пересчитывает и сохраняет итоговые суммы заказа"""
-        totals = Order.objects.get_order_totals(self.id)
-        self.subtotal = totals["subtotal"]
-        self.discount_amount = totals["discount_amount"]
-        self.total_price = totals["total_price"]
-        self.save()
+        Order.objects.get_order_totals(self.id)
 
     def is_editable(self):
         """Проверяет, можно ли редактировать заказ"""
         return self.status in self.EDITABLE_STATUSES
+
+    def update_order_items(self):
+        """Вызывается после изменения состава заказа"""
+        self.recalculate_totals()
+
+    @property
+    def has_pickup_discount(self):
+        """Проверяет, применена ли скидка на самовывоз"""
+        if not hasattr(self, "_pickup_discount"):
+            totals = Order.objects.get_order_totals(self.id)
+            self._pickup_discount = totals["pickup_discount_applied"]
+        return self._pickup_discount
 
 
 class OrderItem(models.Model):
@@ -151,21 +213,49 @@ class OrderItem(models.Model):
         base_price = self.variant.price
         quantity = self.quantity
 
+        # Рассчитываем стоимость допов (бортов и добавок)
         board1_price = self.board1.price if self.board1 else Decimal("0")
         board2_price = self.board2.price if self.board2 else Decimal("0")
         addons_price = sum(addon.price for addon in self.addons.all()) if self.addons.exists() else Decimal("0")
 
+        # Стоимость дополнений (не участвует в скидке)
+        additions_total = (board1_price + board2_price + addons_price) * quantity
+
+        # Изначально скидка 0
+        discount_amount = Decimal("0")
+        discount_percent = Decimal("0")
+
+        # Проверяем условия для скидки
+        if self.product.category.name == "Пицца":
+            # Скидка на самовывоз (10%)
+            if self.order.delivery_type == "pickup":
+                discount_percent = Decimal("10.0")
+                discount_amount = (base_price * (discount_percent / Decimal("100"))) * quantity
+
+            # Дополнительная скидка на пиццу недели (20% если размер 32см)
+            if self.product.is_weekly_special and self.variant.size and self.variant.size.name == "32":
+                discount_percent = Decimal("20.0")
+                discount_amount = (base_price * (discount_percent / Decimal("100"))) * quantity
+
+        # Итоговые суммы
         original_total = (base_price + board1_price + board2_price + addons_price) * quantity
-
-        is_weekly_pizza = self.product.is_weekly_special and getattr(self.product.category, "name", "") == "Пицца"
-        discount_amount = (base_price * quantity * Decimal("0.1")) if is_weekly_pizza else Decimal("0")
-
-        final_total = original_total - discount_amount
+        final_total = (base_price * quantity - discount_amount) + additions_total
 
         return {
             "original_total": original_total.quantize(Decimal(".01")),
             "final_total": final_total.quantize(Decimal(".01")),
             "discount_amount": discount_amount.quantize(Decimal(".01")),
-            "is_weekly_pizza": is_weekly_pizza,
+            "discount_percent": discount_percent,
+            "is_weekly_pizza": self.product.is_weekly_special and self.product.category.name == "Пицza",
+            "is_pickup_discount": self.order.delivery_type == "pickup" and self.product.category.name == "Пицца",
         }
 
+
+@receiver(post_save, sender=OrderItem)
+def update_order_on_item_change(sender, instance, **kwargs):
+    instance.order.update_order_items()
+
+
+@receiver(post_delete, sender=OrderItem)
+def update_order_on_item_delete(sender, instance, **kwargs):
+    instance.order.update_order_items()

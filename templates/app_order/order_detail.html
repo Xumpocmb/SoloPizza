@@ -303,19 +303,19 @@
             <div class="summary-total">
               <div class="summary-row">
                 <span class="summary-label">Сумма заказа:</span>
-                <span class="summary-value">{{ totals.subtotal|floatformat:2 }} руб.</span>
+                <span class="summary-value">{{ order.subtotal|floatformat:2 }} руб.</span>
               </div>
 
               {% if totals.discount_amount > 0 %}
                 <div class="summary-row discount-row">
                   <span class="summary-label">Скидка:</span>
-                  <span class="summary-value">-{{ totals.discount_amount|floatformat:2 }} руб.</span>
+                  <span class="summary-value">-{{ order.discount_amount|floatformat:2 }} руб.</span>
                 </div>
               {% endif %}
 
               <div class="summary-row total-row">
                 <span class="summary-label">Итого к оплате:</span>
-                <span class="summary-value">{{ totals.total_price|floatformat:2 }} руб.</span>
+                <span class="summary-value">{{ order.total_price|floatformat:2 }} руб.</span>
               </div>
             </div>
           </div>
