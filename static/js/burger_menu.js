@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 const themeToggle = document.getElementById('themeToggle');
 
-// Проверяем предпочтения пользователя
+
 if (localStorage.getItem('theme') === 'dark') {
     document.documentElement.classList.add('dark');
     themeToggle.checked = true;
