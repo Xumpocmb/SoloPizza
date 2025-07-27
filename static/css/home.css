@@ -1,9 +1,21 @@
 .page_title {
     text-align: center;
+    color: var(--accent-color);
+    margin-bottom: 1rem;
+    font-size: 2.5rem;
+    width: 100%;
 }
 
 .categories_title {
     margin-bottom: 20px;
+    font-size: 2.0rem;
+}
+
+.divider {
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
+    margin: 0 auto;
+    width: 80%;
 }
 
 .page_text_container {
@@ -28,6 +40,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    max-width: 1200px;
 }
 
 .categories {

@@ -33,7 +33,7 @@ input:checked + .slider {
 .swiper-container {
     position: relative;
     width: 80%;
-    max-width: 1000px;
+    max-width: 1200px;
     margin: 2rem auto;
     border-radius: 12px;
     overflow: hidden;

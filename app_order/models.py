@@ -93,7 +93,7 @@ class Order(models.Model):
         related_name="orders",
         verbose_name="Пользователь",
     )
-    branch = models.ForeignKey(CafeBranch, on_delete=models.SET_NULL, verbose_name="Филиал", null=True, blank=True)
+    # branch = models.ForeignKey(CafeBranch, on_delete=models.SET_NULL, verbose_name="Филиал", null=True, blank=True)
     customer_name = models.CharField(max_length=255, verbose_name="Имя заказчика")
     phone_number = models.CharField(max_length=20, verbose_name="Номер телефона")
     address = models.TextField(verbose_name="Адрес доставки")
