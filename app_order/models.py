@@ -246,7 +246,7 @@ class OrderItem(models.Model):
             "final_total": final_total.quantize(Decimal(".01")),
             "discount_amount": discount_amount.quantize(Decimal(".01")),
             "discount_percent": discount_percent,
-            "is_weekly_pizza": self.product.is_weekly_special and self.product.category.name == "Пицza",
+            "is_weekly_pizza": self.product.is_weekly_special and self.product.category.name == "Пицца" and self.variant.size.name == "32",
             "is_pickup_discount": self.order.delivery_type == "pickup" and self.product.category.name == "Пицца",
         }
 

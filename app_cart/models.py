@@ -101,7 +101,8 @@ class CartItem(models.Model):
 
         original_total = (base_price + board1_price + board2_price + addons_price) * quantity
 
-        is_weekly_pizza = self.item.is_weekly_special and getattr(self.item.category, "name", "") == "Пицца"
+        # TODO: выводить в шаблон пометку скидки (сейчас работает не правильно)
+        is_weekly_pizza = self.item.is_weekly_special and self.item_variant.size.name == "32"
         discount_amount = (base_price * quantity * Decimal("0.2")) if is_weekly_pizza else Decimal("0")
 
         final_total = original_total - discount_amount

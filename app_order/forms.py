@@ -63,9 +63,9 @@ class OrderEditForm(forms.ModelForm):
         model = Order
         fields = ["delivery_type", "payment_method", "payment_status", "customer_name", "phone_number", "address", "comment"]
         widgets = {
-            "delivery_type": forms.RadioSelect(attrs={"class": "delivery-options"}),
-            "payment_method": forms.RadioSelect(attrs={"class": "payment-options"}),
-            "payment_status": forms.CheckboxInput(attrs={"class": "payment-status"}),
+            "delivery_type": forms.RadioSelect(attrs={"class": "custom-radio-list"}), # Просто указываете класс списка
+            "payment_method": forms.RadioSelect(attrs={"class": "custom-radio-list"}),
+            "payment_status": forms.CheckboxInput(attrs={"class": "custom-checkbox-list"}),
             "customer_name": forms.TextInput(attrs={"class": "form-input"}),
             "phone_number": forms.TextInput(attrs={"class": "form-input"}),
             "comment": forms.Textarea(attrs={"class": "form-textarea", "rows": 3, "placeholder": "Ваши пожелания..."}),
