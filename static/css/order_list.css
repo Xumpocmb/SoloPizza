@@ -269,7 +269,7 @@
     }
 
     .table-header, .table-row {
-        grid-template-columns: repeat(7, minmax(100px, 1fr));
+        grid-template-columns: repeat(8, minmax(100px, 1fr));
         width: 900px;
     }
 }

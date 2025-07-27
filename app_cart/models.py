@@ -102,7 +102,7 @@ class CartItem(models.Model):
         original_total = (base_price + board1_price + board2_price + addons_price) * quantity
 
         is_weekly_pizza = self.item.is_weekly_special and getattr(self.item.category, "name", "") == "Пицца"
-        discount_amount = (base_price * quantity * Decimal("0.1")) if is_weekly_pizza else Decimal("0")
+        discount_amount = (base_price * quantity * Decimal("0.2")) if is_weekly_pizza else Decimal("0")
 
         final_total = original_total - discount_amount
 

@@ -10,6 +10,7 @@
     --header-bg: #ffffff;
     --switch-bg: #ccc;
     --switch-thumb: #fff;
+    --border-radius: 20px;
 }
 
 .dark {
@@ -50,6 +51,12 @@ main {
     /*margin-top: 60px;*/
     padding-top: 20px;
     /*margin-bottom: 100px;*/
+}
+
+.main-wrapper {
+    padding: 10px;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 footer {
@@ -141,20 +148,48 @@ a:hover {
     }
 }
 
-header {
+.header-container {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     height: 56px; /* или высота, которую используешь */
     padding: 1rem 2rem;
+    border-radius: var(--border-radius);
+    margin: 0 5px;
     background: var(--header-bg);
     color: var(--text-color);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
     display: flex;
     justify-content: space-between;
     align-items: center;
     z-index: 1001;
+}
+
+.header-menu {
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+    align-items: center;
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.header-phone {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+}
+
+@media (max-width: 992px) {
+
+    .header-phone {
+        display: none;
+    }
 }
 
 .burger {
@@ -172,6 +207,20 @@ header {
     background: #333;
     border-radius: 2px;
     transition: 0.3s;
+}
+
+.site-logo {
+    display: block;
+}
+
+@media (max-width: 992px) {
+    .site-logo {
+        display: none;
+    }
+}
+
+.img-site-logo {
+    width: 50px;
 }
 
 .right {
@@ -215,11 +264,12 @@ header {
 
 .sidebar {
     position: fixed;
-    top: 40px;
+    top: 60px;
     left: -260px;
     width: 240px;
-    height: 100%;
-    background-color: var(--card-bg); /* Цвет фона из темы */
+    /*height: 100%;*/
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
     box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
     padding: 2rem 1rem 1rem 1rem;
     transition: left 0.3s ease, background-color 0.3s ease;
@@ -300,6 +350,7 @@ header {
     vertical-align: middle;
     z-index: 9999;
     cursor: pointer;
+    min-width: 60px;
 }
 
 .theme-toggle-switch input {

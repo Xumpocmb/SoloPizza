@@ -1,78 +1,96 @@
+{% load static %}
+
 <header>
-  <!-- Burger -->
-  <div class="burger" onclick="toggleSidebar()">
-    <span></span>
-    <span></span>
-    <span></span>
-  </div>
-  <!-- Right controls -->
-  <label class="theme-toggle-switch">
-    <input type="checkbox" id="themeToggle" />
-    <span class="toggle-slider"></span>
-    <span class="icon sun">☀️</span>
-    <span class="icon moon">🌙</span>
-  </label>
-  <div class="right">
-    <form action="{% url 'app_home:select_branch' %}" method="post">
-      {% csrf_token %}
-      <select class="branch-select" name="branch_id" id="branch-select" onchange="this.form.submit()">
-        {% for branch in branches %}
-          <option value="{{ branch.id }}"
-          {% if branch.id|stringformat:"s" == selected_branch_id %}selected{% endif %}>{{ branch.address }}</option>
-        {% endfor %}
-      </select>
-    </form>
-    
-    <div class="cart-wrapper">
-      <a href="{% url 'app_cart:view_cart' %}">
-        <div class="cart-icon">
-          <i class="fas fa-shopping-cart"></i>
-          <div class="cart-count">{{ cart_total_quantity }}</div>
+    <div class="header-container">
+        <div class="header-menu">
+            <div class="burger" onclick="toggleSidebar()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <div class="site-logo">
+                <a href="{% url 'app_home:home' %}">
+                    <img src="{% static 'img/sp.png' %}" alt="site logo" class="img-site-logo">
+                </a>
+            </div>
         </div>
-      </a>
+        <div class="header-content">
+            <div class="header-phone">
+                {% for phone in selected_branch.branch_phones.all %}
+                    <div class="phone-text">{{ phone.phone }}</div>
+                {% empty %}
+                    <div class="phone-text">Нет телефонов</div>
+                {% endfor %}
+            </div>
+            <label class="theme-toggle-switch">
+                <input type="checkbox" id="themeToggle"/>
+                <span class="toggle-slider"></span>
+                <span class="icon sun">☀️</span>
+                <span class="icon moon">🌙</span>
+            </label>
+            <div class="right">
+                <form action="{% url 'app_home:select_branch' %}" method="post">
+                    {% csrf_token %}
+                    <select class="branch-select" name="branch_id" id="branch-select" onchange="this.form.submit()">
+                        {% for branch in branches %}
+                            <option value="{{ branch.id }}"
+                                    {% if branch.id|stringformat:"s" == selected_branch_id %}selected{% endif %}>{{ branch.address }}</option>
+                        {% endfor %}
+                    </select>
+                </form>
+
+                <div class="cart-wrapper">
+                    <a href="{% url 'app_cart:view_cart' %}">
+                        <div class="cart-icon">
+                            <i class="fas fa-shopping-cart"></i>
+                            <div class="cart-count">{{ cart_total_quantity }}</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
+
 </header>
 <!-- Sidebar -->
 <div class="sidebar" id="sidebar">
-  <a href="{% url 'app_home:home' %}">Главная</a>
-  <a href="{% url 'app_home:discounts' %}">Акции</a>
-  
-  <div class="has-submenu">
-    <button onclick="toggleSubmenu('aboutSub')">О нас ▾</button>
-    <div class="submenu" id="aboutSub">
-        <a href="{% url 'app_home:home' %}">Информация</a>
-        <a href="{% url 'app_reviews:review_list' %}">Отзывы</a>
-        <a href="{% url 'app_reviews:moderation_list' %}">Модерация</a>
-    </div>
-  </div>
+    <a href="{% url 'app_home:home' %}">Главная</a>
+    <a href="{% url 'app_home:discounts' %}">Акции</a>
 
-  
-  
-  <div class="has-submenu">
-    <button onclick="toggleSubmenu('catalogSub')">Каталог ▾</button>
-    <div class="submenu" id="catalogSub">
-      {% for category in categories %}
-        <a href="{% url 'app_catalog:category_detail' category.slug %}">{{ category.name }}</a>
-      {% endfor %}
+    <div class="has-submenu">
+        <button onclick="toggleSubmenu('aboutSub')">О нас ▾</button>
+        <div class="submenu" id="aboutSub">
+            <a href="{% url 'app_home:home' %}">Информация</a>
+            <a href="{% url 'app_reviews:review_list' %}">Отзывы</a>
+            <a href="{% url 'app_reviews:moderation_list' %}">Модерация</a>
+        </div>
     </div>
-  </div>
-  <div class="has-submenu">
-    <button onclick="toggleSubmenu('profileSub')">Профиль ▾</button>
-    <div class="submenu" id="profileSub">
-      {% if user.is_authenticated %}
-        {% if user.is_superuser %}
-          <a href="{% url 'admin:index' %}">Админ-панель</a>
-        {% endif %}
-        <a href="{% url 'socialaccount_connections' %}">Управление социальными аккаунтами</a>
-        <a href="{% url 'app_cart:view_cart' %}">Корзина</a>
-        <a href="{% url 'app_order:order_list' %}">Заказы</a>
-        <a href="{% url 'app_user:logout' %}">Выход</a>
-      {% else %}
-        <a href="{% url 'app_user:login' %}">Вход</a>
-      {% endif %}
+
+
+    <div class="has-submenu">
+        <button onclick="toggleSubmenu('catalogSub')">Каталог ▾</button>
+        <div class="submenu" id="catalogSub">
+            {% for category in categories %}
+                <a href="{% url 'app_catalog:category_detail' category.slug %}">{{ category.name }}</a>
+            {% endfor %}
+        </div>
     </div>
-  </div>
+    <div class="has-submenu">
+        <button onclick="toggleSubmenu('profileSub')">Профиль ▾</button>
+        <div class="submenu" id="profileSub">
+            {% if user.is_authenticated %}
+                {% if user.is_superuser %}
+                    <a href="{% url 'admin:index' %}">Админ-панель</a>
+                {% endif %}
+                <a href="{% url 'socialaccount_connections' %}">Управление социальными аккаунтами</a>
+                <a href="{% url 'app_cart:view_cart' %}">Корзина</a>
+                <a href="{% url 'app_order:order_list' %}">Заказы</a>
+                <a href="{% url 'app_user:logout' %}">Выход</a>
+            {% else %}
+                <a href="{% url 'app_user:login' %}">Вход</a>
+            {% endif %}
+        </div>
+    </div>
 </div>
 <!-- Overlay -->
 <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>

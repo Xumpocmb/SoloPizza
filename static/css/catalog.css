@@ -67,7 +67,7 @@
 }
 
 .discount-badge {
-    background-color: var(--accent-color);
+    background-color: #ef7700;
     color: white;
     padding: 3px 8px;
     border-radius: 12px;

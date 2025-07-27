@@ -22,7 +22,8 @@ def site_context_processor(request):
     return {
         'branches': branches,
         'categories': categories,
-        'selected_branch_id': str(selected_branch_id)
+        'selected_branch_id': str(selected_branch_id),
+        'selected_branch': selected_branch,
     }
 
 
