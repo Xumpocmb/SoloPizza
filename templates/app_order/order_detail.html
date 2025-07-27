@@ -7,16 +7,15 @@
 
 {% block main %}
     <main class="order-detail-page">
-        <div class="order-container">
+        <div class="main-wrapper">
             <div class="order-header">
-                <h1 class="order-title">Заказ #{{ order.id }}</h1>
+                <h1 class="page_title">Заказ #{{ order.id }}</h1>
                 <div class="order-status {{ order.status }}">{{ order.get_status_display }}</div>
                 <p class="order-date">Дата: {{ order.created_at|date:'d.m.Y H:i' }}</p>
+                <div class="divider"></div>
             </div>
 
-            <!-- Содержимое заказа -->
             <div class="order-content">
-                <!-- Товары заказа -->
                 <form method="POST" action="{% url 'app_order:update_order_items' order.id %}" class="order-items-form">
                     {% csrf_token %}
                     {{ item_formset.management_form }}
@@ -39,16 +38,15 @@
                                                         class="fas fa-pencil-alt"></i></button>
                                             {% endif %}
                                         </h3>
-                                    </div>
-
-                                    <div class="item-image">
-                                        {% if form.instance.product.image %}
-                                            <img src="{{ form.instance.product.image.url }}"
-                                                 alt="{{ form.instance.product.name }}"/>
-                                        {% else %}
-                                            <img src="{% static 'img/test.jpg' %}"
-                                                 alt="{{ form.instance.product.name }}"/>
-                                        {% endif %}
+                                        <div class="item-image">
+                                            {% if form.instance.product.image %}
+                                                <img src="{{ form.instance.product.image.url }}"
+                                                     alt="{{ form.instance.product.name }}"/>
+                                            {% else %}
+                                                <img src="{% static 'img/test.jpg' %}"
+                                                     alt="{{ form.instance.product.name }}"/>
+                                            {% endif %}
+                                        </div>
                                     </div>
 
                                     <div class="item-details">
@@ -56,27 +54,38 @@
                                             <div class="item-option">
                                                 <span class="option-label">Размер:</span>
                                                 <span class="option-value">
-        {% if form.instance.variant.size %}
-            {{ form.instance.variant.size.name }}
-        {% else %}
-            {{ form.instance.variant.value }}
-            {{ form.instance.variant.get_unit_display }}
-        {% endif %} ({{ form.instance.variant.price }} руб.)
-    </span>
+                                                    {% if form.instance.variant.size %}
+                                                        {{ form.instance.variant.size.name }}
+                                                    {% else %}
+                                                        {{ form.instance.variant.value }}
+                                                        {{ form.instance.variant.get_unit_display }}
+                                                    {% endif %} ({{ form.instance.variant.price }} руб.)
+                                                </span>
                                             </div>
 
                                             {% if form.instance.board1 or form.instance.board2 %}
                                                 <div class="item-option">
                                                     <span class="option-label">Борты:</span>
-                                                    <span class="option-value">
-                            {% if form.instance.board1 %}
-                                Борт 1: {{ form.instance.board1.board.name }} (+{{ form.instance.board1.price }} руб.)
-                            {% endif %}
+                                                    <ul class="addons-list">
+
+                                                        {% if form.instance.board1 %}
+                                                            <li><span class="option-value">
+                                                            Борт 1: {{ form.instance.board1.board.name }} (+
+                                                            {{ form.instance.board1.price }} руб.)
+                                                            </span></li>
+                                                        {% endif %}
+
+
                                                         {% if form.instance.board2 %}
+                                                            <li><span class="option-value">
                                                             Борт 2: {{ form.instance.board2.board.name }} (+
                                                             {{ form.instance.board2.price }} руб.)
+                                                            </span></li>
                                                         {% endif %}
-                          </span>
+
+                                                    </ul>
+
+
                                                 </div>
                                             {% endif %}
 
@@ -102,20 +111,19 @@
                                         <div class="item-quantity-price">
                                             <span class="quantity">×{{ form.instance.quantity }}</span>
                                             <span class="item-total">
-                        {% with item_total=form.instance.calculate_item_total %}
-                            {% if item_total.is_weekly_pizza %}
-                                <span class="original-price">{{ item_total.original_total|floatformat:2 }} руб.</span>
-                                <span class="discounted-price">{{ item_total.final_total|floatformat:2 }} руб.</span>
-                            {% else %}
-                                {{ item_total.final_total|floatformat:2 }} руб.
-                            {% endif %}
-                        {% endwith %}
-                      </span>
+                                                {% with item_total=form.instance.calculate_item_total %}
+                                                    {% if item_total.is_weekly_pizza %}
+                                                        <span class="original-price">{{ item_total.original_total|floatformat:2 }} руб.</span>
+                                                        <span class="discounted-price">{{ item_total.final_total|floatformat:2 }} руб.</span>
+                                                    {% else %}
+                                                        {{ item_total.final_total|floatformat:2 }} руб.
+                                                    {% endif %}
+                                                {% endwith %}
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- Режим редактирования товара -->
                                 <div class="item-edit-mode" id="item-edit-{{ form.instance.id }}"
                                      style="display: none;">
                                     {{ form.id }}
@@ -168,18 +176,20 @@
                     </div>
                 </form>
 
-                <!-- Детали заказа -->
                 <div class="order-summary">
                     <div class="summary-card">
                         <div class="section-header">
-                            <h2 class="section-title">Детали заказа</h2>
-                            {% if is_editable %}
-                                <button class="edit-toggle-btn" id="editOrderBtn" aria-label="Редактировать заказ"><i
-                                        class="fas fa-pencil-alt"></i></button>
-                            {% endif %}
+                            <h2 class="section-title">
+                                <span>Детали заказа</span>
+                                {% if is_editable %}
+                                    <button class="edit-toggle-btn" id="editOrderBtn" aria-label="Редактировать заказ">
+                                        <i
+                                                class="fas fa-pencil-alt"></i></button>
+                                {% endif %}
+                            </h2>
+
                         </div>
 
-                        <!-- Форма редактирования заказа -->
                         <div class="edit-mode" id="editOrderForm" style="display: none;">
                             <form method="POST" action="{% url 'app_order:update_order' order.id %}"
                                   class="order-edit-form">
@@ -197,41 +207,8 @@
                                     </div>
                                 </div>
 
-                                <div class="form-group"
-                                     id="address-field"
-                                     style="display: {% if form.delivery_type.value == 'delivery' %}
-
-
-
-
-
-
-
-                                         block
-
-
-
-
-
-
-
-                                     {% else %}
-
-
-
-
-
-
-
-                                         none
-
-
-
-
-
-
-
-                                     {% endif %};">
+                                <div class="form-group" id="address-field"
+                                     style="display: {% if form.delivery_type.value == 'delivery' %}block{% else %}none{% endif %};">
                                     <label for="{{ form.address.id_for_label }}">Адрес доставки:</label>
                                     {{ form.address }}
                                 </div>
@@ -275,7 +252,6 @@
                             </form>
                         </div>
 
-                        <!-- Режим просмотра заказа -->
                         <div class="view-mode" id="viewOrderDetails">
                             <div class="summary-row">
                                 <span class="summary-label">Способ получения:</span>
@@ -297,12 +273,12 @@
                             <div class="summary-row">
                                 <span class="summary-label">Статус оплаты:</span>
                                 <span class="summary-value">
-                  {% if order.payment_status %}
-                      <span class="payment-paid">Оплачено</span>
-                  {% else %}
-                      <span class="payment-unpaid">Не оплачено</span>
-                  {% endif %}
-                </span>
+                                    {% if order.payment_status %}
+                                        <span class="payment-paid">Оплачено</span>
+                                    {% else %}
+                                        <span class="payment-unpaid">Не оплачено</span>
+                                    {% endif %}
+                                </span>
                             </div>
 
                             <div class="summary-row">
@@ -323,7 +299,6 @@
                             {% endif %}
                         </div>
 
-                        <!-- Блок с суммой -->
                         <div class="summary-total">
                             <div class="summary-row">
                                 <span class="summary-label">Сумма заказа:</span>
@@ -349,7 +324,6 @@
 
         <script>
             document.addEventListener('DOMContentLoaded', function () {
-                // Обработка редактирования заказа
                 const editBtn = document.getElementById('editOrderBtn')
                 const cancelBtn = document.getElementById('cancelEditBtn')
                 const editForm = document.getElementById('editOrderForm')
@@ -390,7 +364,6 @@
                     }
                 }
 
-                // Обработка редактирования товаров
                 document.querySelectorAll('.edit-item-btn').forEach((btn) => {
                     btn.addEventListener('click', function () {
                         const itemId = this.dataset.itemId

@@ -11,6 +11,10 @@
     --switch-bg: #ccc;
     --switch-thumb: #fff;
     --border-radius: 20px;
+    --divider-color: #e0e0e0;
+    --text-muted: #6c757d;
+    --success-color: #28a745;
+    --error-color: #dc3545;
 }
 
 .dark {
@@ -21,6 +25,10 @@
     --header-bg: #1e1e1e;
     --switch-bg: #666;
     --switch-thumb: #ddd;
+    --divider-color: #444;
+    --text-muted: #9a9a9a;
+    --success-color: #4caf50;
+    --error-color: #f44336;
 }
 
 * {
@@ -126,6 +134,21 @@ a:hover {
 .btn-outline:hover {
     background-color: var(--accent-color);
     color: white;
+}
+
+.page_title {
+    text-align: center;
+    color: var(--accent-color);
+    margin-bottom: 1rem;
+    font-size: 2.5rem;
+    width: 100%;
+}
+
+.divider {
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
+    margin: 0 auto;
+    width: 80%;
 }
 
 

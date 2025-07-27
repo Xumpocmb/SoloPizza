@@ -1,113 +1,56 @@
-/* Основные стили */
-.order-detail-page {
-    width: 90%;
-    max-width: 1200px;
-    padding: 20px;
-    margin: 60px auto;
-    background-color: var(--bg-color);
-    color: var(--text-color);
-}
-
-.order-container {
-    background-color: var(--card-bg);
-    border-radius: 10px;
-    padding: 25px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-.order-header {
-    margin-bottom: 30px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid var(--hover-bg);
-}
-
-.order-title {
-    font-size: 1.8rem;
-    margin-bottom: 5px;
-    color: var(--text-color);
-}
-
-.order-status {
-    display: inline-block;
-    padding: 5px 10px;
-    border-radius: 15px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    margin-bottom: 10px;
-}
-
-.order-status.new {
-    background-color: #3498db;
-    color: white;
-}
-
-.order-status.confirmed {
-    background-color: #2ecc71;
-    color: white;
-}
-
-.order-status.cooking {
-    background-color: #f39c12;
-    color: white;
-}
-
-.order-status.delivering {
-    background-color: #9b59b6;
-    color: white;
-}
-
-.order-status.completed {
-    background-color: #27ae60;
-    color: white;
-}
-
-.order-status.canceled {
-    background-color: #e74c3c;
-    color: white;
-}
-
-.order-date {
-    color: var(--text-color);
-    opacity: 0.8;
-    font-size: 0.9rem;
-}
-
-/* Стили для товаров в заказе */
 .order-content {
     display: grid;
     grid-template-columns: 1fr 350px;
     gap: 30px;
 }
 
-@media (max-width: 768px) {
-    .order-content {
-        grid-template-columns: 1fr;
-    }
+.order-header {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.order-items-form {
+    background: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 
 .section-title {
     font-size: 1.3rem;
-    margin-bottom: 20px;
+    margin: 0 0 20px 0;
     color: var(--text-color);
-    padding-bottom: 10px;
-    border-bottom: 1px solid var(--hover-bg);
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--divider-color);
+}
+
+.order-items {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
 }
 
 .order-item {
+    background: var(--card-bg);
+    border-radius: calc(var(--border-radius) - 5px);
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--divider-color);
+}
+
+.item-header {
     display: flex;
-    flex-direction: column;
-    gap: 20px;
     padding: 15px;
-    margin-bottom: 15px;
-    background-color: var(--card-bg);
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    gap: 15px;
+    border-bottom: 1px solid var(--divider-color);
 }
 
 .item-image {
-    flex: 0 0 100px;
+    flex: 0 0 80px;
+    height: 80px;
     border-radius: 8px;
     overflow: hidden;
+    background: var(--hover-bg);
 }
 
 .item-image img {
@@ -116,72 +59,91 @@
     object-fit: cover;
 }
 
-.item-details {
-    flex: 1;
-}
-
 .item-name {
-    font-size: 1.1rem;
-    margin: 0 0 10px 0;
+    flex: 1;
+    font-size: 1.05rem;
+    margin: 0;
     color: var(--text-color);
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
 }
 
 .discount-badge {
-    background-color: var(--accent-color);
+    background: var(--accent-color);
     color: white;
-    padding: 2px 8px;
-    border-radius: 10px;
-    font-size: 0.8rem;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+}
+
+.edit-item-btn {
+    background: none;
+    border: none;
+    color: var(--accent-color);
+    cursor: pointer;
+    padding: 5px;
+    opacity: 0.8;
+}
+
+.edit-toggle-btn {
+    background: none;
+    border: none;
+    color: var(--accent-color);
+    cursor: pointer;
+    padding: 5px;
+    opacity: 0.8;
+}
+
+.item-details {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .item-options {
-    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 .item-option {
-    margin-bottom: 5px;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
+    line-height: 1.4;
 }
 
 .option-label {
-    font-weight: 600;
-    margin-right: 5px;
-    color: var(--text-color);
-}
-
-.option-value {
-    color: var(--text-color);
+    font-weight: 500;
+    color: var(--text-muted);
 }
 
 .addons-list {
     display: flex;
     flex-wrap: wrap;
-    gap: 5px;
-    list-style: none;
+    gap: 6px;
+    margin-top: 5px;
     padding: 0;
-    margin: 5px 0 0 0;
+    list-style: none;
 }
 
 .addons-list li {
-    background-color: var(--hover-bg);
+    background: var(--hover-bg);
     padding: 3px 8px;
-    border-radius: 5px;
-    font-size: 0.85rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
 }
 
 .item-quantity-price {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 10px;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 5px;
 }
 
 .quantity {
-    font-weight: 600;
-    color: var(--text-color);
+    font-size: 0.9rem;
+    color: var(--text-muted);
 }
 
 .item-total {
@@ -192,104 +154,171 @@
 
 .original-price {
     text-decoration: line-through;
-    opacity: 0.7;
-    margin-right: 8px;
-    font-size: 0.9rem;
+    color: var(--text-muted);
+    font-size: 0.85rem;
 }
 
 .discounted-price {
     color: var(--accent-color);
 }
 
-/* Стили для блока с информацией о заказе */
+.item-edit-mode {
+    padding: 15px;
+    background: var(--hover-bg);
+    border-top: 1px solid var(--divider-color);
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.form-group select,
+.form-group input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--divider-color);
+    border-radius: 6px;
+    background: var(--card-bg);
+    color: var(--text-color);
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.save-button {
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.cancel-button {
+    background: var(--hover-bg);
+    color: var(--text-color);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.order-summary {
+    position: sticky;
+    top: 20px;
+}
+
 .summary-card {
-    background-color: var(--card-bg);
-    border-radius: 8px;
+    background: var(--card-bg);
+    border-radius: var(--border-radius);
     padding: 20px;
-    margin-bottom: 20px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--divider-color);
 }
 
 .summary-row {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 10px;
-    padding-bottom: 10px;
-    border-bottom: 1px dashed var(--hover-bg);
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px dashed var(--divider-color);
 }
 
 .summary-label {
-    color: var(--text-color);
+    color: var(--text-muted);
 }
 
 .summary-value {
-    font-weight: 600;
+    font-weight: 500;
     color: var(--text-color);
-}
-
-.discount-row {
-    color: var(--accent-color);
 }
 
 .total-row {
-    font-size: 1.1rem;
     font-weight: 700;
-    margin-top: 15px;
+    border-top: 1px solid var(--divider-color);
+    margin-top: 10px;
     padding-top: 10px;
-    border-top: 2px solid var(--hover-bg);
-    border-bottom: none;
 }
 
 .payment-paid {
-    color: #2ecc71;
+    color: var(--success-color);
 }
 
 .payment-unpaid {
-    color: #e74c3c;
+    color: var(--error-color);
 }
 
-/* Кнопки действий */
-.order-actions {
+@media (max-width: 900px) {
+    .order-content {
+        grid-template-columns: 1fr;
+    }
+
+    .order-summary {
+        position: static;
+    }
+}
+
+
+
+/*------------------------------------------------------------*/
+.section-title {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 10px;
+    align-items: center;
 }
 
-.payment-button {
-    background-color: var(--accent-color);
-    color: white;
+.edit-toggle-btn {
+    background: none;
     border: none;
-    padding: 12px;
-    border-radius: 5px;
-    text-align: center;
-    font-weight: 600;
-    text-decoration: none;
-    transition: background-color 0.2s;
+    color: var(--accent-color);
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
 }
 
-.payment-button:hover {
-    background-color: #068a50;
-    color: white;
-}
-
-.continue-button {
-    display: block;
-    text-align: center;
-    padding: 12px;
-    border-radius: 5px;
-    background-color: var(--hover-bg);
-    color: var(--text-color);
-    font-weight: 600;
-    text-decoration: none;
-    transition: background-color 0.2s;
-}
-
-.continue-button:hover {
+.edit-toggle-btn:hover {
     background-color: var(--accent-color-rgba);
+    transform: scale(1.1);
+}
+
+.edit-mode {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 
-/* Добавим в order_detail.css */
+/*--------------------------------------------------------*/
 
 .order-edit-form {
     margin-bottom: 20px;
@@ -346,330 +375,6 @@
     background-color: var(--hover-bg);
 }
 
-.checkbox-group {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.checkbox-group input[type="checkbox"] {
-    width: auto;
-    margin: 0;
-}
-
-.form-actions {
-    margin-top: 20px;
-}
-
-.save-button {
-    background-color: var(--accent-color);
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: background-color 0.2s;
-}
-
-.save-button:hover {
-    background-color: #068a50;
-}
-
-
-/* Стили для редактирования заказа */
-.section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.edit-toggle-btn {
-    background: none;
-    border: none;
-    color: var(--accent-color);
-    font-size: 1rem;
-    cursor: pointer;
-    padding: 5px;
-    border-radius: 50%;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-}
-
-.edit-toggle-btn:hover {
-    background-color: var(--accent-color-rgba);
-    transform: scale(1.1);
-}
-
-.edit-mode {
-    animation: fadeIn 0.3s ease-in-out;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.form-actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 20px;
-}
-
-.save-button {
-    background-color: var(--accent-color);
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: background-color 0.2s;
-    flex: 1;
-}
-
-.save-button:hover {
-    background-color: #068a50;
-}
-
-.cancel-button {
-    background-color: var(--hover-bg);
-    color: var(--text-color);
-    border: none;
-    padding: 10px 20px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: background-color 0.2s;
-    flex: 1;
-}
-
-.cancel-button:hover {
-    background-color: #e0e0e0;
-}
-
-/* Стили для редактирования товаров */
-.item-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.edit-item-btn {
-    background: none;
-    border: none;
-    color: var(--accent-color);
-    font-size: 0.9rem;
-    cursor: pointer;
-    padding: 5px;
-    margin-left: 10px;
-    border-radius: 50%;
-    width: 24px;
-    height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-}
-
-.edit-item-btn:hover {
-    background-color: var(--accent-color-rgba);
-    transform: scale(1.1);
-}
-
-.item-edit-mode {
-    margin-top: 15px;
-    padding: 15px;
-    background-color: var(--card-bg);
-    border-radius: 8px;
-    border: 1px solid var(--hover-bg);
-}
-
-.item-edit-form .form-group {
-    margin-bottom: 15px;
-}
-
-.item-edit-form select {
-    width: 100%;
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background-color: var(--card-bg);
-    color: var(--text-color);
-}
-
-.item-edit-form .form-actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 15px;
-}
-
-.save-item-button {
-    background-color: var(--accent-color);
-    color: white;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 600;
-    flex: 1;
-}
-
-.cancel-item-edit {
-    background-color: var(--hover-bg);
-    color: var(--text-color);
-    border: none;
-    padding: 8px 15px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 600;
-    flex: 1;
-}
-
-/* Стили для формы редактирования */
-.item-edit-mode {
-    background-color: var(--card-bg);
-    border-radius: 8px;
-    padding: 15px;
-    margin-top: 15px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.form-group {
-    margin-bottom: 15px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 5px;
-    color: var(--text-color);
-    font-weight: 500;
-}
-
-/* Стили для обычных select */
-.form-select {
-    width: 100%;
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background-color: var(--card-bg);
-    color: var(--text-color);
-    font-size: 14px;
-    transition: all 0.3s ease;
-}
-
-.form-select:focus {
-    border-color: var(--accent-color);
-    outline: none;
-    box-shadow: 0 0 0 2px var(--accent-color-rgba);
-}
-
-/* Стили для поля количества */
-.form-input.quantity-edit {
-    width: 60px;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background-color: var(--card-bg);
-    color: var(--text-color);
-    text-align: center;
-}
-
-/* Стили для мультиселекта добавок */
-.form-select.multiple-select {
-    height: auto;
-    min-height: 210px;
-    padding: 5px;
-}
-
-.form-select.multiple-select option {
-    padding: 8px 12px;
-    margin: 2px 0;
-    border-radius: 4px;
-    background-color: var(--card-bg);
-    color: var(--text-color);
-}
-
-.form-select.multiple-select option:hover {
-    background-color: var(--hover-bg);
-}
-
-.form-select.multiple-select option:checked {
-    background-color: var(--accent-color);
-    color: white;
-}
-
-/* Стили для кнопок формы */
-.form-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 20px;
-}
-
-.cancel-button,
-.save-button {
-    padding: 8px 16px;
-    border-radius: 4px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.cancel-button {
-    background-color: #f0f0f0;
-    color: #333;
-    border: 1px solid #ddd;
-}
-
-.dark .cancel-button {
-    background-color: #444;
-    color: #f1f1f1;
-    border-color: #555;
-}
-
-.save-button {
-    background-color: var(--accent-color);
-    color: white;
-    border: none;
-}
-
-.cancel-button:hover {
-    background-color: #e0e0e0;
-}
-
-.dark .cancel-button:hover {
-    background-color: #555;
-}
-
-.save-button:hover {
-    background-color: #068c4d;
-}
-
-/* Адаптация для темного режима */
-.dark .form-select,
-.dark .form-input.quantity-edit {
-    border-color: #555;
-    background-color: #444;
-    color: #f1f1f1;
-}
-
-.dark .form-select:focus {
-    border-color: var(--accent-color);
-    box-shadow: 0 0 0 2px var(--accent-color-rgba);
-}
 
 
 /*------------------------------------------------------*/
