@@ -1,0 +1,140 @@
+/* Основные стили секции */
+.vacancies-section {
+    background-color: var(--bg-color);
+    padding: 40px 0;
+}
+
+.vacancies-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.vacancies-title {
+    color: var(--text-color);
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.vacancies-subtitle {
+    color: var(--text-muted);
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto 30px;
+}
+
+/* Сетка вакансий */
+.vacancies-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 25px;
+    align-items: stretch;
+}
+
+/* Карточка вакансии */
+.vacancy-card {
+    display: flex;
+    /* Делаем flex-контейнером */
+    flex-direction: column;
+    /* Вертикальное расположение элементов */
+    height: 100%;
+    /* Занимаем всю доступную высоту */
+    background: var(--card-bg);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.vacancy-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.vacancy-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.vacancy-content {
+    flex: 1;
+    /* Занимает всё доступное пространство */
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.vacancy-title {
+    color: var(--text-color);
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.vacancy-description {
+    color: var(--text-muted);
+    margin-bottom: 15px;
+}
+
+.vacancy-salary {
+    background: var(--accent-color-rgba);
+    color: var(--accent-color);
+    padding: 8px 12px;
+    border-radius: 6px;
+    display: inline-block;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+/* Блок с преимуществами */
+.vacancy-benefits {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.benefit-tag {
+    background: var(--hover-bg);
+    color: var(--text-color);
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 0.85em;
+}
+
+/* Кнопка отклика */
+.vacancy-apply-btn {
+    margin-top: auto;
+    /* Автоматический отступ сверху */
+    display: block;
+    text-align: center;
+    background: var(--accent-color);
+    color: white;
+    padding: 10px;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: background 0.3s;
+}
+
+.vacancy-apply-btn:hover {
+    background: #067a47;
+}
+
+/* Сообщение об отсутствии вакансий */
+.no-vacancies {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 40px;
+    color: var(--text-muted);
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .vacancies-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .vacancies-title {
+        font-size: 1.5rem;
+    }
+}

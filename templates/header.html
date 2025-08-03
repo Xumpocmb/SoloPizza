@@ -1,5 +1,4 @@
 {% load static %}
-
 <header>
     <div class="header-container">
         <div class="header-menu">
@@ -23,22 +22,30 @@
                 {% endfor %}
             </div>
             <label class="theme-toggle-switch">
-                <input type="checkbox" id="themeToggle"/>
+                <input type="checkbox" id="themeToggle" />
                 <span class="toggle-slider"></span>
                 <span class="icon sun">☀️</span>
                 <span class="icon moon">🌙</span>
             </label>
             <div class="right">
-                <form action="{% url 'app_home:select_branch' %}" method="post">
-                    {% csrf_token %}
-                    <select class="branch-select" name="branch_id" id="branch-select" onchange="this.form.submit()">
-                        {% for branch in branches %}
-                            <option value="{{ branch.id }}"
-                                    {% if branch.id|stringformat:"s" == selected_branch_id %}selected{% endif %}>{{ branch.address }}</option>
-                        {% endfor %}
-                    </select>
-                </form>
-
+                {% if branches %}
+                    <form action="{% url 'app_home:select_branch' %}" method="post">
+                        {% csrf_token %}
+                        <select class="branch-select"
+                                name="branch_id"
+                                id="branch-select"
+                                onchange="this.form.submit()">
+                            {% for branch in branches %}
+                                <option value="{{ branch.id }}"
+                                        {% if branch.id|stringformat:"s" == selected_branch_id %}selected{% endif %}>
+                                    {{ branch.address }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </form>
+                {% else %}
+                    <p class="no-branches">Сейчас нет доступных филиалов.</p>
+                {% endif %}
                 <div class="cart-wrapper">
                     <a href="{% url 'app_cart:view_cart' %}">
                         <div class="cart-icon">
@@ -50,13 +57,11 @@
             </div>
         </div>
     </div>
-
 </header>
 <!-- Sidebar -->
 <div class="sidebar" id="sidebar">
     <a href="{% url 'app_home:home' %}">Главная</a>
     <a href="{% url 'app_home:discounts' %}">Акции</a>
-
     <div class="has-submenu">
         <button onclick="toggleSubmenu('aboutSub')">О нас ▾</button>
         <div class="submenu" id="aboutSub">
@@ -65,8 +70,6 @@
             <a href="{% url 'app_reviews:moderation_list' %}">Модерация</a>
         </div>
     </div>
-
-
     <div class="has-submenu">
         <button onclick="toggleSubmenu('catalogSub')">Каталог ▾</button>
         <div class="submenu" id="catalogSub">

@@ -5,11 +5,15 @@ from django.views.decorators.http import require_POST
 from app_cart.models import CartItem
 from app_cart.utils import validate_cart_items_for_branch
 from app_catalog.models import Product
-from app_home.models import CafeBranch
+from app_home.models import CafeBranch, Vacancy
 
 
 def home_page(request):
-    return render(request, "app_home/home.html")
+    active_vacancies = Vacancy.objects.filter(is_active=True)
+    context = {
+        "vacancies": active_vacancies,
+    }
+    return render(request, "app_home/home.html", context=context)
 
 
 @require_POST

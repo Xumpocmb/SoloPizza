@@ -1,5 +1,5 @@
 from django.contrib import admin
-from app_home.models import CafeBranch, CafeBranchPhone
+from app_home.models import CafeBranch, CafeBranchPhone, Vacancy
 
 
 class CafeBranchPhoneAdmin(admin.TabularInline):
@@ -17,3 +17,9 @@ class CafeBranchAdmin(admin.ModelAdmin):
 admin.site.register(CafeBranch, CafeBranchAdmin)
 
 
+@admin.register(Vacancy)
+class VacancyAdmin(admin.ModelAdmin):
+    list_display = ("title", "salary", "is_active", "created_at")
+    list_editable = ("is_active",)
+    list_filter = ("is_active", "created_at")
+    search_fields = ("title", "description")

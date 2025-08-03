@@ -94,8 +94,6 @@ class ProductVariant(models.Model):
     unit = models.CharField(max_length=10, choices=UNIT_CHOICES, default='pcs', verbose_name='Единица измерения')
     price = models.DecimalField('Цена', max_digits=10, decimal_places=2)
 
-
-
     class Meta:
         verbose_name = 'Вариант товара'
         verbose_name_plural = 'Варианты товаров'

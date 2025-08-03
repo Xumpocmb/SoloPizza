@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class CafeBranch(models.Model):
     name = models.CharField(max_length=100, verbose_name="Название филиала")
     address = models.CharField(max_length=200, verbose_name="Адрес")
@@ -7,26 +8,40 @@ class CafeBranch(models.Model):
 
     latitude = models.FloatField(verbose_name="Широта", null=True, blank=True)
     longitude = models.FloatField(verbose_name="Долгота", null=True, blank=True)
-    delivery_zone = models.JSONField(
-        verbose_name="Зона доставки (полигон)",
-        help_text="Массив координат в формате [[lat1, lng1], [lat2, lng2], ...]",
-        null=True, blank=True
-    )
+    delivery_zone = models.JSONField(verbose_name="Зона доставки (полигон)", help_text="Массив координат в формате [[lat1, lng1], [lat2, lng2], ...]", null=True, blank=True)
 
     class Meta:
-        db_table = 'branches'
-        verbose_name = 'Филиал'
-        verbose_name_plural = 'Филиалы'
+        db_table = "branches"
+        verbose_name = "Филиал"
+        verbose_name_plural = "Филиалы"
 
     def __str__(self):
-        return f'Филиал: {self.name}'
+        return f"Филиал: {self.name}"
 
 
 class CafeBranchPhone(models.Model):
-    branch = models.ForeignKey(CafeBranch, on_delete=models.CASCADE, related_name='branch_phones', verbose_name="Филиал")
+    branch = models.ForeignKey(CafeBranch, on_delete=models.CASCADE, related_name="branch_phones", verbose_name="Филиал")
     phone = models.CharField(max_length=20, blank=True, null=True, verbose_name="Номер телефона")
 
     class Meta:
-        db_table = 'branch_phones'
-        verbose_name = 'Телефон филиала'
-        verbose_name_plural = 'Телефоны филиалов'
+        db_table = "branch_phones"
+        verbose_name = "Телефон филиала"
+        verbose_name_plural = "Телефоны филиалов"
+
+
+class Vacancy(models.Model):
+    title = models.CharField("Название", max_length=100)
+    description = models.TextField("Описание", blank=True)
+    image = models.ImageField("Фото профессии", upload_to="vacancies/", blank=True, null=True)
+    salary = models.CharField("Зарплата", max_length=50, blank=True)
+    benefits = models.TextField("Преимущества (через запятую)", blank=True, null=True)
+    is_active = models.BooleanField("Активна", default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Вакансия"
+        verbose_name_plural = "Вакансии"
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return self.title

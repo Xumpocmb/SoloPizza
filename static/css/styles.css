@@ -37,7 +37,8 @@
     box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
     height: 100%;
     margin: 0;
 }
@@ -71,11 +72,75 @@ footer {
     flex-shrink: 0;
     width: 100%;
     background-color: var(--card-bg);
-    text-align: center;
-    padding: 10px;
-    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
     color: var(--text-color);
     transition: background-color 0.3s, color 0.3s;
+    padding: 40px 20px 20px;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.footer-columns {
+    display: flex;
+    justify-content: space-around;
+    gap: 30px;
+    flex-wrap: wrap;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    text-align: left;
+}
+
+.footer-column h3 {
+    font-size: 1.1rem;
+    margin-bottom: 16px;
+    color: var(--accent-color);
+    font-weight: 600;
+}
+
+.footer-column ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-column ul li {
+    margin-bottom: 10px;
+}
+
+.footer-column ul li a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: color 0.2s;
+}
+
+.footer-column ul li a:hover {
+    color: var(--accent-color);
+    text-decoration: underline;
+}
+
+.company-info {
+    text-align: center;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid var(--divider-color);
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+    .footer-columns {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .footer-column h3 {
+        text-align: center;
+    }
+
+    .company-info {
+        padding: 20px;
+    }
 }
 
 h1 {
@@ -120,7 +185,8 @@ a:hover {
 }
 
 .btn-primary:hover {
-    background-color: #068a50; /* Темнее акцента */
+    background-color: #068a50;
+    /* Темнее акцента */
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
@@ -176,7 +242,8 @@ a:hover {
     top: 0;
     left: 0;
     right: 0;
-    height: 56px; /* или высота, которую используешь */
+    height: 56px;
+    /* или высота, которую используешь */
     padding: 1rem 2rem;
     border-radius: var(--border-radius);
     margin: 0 5px;
@@ -308,7 +375,8 @@ a:hover {
 
 .sidebar a {
     text-decoration: none;
-    color: var(--text-color); /* Цвет текста из темы */
+    color: var(--text-color);
+    /* Цвет текста из темы */
     font-size: 16px;
     padding: 6px 10px;
     border-radius: 4px;
@@ -317,7 +385,8 @@ a:hover {
 }
 
 .sidebar a:hover {
-    background-color: var(--hover-bg); /* Цвет при ховере из темы */
+    background-color: var(--hover-bg);
+    /* Цвет при ховере из темы */
 }
 
 .submenu {
@@ -331,20 +400,22 @@ a:hover {
     display: flex;
 }
 
-.has-submenu > button {
+.has-submenu>button {
     background: none;
     border: none;
     font-size: 16px;
     padding: 6px 10px;
     text-align: left;
     width: 100%;
-    color: var(--text-color); /* Цвет текста кнопки из темы */
+    color: var(--text-color);
+    /* Цвет текста кнопки из темы */
     cursor: pointer;
     transition: background-color 0.2s ease;
 }
 
-.has-submenu > button:hover {
-    background-color: var(--hover-bg); /* Цвет при ховере из темы */
+.has-submenu>button:hover {
+    background-color: var(--hover-bg);
+    /* Цвет при ховере из темы */
 }
 
 
@@ -367,7 +438,8 @@ a:hover {
 .theme-toggle-switch {
     position: relative;
     display: inline-block;
-    width: 60px; /* Расширим немного для иконок */
+    width: 60px;
+    /* Расширим немного для иконок */
     height: 30px;
     margin-left: 1rem;
     vertical-align: middle;
@@ -433,20 +505,23 @@ a:hover {
 }
 
 /* При переключении темы меняем видимость иконок */
-.theme-toggle-switch input:checked + .toggle-slider ~ .sun {
-    opacity: 0;
-}
-.theme-toggle-switch input:checked + .toggle-slider ~ .moon {
-    opacity: 1;
-}
-.theme-toggle-switch input:not(:checked) + .toggle-slider ~ .sun {
-    opacity: 1;
-}
-.theme-toggle-switch input:not(:checked) + .toggle-slider ~ .moon {
+.theme-toggle-switch input:checked+.toggle-slider~.sun {
     opacity: 0;
 }
 
-.theme-toggle-switch input:checked + .toggle-slider:before {
+.theme-toggle-switch input:checked+.toggle-slider~.moon {
+    opacity: 1;
+}
+
+.theme-toggle-switch input:not(:checked)+.toggle-slider~.sun {
+    opacity: 1;
+}
+
+.theme-toggle-switch input:not(:checked)+.toggle-slider~.moon {
+    opacity: 0;
+}
+
+.theme-toggle-switch input:checked+.toggle-slider:before {
     transform: translateX(28px);
 }
 

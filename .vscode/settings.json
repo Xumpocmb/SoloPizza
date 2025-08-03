@@ -31,8 +31,9 @@
         "html": "django-html",
     },
     "[django-html]": {
-        // "editor.defaultFormatter": "junstyle.vscode-django-support",
-        "editor.defaultFormatter": "vscode.html-language-features",
+        "editor.tabSize": 4,
+        "editor.insertSpaces": true,
+        "editor.defaultFormatter": "monosans.djlint",
         "breadcrumbs.showClasses": true,
         "editor.quickSuggestions": {
             "other": true,
@@ -44,17 +45,13 @@
     },
     "files.associations": {
         "**/*.html": "html",
-        "**/templates/*.html": "django-html",
         "**/templates/*/*.html": "django-html",
         "**/templates/*/*/*.html": "django-html",
-        "**/templates/*": "django-txt",
+        "**/templates/*": "django-html",
         "**/requirements{/**,*}.{txt,in}": "pip-requirements"
     },
     "django.snippets.exclude": [
         "cms",
         "wagtail"
     ],
-    "[html]": {
-        "editor.defaultFormatter": "vscode.html-language-features",
-    }
 }

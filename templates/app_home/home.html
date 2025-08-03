@@ -1,70 +1,72 @@
 {% extends 'base.html' %}
 {% load static %}
-
 {% block styles %}
     <link rel="stylesheet" href="{% static 'css/home.css' %}">
+    <link rel="stylesheet" href="{% static 'css/vacancies.css' %}">
     <link rel="stylesheet" href="{% static 'css/swiper-bundle.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/swiper.css' %}">
 {% endblock %}
-
 {% block main %}
     <main>
-    <div class="main-wrapper">
-        <section class="site-greetings">
-            <div class="page_title">
-                <h1>Добро пожаловать в Solo Pizza!</h1>
-            </div>
-        </section>
-        <section class="slides">
-            <div class="swiper-container">
-                <div class="swiper-wrapper">
-                    <div class="swiper-slide"><img src="{% static 'img/slider/kombo_ohota.gif' %}"
-                                                   alt="Описание изображения 1"></div>
-                    <div class="swiper-slide"><img src="{% static 'img/slider/kombo_shef.gif' %}"
-                                                   alt="Описание изображения 1"></div>
-                    <div class="swiper-slide"><img src="{% static 'img/slider/kombo_sochnyj.gif' %}"
-                                                   alt="Описание изображения 1"></div>
-                </div>
-                <div class="swiper-button-next"></div>
-                <div class="swiper-button-prev"></div>
-                <div class="swiper-pagination"></div>
-            </div>
-        </section>
-
-        <section class="section_categories">
-            <div class="categories_container">
-
+        <div class="main-wrapper">
+            <section class="site-greetings">
                 <div class="page_title">
-                    <h2 class="categories_title">Наше меню:</h2>
-                    <div class="divider"></div>
+                    <h1>Добро пожаловать в Solo Pizza!</h1>
                 </div>
-
-                <div class="categories">
-                    {% for category in categories %}
-                        <div class="category-card" tabindex="0">
-                            <div class="category-card__image">
-                                {% if category.image %}
-                                    <img src="{{ category.image.url }}" alt="{{ category.name }}">
-                                {% else %}
-                                    <img src="{% static 'img/test.jpg' %}" alt="{{ category.name }}">
-                                {% endif %}
-                            </div>
-
-                            <a
-                                    href="{% url 'app_catalog:category_detail' category.slug %}"
-                                    class="category-card__link"
-                                    aria-label="Перейти в категорию: Пицца"
-                            ><p class="category_name">{{ category.name }}</p></a>
+            </section>
+            <section class="slides">
+                <div class="swiper-container">
+                    <div class="swiper-wrapper">
+                        <div class="swiper-slide">
+                            <img src="{% static 'img/slider/kombo_ohota.gif' %}"
+                                 alt="Описание изображения 1">
                         </div>
-                    {% endfor %}
+                        <div class="swiper-slide">
+                            <img src="{% static 'img/slider/kombo_shef.gif' %}"
+                                 alt="Описание изображения 1">
+                        </div>
+                        <div class="swiper-slide">
+                            <img src="{% static 'img/slider/kombo_sochnyj.gif' %}"
+                                 alt="Описание изображения 1">
+                        </div>
+                    </div>
+                    <div class="swiper-button-next"></div>
+                    <div class="swiper-button-prev"></div>
+                    <div class="swiper-pagination"></div>
                 </div>
-            </div>
-        </section>
-
-    </div>
+            </section>
+            {% include "app_home/includes/vacancy.html" %}
+            {% if categories %}
+                <section class="section_categories">
+                    <div class="categories_container">
+                        <div class="page_title">
+                            <h2 class="categories_title">Наше меню:</h2>
+                            <div class="divider"></div>
+                        </div>
+                        <div class="categories">
+                            {% for category in categories %}
+                                <div class="category-card" tabindex="0">
+                                    <div class="category-card__image">
+                                        {% if category.image %}
+                                            <img src="{{ category.image.url }}" alt="{{ category.name }}">
+                                        {% else %}
+                                            <img src="{% static 'img/test.jpg' %}" alt="{{ category.name }}">
+                                        {% endif %}
+                                    </div>
+                                    <a href="{% url 'app_catalog:category_detail' category.slug %}"
+                                       class="category-card__link"
+                                       aria-label="Перейти в категорию: Пицца">
+                                        <p class="category_name">{{ category.name }}</p>
+                                    </a>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </section>
+            {% endif %}
+        </div>
     </main>
 {% endblock %}
-
 {% block scripts %}
     <script src="{% static 'js/swiper-bundle.min.js' %}" defer></script>
     <script src="{% static 'js/swiper.js' %}"></script>
