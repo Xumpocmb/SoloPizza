@@ -113,3 +113,8 @@ class CartItem(models.Model):
             "discount_amount": discount_amount.quantize(Decimal(".01")),
             "is_weekly_pizza": is_weekly_pizza,
         }
+
+    def is_available_in_branch(self, branch):
+        """Проверяет, доступен ли товар в указанном филиале"""
+        return self.item.category.branch.filter(id=branch.id).exists()
+

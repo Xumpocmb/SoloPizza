@@ -10,7 +10,7 @@
 
 .checkout-container {
     background-color: var(--card-bg);
-    border-radius: 10px;
+    border-radius: var(--border-radius);
     padding: 25px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
@@ -61,7 +61,7 @@
     width: 100%;
     padding: 10px 15px;
     border: 1px solid #ddd;
-    border-radius: 5px;
+    border-radius: var(--border-radius);
     font-size: 1rem;
     background-color: var(--card-bg);
     color: var(--text-color);
@@ -100,7 +100,7 @@
     flex-direction: column;
     cursor: pointer;
     padding: 10px;
-    border-radius: 5px;
+    border-radius: var(--border-radius);
     transition: background-color 0.2s;
     flex-grow: 1;
 }
@@ -150,7 +150,7 @@
     color: white;
     border: none;
     padding: 12px 25px;
-    border-radius: 5px;
+    border-radius: var(--border-radius);
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
@@ -164,7 +164,7 @@
 /* Стили для блока с товарами */
 .order-summary {
     background-color: var(--card-bg);
-    border-radius: 8px;
+    border-radius: var(--border-radius);
     padding: 20px;
     align-self: start;
     position: sticky;
@@ -253,7 +253,7 @@
     flex-direction: column;
     cursor: pointer;
     padding: 12px;
-    border-radius: 8px;
+    border-radius: var(--border-radius);
     border: 1px solid var(--hover-bg);
     background-color: var(--card-bg);
     transition: all 0.2s;

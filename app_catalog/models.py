@@ -3,6 +3,7 @@ import os
 from django.db import models
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
+from django.urls import reverse
 from django.utils.text import slugify
 
 from app_home.models import CafeBranch
@@ -32,6 +33,8 @@ class Category(models.Model):
             self.slug = slugify(self.name)
         super().save(*args, **kwargs)
 
+    def get_absolute_url(self):
+        return reverse('app_catalog:category_detail', kwargs={'slug': self.slug})
 
 class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products')
@@ -41,6 +44,10 @@ class Product(models.Model):
     image = models.ImageField(upload_to='item_images', blank=True, null=True, verbose_name='Изображение')
     is_weekly_special = models.BooleanField(default=False, verbose_name='Акция: Пицца недели', blank=False, null=False)
     is_active = models.BooleanField('Активен', default=True)
+    is_spicy = models.BooleanField('Острый', default=False)
+    is_alcoholic = models.BooleanField('Алкогольный', default=False)
+    is_combo = models.BooleanField('Комбо-набор', default=False)
+    is_sweet = models.BooleanField('Сладкий', default=False)
     created_at = models.DateTimeField('Дата создания', auto_now_add=True)
 
     class Meta:
@@ -56,6 +63,9 @@ class Product(models.Model):
         if not self.slug:
             self.slug = slugify(self.name)
         super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse('app_catalog:product_detail', kwargs={'slug': self.slug})
 
 
 class PizzaSizes(models.Model):
@@ -84,10 +94,7 @@ class ProductVariant(models.Model):
     unit = models.CharField(max_length=10, choices=UNIT_CHOICES, default='pcs', verbose_name='Единица измерения')
     price = models.DecimalField('Цена', max_digits=10, decimal_places=2)
 
-    is_spicy = models.BooleanField('Острый', default=False, blank=True)
-    is_alcoholic = models.BooleanField('Алкогольный', default=False, blank=True)
-    is_combo = models.BooleanField('Комбо-набор', default=False, blank=True)
-    is_sweet = models.BooleanField('Сладкий', default=False, blank=True)
+
 
     class Meta:
         verbose_name = 'Вариант товара'

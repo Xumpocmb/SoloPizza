@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+    <link rel="stylesheet" href="{% static 'css/catalog.css' %}">
+{% endblock %}
+
+{% block main %}
+    <main>
+    <div class="main-wrapper">
+        <div class="breadcrumbs">
+            {% for crumb in breadcrumbs %}
+                <a href="{{ crumb.url }}" class="breadcrumb-link">{{ crumb.title }}</a>
+                {% if not forloop.last %}
+                    <span class="breadcrumb-separator"> &gt; </span>
+                {% endif %}
+            {% endfor %}
+        </div>
+        <section class="section_categories">
+            <div class="categories_container">
+
+                <div class="page_title">
+                    <h2 class="categories_title">Наше меню:</h2>
+                    <div class="divider"></div>
+                </div>
+
+                <div class="categories">
+                    {% for category in categories %}
+                        <div class="category-card" tabindex="0">
+                            <div class="category-card__image">
+                                {% if category.image %}
+                                    <img src="{{ category.image.url }}" alt="{{ category.name }}">
+                                {% else %}
+                                    <img src="{% static 'img/test.jpg' %}" alt="{{ category.name }}">
+                                {% endif %}
+                            </div>
+
+                            <a
+                                    href="{% url 'app_catalog:category_detail' category.slug %}"
+                                    class="category-card__link"
+                                    aria-label="Перейти в категорию: Пицца"
+                            ><p class="category_name">{{ category.name }}</p></a>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+    </div>
+    </main>
+{% endblock %}

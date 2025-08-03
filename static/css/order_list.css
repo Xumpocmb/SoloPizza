@@ -1,7 +1,7 @@
 /* Основные стили страницы */
 .order-list-page {
-    width: 90%;
-    max-width: 1400px;
+    width: 100%;
+    max-width: 1200px;
     padding: 20px;
     margin: 60px auto;
     background-color: var(--bg-color);
@@ -10,7 +10,7 @@
 
 .order-list-container {
     background-color: var(--card-bg);
-    border-radius: 10px;
+    border-radius: var(--border-radius);
     padding: 25px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
@@ -43,7 +43,7 @@
     flex: 1;
     padding: 10px 15px;
     border: 1px solid #ddd;
-    border-radius: 5px 0 0 5px;
+    border-radius: var(--border-radius);
     background-color: var(--card-bg);
     color: var(--text-color);
 }
@@ -53,7 +53,7 @@
     color: white;
     border: none;
     padding: 0 15px;
-    border-radius: 0 5px 5px 0;
+    border-radius: var(--border-radius);
     cursor: pointer;
     transition: background-color 0.2s;
 }
@@ -71,7 +71,7 @@
     flex: 1;
     padding: 10px;
     border: 1px solid #ddd;
-    border-radius: 5px 0 0 5px;
+    border-radius: var(--border-radius);
     background-color: var(--card-bg);
     color: var(--text-color);
 }
@@ -81,7 +81,7 @@
     color: white;
     border: none;
     padding: 0 15px;
-    border-radius: 0 5px 5px 0;
+    border-radius: var(--border-radius);
     cursor: pointer;
     transition: background-color 0.2s;
 }
@@ -93,7 +93,7 @@
 /* Таблица заказов */
 .orders-table {
     margin-bottom: 30px;
-    border-radius: 8px;
+    border-radius: var(--border-radius);
     overflow: hidden;
 }
 
@@ -133,7 +133,7 @@
 .status-badge {
     display: inline-block;
     padding: 4px 10px;
-    border-radius: 12px;
+    border-radius: var(--border-radius);
     font-size: 0.85rem;
     font-weight: 600;
 }
@@ -228,7 +228,7 @@
 .page-link {
     padding: 8px 12px;
     border: 1px solid var(--hover-bg);
-    border-radius: 4px;
+    border-radius: var(--border-radius);
     color: var(--text-color);
     text-decoration: none;
     transition: all 0.2s;
@@ -295,7 +295,7 @@
 .status-select {
     width: 100%;
     padding: 6px 10px;
-    border-radius: 4px;
+    border-radius: var(--border-radius);
     border: 1px solid #ddd;
     background-color: white;
     cursor: pointer;

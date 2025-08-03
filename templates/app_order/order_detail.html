@@ -7,7 +7,23 @@
 
 {% block main %}
     <main class="order-detail-page">
-        <div class="main-wrapper">
+        {% if breadcrumbs %}
+            <div class="breadcrumbs">
+                {% for crumb in breadcrumbs %}
+                    {% if crumb.url != '#' %}
+                        <a href="{{ crumb.url }}" class="breadcrumb-link">{{ crumb.title }}</a>
+                    {% else %}
+                        <span class="breadcrumb-current">{{ crumb.title }}</span>
+                    {% endif %}
+                    {% if not forloop.last %}
+                        <span class="breadcrumb-separator">›</span>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="order-detail-container">
+
             <div class="order-header">
                 <h1 class="page_title">Заказ #{{ order.id }}</h1>
                 <div class="order-status {{ order.status }}">{{ order.get_status_display }}</div>
@@ -29,10 +45,10 @@
                                     <div class="item-header">
                                         <h3 class="item-name">
                                             {{ form.instance.product.name }}
-                                            {% if form.instance.is_weekly_special %}
-                                                <span class="discount-badge">Акция: -10%</span>
+                                            {% if form.instance.product.is_weekly_special %}
+                                                <span class="discount-badge">Акция: -20%</span>
                                             {% endif %}
-                                            {% if is_editable %}
+                                            {% if is_editable and request.user.is_staff %}
                                                 <button type="button" class="edit-item-btn"
                                                         data-item-id="{{ form.instance.id }}"><i
                                                         class="fas fa-pencil-alt"></i></button>
@@ -181,10 +197,10 @@
                         <div class="section-header">
                             <h2 class="section-title">
                                 <span>Детали заказа</span>
-                                {% if is_editable %}
+                                {% if is_editable and request.user.is_staff %}
                                     <button class="edit-toggle-btn" id="editOrderBtn" aria-label="Редактировать заказ">
-                                        <i
-                                                class="fas fa-pencil-alt"></i></button>
+                                        <i class="fas fa-pencil-alt"></i>
+                                    </button>
                                 {% endif %}
                             </h2>
 

@@ -1,3 +1,20 @@
+.order-detail-page {
+    width: 100%;
+    max-width: 1200px;
+    padding: 20px;
+    margin: 60px auto;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+
+.order-detail-container {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 25px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+
 .order-content {
     display: grid;
     grid-template-columns: 1fr 350px;
@@ -14,6 +31,7 @@
     border-radius: var(--border-radius);
     padding: 20px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--divider-color);
 }
 
 .section-title {

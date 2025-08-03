@@ -82,6 +82,7 @@ class Order(models.Model):
     DELIVERY_CHOICES = [
         ("pickup", "Самовывоз"),
         ("delivery", "Доставка"),
+        ("cafe", "На месте")
     ]
 
     EDITABLE_STATUSES = ["new", "confirmed"]
@@ -93,10 +94,10 @@ class Order(models.Model):
         related_name="orders",
         verbose_name="Пользователь",
     )
-    # branch = models.ForeignKey(CafeBranch, on_delete=models.SET_NULL, verbose_name="Филиал", null=True, blank=True)
+    branch = models.ForeignKey(CafeBranch, on_delete=models.SET_NULL, verbose_name="Филиал", null=True)
     customer_name = models.CharField(max_length=255, verbose_name="Имя заказчика")
     phone_number = models.CharField(max_length=20, verbose_name="Номер телефона")
-    address = models.TextField(verbose_name="Адрес доставки")
+    address = models.TextField(verbose_name="Адрес доставки", null=True, blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="new", verbose_name="Статус")
 
     delivery_type = models.CharField(max_length=20, choices=DELIVERY_CHOICES, verbose_name="Способ получения")

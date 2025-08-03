@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load cart_tags %}
 
 {% block styles %}
     <link rel="stylesheet" href="{% static 'css/cart.css' %}">
@@ -14,7 +15,7 @@
                 <div class="cart-items-list">
                     {% for item_data in items %}
                         {% with item=item_data.object %}
-                        <div class="cart-item-card">
+                        <div class="cart-item-card {% if not item|is_available_in_branch:selected_branch %}unavailable{% endif %}">
                             <!-- Изображение товара -->
                             <div class="cart-item-image">
                                 {% if item.item.image %}
@@ -154,7 +155,7 @@
                         <i class="fas fa-shopping-cart"></i>
                     </div>
                     <p class="empty-text">Ваша корзина пуста</p>
-                    <a href="{% url 'app_home:home' %}" class="continue-shopping-btn">
+                    <a href="{% url 'app_catalog:catalog' %}" class="continue-shopping-btn">
                         <i class="fas fa-arrow-left"></i> Вернуться к покупкам
                     </a>
                 </div>

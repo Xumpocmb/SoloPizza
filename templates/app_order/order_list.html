@@ -7,6 +7,20 @@
 
 {% block main %}
     <main class="order-list-page">
+        {% if breadcrumbs %}
+            <div class="breadcrumbs">
+                {% for crumb in breadcrumbs %}
+                    {% if crumb.url != '#' %}
+                        <a href="{{ crumb.url }}" class="breadcrumb-link">{{ crumb.title }}</a>
+                    {% else %}
+                        <span class="breadcrumb-current">{{ crumb.title }}</span>
+                    {% endif %}
+                    {% if not forloop.last %}
+                        <span class="breadcrumb-separator">›</span>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endif %}
         <div class="order-list-container">
             <h1 class="page-title">Мои заказы</h1>
 
@@ -53,91 +67,95 @@
                 </div>
 
                 {% for order in page_obj %}
-                <div class="table-row status-{{ order.status }}">
-                    <div class="table-cell">#{{ order.id }}</div>
-                    <div class="table-cell">{{ order.customer_name }}</div>
-                    <div class="table-cell">{{ order.created_at|date:"d.m.Y H:i" }}</div>
-                    <div class="table-cell">
-                        {% if request.user.is_staff %}
-                            <form method="post" action="{% url 'app_order:update_order_status' order.id %}">
-                                {% csrf_token %}
-                                <select name="status" class="status-select status-{{ order.status }}" 
-                                        onchange="this.form.submit()" required>
-                                    {% for status in order.STATUS_CHOICES %}
-                                        <option value="{{ status.0 }}" 
-                                                {% if order.status == status.0 %}selected{% endif %}
-                                                {% if status.0 == 'canceled' %}data-confirm="true"{% endif %}>
-                                            {{ status.1 }}
-                                        </option>
-                                    {% endfor %}
-                                </select>
-                            </form>
+                    <div class="table-row status-{{ order.status }}">
+                        <div class="table-cell">#{{ order.id }}</div>
+                        <div class="table-cell">{{ order.customer_name }}</div>
+                        <div class="table-cell">{{ order.created_at|date:"d.m.Y H:i" }}</div>
+                        <div class="table-cell">
+                            {% if request.user.is_staff %}
+                                <form method="post" action="{% url 'app_order:update_order_status' order.id %}">
+                                    {% csrf_token %}
+                                    <select name="status" class="status-select status-{{ order.status }}"
+                                            onchange="this.form.submit()" required>
+                                        {% for status in order.STATUS_CHOICES %}
+                                            <option value="{{ status.0 }}"
+                                                    {% if order.status == status.0 %}selected{% endif %}
+                                                    {% if status.0 == 'canceled' %}data-confirm="true"{% endif %}>
+                                                {{ status.1 }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </form>
                             {% else %}
                                 <span class="status-badge {{ order.status }}">
                                     {{ order.get_status_display }}
                                 </span>
                             {% endif %}
+                        </div>
+                        <div class="table-cell">{{ order.total_price|floatformat:2 }} руб.</div>
+                        <div class="table-cell">{{ order.get_delivery_type_display }}</div>
+                        <div class="table-cell">
+                            {% if order.payment_status %}
+                                <span class="payment-paid">Оплачено</span>
+                            {% else %}
+                                <span class="payment-unpaid">Не оплачено</span>
+                            {% endif %}
+                        </div>
+                        <div class="table-cell actions-cell">
+                            <a href="{% url 'app_order:order_detail' order.id %}"
+                               class="view-button"
+                               title="Просмотреть">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </div>
                     </div>
-                    <div class="table-cell">{{ order.total_price|floatformat:2 }} руб.</div>
-                    <div class="table-cell">{{ order.get_delivery_type_display }}</div>
-                    <div class="table-cell">
-                        {% if order.payment_status %}
-                            <span class="payment-paid">Оплачено</span>
-                        {% else %}
-                            <span class="payment-unpaid">Не оплачено</span>
-                        {% endif %}
-                    </div>
-                    <div class="table-cell actions-cell">
-                        <a href="{% url 'app_order:order_detail' order.id %}"
-                           class="view-button"
-                           title="Просмотреть">
-                            <i class="fas fa-eye"></i>
-                        </a>
-                    </div>
-                </div>
                 {% empty %}
-                <div class="no-orders">
-                    <p>Заказы не найдены</p>
-                </div>
+                    <div class="no-orders">
+                        <p>Заказы не найдены</p>
+                    </div>
                 {% endfor %}
             </div>
 
             <!-- Пагинация -->
             {% if page_obj.paginator.num_pages > 1 %}
-            <div class="pagination">
-                {% if page_obj.has_previous %}
-                    <a href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}"
-                       class="page-link first-page">
-                        <i class="fas fa-angle-double-left"></i>
-                    </a>
-                    <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}"
-                       class="page-link">
-                        <i class="fas fa-angle-left"></i>
-                    </a>
-                {% endif %}
-
-                {% for num in page_obj.paginator.page_range %}
-                    {% if page_obj.number == num %}
-                        <span class="page-link current-page">{{ num }}</span>
-                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                        <a href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}"
+                <div class="pagination">
+                    {% if page_obj.has_previous %}
+                        <a href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}"
+                           class="page-link first-page">
+                            <i class="fas fa-angle-double-left"></i>
+                        </a>
+                        <a href="?page=
+                                {{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}"
                            class="page-link">
-                            {{ num }}
+                            <i class="fas fa-angle-left"></i>
                         </a>
                     {% endif %}
-                {% endfor %}
 
-                {% if page_obj.has_next %}
-                    <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}"
-                       class="page-link">
-                        <i class="fas fa-angle-right"></i>
-                    </a>
-                    <a href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}"
-                       class="page-link last-page">
-                        <i class="fas fa-angle-double-right"></i>
-                    </a>
-                {% endif %}
-            </div>
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <span class="page-link current-page">{{ num }}</span>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <a href="?page=
+                                    {{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}"
+                               class="page-link">
+                                {{ num }}
+                            </a>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                        <a href="?page=
+                                {{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}"
+                           class="page-link">
+                            <i class="fas fa-angle-right"></i>
+                        </a>
+                        <a href="?page=
+                                {{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}"
+                           class="page-link last-page">
+                            <i class="fas fa-angle-double-right"></i>
+                        </a>
+                    {% endif %}
+                </div>
             {% endif %}
         </div>
     </main>

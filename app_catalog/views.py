@@ -1,5 +1,6 @@
 from django.db.models import Min
 from django.shortcuts import render, get_object_or_404
+from django.urls import reverse
 
 from app_catalog.models import Category, Product, AddonParams, BoardParams, ProductVariant, PizzaSauce
 
@@ -10,10 +11,18 @@ def category_detail(request, slug):
         Product.objects.filter(category=category)
         .annotate(min_price=Min('variants__price'))
     )
+
+    breadcrumbs = [
+        {'title': 'Главная', 'url': '/'},
+        {'title': 'Каталог', 'url': reverse('app_catalog:catalog')},
+        {'title': category.name, 'url': category.get_absolute_url()},
+    ]
+
     context = {
         'title': f'Solo Pizza | Категория: {category.name}',
         'category': category,
         'items': items,
+        "breadcrumbs": breadcrumbs,
     }
     return render(request, 'app_catalog/category_detail.html', context=context)
 
@@ -60,6 +69,14 @@ def item_detail(request, slug):
             sauces = []
             addons = []
 
+    category = item.category
+    breadcrumbs = [
+        {'title': 'Главная', 'url': '/'},
+        {'title': 'Каталог', 'url': reverse('app_catalog:catalog')},
+        {'title': category.name, 'url': category.get_absolute_url()},
+        {'title': item.name, 'url': '#'}
+    ]
+
     context = {
         "item": item,
         "variants": variants,
@@ -70,6 +87,23 @@ def item_detail(request, slug):
         "drinks": drinks,
         "min_price": min_price,
         "is_pizza_or_calzone": is_pizza_or_calzone,
+        "breadcrumbs": breadcrumbs,
+        "category": category,
     }
 
     return render(request, "app_catalog/item_detail.html", context)
+
+
+def catalog_view(request):
+
+    context = {}
+
+    breadcrumbs = [
+        {'title': 'Главная', 'url': '/'},
+        {'title': 'Каталог', 'url': reverse('app_catalog:catalog')},
+    ]
+
+    context = {
+        "breadcrumbs": breadcrumbs,
+    }
+    return render(request, "app_catalog/catalog.html", context=context)

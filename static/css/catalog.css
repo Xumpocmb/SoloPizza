@@ -24,7 +24,7 @@
 
 .item-card {
     background-color: var(--card-bg);
-    border-radius: 10px;
+    border-radius: var(--border-radius);
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     overflow: hidden;
     transition: transform 0.3s, box-shadow 0.3s;
@@ -44,7 +44,7 @@
     width: 100%;
     height: 200px;
     object-fit: cover;
-    border-radius: 10px 10px 0 0;
+    border-radius: var(--border-radius);
 }
 
 .item-card h2 {
@@ -70,7 +70,7 @@
     background-color: #ef7700;
     color: white;
     padding: 3px 8px;
-    border-radius: 12px;
+    border-radius: var(--border-radius);
     font-size: 0.8rem;
     font-weight: 600;
 }
@@ -79,7 +79,7 @@
     background-color: var(--accent-color);
     color: white;
     padding: 10px 20px;
-    border-radius: 5px;
+    border-radius: var(--border-radius);
     text-align: center;
     text-decoration: none;
     transition: background-color 0.3s;

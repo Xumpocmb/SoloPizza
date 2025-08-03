@@ -8,7 +8,16 @@
 
 {% block main %}
     <main>
+
         <section class="item">
+        <div class="breadcrumbs">
+            {% for crumb in breadcrumbs %}
+                <a href="{{ crumb.url }}" class="breadcrumb-link">{{ crumb.title }}</a>
+                {% if not forloop.last %}
+                    <span class="breadcrumb-separator"> &gt; </span>
+                {% endif %}
+            {% endfor %}
+        </div>
             <div class="item_container">
                 <div class="item-image">
                     {% if item.image %}

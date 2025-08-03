@@ -28,7 +28,7 @@
     --divider-color: #444;
     --text-muted: #9a9a9a;
     --success-color: #4caf50;
-    --error-color: #f44336;
+    --error-color: #d53a3a;
 }
 
 * {
@@ -544,4 +544,26 @@ input[type="number"]:focus {
     outline: none;
     border-color: var(--accent-color);
     box-shadow: 0 0 0 3px var(--accent-color-rgba);
+}
+
+.breadcrumbs {
+    padding: 15px 0;
+    margin: 0 auto;
+    max-width: 1200px;
+}
+
+.breadcrumb-link {
+    color: var(--accent-color);
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.breadcrumb-link:hover {
+    color: var(--text-color);
+    text-decoration: underline;
+}
+
+.breadcrumb-separator {
+    margin: 0 5px;
+    color: var(--text-muted);
 }

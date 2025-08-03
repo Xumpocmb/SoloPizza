@@ -80,7 +80,7 @@
         <div class="submenu" id="profileSub">
             {% if user.is_authenticated %}
                 {% if user.is_superuser %}
-                    <a href="{% url 'admin:index' %}">Админ-панель</a>
+                    <a href="{% url 'admin:index' %}" target="_blank">Админ-панель</a>
                 {% endif %}
                 <a href="{% url 'socialaccount_connections' %}">Управление социальными аккаунтами</a>
                 <a href="{% url 'app_cart:view_cart' %}">Корзина</a>

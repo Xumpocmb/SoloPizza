@@ -5,29 +5,54 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import HttpResponseForbidden
 from django.shortcuts import redirect, render, get_object_or_404
+from django.urls import reverse
 from django.views.decorators.http import require_POST
 from app_cart.models import CartItem
+from app_cart.utils import validate_cart_items_for_branch
+from app_home.models import CafeBranch
 from app_order.forms import CheckoutForm, OrderEditForm, OrderItemFormSet
 from app_order.models import OrderItem, Order
+
+DEFAULT_BRANCH_ID = 1
 
 
 @login_required
 def checkout(request):
-    cart_items = CartItem.objects.filter(user=request.user)
+    cart_items = CartItem.objects.filter(user=request.user).select_related(
+        'item', 'item__category'
+    )
     cart_totals = CartItem.objects.get_cart_totals(request.user)
 
     if not cart_items.exists():
         return redirect("app_cart:view_cart")
 
+    # Получаем выбранный филиал
+    selected_branch_id = request.session.get('selected_branch_id', DEFAULT_BRANCH_ID)
+    try:
+        selected_branch = CafeBranch.objects.get(id=selected_branch_id)
+    except CafeBranch.DoesNotExist:
+        selected_branch = CafeBranch.objects.get(id=DEFAULT_BRANCH_ID)
+
     if request.method == "POST":
         form = CheckoutForm(request.POST)
         if form.is_valid():
-            # Создаем заказ
-            order = form.save(user=request.user)
+            # Проверяем товары перед созданием заказа
+            unavailable_items = validate_cart_items_for_branch(cart_items, selected_branch)
 
-            # Переносим товары из корзины в заказ
+            if unavailable_items:
+                messages.error(
+                    request,
+                    f"Некоторые товары недоступны в филиале '{selected_branch.name}': "
+                    f"{', '.join(item.item.name for item in unavailable_items)}"
+                )
+                return redirect("app_cart:view_cart")
+
+            order = form.save(user=request.user)
+            order.branch = selected_branch
+            order.save()
+
             for cart_item in cart_items:
-                order_item = OrderItem.objects.create(
+                OrderItem.objects.create(
                     order=order,
                     product=cart_item.item,
                     variant=cart_item.item_variant,
@@ -35,14 +60,21 @@ def checkout(request):
                     board1=cart_item.board1,
                     board2=cart_item.board2,
                     sauce=cart_item.sauce,
-                )
-                order_item.addons.set(cart_item.addons.all())
+                ).addons.set(cart_item.addons.all())
 
-            # Очищаем корзину
             cart_items.delete()
-
             return redirect("app_order:order_detail", order_id=order.id)
     else:
+        # Проверяем товары при заходе на страницу оформления
+        unavailable_items = validate_cart_items_for_branch(cart_items, selected_branch)
+        if unavailable_items:
+            messages.error(
+                request,
+                f"Некоторые товары недоступны в филиале '{selected_branch.name}'. "
+                "Пожалуйста, измените состав корзины или выберите другой филиал."
+            )
+            return redirect("app_cart:view_cart")
+
         initial = {
             "customer_name": request.user.get_full_name(),
             "phone_number": getattr(request.user, "phone", ""),
@@ -56,6 +88,7 @@ def checkout(request):
             "form": form,
             "cart_items": cart_items,
             "cart_totals": cart_totals,
+            "selected_branch": selected_branch,
         },
     )
 
@@ -75,6 +108,12 @@ def order_detail(request, order_id):
     order_form = OrderEditForm(instance=order)
     items_formset = OrderItemFormSet(instance=order)
 
+    breadcrumbs = [
+        {'title': 'Главная', 'url': '/'},
+        {'title': 'Мои заказы', 'url': reverse('app_order:order_list')},
+        {'title': f'Заказ #{order.id}', 'url': '#'}
+    ]
+
     return render(
         request,
         "app_order/order_detail.html",
@@ -84,6 +123,7 @@ def order_detail(request, order_id):
             "form": order_form,
             "item_formset": items_formset,
             "is_editable": is_editable,
+            "breadcrumbs": breadcrumbs,
         },
     )
 
@@ -124,51 +164,14 @@ def update_order_items(request, order_id):
     return redirect("app_order:order_detail", order_id=order.id)
 
 
-def update_order_totals(order):
-    """Обновляет суммы заказа на основе текущих товаров с учетом бортов и добавок"""
-    order.subtotal = Decimal("0")
-    order.discount_amount = Decimal("0")
-    order.total_price = Decimal("0")
-
-    for item in order.items.all():
-        # Базовая стоимость товара (вариант * количество)
-        item_price = item.price * item.quantity
-        item_subtotal = item_price
-
-        # Добавляем стоимость борта, если есть
-        if item.board:
-            item_subtotal += item.board.price * item.quantity
-
-        # Добавляем стоимость всех добавок
-        for addon in item.addons.all():
-            item_subtotal += addon.price * item.quantity
-
-        # Рассчитываем скидку (если есть акция)
-        if item.is_weekly_special:
-            item.discount_amount = Decimal("0.1") * item_price  # 10% от базовой стоимости
-        else:
-            item.discount_amount = Decimal("0")
-
-        item.save()
-
-        # Обновляем суммы заказа
-        order.subtotal += item_subtotal
-        order.discount_amount += item.discount_amount
-
-    # Итоговая сумма с учетом скидки
-    order.total_price = order.subtotal - order.discount_amount
-    order.save()
-
 
 @login_required
 def order_list(request):
-    # Фильтрация заказов для пользователя (админы видят все)
     if request.user.is_staff:
         orders = Order.objects.all().order_by("-created_at")
     else:
         orders = Order.objects.filter(user=request.user).order_by("-created_at")
 
-    # Поиск и фильтрация
     search_query = request.GET.get("search", "")
     status_filter = request.GET.get("status", "")
 
@@ -178,16 +181,21 @@ def order_list(request):
     if status_filter:
         orders = orders.filter(status=status_filter)
 
-    # Пагинация
     paginator = Paginator(orders, 15)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
+
+    breadcrumbs = [
+        {'title': 'Главная', 'url': '/'},
+        {'title': 'Мои заказы', 'url': reverse('app_order:order_list')}  # Текущая страница
+    ]
 
     context = {
         "page_obj": page_obj,
         "status_choices": Order.STATUS_CHOICES,
         "search_query": search_query,
         "status_filter": status_filter,
+        "breadcrumbs": breadcrumbs,
     }
     return render(request, "app_order/order_list.html", context)
 

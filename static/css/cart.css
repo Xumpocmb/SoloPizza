@@ -19,9 +19,14 @@
     gap: 20px;
     padding: 20px;
     background-color: var(--card-bg);
-    border-radius: 10px;
+    border-radius: var(--border-radius);
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s;
+}
+
+.cart-item-card.unavailable {
+    opacity: 0.4;
+    border-left: 3px solid #ff5722;
 }
 
 .cart-item-card:hover {
@@ -37,7 +42,7 @@
 /* Изображение товара */
 .cart-item-image {
     flex: 0 0 200px;
-    border-radius: 10px;
+    border-radius: var(--border-radius);
     overflow: hidden;
 }
 
@@ -96,7 +101,7 @@
 .addons-list li {
     background-color: var(--hover-bg);
     padding: 3px 8px;
-    border-radius: 5px;
+    border-radius: var(--border-radius);
     font-size: 0.9rem;
 }
 
@@ -126,7 +131,7 @@
     background-color: var(--accent-color);
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: var(--border-radius);
     cursor: pointer;
     font-size: 1rem;
     display: flex;
@@ -150,7 +155,7 @@
     color: white;
     border: none;
     padding: 5px 10px;
-    border-radius: 5px;
+    border-radius: var(--border-radius);
     cursor: pointer;
     font-size: 0.9rem;
     display: flex;
@@ -177,7 +182,7 @@
     margin-top: 30px;
     padding: 20px;
     background-color: var(--card-bg);
-    border-radius: 10px;
+    border-radius: var(--border-radius);
     display: flex;
     flex-direction: column;
     align-items: flex-end;
@@ -203,7 +208,7 @@
     color: white;
     border: none;
     padding: 12px 25px;
-    border-radius: 5px;
+    border-radius: var(--border-radius);
     cursor: pointer;
     font-size: 1rem;
     font-weight: 600;
@@ -213,6 +218,7 @@
 
 .checkout-btn:hover {
     background-color: #068a50;
+    border-radius: var(--border-radius);
 }
 
 /* Пустая корзина */
@@ -220,7 +226,7 @@
     text-align: center;
     padding: 50px 20px;
     background-color: var(--card-bg);
-    border-radius: 10px;
+    border-radius: var(--border-radius);
 }
 
 .empty-cart-icon {
@@ -242,7 +248,7 @@
     background-color: var(--accent-color);
     color: white;
     padding: 10px 20px;
-    border-radius: 5px;
+    border-radius: var(--border-radius);
     text-decoration: none;
     font-size: 1rem;
     transition: background-color 0.2s;
@@ -317,7 +323,7 @@
     background-color: var(--accent-color);
     color: white;
     padding: 3px 8px;
-    border-radius: 12px;
+    border-radius: var(--border-radius);
     font-size: 0.8rem;
     font-weight: 600;
 }

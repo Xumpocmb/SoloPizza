@@ -8,9 +8,9 @@
     padding: 10px;
     border-radius: 5px;
     border: 1px solid transparent;
+    z-index: 3;
 }
 
-/* Стили для различных типов уведомлений */
 .notification.success {
     background-color: #d4edda;
     color: #155724;

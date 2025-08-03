@@ -9,17 +9,27 @@ class CheckoutForm(forms.ModelForm):
     DELIVERY_CHOICES = Order.DELIVERY_CHOICES
     PAYMENT_CHOICES = Order.PAYMENT_CHOICES
 
-    name = forms.CharField(label="Ваше имя", max_length=100, widget=forms.TextInput(attrs={"class": "form-input", "placeholder": "Иван Иванов"}))
+    name = forms.CharField(label="Ваше имя", max_length=100,
+                           widget=forms.TextInput(attrs={"class": "form-input", "placeholder": "Иван Иванов"}))
 
-    phone = forms.CharField(label="Телефон", max_length=20, widget=forms.TextInput(attrs={"class": "form-input", "placeholder": "+7 (999) 123-45-67"}))
+    phone = forms.CharField(label="Телефон", max_length=20,
+                            widget=forms.TextInput(attrs={"class": "form-input", "placeholder": "+375 (99) 123-45-67"}))
 
-    address = forms.CharField(label="Адрес доставки", required=False, widget=forms.TextInput(attrs={"class": "form-input", "placeholder": "ул. Ленина, д. 1, кв. 1"}))
+    address = forms.CharField(label="Адрес доставки", required=False, widget=forms.TextInput(
+        attrs={"class": "form-input", "placeholder": "ул. Ленина, д. 1, кв. 1"}))
 
-    delivery_type = forms.ChoiceField(label="Способ получения", choices=DELIVERY_CHOICES, widget=forms.RadioSelect(attrs={"class": "delivery-options"}))
+    delivery_type = forms.ChoiceField(
+        label="Способ получения",
+        choices=DELIVERY_CHOICES,
+        widget=forms.RadioSelect(attrs={"class": "delivery-options"}),
+        initial="pickup"
+    )
 
-    payment_method = forms.ChoiceField(label="Способ оплаты", choices=PAYMENT_CHOICES, widget=forms.RadioSelect(), initial="cash")
+    payment_method = forms.ChoiceField(label="Способ оплаты", choices=PAYMENT_CHOICES, widget=forms.RadioSelect(),
+                                       initial="cash")
 
-    comment = forms.CharField(label="Комментарий к заказу", required=False, widget=forms.Textarea(attrs={"class": "form-textarea", "placeholder": "Ваши пожелания...", "rows": 3}))
+    comment = forms.CharField(label="Комментарий к заказу", required=False, widget=forms.Textarea(
+        attrs={"class": "form-textarea", "placeholder": "Ваши пожелания...", "rows": 3}))
 
     class Meta:
         model = Order
@@ -40,18 +50,15 @@ class CheckoutForm(forms.ModelForm):
         if delivery_type == "delivery" and not address:
             self.add_error("address", "Укажите адрес для доставки")
 
-        # Автоматическое заполнение адреса для самовывоза
-        if delivery_type == "pickup":
-            cleaned_data["address"] = "Самовывоз"
-
         return cleaned_data
 
     def save(self, commit=True, user=None):
         order = super().save(commit=False)
         if user:
+
             order.user = user
-            order.payment_status = False  # По умолчанию не оплачено
-            order.status = "new"  # Новый заказ
+            order.payment_status = True if user.is_staff else False
+            order.status = "new"
 
         if commit:
             order.save()
@@ -61,15 +68,17 @@ class CheckoutForm(forms.ModelForm):
 class OrderEditForm(forms.ModelForm):
     class Meta:
         model = Order
-        fields = ["delivery_type", "payment_method", "payment_status", "customer_name", "phone_number", "address", "comment"]
+        fields = ["delivery_type", "payment_method", "payment_status", "customer_name", "phone_number", "address",
+                  "comment"]
         widgets = {
-            "delivery_type": forms.RadioSelect(attrs={"class": "custom-radio-list"}), # Просто указываете класс списка
+            "delivery_type": forms.RadioSelect(attrs={"class": "custom-radio-list"}),  # Просто указываете класс списка
             "payment_method": forms.RadioSelect(attrs={"class": "custom-radio-list"}),
             "payment_status": forms.CheckboxInput(attrs={"class": "custom-checkbox-list"}),
             "customer_name": forms.TextInput(attrs={"class": "form-input"}),
             "phone_number": forms.TextInput(attrs={"class": "form-input"}),
             "comment": forms.Textarea(attrs={"class": "form-textarea", "rows": 3, "placeholder": "Ваши пожелания..."}),
-            "address": forms.TextInput(attrs={"class": "form-input", "placeholder": "ул. Ленина, д. 1, кв. 1", "id": "id_address"}),
+            "address": forms.TextInput(
+                attrs={"class": "form-input", "placeholder": "ул. Ленина, д. 1, кв. 1", "id": "id_address"}),
         }
         labels = {
             "customer_name": "Имя заказчика",
@@ -139,7 +148,8 @@ class OrderItemEditForm(forms.ModelForm):
         if size:
             self.fields["board1"].queryset = BoardParams.objects.filter(size=size)
             self.fields["board2"].queryset = BoardParams.objects.filter(size=size)
-            self.fields["addons"].queryset = AddonParams.objects.filter(addon__is_active=True, size=size).select_related("addon")
+            self.fields["addons"].queryset = AddonParams.objects.filter(addon__is_active=True,
+                                                                        size=size).select_related("addon")
         else:
             self.fields["board1"].queryset = BoardParams.objects.none()
             self.fields["board2"].queryset = BoardParams.objects.none()
@@ -172,38 +182,39 @@ class OrderItemEditForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
         variant = cleaned_data.get("variant")
-        
+
         if variant and hasattr(variant, 'size'):
             if self.instance.variant and (variant.size != self.instance.variant.size):
                 new_size = variant.size
-                
+
                 cleaned_data["board1"] = self._find_board_replacement(
                     self.instance.board1, new_size
                 )
                 cleaned_data["board2"] = self._find_board_replacement(
                     self.instance.board2, new_size
                 )
-                
+
                 if self.instance.addons.exists():
                     new_addons = []
                     for addon in self.instance.addons.all():
                         replacement = self._find_addon_replacement(addon, new_size)
                         if replacement:
                             new_addons.append(replacement.id)
-                    
+
                     cleaned_data["addons"] = new_addons
-                
+
                 self.instance.variant = variant
                 self._update_size_dependent_fields()
-                
+
                 # Добавляем сообщение
                 if self.request:
                     messages.info(
                         self.request,
                         f"Борты и добавки автоматически изменены для размера {new_size.name}"
                     )
-        
+
         return cleaned_data
 
 
-OrderItemFormSet = inlineformset_factory(Order, OrderItem, form=OrderItemEditForm, extra=0, can_delete=False, fields=["variant", "quantity", "board1", "board2", "sauce", "addons"])
+OrderItemFormSet = inlineformset_factory(Order, OrderItem, form=OrderItemEditForm, extra=0, can_delete=False,
+                                         fields=["variant", "quantity", "board1", "board2", "sauce", "addons"])

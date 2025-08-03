@@ -12,47 +12,6 @@ from app_catalog.models import Product, ProductVariant, BoardParams, AddonParams
 from .models import CartItem
 
 
-# @login_required()
-# def add_to_cart(request, slug):
-#     if request.method == 'POST':
-#         item = get_object_or_404(Product, slug=slug)
-#         variant_id = request.POST.get('variant_id')
-#         quantity = int(request.POST.get('quantity', 1))
-#         sauce_id = request.POST.get('sauce_id')
-#         board1_id = request.POST.get('board1_id')
-#         board2_id = request.POST.get('board2_id')
-#         addon_ids = request.POST.getlist('addon_ids')
-        
-#         print(board1_id, board2_id)
-
-#         variant = ProductVariant.objects.get(id=variant_id, product=item)
-#         sauce =  PizzaSauce.objects.get(id=sauce_id) if sauce_id else None
-#         board1 = BoardParams.objects.get(id=board1_id) if board1_id else None
-#         board2 = BoardParams.objects.get(id=board2_id) if board2_id else None
-#         addons = AddonParams.objects.filter(id__in=addon_ids) if addon_ids else []
-
-#         cart_item, created = CartItem.objects.get_or_create(
-#             user=request.user,
-#             item=item,
-#             item_variant=variant,
-#             sauce=sauce,
-#             board1=board1,
-#             board2=board2,
-#             defaults={'quantity': quantity}
-#         )
-
-#         if not created:
-#             cart_item.quantity += quantity
-#             cart_item.save()
-
-#         cart_item.addons.set(addons)
-
-#         messages.success(request, f'Товар "{item.name}" добавлен в корзину!')
-#         return redirect('app_catalog:item_detail', slug=slug)
-
-#     return redirect('app_catalog:item_detail', slug=slug)
-
-
 @login_required
 def add_to_cart(request, slug):
     if request.method == 'POST':
