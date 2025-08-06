@@ -12,6 +12,9 @@ from app_cart.utils import validate_cart_items_for_branch
 from app_home.models import CafeBranch
 from app_order.forms import CheckoutForm, OrderEditForm, OrderItemFormSet
 from app_order.models import OrderItem, Order
+from decimal import Decimal, ROUND_HALF_UP
+
+
 
 DEFAULT_BRANCH_ID = 1
 
@@ -164,7 +167,6 @@ def update_order_items(request, order_id):
     return redirect("app_order:order_detail", order_id=order.id)
 
 
-
 @login_required
 def order_list(request):
     if request.user.is_staff:
@@ -205,7 +207,7 @@ def order_list(request):
 def update_order_status(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     new_status = request.POST.get("status")
-    
+
     print(new_status)
 
     if new_status in dict(Order.STATUS_CHOICES):
@@ -216,3 +218,97 @@ def update_order_status(request, order_id):
         messages.error(request, "Неверный статус заказа")
 
     return redirect(request.META.get("HTTP_REFERER", "app_order:order_list"))
+
+
+def print_check_non_fastfood(request, order_id):
+    """
+    Генерирует HTML для печати чека заказа БЕЗ фастфуда.
+    Включает полную информацию о заказе.
+    """
+    order = get_object_or_404(Order, id=order_id)
+
+    # Получаем позиции, исключая фастфуд
+    items = (
+        order.items.exclude(product__category__name="Фастфуд")
+        .select_related("product__category", "variant__size", "board1__board", "board2__board", "sauce")
+        .prefetch_related("addons")
+    )
+
+    # Пересчитываем итоги только для этой части
+    subtotal_part = Decimal("0.00")
+    discount_amount_part = Decimal("0.00")
+    items_data = []
+
+    for item in items:
+        calc = item.calculate_item_total()
+        # Цена за единицу без добавок (для отображения)
+        base_item_price = (calc["final_total"] - (calc.get("additions_total", Decimal("0.00")))) / item.quantity if item.quantity > 0 else Decimal("0.00")
+        # Округляем до 2 знаков
+        base_item_price = base_item_price.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
+        items_data.append(
+            {"item": item, "calculation": calc, "base_unit_price": base_item_price, "final_line_total": calc["final_total"]}  # Цена за единицу без добавок  # Итог по строке
+        )
+        subtotal_part += calc["original_total"]
+        discount_amount_part += calc["discount_amount"]
+
+    # Итог для этой части
+    part_total = subtotal_part - discount_amount_part
+
+    context = {
+        "order": order,
+        "items_data": items_data,
+        "subtotal_part": subtotal_part.quantize(Decimal("0.01")),
+        "discount_amount_part": discount_amount_part.quantize(Decimal("0.01")),
+        "part_total": part_total.quantize(Decimal("0.01")),  # Итог только для этой части
+        "check_title": "ЧЕК (Без Фастфуда)",
+        "show_order_details": True,  # Флаг для отображения деталей заказа
+    }
+    return render(request, "app_order/print_check.html", context)
+
+
+def print_check_fastfood_only(request, order_id):
+    """
+    Генерирует HTML для печати чека ТОЛЬКО с фастфудом.
+    НЕ включает общую информацию о заказе.
+    """
+    order = get_object_or_404(Order, id=order_id)
+
+    # Получаем только позиции фастфуда
+    items = (
+        order.items.filter(product__category__name="Фастфуд")
+        .select_related("product__category", "variant__size", "board1__board", "board2__board", "sauce")
+        .prefetch_related("addons")
+    )
+
+    # Пересчитываем итоги только для этой части
+    subtotal_part = Decimal("0.00")
+    discount_amount_part = Decimal("0.00")
+    items_data = []
+
+    for item in items:
+        calc = item.calculate_item_total()
+        # Цена за единицу без добавок (для отображения)
+        base_item_price = (calc["final_total"] - (calc.get("additions_total", Decimal("0.00")))) / item.quantity if item.quantity > 0 else Decimal("0.00")
+        # Округляем до 2 знаков
+        base_item_price = base_item_price.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
+        items_data.append(
+            {"item": item, "calculation": calc, "base_unit_price": base_item_price, "final_line_total": calc["final_total"]}  # Цена за единицу без добавок  # Итог по строке
+        )
+        subtotal_part += calc["original_total"]
+        discount_amount_part += calc["discount_amount"]
+
+    # Итог для этой части
+    part_total = subtotal_part - discount_amount_part
+
+    context = {
+        "order": order,  # Передаем для потенциального доступа к ID или дате
+        "items_data": items_data,
+        "subtotal_part": subtotal_part.quantize(Decimal("0.01")),
+        "discount_amount_part": discount_amount_part.quantize(Decimal("0.01")),
+        "part_total": part_total.quantize(Decimal("0.01")),  # Итог только для этой части
+        "check_title": "ЧЕК (Только Фастфуд)",
+        "show_order_details": False,  # Флаг для НЕ отображения деталей заказа
+    }
+    return render(request, "app_order/print_check.html", context)

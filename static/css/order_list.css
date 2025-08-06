@@ -99,7 +99,7 @@
 
 .table-header {
     display: grid;
-    grid-template-columns: 80px 100px 120px 140px 120px 150px 120px 100px;
+    grid-template-columns: 80px 100px 120px 140px 120px 150px 120px 100px 50px 50px;
     background-color: var(--accent-color);
     color: white;
     font-weight: 600;
@@ -112,7 +112,7 @@
 
 .table-row {
     display: grid;
-    grid-template-columns: 80px 100px 120px 140px 120px 150px 120px 100px;
+    grid-template-columns: 80px 100px 120px 140px 120px 150px 120px 100px 50px 50px;
     padding: 12px 15px;
     border-bottom: 1px solid var(--hover-bg);
     transition: background-color 0.2s;

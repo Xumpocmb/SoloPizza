@@ -1,0 +1,198 @@
+<!-- app_order/templates/app_order/print_check.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ check_title }} - Заказ #{{ order.id }}</title>
+    <style>
+        @media print {
+            @page {
+                margin: 3mm; /* Очень маленькие поля для 80мм */
+                size: 80mm auto; /* Ширина 80мм, высота автоматическая */
+            }
+            body {
+                font-family: 'Courier New', Courier, monospace;
+                font-size: 9px; /* Подобрать под ваш принтер */
+                margin: 0;
+                padding: 2mm;
+                width: 80mm; /* Ширина 80мм */
+                box-sizing: border-box;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 9px;
+            margin: 0;
+            padding: 2mm;
+            width: 80mm; /* Для предварительного просмотра */
+            box-sizing: border-box;
+            border: 1px dashed #ccc; /* Визуальная граница при просмотре */
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3mm;
+            font-weight: bold;
+        }
+
+        .order-details {
+            margin-bottom: 3mm;
+        }
+
+        .order-details div {
+            margin-bottom: 1mm;
+        }
+
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 3mm;
+            font-size: 8px; /* Может быть чуть меньше */
+            table-layout: fixed; /* Для контроля ширины колонок */
+        }
+
+        .items-table th,
+        .items-table td {
+            /* border: 1px solid #ddd; */ /* Убрать для экономии места */
+            border-bottom: 1px dotted #aaa;
+            padding: 1mm;
+            text-align: left;
+            vertical-align: top;
+            word-wrap: break-word; /* Перенос слов */
+        }
+
+        /* Ширины колонок */
+        .col-desc { width: 45%; }
+        .col-qty { width: 15%; text-align: center; }
+        .col-price { width: 20%; text-align: right; }
+        .col-total { width: 20%; text-align: right; }
+
+        .items-table th {
+            background-color: #f9f9f9;
+            font-weight: bold;
+        }
+
+        .item-description {
+            font-size: 8px;
+        }
+
+        .totals {
+            text-align: right;
+            font-weight: bold;
+            margin-top: 2mm;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 5mm;
+            font-style: italic;
+            font-size: 8px;
+        }
+
+        .btn-print {
+            display: block;
+            width: 100%;
+            padding: 5px;
+            margin: 10px 0;
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .btn-print:hover {
+            background-color: #0056b3;
+        }
+
+        .discount-info {
+            font-size: 7px;
+            text-align: right;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Кнопка печати для удобства в браузере -->
+    <button class="btn-print no-print" onclick="window.print()">Печать Чека</button>
+
+    <div class="header">{{ check_title }}</div>
+
+    {% if show_order_details %}
+    <div class="order-details">
+        <div><strong>Заказ #:</strong> {{ order.id }}</div>
+        <div><strong>Дата:</strong> {{ order.created_at|date:"d.m.Y H:i" }}</div>
+        <div><strong>Клиент:</strong> {{ order.customer_name }}</div>
+        <div><strong>Телефон:</strong> {{ order.phone_number }}</div>
+        {% if order.delivery_type == 'delivery' %}
+        <div><strong>Адрес:</strong> {{ order.address }}</div>
+        {% endif %}
+        <div><strong>Тип:</strong> {{ order.get_delivery_type_display }}</div>
+        <div><strong>Оплата:</strong> {{ order.get_payment_method_display }}</div>
+        {% if order.comment %}
+        <div><strong>Комментарий:</strong> {{ order.comment }}</div>
+        {% endif %}
+    </div>
+    {% else %}
+    <!-- Для чека "Только Фастфуд" показываем минимум -->
+    <div class="order-details">
+        <div><strong>Заказ #:</strong> {{ order.id }}</div>
+        <div><strong>Дата:</strong> {{ order.created_at|date:"d.m.Y H:i" }}</div>
+        <!-- Можно добавить "Тип: Фастфуд" если нужно -->
+    </div>
+    {% endif %}
+
+    {% if items_data %}
+    <table class="items-table">
+        <thead>
+            <tr>
+                <th class="col-desc">Наименование</th>
+                <th class="col-qty">Кол-во</th>
+                <th class="col-price">Цена</th>
+                <th class="col-total">Сумма</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for data in items_data %}
+            <tr>
+                <td class="col-desc item-description">{{ data.item.get_full_description }}</td>
+                <td class="col-qty">{{ data.item.quantity }}</td>
+                <td class="col-price">{{ data.base_unit_price|floatformat:2 }}</td>
+                <td class="col-total">{{ data.final_line_total|floatformat:2 }}</td>
+            </tr>
+            {% if data.calculation.discount_amount > 0 %}
+            <tr>
+                <td colspan="3" class="discount-info">Скидка ({{ data.calculation.discount_percent|floatformat:0 }}%):</td>
+                <td class="col-total">-{{ data.calculation.discount_amount|floatformat:2 }}</td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="totals">
+        <div><strong>Подытог (часть):</strong> {{ subtotal_part|floatformat:2 }} руб.</div>
+        {% if discount_amount_part > 0 %}
+        <div><strong>Скидка (часть):</strong> -{{ discount_amount_part|floatformat:2 }} руб.</div>
+        {% endif %}
+        <div><strong>ИТОГО (часть):</strong> {{ part_total|floatformat:2 }} руб.</div>
+    </div>
+    {% else %}
+    <p>Нет позиций для печати в этом чеке.</p>
+    {% endif %}
+
+    <div class="footer">
+        Спасибо за заказ!
+    </div>
+
+    <!-- Кнопка печати внизу -->
+    <button class="btn-print no-print" onclick="window.print()">Печать Чека</button>
+
+</body>
+</html>

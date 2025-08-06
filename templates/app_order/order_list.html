@@ -63,7 +63,9 @@
                     <div class="header-cell">Сумма</div>
                     <div class="header-cell">Способ получения</div>
                     <div class="header-cell">Оплата</div>
-                    <div class="header-cell">Действия</div>
+                    <div class="header-cell">Детали</div>
+                    <div class="header-cell">Чек</div>
+                    <div class="header-cell">Фастфуд</div>
                 </div>
 
                 {% for order in page_obj %}
@@ -106,6 +108,20 @@
                                class="view-button"
                                title="Просмотреть">
                                 <i class="fas fa-eye"></i>
+                            </a>
+                        </div>
+                        <div class="table-cell">
+                            <a href="{% url 'app_order:print_non_fastfood_check' order.id %}"
+                               class="pdf-button"
+                               title="Скачать чек">
+                                <i class="fas fa-file-pdf"></i>
+                            </a>
+                        </div>
+                        <div class="table-cell">
+                            <a href="{% url 'app_order:print_fastfood_check' order.id %}"
+                               class="pdf-button"
+                               title="Скачать чек">
+                                <i class="fas fa-file-pdf"></i>
                             </a>
                         </div>
                     </div>

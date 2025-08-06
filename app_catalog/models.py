@@ -1,7 +1,7 @@
 import os
 
 from django.db import models
-from django.db.models.signals import post_delete
+from django.db.models.signals import pre_save
 from django.dispatch import receiver
 from django.urls import reverse
 from django.utils.text import slugify
@@ -44,11 +44,11 @@ class Product(models.Model):
     image = models.ImageField(upload_to='item_images', blank=True, null=True, verbose_name='Изображение')
     is_weekly_special = models.BooleanField(default=False, verbose_name='Акция: Пицца недели', blank=False, null=False)
     is_active = models.BooleanField('Активен', default=True)
+    created_at = models.DateTimeField('Дата создания', auto_now_add=True)
     is_spicy = models.BooleanField('Острый', default=False)
     is_alcoholic = models.BooleanField('Алкогольный', default=False)
     is_combo = models.BooleanField('Комбо-набор', default=False)
     is_sweet = models.BooleanField('Сладкий', default=False)
-    created_at = models.DateTimeField('Дата создания', auto_now_add=True)
 
     class Meta:
         db_table = 'products'
@@ -93,6 +93,7 @@ class ProductVariant(models.Model):
     size = models.ForeignKey(PizzaSizes, on_delete=models.SET_NULL, blank=True, null=True, verbose_name='Размер', help_text="Размер для пиццы и кальцоне")
     unit = models.CharField(max_length=10, choices=UNIT_CHOICES, default='pcs', verbose_name='Единица измерения')
     price = models.DecimalField('Цена', max_digits=10, decimal_places=2)
+
 
     class Meta:
         verbose_name = 'Вариант товара'
@@ -210,10 +211,17 @@ class IceCreamTopping(models.Model):
         super().save(*args, **kwargs)
 
 
-@receiver(post_delete, sender=Category)
-@receiver(post_delete, sender=Product)
-def delete_image_file(sender, instance, **kwargs):
-    """Удаляет файл изображения при удалении объекта."""
-    if instance.image:
-        if os.path.isfile(instance.image.path):
-            os.remove(instance.image.path)
+@receiver(pre_save, sender=Category)
+@receiver(pre_save, sender=Product)
+def delete_old_image_on_update(sender, instance, **kwargs):
+    if not instance.pk:
+        return False
+
+    try:
+        old_image = sender.objects.get(pk=instance.pk).image
+    except sender.DoesNotExist:
+        return False
+
+    if old_image and old_image != instance.image:
+        if os.path.isfile(old_image.path):
+            os.remove(old_image.path)
