@@ -2,7 +2,7 @@
 .checkout-page {
     width: 90%;
     max-width: 1200px;
-    padding: 20px;
+    /* padding: 20px; */
     margin: 60px auto;
     background-color: var(--bg-color);
     color: var(--text-color);

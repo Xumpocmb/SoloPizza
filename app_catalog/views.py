@@ -29,7 +29,6 @@ def category_detail(request, slug):
     return render(request, 'app_catalog/category_detail.html', context=context)
 
 
-@cache_page(60 * 60 * 6)  # Кеширование на 6 часов
 def item_detail(request, slug):
     """Страница карточки товара без формы, просто отображаем данные."""
     item = get_object_or_404(Product, slug=slug)
