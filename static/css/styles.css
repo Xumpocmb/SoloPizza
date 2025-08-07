@@ -284,7 +284,7 @@ a:hover {
 
 .burger {
     width: 28px;
-    height: 20px;
+    height: 24px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -330,9 +330,29 @@ a:hover {
 
 .cart-icon {
     position: relative;
-    width: 24px;
-    height: 24px;
+    width: 30px;
+    height: 30px;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cart-wrapper {
+    margin-left: 10px;
+}
+
+.cart-wrapper a {
+    display: flex;
+    align-items: center;
+    background: none;
+    padding: 5px 8px;
+    border-radius: 20px;
+    transition: background-color 0.2s ease;
+}
+
+.cart-wrapper a:hover {
+    background-color: rgba(7, 155, 89, 0.1);
 }
 
 .cart-icon svg {
@@ -341,15 +361,52 @@ a:hover {
     fill: #333;
 }
 
+.cart-icon i {
+    font-size: 24px;
+    color: var(--accent-color);
+    transition: transform 0.2s ease;
+}
+
+.cart-icon:hover i {
+    transform: scale(1.1);
+}
+
 .cart-count {
-    position: absolute;
-    top: -6px;
-    right: -6px;
-    background: crimson;
+    position: relative;
+    margin-left: 8px;
+    background: var(--accent-color);
     color: #fff;
-    font-size: 10px;
-    padding: 2px 5px;
-    border-radius: 50%;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 4px 10px;
+    border-radius: 12px;
+    min-width: 28px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s ease;
+}
+
+.cart-wrapper:hover .cart-count {
+    transform: scale(1.05);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.25);
+}
+
+/* Адаптивные стили для корзины на мобильных устройствах */
+@media (max-width: 768px) {
+    .cart-icon {
+        width: 28px;
+        height: 28px;
+    }
+    
+    .cart-icon i {
+        font-size: 22px;
+    }
+    
+    .cart-count {
+        font-size: 12px;
+        padding: 3px 8px;
+        min-width: 24px;
+    }
 }
 
 .sidebar {

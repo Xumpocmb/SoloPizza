@@ -7,6 +7,8 @@ from django.http import HttpResponseForbidden
 from django.shortcuts import redirect, render, get_object_or_404
 from django.urls import reverse
 from django.views.decorators.http import require_POST
+from django.utils import timezone
+from datetime import time
 from app_cart.models import CartItem
 from app_cart.utils import validate_cart_items_for_branch
 from app_home.models import CafeBranch
@@ -19,6 +21,27 @@ from decimal import Decimal, ROUND_HALF_UP
 DEFAULT_BRANCH_ID = 1
 
 
+def is_order_time_allowed(user):
+    """
+    Проверяет, разрешено ли пользователю делать заказ в текущее время.
+    Администраторы и сотрудники могут делать заказы в любое время.
+    Обычные пользователи могут делать заказы только с 11:00 до 23:00.
+    """
+    # Администраторы и сотрудники могут делать заказы в любое время
+    if user.is_superuser or user.is_staff:
+        return True
+    
+    # Получаем текущее время в часовом поясе проекта
+    current_time = timezone.localtime().time()
+    
+    # Определяем разрешенный интервал времени для заказов (с 11:00 до 23:00)
+    start_time = time(11, 0)  # 11:00
+    end_time = time(23, 0)    # 23:00
+    
+    # Проверяем, находится ли текущее время в разрешенном интервале
+    return start_time <= current_time <= end_time
+
+
 @login_required
 def checkout(request):
     cart_items = CartItem.objects.filter(user=request.user).select_related(
@@ -27,6 +50,14 @@ def checkout(request):
     cart_totals = CartItem.objects.get_cart_totals(request.user)
 
     if not cart_items.exists():
+        return redirect("app_cart:view_cart")
+        
+    # Проверяем, разрешено ли пользователю делать заказ в текущее время
+    if not is_order_time_allowed(request.user):
+        messages.error(
+            request,
+            "Заказы принимаются только с 11:00 до 23:00. Администраторы и сотрудники могут делать заказы в любое время."
+        )
         return redirect("app_cart:view_cart")
 
     # Получаем выбранный филиал
