@@ -34,9 +34,8 @@ def is_order_time_allowed(user):
     # Получаем текущее время в часовом поясе проекта
     current_time = timezone.localtime().time()
     
-    # Определяем разрешенный интервал времени для заказов (с 11:00 до 23:00)
     start_time = time(11, 0)  # 11:00
-    end_time = time(23, 0)    # 23:00
+    end_time = time(22, 30)    # 22:30
     
     # Проверяем, находится ли текущее время в разрешенном интервале
     return start_time <= current_time <= end_time
