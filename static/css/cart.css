@@ -76,7 +76,7 @@
 .item-option {
     margin-bottom: 8px;
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
 }
 
 .option-label {
@@ -87,6 +87,14 @@
 
 .option-value {
     color: var(--text-color);
+}
+
+.board-list {
+    list-style: none;
+    padding: 0;
+    margin: 5px 0 0 0;
+    display: block;
+    width: 100%;
 }
 
 .addons-list {

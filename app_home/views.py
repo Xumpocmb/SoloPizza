@@ -10,11 +10,10 @@ from django.conf import settings
 from app_cart.models import CartItem
 from app_cart.utils import validate_cart_items_for_branch
 from app_catalog.models import Product
-from app_home.models import CafeBranch, Vacancy, VacancyApplication, Feedback
+from app_home.models import CafeBranch, Vacancy
 from app_home.forms import VacancyApplicationForm, FeedbackForm
 
 
-@cache_page(60 * 60 * 6)  # Кеширование на 6 часов
 def home_page(request):
     active_vacancies = Vacancy.objects.filter(is_active=True)
     context = {
@@ -107,10 +106,7 @@ def vacancy_apply(request, vacancy_id):
 @cache_page(60 * 60 * 6)  # Кеширование на 6 часов
 def contacts_view(request):
     """Отображает страницу контактов с информацией о выбранном филиале"""
-    # Информация о филиале уже доступна через контекстный процессор
-    # selected_branch передается через app_home.context_processors.site_context_processor
-    # и уже кешируется там
-    
+   
     breadcrumbs = [
         {'title': 'Главная', 'url': '/'},
         {'title': 'Контакты', 'url': reverse('app_home:contacts')}
