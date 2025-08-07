@@ -1,6 +1,16 @@
 <footer>
     <div class="footer-columns">
         <div class="footer-column">
+            <h3>Наше меню</h3>
+            <ul>
+                {% for category in categories %}
+                <li>
+                    <a href="{% url 'app_catalog:category_detail' category.slug %}">{{ category.name }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="footer-column">
             <h3>Компания</h3>
             <ul>
                 <li>
