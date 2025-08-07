@@ -109,7 +109,7 @@ def item_detail(request, slug):
     return render(request, "app_catalog/item_detail.html", context)
 
 
-@cache_page(60 * 60 * 6)  # Кеширование на 6 часов
+@cache_page(60 * 60 * 1)
 def catalog_view(request):
 
     context = {}
