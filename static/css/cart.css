@@ -257,6 +257,7 @@
 .continue-shopping-btn:hover {
     background-color: #068a50;
     color: white;
+    border-radius: var(--border-radius);
 }
 
 /* Адаптивные стили */
