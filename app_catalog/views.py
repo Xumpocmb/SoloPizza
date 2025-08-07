@@ -23,7 +23,6 @@ def category_detail(request, slug):
         {'title': category.name, 'url': category.get_absolute_url()},
     ]
 
-    # Получаем все соусы, борты и добавки для административного интерфейса
     sauces = PizzaSauce.objects.all()
     boards = BoardParams.objects.all()
     addons = AddonParams.objects.all()
