@@ -15,12 +15,14 @@ def clear_category_cache(sender, instance, **kwargs):
     """
     # Очищаем кеш для страницы каталога
     catalog_url = reverse('app_catalog:catalog')
-    cache.delete_pattern(f'views.decorators.cache.cache_page.*.{catalog_url}*')
+    cache_key = f'views.decorators.cache.cache_page.{catalog_url}'
+    cache.delete(cache_key)
     
     # Очищаем кеш для страницы категории
     if instance.slug:
         category_url = reverse('app_catalog:category_detail', kwargs={'slug': instance.slug})
-        cache.delete_pattern(f'views.decorators.cache.cache_page.*.{category_url}*')
+        cache_key = f'views.decorators.cache.cache_page.{category_url}'
+        cache.delete(cache_key)
 
 
 @receiver([post_save, post_delete], sender=Product)
@@ -31,21 +33,25 @@ def clear_product_cache(sender, instance, **kwargs):
     # Очищаем кеш для страницы товара
     if instance.slug:
         product_url = reverse('app_catalog:item_detail', kwargs={'slug': instance.slug})
-        cache.delete_pattern(f'views.decorators.cache.cache_page.*.{product_url}*')
+        cache_key = f'views.decorators.cache.cache_page.{product_url}'
+        cache.delete(cache_key)
     
     # Очищаем кеш для страницы категории
     if instance.category and instance.category.slug:
         category_url = reverse('app_catalog:category_detail', kwargs={'slug': instance.category.slug})
-        cache.delete_pattern(f'views.decorators.cache.cache_page.*.{category_url}*')
+        cache_key = f'views.decorators.cache.cache_page.{category_url}'
+        cache.delete(cache_key)
     
     # Очищаем кеш для страницы каталога
     catalog_url = reverse('app_catalog:catalog')
-    cache.delete_pattern(f'views.decorators.cache.cache_page.*.{catalog_url}*')
+    cache_key = f'views.decorators.cache.cache_page.{catalog_url}'
+    cache.delete(cache_key)
     
     # Если это акционный товар, очищаем кеш для страницы акций
     if instance.is_weekly_special or kwargs.get('update_fields') and 'is_weekly_special' in kwargs.get('update_fields'):
         discounts_url = reverse('app_home:discounts')
-        cache.delete_pattern(f'views.decorators.cache.cache_page.*.{discounts_url}*')
+        cache_key = f'views.decorators.cache.cache_page.{discounts_url}'
+        cache.delete(cache_key)
 
 
 @receiver([post_save, post_delete], sender=ProductVariant)
@@ -56,12 +62,14 @@ def clear_variant_cache(sender, instance, **kwargs):
     # Очищаем кеш для страницы товара
     if instance.product and instance.product.slug:
         product_url = reverse('app_catalog:item_detail', kwargs={'slug': instance.product.slug})
-        cache.delete_pattern(f'views.decorators.cache.cache_page.*.{product_url}*')
+        cache_key = f'views.decorators.cache.cache_page.{product_url}'
+        cache.delete(cache_key)
     
     # Очищаем кеш для страницы категории
     if instance.product and instance.product.category and instance.product.category.slug:
         category_url = reverse('app_catalog:category_detail', kwargs={'slug': instance.product.category.slug})
-        cache.delete_pattern(f'views.decorators.cache.cache_page.*.{category_url}*')
+        cache_key = f'views.decorators.cache.cache_page.{category_url}'
+        cache.delete(cache_key)
 
 
 @receiver([post_save, post_delete], sender=BoardParams)
@@ -77,10 +85,17 @@ def clear_pizza_params_cache(sender, instance, **kwargs):
     # Очищаем кеш для всех страниц товаров категории "Пицца"
     # Поскольку мы не знаем, какие конкретно товары затронуты, очищаем кеш для всех страниц каталога
     catalog_url = reverse('app_catalog:catalog')
-    cache.delete_pattern(f'views.decorators.cache.cache_page.*.{catalog_url}*')
+    cache_key = f'views.decorators.cache.cache_page.{catalog_url}'
+    cache.delete(cache_key)
     
-    # Также можно очистить кеш для всех страниц товаров
-    cache.delete_pattern(f'views.decorators.cache.cache_page.*.{reverse("app_catalog:item_detail", kwargs={"slug": "*"})}*')
+    # Для очистки кеша всех страниц товаров нам нужно найти все товары и очистить их кеш
+    # Вместо использования delete_pattern, который не поддерживается в RedisCache
+    from app_catalog.models import Product
+    for product in Product.objects.all():
+        if product.slug:
+            product_url = reverse('app_catalog:item_detail', kwargs={'slug': product.slug})
+            cache_key = f'views.decorators.cache.cache_page.{product_url}'
+            cache.delete(cache_key)
 
 
 @receiver([post_save, post_delete], sender=RollTopping)
@@ -91,7 +106,21 @@ def clear_toppings_cache(sender, instance, **kwargs):
     """
     # Очищаем кеш для всех страниц каталога
     catalog_url = reverse('app_catalog:catalog')
-    cache.delete_pattern(f'views.decorators.cache.cache_page.*.{catalog_url}*')
+    cache_key = f'views.decorators.cache.cache_page.{catalog_url}'
+    cache.delete(cache_key)
     
-    # Также можно очистить кеш для всех страниц товаров
-    cache.delete_pattern(f'views.decorators.cache.cache_page.*.{reverse("app_catalog:item_detail", kwargs={"slug": "*"})}*')
+    # Очищаем кеш для категорий роллов и мороженого
+    from app_catalog.models import Category
+    for category in Category.objects.filter(name__in=['Роллы', 'Мороженое']):
+        if category.slug:
+            category_url = reverse('app_catalog:category_detail', kwargs={'slug': category.slug})
+            cache_key = f'views.decorators.cache.cache_page.{category_url}'
+            cache.delete(cache_key)
+            
+    # Очищаем кеш для всех товаров в этих категориях
+    from app_catalog.models import Product
+    for product in Product.objects.filter(category__name__in=['Роллы', 'Мороженое']):
+        if product.slug:
+            product_url = reverse('app_catalog:item_detail', kwargs={'slug': product.slug})
+            cache_key = f'views.decorators.cache.cache_page.{product_url}'
+            cache.delete(cache_key)

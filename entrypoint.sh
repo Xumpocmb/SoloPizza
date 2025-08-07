@@ -8,6 +8,10 @@ while ! nc -z redis 6379; do
 done
 echo "Redis started"
 
+echo "Clearing Redis cache..."
+redis-cli -h redis flushall
+echo "Redis cache cleared"
+
 echo "Applying migrations..."
 python manage.py migrate --noinput
 python manage.py migrate django_celery_beat --noinput
