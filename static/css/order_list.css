@@ -179,13 +179,8 @@
     font-weight: 600;
 }
 
-/* Кнопки действий */
-.actions-cell {
-    display: flex;
-    gap: 10px;
-}
-
-.view-button, .edit-button {
+.view-button,
+.edit-button {
     color: var(--text-color);
     background: none;
     border: none;
@@ -244,7 +239,8 @@
     border-color: var(--accent-color);
 }
 
-.first-page, .last-page {
+.first-page,
+.last-page {
     padding: 8px 10px;
 }
 
@@ -258,7 +254,9 @@
 
 /* Адаптивность */
 @media (max-width: 1200px) {
-    .table-header, .table-row {
+
+    .table-header,
+    .table-row {
         grid-template-columns: 80px 120px 140px 120px 120px 100px 80px;
     }
 }
@@ -268,9 +266,22 @@
         overflow-x: auto;
     }
 
-    .table-header, .table-row {
+    .table-header,
+    .table-row {
         grid-template-columns: repeat(8, minmax(100px, 1fr));
         width: 900px;
+    }
+
+    .table-container {
+        padding: 0;
+        overflow-x: hidden;
+    }
+
+    .table-header {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+        overflow-x: auto;
+        max-width: 100%;
     }
 }
 
@@ -280,7 +291,8 @@
         align-items: stretch;
     }
 
-    .search-group, .filter-group {
+    .search-group,
+    .filter-group {
         min-width: 100%;
     }
 }
@@ -403,3 +415,199 @@
     transition: background-color 0.3s ease;
 }
 
+/* Медиа-запросы для адаптивности */
+@media screen and (max-width: 992px) {
+    .order-list-container {
+        padding: 15px;
+        overflow-x: hidden;
+        /* Предотвращаем горизонтальную прокрутку контейнера */
+    }
+
+    .page-title {
+        font-size: 1.5rem;
+        margin-bottom: 15px;
+    }
+
+    .order-controls {
+        margin-bottom: 20px;
+    }
+
+    .search-form {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
+    }
+
+    .search-group,
+    .filter-group {
+        width: 100%;
+        min-width: auto;
+    }
+
+    .search-input {
+        height: 42px;
+        font-size: 16px;
+        /* Предотвращает масштабирование на iOS */
+    }
+
+    .search-button,
+    .filter-button {
+        height: 42px;
+        padding: 0 15px;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .search-button i,
+    .filter-button i {
+        margin-right: 5px;
+    }
+
+    .filter-button {
+        width: 100%;
+        /* margin-top: 10px; */
+        background-color: var(--accent-color);
+        color: white;
+        border: none;
+        border-radius: var(--border-radius);
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .filter-button:hover {
+        background-color: #068a50;
+    }
+
+    .status-filter {
+        height: 42px;
+        font-size: 16px;
+        /* Предотвращает масштабирование на iOS */
+    }
+
+    /* Убираем горизонтальную прокрутку для таблицы */
+    .orders-table {
+        width: 100%;
+        overflow-x: visible;
+    }
+
+    /* Уменьшаем ширину заголовка таблицы */
+    .table-header {
+        width: 100%;
+        grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    }
+
+    /* Изменение отображения таблицы для мобильных устройств */
+    .table-header {
+        display: none;
+        /* Скрываем заголовки на мобильных */
+    }
+
+    /* Обновляем стили для строк таблицы */
+    .table-row {
+        display: flex;
+        flex-direction: column;
+        grid-template-columns: none;
+        /* Отключаем grid-шаблон для мобильных */
+        width: 100%;
+        padding: 15px;
+        margin-bottom: 15px;
+        border-radius: var(--border-radius);
+        position: relative;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        border-left-width: 5px;
+    }
+
+    .table-cell {
+        padding: 10px 5px;
+        display: flex;
+        align-items: center;
+        border-bottom: 1px solid var(--hover-bg);
+        width: 100%;
+        font-size: 14px;
+    }
+
+    .table-cell:last-child {
+        border-bottom: none;
+    }
+
+    /* Добавляем подписи для ячеек на мобильных */
+    .table-cell::before {
+        content: attr(data-label);
+        font-weight: bold;
+        width: 35%;
+        margin-right: 10px;
+        flex-shrink: 0;
+        font-size: 13px;
+        color: #666;
+    }
+
+    /* Улучшение отображения статусов на мобильных */
+    .status-badge {
+        width: 100%;
+        text-align: center;
+        padding: 6px 10px;
+    }
+
+    /* Стили для селекта статуса на мобильных */
+    .status-select {
+        width: 100%;
+        height: 38px;
+        font-size: 14px;
+    }
+
+    /* Стили для кнопок действий */
+    .actions-cell {
+        justify-content: flex-start;
+        margin-top: 10px;
+    }
+
+    /* Улучшение отображения кнопок на мобильных */
+    .view-button,
+    .pdf-button {
+        width: 36px;
+        height: 36px;
+        font-size: 1.1rem;
+        background-color: var(--hover-bg);
+        border-radius: var(--border-radius);
+        margin-right: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .view-button:hover,
+    .pdf-button:hover {
+        background-color: var(--accent-color-rgba);
+        color: var(--accent-color);
+    }
+
+    /* Стили для пагинации */
+    .pagination {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 20px;
+    }
+
+    .page-link {
+        min-width: 36px;
+        height: 36px;
+    }
+
+    /* Стили для пустого состояния */
+    .no-orders {
+        padding: 30px 15px;
+        text-align: center;
+        background-color: var(--hover-bg);
+        border-radius: var(--border-radius);
+        margin-top: 20px;
+    }
+
+    .no-orders p {
+        font-size: 16px;
+        color: var(--text-color);
+        margin: 0;
+    }
+}

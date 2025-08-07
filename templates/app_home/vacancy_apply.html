@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'css/vacancies.css' %}">
+{% endblock %}
+
+{% block main %}
+    <main>
+        <div class="main-wrapper">
+            <div class="vacancy-application-container">
+                <h1 class="vacancy-application-title">Отклик на вакансию: {{ vacancy.title }}</h1>
+                
+                <div class="vacancy-application-form">
+                    <form method="post" action="{% url 'app_home:vacancy_apply' vacancy_id=vacancy.id %}">
+                        {% csrf_token %}
+                        
+                        <div class="form-group">
+                            <label for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>
+                            {{ form.name }}
+                            {% if form.name.errors %}
+                                <div class="form-error">{{ form.name.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="{{ form.age.id_for_label }}">{{ form.age.label }}</label>
+                            {{ form.age }}
+                            {% if form.age.errors %}
+                                <div class="form-error">{{ form.age.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="{{ form.phone.id_for_label }}">{{ form.phone.label }}</label>
+                            {{ form.phone }}
+                            {% if form.phone.errors %}
+                                <div class="form-error">{{ form.phone.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="{{ form.experience_years.id_for_label }}">{{ form.experience_years.label }}</label>
+                            {{ form.experience_years }}
+                            {% if form.experience_years.errors %}
+                                <div class="form-error">{{ form.experience_years.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="{{ form.work_experience.id_for_label }}">{{ form.work_experience.label }}</label>
+                            {{ form.work_experience }}
+                            {% if form.work_experience.errors %}
+                                <div class="form-error">{{ form.work_experience.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="vacancy-details-btn">Отправить отклик</button>
+                            <a href="{% url 'app_home:vacancy_detail' vacancy_id=vacancy.id %}" class="back-link">← Вернуться к вакансии</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+{% endblock %}

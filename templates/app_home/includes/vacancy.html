@@ -12,9 +12,9 @@
                             <img src="{{ vacancy.image.url }}"
                                  alt="{{ vacancy.title }}"
                                  class="vacancy-image"
-                                 onerror="this.src='{% static 'img/No-Image-Placeholder.png' %}'">
+                                 onerror="this.src='{% static 'img/No-Image-Placeholder.svg' %}'">
                         {% else %}
-                            <img src="{% static 'img/No-Image-Placeholder.png' %}"
+                            <img src="{% static 'img/No-Image-Placeholder.svg' %}"
                                  alt="{{ vacancy.title }}"
                                  class="vacancy-image">
                         {% endif %}
@@ -27,14 +27,16 @@
                                     {% for benefit in vacancy.benefits|split:"," %}<span class="benefit-tag">{{ benefit|strip }}</span>{% endfor %}
                                 </div>
                             {% endif %}
-                            <a href="#apply-modal"
-                               data-vacancy="{{ vacancy.title }}"
-                               class="vacancy-apply-btn">Откликнуться</a>
+                            <a href="{% url 'app_home:vacancy_detail' vacancy.id %}"
+                               class="vacancy-details-btn">Подробнее</a>
                         </div>
                     </div>
                 {% empty %}
                     <div class="no-vacancies">Сейчас нет активных вакансий, но загляните позже!</div>
                 {% endfor %}
+            </div>
+            <div class="vacancies-footer">
+                <a href="{% url 'app_home:vacancy_list' %}" class="all-vacancies-link">Смотреть все вакансии →</a>
             </div>
         </div>
     </section>

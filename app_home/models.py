@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
 
 
 class CafeBranch(models.Model):
@@ -45,3 +46,36 @@ class Vacancy(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class VacancyApplication(models.Model):
+    vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE, related_name="applications", verbose_name="Вакансия")
+    name = models.CharField("ФИО", max_length=100)
+    age = models.PositiveIntegerField(
+        "Возраст", 
+        validators=[MinValueValidator(16, message="Минимальный возраст - 16 лет"), 
+                   MaxValueValidator(100, message="Максимальный возраст - 100 лет")]
+    )
+    phone_regex = RegexValidator(
+        regex=r'^\+?7?\d{10,15}$',
+        message="Номер телефона должен быть в формате: '+7XXXXXXXXXX' или '8XXXXXXXXXX'. До 15 цифр."
+    )
+    phone = models.CharField(
+        "Номер телефона", 
+        max_length=17, 
+        validators=[phone_regex]
+    )
+    experience_years = models.PositiveIntegerField(
+        "Стаж работы (лет)", 
+        validators=[MaxValueValidator(50, message="Максимальный стаж - 50 лет")]
+    )
+    work_experience = models.TextField("Опыт работы")
+    created_at = models.DateTimeField("Дата отклика", auto_now_add=True)
+    
+    class Meta:
+        verbose_name = "Отклик на вакансию"
+        verbose_name_plural = "Отклики на вакансии"
+        ordering = ["-created_at"]
+    
+    def __str__(self):
+        return f"Отклик на {self.vacancy.title} от {self.name}"

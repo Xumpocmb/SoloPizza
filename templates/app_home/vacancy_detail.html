@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load tag_split %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'css/vacancies.css' %}">
+{% endblock %}
+
+{% block main %}
+    <main>
+        <div class="main-wrapper">
+            <div class="vacancy-detail">
+                <div class="vacancy-header">
+                    {% if vacancy.image %}
+                        <img src="{{ vacancy.image.url }}" 
+                             alt="{{ vacancy.title }}" 
+                             class="vacancy-header-image"
+                             onerror="this.src='{% static 'img/No-Image-Placeholder.svg' %}'">
+                    {% else %}
+                        <img src="{% static 'img/No-Image-Placeholder.svg' %}" 
+                             alt="{{ vacancy.title }}" 
+                             class="vacancy-header-image">
+                    {% endif %}
+                    <div class="vacancy-header-content">
+                        <h1>{{ vacancy.title }}</h1>
+                        {% if vacancy.salary %}
+                            <div class="vacancy-salary">💰 {{ vacancy.salary }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                {% if vacancy.description %}
+                    <div class="vacancy-description">
+                        {{ vacancy.description|linebreaks }}
+                    </div>
+                {% endif %}
+                
+                {% if vacancy.benefits %}
+                    <div class="vacancy-benefits-section">
+                        <h2>Преимущества работы у нас:</h2>
+                        <div class="vacancy-benefits">
+                            {% for benefit in vacancy.benefits|split:"," %}
+                                <span class="benefit-tag">{{ benefit|strip }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+                
+                <div class="vacancy-apply">
+                    <a href="{% url 'app_home:vacancy_apply' vacancy_id=vacancy.id %}" class="vacancy-details-btn">Откликнуться на вакансию</a>
+                </div>
+                
+                <a href="{% url 'app_home:vacancy_list' %}" class="back-link">← Вернуться к списку вакансий</a>
+            </div>
+        </div>
+    </main>
+{% endblock %}

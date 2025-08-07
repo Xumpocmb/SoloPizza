@@ -70,10 +70,10 @@
 
                 {% for order in page_obj %}
                     <div class="table-row status-{{ order.status }}">
-                        <div class="table-cell">#{{ order.id }}</div>
-                        <div class="table-cell">{{ order.customer_name }}</div>
-                        <div class="table-cell">{{ order.created_at|date:"d.m.Y H:i" }}</div>
-                        <div class="table-cell">
+                        <div class="table-cell" data-label="ID">#{{ order.id }}</div>
+                        <div class="table-cell" data-label="Имя">{{ order.customer_name }}</div>
+                        <div class="table-cell" data-label="Дата">{{ order.created_at|date:"d.m.Y H:i" }}</div>
+                        <div class="table-cell" data-label="Статус">
                             {% if request.user.is_staff %}
                                 <form method="post" action="{% url 'app_order:update_order_status' order.id %}">
                                     {% csrf_token %}
@@ -94,30 +94,30 @@
                                 </span>
                             {% endif %}
                         </div>
-                        <div class="table-cell">{{ order.total_price|floatformat:2 }} руб.</div>
-                        <div class="table-cell">{{ order.get_delivery_type_display }}</div>
-                        <div class="table-cell">
+                        <div class="table-cell" data-label="Сумма">{{ order.total_price|floatformat:2 }} руб.</div>
+                        <div class="table-cell" data-label="Способ получения">{{ order.get_delivery_type_display }}</div>
+                        <div class="table-cell" data-label="Оплата">
                             {% if order.payment_status %}
                                 <span class="payment-paid">Оплачено</span>
                             {% else %}
                                 <span class="payment-unpaid">Не оплачено</span>
                             {% endif %}
                         </div>
-                        <div class="table-cell actions-cell">
+                        <div class="table-cell actions-cell" data-label="Детали">
                             <a href="{% url 'app_order:order_detail' order.id %}"
                                class="view-button"
                                title="Просмотреть">
                                 <i class="fas fa-eye"></i>
                             </a>
                         </div>
-                        <div class="table-cell">
+                        <div class="table-cell" data-label="Чек">
                             <a href="{% url 'app_order:print_non_fastfood_check' order.id %}"
                                class="pdf-button"
                                title="Скачать чек">
                                 <i class="fas fa-file-pdf"></i>
                             </a>
                         </div>
-                        <div class="table-cell">
+                        <div class="table-cell" data-label="Фастфуд">
                             <a href="{% url 'app_order:print_fastfood_check' order.id %}"
                                class="pdf-button"
                                title="Скачать чек">

@@ -1,11 +1,14 @@
 from django.contrib import messages
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
+from django.urls import reverse
+from django.views.decorators.csrf import csrf_protect
 
 from app_cart.models import CartItem
 from app_cart.utils import validate_cart_items_for_branch
 from app_catalog.models import Product
-from app_home.models import CafeBranch, Vacancy
+from app_home.models import CafeBranch, Vacancy, VacancyApplication
+from app_home.forms import VacancyApplicationForm
 
 
 def home_page(request):
@@ -48,3 +51,47 @@ def discounts_view(request):
     pizza_weekly = Product.objects.filter(category__slug="picca", is_active=True, is_weekly_special=True).first()
     context = {"pizza_weekly": pizza_weekly}
     return render(request, "app_home/discounts.html", context=context)
+
+
+def vacancy_list(request):
+    """Отображает список всех активных вакансий"""
+    vacancies = Vacancy.objects.filter(is_active=True)
+    context = {
+        "vacancies": vacancies,
+        "title": "Вакансии"
+    }
+    return render(request, "app_home/vacancy_list.html", context=context)
+
+
+def vacancy_detail(request, vacancy_id):
+    """Отображает детальную информацию о конкретной вакансии"""
+    vacancy = get_object_or_404(Vacancy, id=vacancy_id, is_active=True)
+    context = {
+        "vacancy": vacancy,
+        "title": vacancy.title
+    }
+    return render(request, "app_home/vacancy_detail.html", context=context)
+
+
+@csrf_protect
+def vacancy_apply(request, vacancy_id):
+    """Отображает форму для отклика на вакансию и обрабатывает её отправку"""
+    vacancy = get_object_or_404(Vacancy, id=vacancy_id, is_active=True)
+    
+    if request.method == 'POST':
+        form = VacancyApplicationForm(request.POST)
+        if form.is_valid():
+            application = form.save(commit=False)
+            application.vacancy = vacancy
+            application.save()
+            messages.success(request, "Ваш отклик успешно отправлен! Мы свяжемся с вами в ближайшее время.", extra_tags="success")
+            return redirect(reverse('app_home:vacancy_detail', kwargs={'vacancy_id': vacancy_id}))
+    else:
+        form = VacancyApplicationForm()
+    
+    context = {
+        "vacancy": vacancy,
+        "form": form,
+        "title": f"Отклик на вакансию: {vacancy.title}"
+    }
+    return render(request, "app_home/vacancy_apply.html", context=context)
