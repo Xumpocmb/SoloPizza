@@ -1,11 +1,14 @@
 from decimal import Decimal
+import json
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 
 from app_cart.forms import AddToCartForm
 from app_catalog.models import Product, ProductVariant, BoardParams, AddonParams, PizzaSauce

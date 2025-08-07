@@ -3,7 +3,9 @@ from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from django.views.decorators.cache import cache_page
 
-from app_catalog.models import Category, Product, AddonParams, BoardParams, ProductVariant, PizzaSauce
+from app_catalog.models import (Category, Product, AddonParams, BoardParams, 
+                               ProductVariant, PizzaSauce, PizzaAddon, PizzaBoard, 
+                               PizzaSizes)
 
 
 @cache_page(60 * 60 * 6)  # Кеширование на 6 часов
@@ -20,12 +22,23 @@ def category_detail(request, slug):
         {'title': category.name, 'url': category.get_absolute_url()},
     ]
 
+    # Получаем все соусы, борты и добавки для административного интерфейса
+    sauces = PizzaSauce.objects.all()
+    boards = BoardParams.objects.all()
+    addons = AddonParams.objects.all()
+    drinks = ["Кола 1л.", "Sprite 1л.", "Фанта 1л.", "Вода 0.5л."]
+
     context = {
         'title': f'Solo Pizza | Категория: {category.name}',
         'category': category,
         'items': items,
         "breadcrumbs": breadcrumbs,
+        "sauces": sauces,
+        "boards": boards,
+        "addons": addons,
+        "drinks": drinks,
     }
+    
     return render(request, 'app_catalog/category_detail.html', context=context)
 
 
