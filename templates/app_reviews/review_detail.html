@@ -1,6 +1,11 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block meta_description %}Отзыв от {{ review.user.username }} о Solo Pizza - {{ review.text|truncatechars:100 }}{% endblock %}
+{% block meta_keywords %}отзыв клиента, мнение о Solo Pizza, рейтинг пиццерии, отзыв {{ review.user.username }}{% endblock %}
+{% block og_description %}Отзыв от {{ review.user.username }} о Solo Pizza - {{ review.text|truncatechars:100 }}{% endblock %}
+{% block twitter_description %}Отзыв от {{ review.user.username }} о Solo Pizza - {{ review.text|truncatechars:100 }}{% endblock %}
+
 
 {% block styles %}
     <link rel="stylesheet" href="{% static 'css/reviews.css' %}">

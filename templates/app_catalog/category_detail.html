@@ -1,6 +1,11 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block meta_description %}{{ category.name }} в Solo Pizza - {{ category.description|default:"Вкусные блюда с доставкой" }}{% endblock %}
+{% block meta_keywords %}{{ category.name }}, заказать {{ category.name }}, доставка {{ category.name }}, Solo Pizza{% endblock %}
+{% block og_description %}{{ category.name }} в Solo Pizza - {{ category.description|default:"Вкусные блюда с доставкой" }}{% endblock %}
+{% block twitter_description %}{{ category.name }} в Solo Pizza - {{ category.description|default:"Вкусные блюда с доставкой" }}{% endblock %}
+
 {% block styles %}
     <link rel="stylesheet" href="{% static 'css/catalog.css' %}">
 {% endblock %}

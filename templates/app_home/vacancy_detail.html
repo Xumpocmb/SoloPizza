@@ -4,6 +4,11 @@
 
 {% block title %}{{ title }}{% endblock %}
 
+{% block meta_description %}Вакансия {{ vacancy.title }} в Solo Pizza - {{ vacancy.description|truncatechars:100 }}{% endblock %}
+{% block meta_keywords %}вакансия {{ vacancy.title }}, работа в пиццерии, карьера в Solo Pizza, {{ vacancy.title }} в ресторане{% endblock %}
+{% block og_description %}Вакансия {{ vacancy.title }} в Solo Pizza - {{ vacancy.description|truncatechars:100 }}{% endblock %}
+{% block twitter_description %}Вакансия {{ vacancy.title }} в Solo Pizza - {{ vacancy.description|truncatechars:100 }}{% endblock %}
+
 {% block styles %}
     <link rel="stylesheet" href="{% static 'css/vacancies.css' %}">
 {% endblock %}

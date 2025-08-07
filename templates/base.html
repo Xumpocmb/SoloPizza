@@ -5,6 +5,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{% block meta_description %}Solo Pizza - вкусная пицца и другие блюда с доставкой. Заказывайте онлайн!{% endblock %}">
+    <meta name="keywords" content="{% block meta_keywords %}пицца, доставка пиццы, итальянская кухня, заказать пиццу{% endblock %}">
+    <meta name="author" content="Solo Pizza">
+    <meta property="og:title" content="{{ title|default:"Solo Pizza" }}">
+    <meta property="og:description" content="{% block og_description %}Solo Pizza - вкусная пицца и другие блюда с доставкой. Заказывайте онлайн!{% endblock %}">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta property="og:site_name" content="Solo Pizza">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="{{ title|default:"Solo Pizza" }}">
+    <meta name="twitter:description" content="{% block twitter_description %}Solo Pizza - вкусная пицца и другие блюда с доставкой. Заказывайте онлайн!{% endblock %}">
+    <link rel="canonical" href="{{ request.build_absolute_uri }}">
     <title>{{ title|default:"Solo Pizza" }}</title>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     <link rel="stylesheet" href="{% static 'css/alert.css' %}">
