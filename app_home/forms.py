@@ -1,5 +1,39 @@
 from django import forms
-from .models import VacancyApplication
+from .models import VacancyApplication, Feedback
+
+
+class FeedbackForm(forms.ModelForm):
+    """Форма для вопросов и предложений"""
+    
+    class Meta:
+        model = Feedback
+        fields = ['name', 'phone', 'message']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите ваше имя'}),
+            'phone': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '+7XXXXXXXXXX'}),
+            'message': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Введите ваш вопрос или предложение', 'rows': 5}),
+        }
+        
+    def clean_phone(self):
+        """Валидация номера телефона"""
+        phone = self.cleaned_data.get('phone')
+        
+        # Удаляем все нецифровые символы, кроме +
+        phone = ''.join(c for c in phone if c.isdigit() or c == '+')
+        
+        # Если номер начинается с 8, заменяем на +7
+        if phone.startswith('8'):
+            phone = '+7' + phone[1:]
+        
+        # Если номер начинается с 7, добавляем +
+        elif phone.startswith('7') and not phone.startswith('+'):
+            phone = '+' + phone
+            
+        # Если номер не начинается с +, добавляем +7
+        elif not phone.startswith('+'):
+            phone = '+7' + phone
+            
+        return phone
 
 
 class VacancyApplicationForm(forms.ModelForm):

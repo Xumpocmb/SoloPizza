@@ -249,6 +249,7 @@
 
 .all-vacancies-link:hover {
     color: white;
+    border-radius: var(--border-radius);
 }
 
 .all-vacancies-link:hover::before {
@@ -488,22 +489,22 @@
     .vacancies-title {
         font-size: 1.5rem;
     }
-    
+
     .vacancy-header {
         flex-direction: column;
         text-align: center;
     }
-    
+
     .vacancy-header-image {
         margin-right: 0;
         margin-bottom: 20px;
     }
-    
+
     .vacancy-header-content h1::after {
         left: 50%;
         transform: translateX(-50%);
     }
-    
+
     .vacancy-detail {
         padding: 20px;
     }

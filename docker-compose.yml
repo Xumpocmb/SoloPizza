@@ -1,15 +1,10 @@
 services:
-  db:
-    image: postgres:16
-    env_file:
-      - .env.dev
-    volumes:
-      - db-data:/var/lib/postgresql/data
-
   redis:
     image: redis:latest
     ports:
       - "6379:6379"
+    volumes:
+      - redis-data:/data
 
   web:
     build: .
@@ -18,9 +13,32 @@ services:
     ports:
       - "8000:8000"
     depends_on:
-      - db
+      - redis
     env_file:
       - .env.dev
+    command: python manage.py runserver 0.0.0.0:8000
+
+  celery_worker:
+    build: .
+    volumes:
+      - .:/app
+    depends_on:
+      - redis
+      - web
+    env_file:
+      - .env.dev
+    command: celery -A SoloPizza worker --loglevel=info
+
+  celery_beat:
+    build: .
+    volumes:
+      - .:/app
+    depends_on:
+      - redis
+      - web
+    env_file:
+      - .env.dev
+    command: celery -A SoloPizza beat --scheduler django_celery_beat.schedulers:DatabaseScheduler --loglevel=info
 
 volumes:
-  db-data:
+  redis-data:

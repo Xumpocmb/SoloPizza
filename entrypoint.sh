@@ -2,14 +2,16 @@
 
 set -e
 
-echo "Waiting for PostgreSQL to start..."
-while ! nc -z db 5432; do
+echo "Waiting for Redis to start..."
+while ! nc -z redis 6379; do
   sleep 1
 done
-echo "PostgreSQL started"
+echo "Redis started"
 
 echo "Applying migrations..."
 python manage.py migrate --noinput
+python manage.py migrate django_celery_beat --noinput
+python manage.py migrate django_celery_results --noinput
 
 echo "Starting server..."
 exec "$@"

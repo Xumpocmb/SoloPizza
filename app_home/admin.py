@@ -1,5 +1,5 @@
 from django.contrib import admin
-from app_home.models import CafeBranch, CafeBranchPhone, Vacancy, VacancyApplication
+from app_home.models import CafeBranch, CafeBranchPhone, Vacancy, VacancyApplication, Feedback
 
 
 class CafeBranchPhoneAdmin(admin.TabularInline):
@@ -37,5 +37,21 @@ class VacancyApplicationAdmin(admin.ModelAdmin):
         }),
         ("Опыт работы", {
             "fields": ("experience_years", "work_experience")
+        }),
+    )
+
+
+@admin.register(Feedback)
+class FeedbackAdmin(admin.ModelAdmin):
+    list_display = ("name", "phone", "created_at")
+    list_filter = ("created_at",)
+    search_fields = ("name", "phone", "message")
+    readonly_fields = ("created_at",)
+    fieldsets = (
+        ("Информация", {
+            "fields": ("name", "phone", "created_at")
+        }),
+        ("Вопрос/предложение", {
+            "fields": ("message",)
         }),
     )

@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'css/feedback.css' %}">
+{% endblock %}
+
+{% block main %}
+    <main>
+        <div class="main-wrapper">
+            <div class="breadcrumbs">
+                {% for crumb in breadcrumbs %}
+                    {% if forloop.last %}
+                        <span class="breadcrumb-item active">{{ crumb.title }}</span>
+                    {% else %}
+                        <a href="{{ crumb.url }}" class="breadcrumb-item">{{ crumb.title }}</a>
+                        <span class="breadcrumb-separator">&gt;</span>
+                    {% endif %}
+                {% endfor %}
+            </div>
+
+            <div class="feedback-page">
+                <h1 class="page-title">{{ title }}</h1>
+                <div class="divider"></div>
+
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <div class="feedback-form-container">
+                    <p class="feedback-intro">Оставьте ваш вопрос или предложение, и мы свяжемся с вами в ближайшее время.</p>
+                    
+                    <form method="post" action="{% url 'app_home:feedback' %}" class="feedback-form">
+                        {% csrf_token %}
+                        
+                        <div class="form-group">
+                            <label for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>
+                            {{ form.name }}
+                            {% if form.name.errors %}
+                                <div class="form-error">{{ form.name.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="{{ form.phone.id_for_label }}">{{ form.phone.label }}</label>
+                            {{ form.phone }}
+                            {% if form.phone.errors %}
+                                <div class="form-error">{{ form.phone.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="{{ form.message.id_for_label }}">{{ form.message.label }}</label>
+                            {{ form.message }}
+                            {% if form.message.errors %}
+                                <div class="form-error">{{ form.message.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="feedback-submit-btn">Отправить</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+{% endblock %}

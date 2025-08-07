@@ -1,10 +1,12 @@
 from django.db.models import Min
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
+from django.views.decorators.cache import cache_page
 
 from app_catalog.models import Category, Product, AddonParams, BoardParams, ProductVariant, PizzaSauce
 
 
+@cache_page(60 * 60 * 6)  # Кеширование на 6 часов
 def category_detail(request, slug):
     category = get_object_or_404(Category, slug=slug)
     items = (
@@ -27,6 +29,7 @@ def category_detail(request, slug):
     return render(request, 'app_catalog/category_detail.html', context=context)
 
 
+@cache_page(60 * 60 * 6)  # Кеширование на 6 часов
 def item_detail(request, slug):
     """Страница карточки товара без формы, просто отображаем данные."""
     item = get_object_or_404(Product, slug=slug)
@@ -94,6 +97,7 @@ def item_detail(request, slug):
     return render(request, "app_catalog/item_detail.html", context)
 
 
+@cache_page(60 * 60 * 6)  # Кеширование на 6 часов
 def catalog_view(request):
 
     context = {}

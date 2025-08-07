@@ -7,10 +7,10 @@
                     <a href="#">О нас</a>
                 </li>
                 <li>
-                    <a href="#">Контакты</a>
+                    <a href="{% url 'app_home:contacts' %}">Контакты</a>
                 </li>
                 <li>
-                    <a href="#">Вакансии</a>
+                    <a href="{% url 'app_home:vacancy_list' %}">Вакансии</a>
                 </li>
             </ul>
         </div>
@@ -18,7 +18,7 @@
             <h3>Помощь</h3>
             <ul>
                 <li>
-                    <a href="#">Условия использования</a>
+                    <a href="{% url 'app_home:feedback' %}">Вопросы и предложения</a>
                 </li>
             </ul>
         </div>

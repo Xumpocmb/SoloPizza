@@ -1,6 +1,6 @@
 {
     // Python
-    "python.languageServer": "Pylance",
+    "python.languageServer": "None",
     "python.analysis.indexing": true,
     "python.analysis.typeCheckingMode": "off",
     "python.analysis.diagnosticMode": "openFilesOnly",

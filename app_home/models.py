@@ -2,6 +2,29 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
 
 
+class Feedback(models.Model):
+    name = models.CharField("Имя", max_length=100)
+    phone_regex = RegexValidator(
+        regex=r'^\+?7?\d{10,15}$',
+        message="Номер телефона должен быть в формате: '+7XXXXXXXXXX' или '8XXXXXXXXXX'. До 15 цифр."
+    )
+    phone = models.CharField(
+        "Номер телефона", 
+        max_length=17, 
+        validators=[phone_regex]
+    )
+    message = models.TextField("Сообщение")
+    created_at = models.DateTimeField("Дата отправки", auto_now_add=True)
+    
+    class Meta:
+        verbose_name = "Вопрос/предложение"
+        verbose_name_plural = "Вопросы и предложения"
+        ordering = ["-created_at"]
+    
+    def __str__(self):
+        return f"Вопрос/предложение от {self.name}"
+
+
 class CafeBranch(models.Model):
     name = models.CharField(max_length=100, verbose_name="Название филиала")
     address = models.CharField(max_length=200, verbose_name="Адрес")
