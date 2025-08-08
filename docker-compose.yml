@@ -26,7 +26,7 @@ services:
       - redis
       - web
     env_file:
-      - .env.dev
+      - .env
     command: celery -A SoloPizza worker --loglevel=info
 
   celery_beat:
@@ -37,7 +37,7 @@ services:
       - redis
       - web
     env_file:
-      - .env.dev
+      - .env
     command: celery -A SoloPizza beat --scheduler django_celery_beat.schedulers:DatabaseScheduler --loglevel=info
 
 volumes:
