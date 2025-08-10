@@ -5,8 +5,8 @@ from django.core.validators import MinValueValidator, MaxValueValidator, RegexVa
 class Feedback(models.Model):
     name = models.CharField("Имя", max_length=100)
     phone_regex = RegexValidator(
-        regex=r'^\+?7?\d{10,15}$',
-        message="Номер телефона должен быть в формате: '+7XXXXXXXXXX' или '8XXXXXXXXXX'. До 15 цифр."
+        regex=r'^\d{12,}$',
+        message="Номер телефона должен содержать не менее 12 цифр."
     )
     phone = models.CharField(
         "Номер телефона", 
@@ -80,8 +80,8 @@ class VacancyApplication(models.Model):
                    MaxValueValidator(100, message="Максимальный возраст - 100 лет")]
     )
     phone_regex = RegexValidator(
-        regex=r'^\+?7?\d{10,15}$',
-        message="Номер телефона должен быть в формате: '+7XXXXXXXXXX' или '8XXXXXXXXXX'. До 15 цифр."
+        regex=r'^\d{12,}$',
+        message="Номер телефона должен содержать не менее 12 цифр."
     )
     phone = models.CharField(
         "Номер телефона", 

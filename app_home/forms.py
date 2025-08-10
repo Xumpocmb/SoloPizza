@@ -10,7 +10,7 @@ class FeedbackForm(forms.ModelForm):
         fields = ['name', 'phone', 'message']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите ваше имя'}),
-            'phone': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '+7XXXXXXXXXX'}),
+            'phone': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '375XXXXXXXXXXXX (минимум 12 цифр)'}),
             'message': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Введите ваш вопрос или предложение', 'rows': 5}),
         }
         
@@ -18,20 +18,12 @@ class FeedbackForm(forms.ModelForm):
         """Валидация номера телефона"""
         phone = self.cleaned_data.get('phone')
         
-        # Удаляем все нецифровые символы, кроме +
-        phone = ''.join(c for c in phone if c.isdigit() or c == '+')
+        # Удаляем все нецифровые символы
+        phone = ''.join(c for c in phone if c.isdigit())
         
-        # Если номер начинается с 8, заменяем на +7
-        if phone.startswith('8'):
-            phone = '+7' + phone[1:]
-        
-        # Если номер начинается с 7, добавляем +
-        elif phone.startswith('7') and not phone.startswith('+'):
-            phone = '+' + phone
-            
-        # Если номер не начинается с +, добавляем +7
-        elif not phone.startswith('+'):
-            phone = '+7' + phone
+        # Проверяем длину номера
+        if len(phone) < 12:
+            raise forms.ValidationError("Номер телефона должен содержать не менее 12 цифр.")
             
         return phone
 
@@ -45,7 +37,7 @@ class VacancyApplicationForm(forms.ModelForm):
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите ваше ФИО'}),
             'age': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Введите ваш возраст', 'min': '16', 'max': '100'}),
-            'phone': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '+375XXXXXXXXX'}),
+            'phone': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '375XXXXXXXXXXXX (минимум 12 цифр)'}),
             'experience_years': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Стаж работы в годах', 'min': '0', 'max': '50'}),
             'work_experience': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Опишите ваш опыт работы', 'rows': 5}),
         }
@@ -54,19 +46,11 @@ class VacancyApplicationForm(forms.ModelForm):
         """Валидация номера телефона"""
         phone = self.cleaned_data.get('phone')
         
-        # Удаляем все нецифровые символы, кроме +
-        phone = ''.join(c for c in phone if c.isdigit() or c == '+')
+        # Удаляем все нецифровые символы
+        phone = ''.join(c for c in phone if c.isdigit())
         
-        # Если номер начинается с 8, заменяем на +7
-        if phone.startswith('8'):
-            phone = '+7' + phone[1:]
-        
-        # Если номер начинается с 7, добавляем +
-        elif phone.startswith('7') and not phone.startswith('+'):
-            phone = '+' + phone
-            
-        # Если номер не начинается с +, добавляем +7
-        elif not phone.startswith('+'):
-            phone = '+7' + phone
+        # Проверяем длину номера
+        if len(phone) < 12:
+            raise forms.ValidationError("Номер телефона должен содержать не менее 12 цифр.")
             
         return phone

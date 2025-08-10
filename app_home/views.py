@@ -108,6 +108,9 @@ def vacancy_apply(request, vacancy_id):
             application.save()
             messages.success(request, "Ваш отклик успешно отправлен! Мы свяжемся с вами в ближайшее время.", extra_tags="success")
             return redirect(reverse('app_home:vacancy_detail', kwargs={'vacancy_id': vacancy_id}))
+        else:
+            # Добавляем сообщение об ошибке, если форма не валидна
+            messages.error(request, "Пожалуйста, исправьте ошибки в форме.", extra_tags="error")
     else:
         form = VacancyApplicationForm()
     
@@ -159,6 +162,9 @@ def feedback_view(request):
             form.save()
             messages.success(request, "Ваш вопрос/предложение успешно отправлено! Мы свяжемся с вами в ближайшее время.", extra_tags="success")
             return redirect(reverse('app_home:feedback'))
+        else:
+            # Добавляем сообщение об ошибке, если форма не валидна
+            messages.error(request, "Пожалуйста, исправьте ошибки в форме.", extra_tags="error")
     else:
         form = FeedbackForm()
     
