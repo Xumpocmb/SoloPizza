@@ -16,9 +16,21 @@
 {% block main %}
     <main>
         <div class="main-wrapper">
+            {% if breadcrumbs %}
+            <div class="breadcrumbs">
+                {% for crumb in breadcrumbs %}
+                    {% if not forloop.last %}
+                        <a href="{{ crumb.url }}">{{ crumb.title }}</a> <span class="breadcrumb-separator">></span>
+                    {% else %}
+                        <span class="breadcrumb-current">{{ crumb.title }}</span>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            {% endif %}
             <section class="vacancies-section">
                 <div class="vacancies-container">
                     <h1 class="vacancies-title">Вакансии Solo Pizza</h1>
+                    <div class="divider"></div>
                     <p class="vacancies-subtitle">Присоединяйся к нашей команде! Мы ищем классных людей, которые любят пиццу, еду и хорошую атмосферу.</p>
                     
                     <div class="vacancies-grid">

@@ -1,3 +1,32 @@
+/* Стили для хлебных крошек */
+.breadcrumbs {
+    padding: 15px 0;
+    margin: 0 auto 10px;
+    max-width: 1200px;
+    font-size: 0.9rem;
+}
+
+.breadcrumbs a {
+    color: var(--accent-color);
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.breadcrumbs a:hover {
+    color: var(--text-color);
+    text-decoration: underline;
+}
+
+.breadcrumb-separator {
+    margin: 0 5px;
+    color: var(--text-muted);
+}
+
+.breadcrumb-current {
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
 /* Основные стили секции */
 .vacancies-section {
     background-color: var(--bg-color);
@@ -15,19 +44,6 @@
     text-align: center;
     margin-bottom: 15px;
     font-size: 2.5rem;
-    position: relative;
-    padding-bottom: 15px;
-}
-
-.vacancies-title::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 80px;
-    height: 3px;
-    background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
 }
 
 .vacancies-subtitle {
@@ -308,6 +324,13 @@
     border-top: 5px solid var(--accent-color);
 }
 
+.divider {
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
+    margin: 20px auto;
+    width: 100%;
+}
+
 .vacancy-header {
     display: flex;
     align-items: center;
@@ -329,18 +352,6 @@
     color: var(--accent-color);
     font-size: 2rem;
     margin-bottom: 15px;
-    position: relative;
-    padding-bottom: 10px;
-}
-
-.vacancy-header-content h1::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 60px;
-    height: 3px;
-    background: var(--accent-color);
 }
 
 .vacancy-salary {

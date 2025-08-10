@@ -61,9 +61,17 @@ def discounts_view(request):
 def vacancy_list(request):
     """Отображает список всех активных вакансий"""
     vacancies = Vacancy.objects.filter(is_active=True)
+    
+    # Добавляем хлебные крошки
+    breadcrumbs = [
+        {'title': 'Главная', 'url': '/'},
+        {'title': 'Вакансии', 'url': '#'}
+    ]
+    
     context = {
         "vacancies": vacancies,
-        "title": "Вакансии"
+        "title": "Вакансии",
+        "breadcrumbs": breadcrumbs
     }
     return render(request, "app_home/vacancy_list.html", context=context)
 
@@ -72,9 +80,18 @@ def vacancy_list(request):
 def vacancy_detail(request, vacancy_id):
     """Отображает детальную информацию о конкретной вакансии"""
     vacancy = get_object_or_404(Vacancy, id=vacancy_id, is_active=True)
+    
+    # Добавляем хлебные крошки
+    breadcrumbs = [
+        {'title': 'Главная', 'url': '/'},
+        {'title': 'Вакансии', 'url': reverse('app_home:vacancy_list')},
+        {'title': vacancy.title, 'url': '#'}
+    ]
+    
     context = {
         "vacancy": vacancy,
-        "title": vacancy.title
+        "title": vacancy.title,
+        "breadcrumbs": breadcrumbs
     }
     return render(request, "app_home/vacancy_detail.html", context=context)
 
@@ -95,15 +112,23 @@ def vacancy_apply(request, vacancy_id):
     else:
         form = VacancyApplicationForm()
     
+    # Добавляем хлебные крошки
+    breadcrumbs = [
+        {'title': 'Главная', 'url': '/'},
+        {'title': 'Вакансии', 'url': reverse('app_home:vacancy_list')},
+        {'title': vacancy.title, 'url': reverse('app_home:vacancy_detail', kwargs={'vacancy_id': vacancy_id})},
+        {'title': 'Отклик на вакансию', 'url': '#'}
+    ]
+    
     context = {
         "vacancy": vacancy,
         "form": form,
+        "breadcrumbs": breadcrumbs,
         "title": f"Отклик на вакансию: {vacancy.title}"
     }
     return render(request, "app_home/vacancy_apply.html", context=context)
 
 
-@cache_page(60 * 60 * 6)  # Кеширование на 6 часов
 def contacts_view(request):
     """Отображает страницу контактов с информацией о выбранном филиале"""
    

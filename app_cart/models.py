@@ -79,8 +79,14 @@ class CartItem(models.Model):
         if size:
             desc.append(size)
 
-        if self.board:
-            desc.append(f"Борт: {self.board.board.name}")
+        # Добавляем информацию о бортах для пиццы и комбо
+        if self.board1 or self.board2:
+            boards = []
+            if self.board1:
+                boards.append(f"Борт 1: {self.board1.board.name}")
+            if self.board2:
+                boards.append(f"Борт 2: {self.board2.board.name}")
+            desc.append(" | ".join(boards))
 
         if self.sauce:
             desc.append(f"Соус: {self.sauce.name}")

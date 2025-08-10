@@ -38,9 +38,16 @@ def add_to_cart(request, slug):
             board1 = BoardParams.objects.filter(id=board1_id).first() if board1_id else None
             board2 = BoardParams.objects.filter(id=board2_id).first() if board2_id else None
 
+            # Проверка на одинаковые борты для пиццы и комбо
             if board1 and board2 and board1_id == board2_id:
                 messages.error(request, 'Нельзя выбрать одинаковые борты.')
                 return redirect('app_catalog:item_detail', slug=slug)
+                
+            # Проверка, что борты доступны для данного товара
+            is_pizza_or_combo = item.category.name in ["Пицца", "Кальцоне"] or (item.category.name == "Комбо" and item.is_combo)
+            if not is_pizza_or_combo:
+                board1 = None
+                board2 = None
 
             # Обработка соуса
             sauce = PizzaSauce.objects.filter(id=sauce_id).first() if sauce_id else None

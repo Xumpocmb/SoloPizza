@@ -16,6 +16,17 @@
 {% block main %}
     <main>
         <div class="main-wrapper">
+            {% if breadcrumbs %}
+            <div class="breadcrumbs">
+                {% for crumb in breadcrumbs %}
+                    {% if not forloop.last %}
+                        <a href="{{ crumb.url }}">{{ crumb.title }}</a> <span class="breadcrumb-separator">></span>
+                    {% else %}
+                        <span class="breadcrumb-current">{{ crumb.title }}</span>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            {% endif %}
             <div class="vacancy-detail">
                 <div class="vacancy-header">
                     {% if vacancy.image %}
@@ -35,6 +46,7 @@
                         {% endif %}
                     </div>
                 </div>
+                <div class="divider"></div>
                 
                 {% if vacancy.description %}
                     <div class="vacancy-description">

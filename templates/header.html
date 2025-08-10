@@ -62,11 +62,11 @@
 <div class="sidebar" id="sidebar">
     <a href="{% url 'app_home:home' %}">Главная</a>
     <a href="{% url 'app_home:discounts' %}">Акции</a>
-    <a href="{% url 'app_home:contacts' %}">Контакты</a>
     <div class="has-submenu">
         <button onclick="toggleSubmenu('aboutSub')">О нас ▾</button>
         <div class="submenu" id="aboutSub">
             <a href="{% url 'app_home:home' %}">Информация</a>
+            <a href="{% url 'app_home:contacts' %}">Контакты</a>
             <a href="{% url 'app_reviews:review_list' %}">Отзывы</a>
             <a href="{% url 'app_reviews:moderation_list' %}">Модерация</a>
         </div>

@@ -23,14 +23,23 @@ class AddToCartForm(forms.Form):
         self.variant = kwargs.pop('variant', None)
         super().__init__(*args, **kwargs)
 
-        # Если это не пицца или кальцоне — скрываем все специфичные поля
-        if not (self.product and self.product.category.name in ["Пицца", "Кальцоне"]):
+        # Если это не пицца, кальцоне или комбо — скрываем все специфичные поля
+        if not (self.product and (self.product.category.name in ["Пицца", "Кальцоне"] or 
+                                (self.product.category.name == "Комбо" and self.product.is_combo))):
             for field in ['sauce_id', 'board1_id', 'board2_id', 'addons']:
                 if field in self.fields:
                     del self.fields[field]
         else:
-            # Только если это пицца — добавляем опции для addons
-            self.fields['addons'].choices = [
-                (addon.id, f"{addon.addon.name} (+{addon.price} руб.)")
-                for addon in AddonParams.objects.filter(size=self.variant.size)
-            ]
+            # Для пиццы и комбо-наборов с пиццей добавляем опции
+            if self.product.category.name in ["Пицца", "Кальцоне"]:
+                # Для пиццы добавляем опции для addons
+                self.fields['addons'].choices = [
+                    (addon.id, f"{addon.addon.name} (+{addon.price} руб.)")
+                    for addon in AddonParams.objects.filter(size=self.variant.size)
+                ]
+            elif self.product.category.name == "Комбо" and self.product.is_combo:
+                # Для комбо оставляем только поля для бортов
+                if 'sauce_id' in self.fields:
+                    del self.fields['sauce_id']
+                if 'addons' in self.fields:
+                    del self.fields['addons']

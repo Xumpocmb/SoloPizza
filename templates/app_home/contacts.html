@@ -45,19 +45,7 @@
                 </ul>
             </div>
 
-            <div class="branch-selection">
-                <h3>Выбрать другой филиал</h3>
-                <form action="{% url 'app_home:select_branch' %}" method="post" class="branch-form">
-                    {% csrf_token %}
-                    <select name="branch_id" id="branch-select-contacts" onchange="this.form.submit()">
-                        {% for branch in branches %}
-                            <option value="{{ branch.id }}" {% if branch.id|stringformat:"s" == selected_branch_id %}selected{% endif %}>
-                                {{ branch.address }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                </form>
-            </div>
+
         </div>
     </div>
     </div>
