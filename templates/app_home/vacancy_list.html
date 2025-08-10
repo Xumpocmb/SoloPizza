@@ -27,44 +27,7 @@
                 {% endfor %}
             </div>
             {% endif %}
-            <section class="vacancies-section">
-                <div class="vacancies-container">
-                    <h1 class="vacancies-title">Вакансии Solo Pizza</h1>
-                    <div class="divider"></div>
-                    <p class="vacancies-subtitle">Присоединяйся к нашей команде! Мы ищем классных людей, которые любят пиццу, еду и хорошую атмосферу.</p>
-                    
-                    <div class="vacancies-grid">
-                        {% for vacancy in vacancies %}
-                            <div class="vacancy-card">
-                                {% if vacancy.image %}
-                                    <img src="{{ vacancy.image.url }}"
-                                         alt="{{ vacancy.title }}"
-                                         class="vacancy-image"
-                                         onerror="this.src='{% static 'img/No-Image-Placeholder.svg' %}'">
-                                {% else %}
-                                    <img src="{% static 'img/No-Image-Placeholder.svg' %}"
-                                         alt="{{ vacancy.title }}"
-                                         class="vacancy-image">
-                                {% endif %}
-                                <div class="vacancy-content">
-                                    <h3 class="vacancy-title">{{ vacancy.title }}</h3>
-                                    {% if vacancy.description %}<p class="vacancy-description">{{ vacancy.description|truncatewords:20 }}</p>{% endif %}
-                                    {% if vacancy.salary %}<div class="vacancy-salary">💰 {{ vacancy.salary }}</div>{% endif %}
-                                    {% if vacancy.benefits %}
-                                        <div class="vacancy-benefits">
-                                            {% for benefit in vacancy.benefits|split:"," %}<span class="benefit-tag">{{ benefit|strip }}</span>{% endfor %}
-                                        </div>
-                                    {% endif %}
-                                    <a href="{% url 'app_home:vacancy_detail' vacancy.id %}"
-                                       class="vacancy-details-btn">Подробнее</a>
-                                </div>
-                            </div>
-                        {% empty %}
-                            <div class="no-vacancies">Сейчас нет активных вакансий, но загляните позже!</div>
-                        {% endfor %}
-                    </div>
-                </div>
-            </section>
+            {% include "app_home/includes/vacancy.html" %}
         </div>
     </main>
 {% endblock %}

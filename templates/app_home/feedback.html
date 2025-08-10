@@ -30,14 +30,6 @@
                 <h1 class="page-title">{{ title }}</h1>
                 <div class="divider"></div>
 
-                {% if messages %}
-                    {% for message in messages %}
-                        <div class="alert alert-{{ message.tags }}">
-                            {{ message }}
-                        </div>
-                    {% endfor %}
-                {% endif %}
-
                 <div class="feedback-form-container">
                     <p class="feedback-intro">Оставьте ваш вопрос или предложение, и мы свяжемся с вами в ближайшее время.</p>
                     

@@ -4,7 +4,6 @@ from django.views.decorators.http import require_POST
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_protect
 from django.db.models import Q
-from django.views.decorators.cache import cache_page
 from django.conf import settings
 
 from app_cart.models import CartItem
@@ -24,6 +23,7 @@ def home_page(request):
 
 @require_POST
 def select_branch(request):
+    """Выбор филиала пользователем."""
     branch_id = request.POST.get("branch_id")
     try:
         if branch_id:
@@ -31,12 +31,14 @@ def select_branch(request):
             request.session["selected_branch_id"] = branch_id
             messages.success(request, "Филиал изменен!", extra_tags="success")
 
-            cart_items = CartItem.objects.filter(user=request.user).select_related('item__category')
-            unavailable_items = validate_cart_items_for_branch(cart_items, branch)
-
-            if unavailable_items:
-                messages.warning(
-                    request,
+            # Проверяем, авторизован ли пользователь, прежде чем получать его корзину
+            if request.user.is_authenticated:
+                cart_items = CartItem.objects.filter(user=request.user).select_related('item__category')
+                unavailable_items = validate_cart_items_for_branch(cart_items, branch)
+                
+                if unavailable_items:
+                    messages.warning(
+                        request,
                     f"Некоторые товары в корзине недоступны в филиале '{branch.name}'. "
                     "Пожалуйста, удалите их перед оформлением заказа."
                 )
@@ -50,14 +52,12 @@ def select_branch(request):
     return redirect(request.META.get("HTTP_REFERER"))
 
 
-@cache_page(60 * 60 * 6)  # Кеширование на 6 часов
 def discounts_view(request):
     pizza_weekly = Product.objects.filter(category__slug="picca", is_active=True, is_weekly_special=True).first()
     context = {"pizza_weekly": pizza_weekly}
     return render(request, "app_home/discounts.html", context=context)
 
 
-@cache_page(60 * 60 * 12)  # Кеширование на 12 часов
 def vacancy_list(request):
     """Отображает список всех активных вакансий"""
     vacancies = Vacancy.objects.filter(is_active=True)
@@ -76,7 +76,6 @@ def vacancy_list(request):
     return render(request, "app_home/vacancy_list.html", context=context)
 
 
-@cache_page(60 * 60 * 12)  # Кеширование на 12 часов
 def vacancy_detail(request, vacancy_id):
     """Отображает детальную информацию о конкретной вакансии"""
     vacancy = get_object_or_404(Vacancy, id=vacancy_id, is_active=True)
@@ -170,3 +169,19 @@ def feedback_view(request):
     }
     
     return render(request, "app_home/feedback.html", context=context)
+
+
+def info_view(request):
+    """Отображает страницу с информацией о компании"""
+    
+    breadcrumbs = [
+        {'title': 'Главная', 'url': '/'},
+        {'title': 'Информация', 'url': reverse('app_home:info')}
+    ]
+    
+    context = {
+        "breadcrumbs": breadcrumbs,
+        "title": "Информация о компании"
+    }
+    
+    return render(request, "app_home/info.html", context=context)

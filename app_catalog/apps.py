@@ -6,5 +6,4 @@ class AppCatalogConfig(AppConfig):
     name = 'app_catalog'
     verbose_name = 'Каталог'
     
-    def ready(self):
-        import app_catalog.signals  # Импортируем сигналы при запуске приложения
+

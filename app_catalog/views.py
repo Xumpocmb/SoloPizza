@@ -1,8 +1,6 @@
 from django.db.models import Min
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
-from django.views.decorators.cache import cache_page
-from django.core.cache import cache
 
 from app_catalog.models import (Category, Product, AddonParams, BoardParams, 
                                ProductVariant, PizzaSauce, PizzaAddon, PizzaBoard, 
@@ -15,7 +13,6 @@ def category_detail(request, slug):
         Product.objects.filter(category=category)
         .annotate(min_price=Min('variants__price'))
     )
-    cache.set(f'items_{slug}', items, 3600)
 
     breadcrumbs = [
         {'title': 'Главная', 'url': '/'},
@@ -113,7 +110,6 @@ def item_detail(request, slug):
     return render(request, "app_catalog/item_detail.html", context)
 
 
-@cache_page(60 * 60 * 1)
 def catalog_view(request):
 
     context = {}

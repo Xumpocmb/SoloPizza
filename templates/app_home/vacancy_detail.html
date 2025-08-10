@@ -32,8 +32,7 @@
                     {% if vacancy.image %}
                         <img src="{{ vacancy.image.url }}" 
                              alt="{{ vacancy.title }}" 
-                             class="vacancy-header-image"
-                             onerror="this.src='{% static 'img/No-Image-Placeholder.svg' %}'">
+                             class="vacancy-header-image">
                     {% else %}
                         <img src="{% static 'img/No-Image-Placeholder.svg' %}" 
                              alt="{{ vacancy.title }}" 
