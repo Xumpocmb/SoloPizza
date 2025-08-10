@@ -84,7 +84,7 @@ def item_detail(request, slug):
                 boards = BoardParams.objects.filter(size=selected_variant.size)
             else:
                 boards = []
-            drinks = ["Кола 1л.", "Sprite 1л."]
+            drinks = ["Кола 1л.", "Sprite 1л.", "Фанта 1л."]
             sauces = []
             addons = []
 
