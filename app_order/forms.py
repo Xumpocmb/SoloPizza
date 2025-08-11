@@ -1,6 +1,7 @@
 from django import forms
 from django.forms import inlineformset_factory
 from django.contrib import messages
+from django.utils import timezone
 from app_catalog.models import AddonParams, PizzaSauce, ProductVariant, BoardParams
 from app_order.models import Order, OrderItem
 
@@ -62,10 +63,16 @@ class CheckoutForm(forms.ModelForm):
     def save(self, commit=True, user=None):
         order = super().save(commit=False)
         if user:
-
             order.user = user
             order.payment_status = True if user.is_staff else False
             order.status = "new"
+        
+        # Автозаполнение поля delivery_by на основе ready_by
+        ready_by = order.ready_by
+        delivery_by = order.delivery_by
+        if ready_by and not delivery_by:
+            order.ready_by = ready_by
+            order.delivery_by = ready_by + timezone.timedelta(minutes=30)
 
         if commit:
             order.save()
@@ -98,14 +105,24 @@ class OrderEditForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["payment_status"].label = "Заказ оплачен"
-
+        
         # Устанавливаем начальное значение для адреса при самовывозе
-        if self.instance.delivery_type == "pickup" and not self.instance.address:
+        if self.instance and self.instance.delivery_type == "pickup" and not self.instance.address:
             self.instance.address = "Самовывоз"
-
-        self.fields["address"].required = False
-        if self.initial.get("delivery_type") == "delivery":
-            self.fields["address"].required = True
+        
+    def save(self, commit=True):
+        order = super().save(commit=False)
+        
+        # Автозаполнение поля delivery_by на основе ready_by
+        ready_by = order.ready_by
+        delivery_by = order.delivery_by
+        if ready_by and not delivery_by:
+            order.ready_by = ready_by
+            order.delivery_by = ready_by + timezone.timedelta(minutes=30)
+            
+        if commit:
+            order.save()
+        return order
 
     def clean(self):
         cleaned_data = super().clean()
