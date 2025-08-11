@@ -10,7 +10,6 @@
     <link rel="stylesheet" href="{% static 'css/checkout.css' %}"/>
 {% endblock %}
 
-
 {% block main %}
     <main class="checkout-page">
         <div class="checkout-container">
@@ -90,6 +89,21 @@
                     </div>
 
                     <div class="form-section">
+                        <h2 class="section-title">Время заказа</h2>
+                        <div class="form-group">
+                            <label for="{{ form.ready_by.id_for_label }}">{{ form.ready_by.label }}</label>
+                            {{ form.ready_by }}
+                            {{ form.ready_by.errors }}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="{{ form.delivery_by.id_for_label }}">{{ form.delivery_by.label }}</label>
+                            {{ form.delivery_by }}
+                            {{ form.delivery_by.errors }}
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
                         <h2 class="section-title">Комментарий к заказу</h2>
                         <div class="form-group">{{ form.comment }}
                             {{ form.comment.errors }}</div>
@@ -159,6 +173,7 @@
         </div>
     </main>
 {% endblock %}
+
 
 {% block scripts %}
     <script>

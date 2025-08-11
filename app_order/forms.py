@@ -30,10 +30,17 @@ class CheckoutForm(forms.ModelForm):
 
     comment = forms.CharField(label="Комментарий к заказу", required=False, widget=forms.Textarea(
         attrs={"class": "form-textarea", "placeholder": "Ваши пожелания...", "rows": 3}))
+        
+    ready_by = forms.DateTimeField(label="Готов к", required=False, 
+                                 widget=forms.DateTimeInput(attrs={"class": "form-input", "type": "datetime-local", "format": "%Y-%m-%dT%H:%M"}))
+    
+    delivery_by = forms.DateTimeField(label="Доставка к", required=False, 
+                                    widget=forms.DateTimeInput(attrs={"class": "form-input", "type": "datetime-local", "format": "%Y-%m-%dT%H:%M"}))
 
     class Meta:
         model = Order
-        fields = ["customer_name", "phone_number", "address", "delivery_type", "payment_method", "comment"]
+        fields = ["customer_name", "phone_number", "address", "delivery_type", "payment_method", 
+                 "ready_by", "delivery_by", "comment"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -69,13 +76,15 @@ class OrderEditForm(forms.ModelForm):
     class Meta:
         model = Order
         fields = ["delivery_type", "payment_method", "payment_status", "customer_name", "phone_number", "address",
-                  "comment"]
+                  "ready_by", "delivery_by", "comment"]
         widgets = {
             "delivery_type": forms.RadioSelect(attrs={"class": "custom-radio-list"}),  # Просто указываете класс списка
             "payment_method": forms.RadioSelect(attrs={"class": "custom-radio-list"}),
             "payment_status": forms.CheckboxInput(attrs={"class": "custom-checkbox-list"}),
             "customer_name": forms.TextInput(attrs={"class": "form-input"}),
             "phone_number": forms.TextInput(attrs={"class": "form-input"}),
+            "ready_by": forms.DateTimeInput(attrs={"class": "form-input", "type": "datetime-local", "format": "%Y-%m-%dT%H:%M"}),
+            "delivery_by": forms.DateTimeInput(attrs={"class": "form-input", "type": "datetime-local", "format": "%Y-%m-%dT%H:%M"}),
             "comment": forms.Textarea(attrs={"class": "form-textarea", "rows": 3, "placeholder": "Ваши пожелания..."}),
             "address": forms.TextInput(
                 attrs={"class": "form-input", "placeholder": "ул. Ленина, д. 1, кв. 1", "id": "id_address"}),

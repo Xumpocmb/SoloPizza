@@ -103,6 +103,9 @@ class Order(models.Model):
     delivery_type = models.CharField(max_length=20, choices=DELIVERY_CHOICES, verbose_name="Способ получения")
     payment_method = models.CharField(max_length=20, choices=PAYMENT_CHOICES, verbose_name="Способ оплаты")
     payment_status = models.BooleanField(default=True, verbose_name="Оплачено")
+    
+    ready_by = models.DateTimeField(verbose_name="Готов к", null=True, blank=True)
+    delivery_by = models.DateTimeField(verbose_name="Доставка к", null=True, blank=True)
 
     comment = models.TextField(blank=True, verbose_name="Комментарий к заказу")
 

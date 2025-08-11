@@ -10,6 +10,11 @@
     <link rel="stylesheet" href="{% static 'css/order_detail.css' %}"/>
 {% endblock %}
 
+{% block scripts %}
+    {{ block.super }}
+    <script src="{% static 'js/datetime_format.js' %}"></script>
+{% endblock %}
+
 {% block main %}
     <main class="order-detail-page">
         {% if breadcrumbs %}
@@ -262,6 +267,16 @@
                                 </div>
 
                                 <div class="form-group">
+                                    <label>Готов к:</label>
+                                    {{ form.ready_by }}
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>Доставка к:</label>
+                                    {{ form.delivery_by }}
+                                </div>
+                                
+                                <div class="form-group">
                                     <label>Комментарий:</label>
                                     {{ form.comment }}
                                 </div>
@@ -301,6 +316,20 @@
                                     {% endif %}
                                 </span>
                             </div>
+                            
+                            {% if order.ready_by %}
+                            <div class="summary-row">
+                                <span class="summary-label">Готов к:</span>
+                                <span class="summary-value">{{ order.ready_by|date:'d.m.Y H:i' }}</span>
+                            </div>
+                            {% endif %}
+                            
+                            {% if order.delivery_by %}
+                            <div class="summary-row">
+                                <span class="summary-label">Доставка к:</span>
+                                <span class="summary-value">{{ order.delivery_by|date:'d.m.Y H:i' }}</span>
+                            </div>
+                            {% endif %}
 
                             <div class="summary-row">
                                 <span class="summary-label">Имя заказчика:</span>
