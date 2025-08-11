@@ -4,7 +4,7 @@ from django.conf import settings
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from app_catalog.models import AddonParams, ProductVariant, BoardParams, PizzaSauce
-from app_home.models import CafeBranch
+from app_home.models import CafeBranch, Discount
 
 
 class OrderManager(models.Manager):
@@ -159,6 +159,7 @@ class OrderItem(models.Model):
     product = models.ForeignKey("app_catalog.Product", on_delete=models.PROTECT, verbose_name="Товар")
     variant = models.ForeignKey(ProductVariant, on_delete=models.PROTECT, verbose_name="Вариант")
     quantity = models.PositiveIntegerField(verbose_name="Количество")
+    discount = models.ForeignKey(Discount, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Скидка")
     board1 = models.ForeignKey(
         BoardParams,
         on_delete=models.SET_NULL,

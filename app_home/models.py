@@ -2,6 +2,19 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
 
 
+class Discount(models.Model):
+    name = models.CharField(max_length=100, verbose_name="Название скидки")
+    percent = models.PositiveIntegerField(verbose_name="Процент скидки")
+    
+    class Meta:
+        verbose_name = "Скидка"
+        verbose_name_plural = "Скидки"
+        
+    def __str__(self):
+        return f"{self.name} ({self.percent}%)"
+
+
+
 class Feedback(models.Model):
     name = models.CharField("Имя", max_length=100)
     phone_regex = RegexValidator(

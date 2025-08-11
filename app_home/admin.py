@@ -1,5 +1,11 @@
 from django.contrib import admin
-from app_home.models import CafeBranch, CafeBranchPhone, Vacancy, VacancyApplication, Feedback
+from app_home.models import CafeBranch, CafeBranchPhone, Vacancy, VacancyApplication, Feedback, Discount
+
+
+@admin.register(Discount)
+class DiscountAdmin(admin.ModelAdmin):
+    list_display = ['name', 'percent']
+    search_fields = ['name']
 
 
 class CafeBranchPhoneAdmin(admin.TabularInline):
