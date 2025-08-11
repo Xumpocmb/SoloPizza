@@ -87,6 +87,23 @@
                             {{ form.payment_method.errors }}
                         </div>
                     </div>
+                    
+                    {% if user.is_superuser or user.is_staff %}
+                    <div class="form-section">
+                        <h2 class="section-title">Скидки</h2>
+                        <div class="form-group partner-discount-group">
+                            <div class="partner-checkbox-container">
+                                {{ form.is_partner }}
+                                <label for="{{ form.is_partner.id_for_label }}">{{ form.is_partner.label }}</label>
+                            </div>
+                            <div class="partner-discount-input" style="display: none;">
+                                <label for="{{ form.partner_discount_percent.id_for_label }}">{{ form.partner_discount_percent.label }}</label>
+                                {{ form.partner_discount_percent }}
+                                {{ form.partner_discount_percent.errors }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
 
                     <div class="form-section">
                         <h2 class="section-title">Время заказа</h2>
@@ -192,6 +209,18 @@
             })
 
             toggleAddressField()
+            
+            // Показываем/скрываем поле процента скидки партнера
+            const partnerCheckbox = document.querySelector('input[name="is_partner"]')
+            const partnerDiscountInput = document.querySelector('.partner-discount-input')
+            
+            function togglePartnerDiscountField() {
+                partnerDiscountInput.style.display = partnerCheckbox.checked ? 'block' : 'none'
+            }
+            
+            partnerCheckbox.addEventListener('change', togglePartnerDiscountField)
+            
+            togglePartnerDiscountField()
         })
     </script>
 {% endblock %}

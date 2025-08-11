@@ -86,6 +86,8 @@ class Order(models.Model):
     ]
 
     EDITABLE_STATUSES = ["new", "confirmed"]
+    
+    PARTNER_DISCOUNT_PERCENT = 15  # Процент скидки для партнеров
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -98,6 +100,8 @@ class Order(models.Model):
     customer_name = models.CharField(max_length=255, verbose_name="Имя заказчика")
     phone_number = models.CharField(max_length=20, verbose_name="Номер телефона")
     address = models.TextField(verbose_name="Адрес доставки", null=True, blank=True)
+    is_partner = models.BooleanField(default=False, verbose_name="Партнер")
+    partner_discount_percent = models.PositiveIntegerField(default=10, verbose_name="Процент скидки партнера")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="new", verbose_name="Статус")
 
     delivery_type = models.CharField(max_length=20, choices=DELIVERY_CHOICES, verbose_name="Способ получения")
@@ -229,18 +233,63 @@ class OrderItem(models.Model):
         # Изначально скидка 0
         discount_amount = Decimal("0")
         discount_percent = Decimal("0")
+        is_pickup_discount = False
+        is_weekly_pizza_discount = False
+        is_partner_discount = False
 
         # Проверяем условия для скидки
         if self.product.category.name == "Пицца":
-            # Скидка на самовывоз (10%)
-            if self.order.delivery_type == "pickup":
-                discount_percent = Decimal("10.0")
-                discount_amount = (base_price * (discount_percent / Decimal("100"))) * quantity
+            # Если активирована скидка партнера, применяем только её
+            if self.order.is_partner:
+                try:
+                    # Получаем скидку "Партнер" из базы данных по slug
+                    partner_discount = Discount.objects.get(slug="partner")
+                    discount_percent = Decimal(str(partner_discount.percent))
+                    discount_amount = (base_price * (discount_percent / Decimal("100"))) * quantity
+                    is_partner_discount = True
+                except Discount.DoesNotExist:
+                    # Если скидка не найдена, используем значение из заказа
+                    discount_percent = Decimal(str(self.order.partner_discount_percent))
+                    discount_amount = (base_price * (discount_percent / Decimal("100"))) * quantity
+                    is_partner_discount = True
+            # Иначе применяем обычные скидки
+            else:
+                # Скидка на самовывоз
+                if self.order.delivery_type == "pickup":
+                    # Получаем скидку "Самовывоз" из базы данных
+                    try:
+                        pickup_discount = Discount.objects.get(slug="pickup")
+                        discount_percent = Decimal(str(pickup_discount.percent))
+                        discount_amount = (base_price * (discount_percent / Decimal("100"))) * quantity
+                        is_pickup_discount = True
+                    except Discount.DoesNotExist:
+                        try:
+                            pickup_discount = Discount.objects.get(name="Самовывоз")
+                            discount_percent = Decimal(str(pickup_discount.percent))
+                            discount_amount = (base_price * (discount_percent / Decimal("100"))) * quantity
+                            is_pickup_discount = True
+                        except Discount.DoesNotExist:
+                            pass
 
-            # Дополнительная скидка на пиццу недели (20% если размер 32см)
-            if self.product.is_weekly_special and self.variant.size and self.variant.size.name == "32":
-                discount_percent = Decimal("20.0")
-                discount_amount = (base_price * (discount_percent / Decimal("100"))) * quantity
+                    # Дополнительная скидка на пиццу недели (только при самовывозе)
+                    if self.product.is_weekly_special:
+                        try:
+                            weekly_pizza_discount = Discount.objects.get(slug="weekly-pizza")
+                            weekly_discount_percent = Decimal(str(weekly_pizza_discount.percent))
+                            weekly_discount_amount = (base_price * (weekly_discount_percent / Decimal("100"))) * quantity
+                            discount_amount = weekly_discount_amount
+                            discount_percent = weekly_discount_percent
+                            is_weekly_pizza_discount = True
+                        except Discount.DoesNotExist:
+                            try:
+                                weekly_pizza_discount = Discount.objects.get(name="Пицца недели")
+                                weekly_discount_percent = Decimal(str(weekly_pizza_discount.percent))
+                                weekly_discount_amount = (base_price * (weekly_discount_percent / Decimal("100"))) * quantity
+                                discount_amount = weekly_discount_amount
+                                discount_percent = weekly_discount_percent
+                                is_weekly_pizza_discount = True
+                            except Discount.DoesNotExist:
+                                pass
 
         # Итоговые суммы
         original_total = (base_price + board1_price + board2_price + addons_price) * quantity
@@ -251,8 +300,9 @@ class OrderItem(models.Model):
             "final_total": final_total.quantize(Decimal(".01")),
             "discount_amount": discount_amount.quantize(Decimal(".01")),
             "discount_percent": discount_percent,
-            "is_weekly_pizza": self.product.is_weekly_special and self.product.category.name == "Пицца" and self.variant.size.name == "32",
-            "is_pickup_discount": self.order.delivery_type == "pickup" and self.product.category.name == "Пицца",
+            "is_weekly_pizza": is_weekly_pizza_discount,
+            "is_pickup_discount": is_pickup_discount,
+            "is_partner_discount": is_partner_discount,
         }
 
 

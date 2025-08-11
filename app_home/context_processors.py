@@ -1,5 +1,5 @@
 from app_cart.models import CartItem
-from app_home.models import CafeBranch
+from app_home.models import CafeBranch, Discount
 from app_catalog.models import Category
 from django.conf import settings
 
@@ -41,6 +41,8 @@ def site_context_processor(request):
             categories = Category.objects.filter(is_active=True, branch=selected_branch, is_for_admin=False).order_by("order")
     except Exception:
         categories = []
+
+
 
     return {
         "branches": branches,

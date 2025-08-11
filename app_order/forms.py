@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.utils import timezone
 from app_catalog.models import AddonParams, PizzaSauce, ProductVariant, BoardParams
 from app_order.models import Order, OrderItem
+from app_home.models import Discount
 
 
 class CheckoutForm(forms.ModelForm):
@@ -29,6 +30,20 @@ class CheckoutForm(forms.ModelForm):
     payment_method = forms.ChoiceField(label="Способ оплаты", choices=PAYMENT_CHOICES, widget=forms.RadioSelect(),
                                        initial="cash")
 
+    is_partner = forms.BooleanField(label="Партнёр", required=False, 
+                                  widget=forms.CheckboxInput(attrs={"class": "partner-checkbox"}))
+    
+    # Получаем процент скидки из модели Discount
+    try:
+        partner_discount = Discount.objects.filter(slug='partner').first()
+        partner_discount_initial = partner_discount.percent if partner_discount else 10
+    except:
+        partner_discount_initial = 10
+        
+    partner_discount_percent = forms.IntegerField(label="Процент скидки", required=False, initial=partner_discount_initial,
+                                               widget=forms.NumberInput(attrs={"class": "form-input partner-discount", 
+                                                                          "min": "1", "max": "100"}))
+
     comment = forms.CharField(label="Комментарий к заказу", required=False, widget=forms.Textarea(
         attrs={"class": "form-textarea", "placeholder": "Ваши пожелания...", "rows": 3}))
         
@@ -41,7 +56,7 @@ class CheckoutForm(forms.ModelForm):
     class Meta:
         model = Order
         fields = ["customer_name", "phone_number", "address", "delivery_type", "payment_method", 
-                 "ready_by", "delivery_by", "comment"]
+                 "is_partner", "partner_discount_percent", "ready_by", "delivery_by", "comment"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

@@ -4,7 +4,15 @@ from django.core.validators import MinValueValidator, MaxValueValidator, RegexVa
 
 class Discount(models.Model):
     name = models.CharField(max_length=100, verbose_name="Название скидки")
+    slug = models.SlugField(max_length=100, unique=True, verbose_name="Идентификатор скидки", blank=True, null=True)
     percent = models.PositiveIntegerField(verbose_name="Процент скидки")
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            # Преобразуем название в slug (транслитерация и замена пробелов на дефисы)
+            from django.utils.text import slugify
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
     
     class Meta:
         verbose_name = "Скидка"
