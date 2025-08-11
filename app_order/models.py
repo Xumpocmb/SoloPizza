@@ -271,8 +271,8 @@ class OrderItem(models.Model):
                         except Discount.DoesNotExist:
                             pass
 
-                    # Дополнительная скидка на пиццу недели (только при самовывозе)
-                    if self.product.is_weekly_special:
+                    # Дополнительная скидка на пиццу недели (только при самовывозе и только для размера "32")
+                    if self.product.is_weekly_special and self.variant.size and self.variant.size.name == "32":
                         try:
                             weekly_pizza_discount = Discount.objects.get(slug="weekly-pizza")
                             weekly_discount_percent = Decimal(str(weekly_pizza_discount.percent))
@@ -289,7 +289,12 @@ class OrderItem(models.Model):
                                 discount_percent = weekly_discount_percent
                                 is_weekly_pizza_discount = True
                             except Discount.DoesNotExist:
-                                pass
+                                # Если скидка не найдена, используем значение по умолчанию 20%
+                                weekly_discount_percent = Decimal("20")
+                                weekly_discount_amount = (base_price * (weekly_discount_percent / Decimal("100"))) * quantity
+                                discount_amount = weekly_discount_amount
+                                discount_percent = weekly_discount_percent
+                                is_weekly_pizza_discount = True
 
         # Итоговые суммы
         original_total = (base_price + board1_price + board2_price + addons_price) * quantity

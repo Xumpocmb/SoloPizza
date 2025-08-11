@@ -107,9 +107,20 @@ class CartItem(models.Model):
 
         original_total = (base_price + board1_price + board2_price + addons_price) * quantity
 
-        # TODO: выводить в шаблон пометку скидки (сейчас работает не правильно)
-        is_weekly_pizza = self.item.is_weekly_special and self.item_variant.size.name == "32"
-        discount_amount = (base_price * quantity * Decimal("0.2")) if is_weekly_pizza else Decimal("0")
+        # Применяем скидку "Пицца недели" только для пицц размера "32"
+        is_weekly_pizza = self.item.is_weekly_special and self.item_variant.size and self.item_variant.size.name == "32"
+        
+        discount_percent = Decimal("0")
+        if is_weekly_pizza:
+            # Получаем процент скидки из базы данных
+            from app_home.models import Discount
+            try:
+                discount = Discount.objects.get(slug='picca-nedeli')
+                discount_percent = Decimal(str(discount.percent)) / Decimal("100")
+            except Discount.DoesNotExist:
+                discount_percent = Decimal("0.2")  # 20% по умолчанию
+        
+        discount_amount = (base_price * quantity * discount_percent) if is_weekly_pizza else Decimal("0")
 
         final_total = original_total - discount_amount
 
