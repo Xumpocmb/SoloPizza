@@ -251,11 +251,16 @@ def update_order_status(request, order_id):
     return redirect(request.META.get("HTTP_REFERER", "app_order:order_list"))
 
 
+@login_required
 def print_check_non_fastfood(request, order_id):
     """
     Генерирует HTML для печати чека со ВСЕМИ товарами заказа.
     Включает полную информацию о заказе.
     """
+    # Проверка прав доступа - только для администраторов и персонала
+    if not (request.user.is_staff or request.user.is_superuser):
+        return redirect('app_order:order_list')
+        
     order = get_object_or_404(Order, id=order_id)
 
     # Получаем все позиции заказа
@@ -305,11 +310,16 @@ def print_check_non_fastfood(request, order_id):
     return render(request, "app_order/print_check.html", context)
 
 
+@login_required
 def print_check_fastfood_only(request, order_id):
     """
     Генерирует HTML для печати чека ТОЛЬКО с фастфудом.
     НЕ включает общую информацию о заказе.
     """
+    # Проверка прав доступа - только для администраторов и персонала
+    if not (request.user.is_staff or request.user.is_superuser):
+        return redirect('app_order:order_list')
+        
     order = get_object_or_404(Order, id=order_id)
 
     # Получаем только позиции фастфуда

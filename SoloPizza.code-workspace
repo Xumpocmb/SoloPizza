@@ -1,0 +1,20 @@
+{
+    "folders": [
+        {
+            "path": "."
+        }
+    ],
+    "settings": {
+        "files.associations": {
+            "**/*.html": "django-html",
+            "**/templates/**/*.html": "django-html",
+            "**/templates/*.html": "django-html",
+            "**/templates/*/*.html": "django-html",
+            "**/templates/*/*/*.html": "django-html",
+            "templates/app_catalog/item_detail.html": "django-html"
+        },
+        "emmet.includeLanguages": {
+            "django-html": "html"
+        }
+    }
+}

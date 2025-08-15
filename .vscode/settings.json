@@ -28,7 +28,8 @@
     // Django
     "emmet.includeLanguages": {
         "django-html": "html",
-        "html": "django-html",
+        "html": "html",
+        "jinja-html": "html"
     },
     "[django-html]": {
         // "editor.defaultFormatter": "junstyle.vscode-django-support",
@@ -43,10 +44,12 @@
         "editor.autoClosingQuotes": "always",
     },
     "files.associations": {
-        "**/*.html": "html",
+        "**/*.html": "django-html",
+        "**/templates/**/*.html": "django-html",
         "**/templates/*.html": "django-html",
         "**/templates/*/*.html": "django-html",
         "**/templates/*/*/*.html": "django-html",
+        "templates/app_catalog/item_detail.html": "django-html",
         "**/templates/*": "django-txt",
         "**/requirements{/**,*}.{txt,in}": "pip-requirements"
     },
@@ -54,9 +57,16 @@
         "cms",
         "wagtail"
     ],
+    "django.enable": true,
+    "django.i18n": true,
+    "django.validation.enabled": true,
     "[html]": {
         "editor.defaultFormatter": "vscode.html-language-features",
     },
+    "editor.detectIndentation": true,
+    "editor.formatOnSave": true,
+    "files.autoSave": "afterDelay",
+    "files.autoSaveDelay": 1000,
     "mcpServers": {
         "context7": {
             "command": "npx",

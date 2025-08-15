@@ -36,9 +36,6 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 36px;
-    height: 36px;
-    background-color: var(--accent-color);
     color: white;
     border-radius: 50%;
     text-decoration: none;

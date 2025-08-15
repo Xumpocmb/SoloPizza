@@ -37,16 +37,18 @@
             <div class="order-header">
                 <h1 class="page_title">
                     Заказ #{{ order.id }}
-                    <a href="{% url 'app_order:print_non_fastfood_check' order.id %}" 
-                       class="pdf-button" 
-                       title="Скачать чек">
-                        <i class="fas fa-file-pdf"></i>
-                    </a>
-                    <a href="{% url 'app_order:print_fastfood_check' order.id %}" 
-                       class="pdf-button" 
-                       title="Скачать чек фастфуд">
-                        <i class="fas fa-file-pdf"></i>
-                    </a>
+                    {% if request.user.is_staff or request.user.is_superuser %}
+                        <a href="{% url 'app_order:print_non_fastfood_check' order.id %}" 
+                           class="pdf-button" 
+                           title="Скачать чек">
+                            <i class="fas fa-file-pdf"></i>
+                        </a>
+                        <a href="{% url 'app_order:print_fastfood_check' order.id %}" 
+                           class="pdf-button" 
+                           title="Скачать чек фастфуд">
+                            <i class="fas fa-file-pdf"></i>
+                        </a>
+                    {% endif %}
                 </h1>
                 <div class="order-status {{ order.status }}">{{ order.get_status_display }}</div>
                 <p class="order-date">Дата: {{ order.created_at|date:'d.m.Y H:i' }}</p>

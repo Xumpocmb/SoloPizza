@@ -1,119 +1,12 @@
 <!-- app_order/templates/app_order/print_check.html -->
+{% load tag_split %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <title>{{ check_title }} - Заказ #{{ order.id }}</title>
-    <style>
-        @media print {
-            @page {
-                margin: 3mm; /* Очень маленькие поля для 80мм */
-                size: 80mm auto; /* Ширина 80мм, высота автоматическая */
-            }
-            body {
-                font-family: 'Courier New', Courier, monospace;
-                font-size: 18px; /* Увеличен в 2 раза с 9px */
-                margin: 0;
-                padding: 2mm;
-                width: 80mm; /* Ширина 80мм */
-                box-sizing: border-box;
-            }
-            .no-print {
-                display: none !important;
-            }
-        }
-
-        body {
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 18px; /* Увеличен в 2 раза с 9px */
-            margin: 0;
-            padding: 2mm;
-            width: 80mm; /* Для предварительного просмотра */
-            box-sizing: border-box;
-            border: 1px dashed #ccc; /* Визуальная граница при просмотре */
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 3mm;
-            font-weight: bold;
-        }
-
-        .order-details {
-            margin-bottom: 3mm;
-        }
-
-        .order-details div {
-            margin-bottom: 1mm;
-        }
-
-        .items-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 3mm;
-            font-size: 16px; /* Увеличен в 2 раза с 8px */
-            table-layout: fixed; /* Для контроля ширины колонок */
-        }
-
-        .items-table th,
-        .items-table td {
-            /* border: 1px solid #ddd; */ /* Убрать для экономии места */
-            border-bottom: 1px dotted #aaa;
-            padding: 1mm;
-            text-align: left;
-            vertical-align: top;
-            word-wrap: break-word; /* Перенос слов */
-        }
-
-        /* Полная ширина для описания */
-        .col-desc { width: 100%; }
-
-        .items-table th {
-            background-color: #f9f9f9;
-            font-weight: bold;
-        }
-
-        .item-description {
-            font-size: 16px; /* Увеличен в 2 раза с 8px */
-            white-space: pre-wrap;
-        }
-
-        .totals {
-            text-align: right;
-            font-weight: bold;
-            margin-top: 2mm;
-        }
-
-        .footer {
-            text-align: center;
-            margin-top: 5mm;
-            font-style: italic;
-            font-size: 16px; /* Увеличен в 2 раза с 8px */
-        }
-
-        .btn-print {
-            display: block;
-            width: 100%;
-            padding: 5px;
-            margin: 10px 0;
-            background-color: #007bff;
-            color: white;
-            text-align: center;
-            text-decoration: none;
-            border: none;
-            cursor: pointer;
-            font-size: 12px;
-        }
-        .btn-print:hover {
-            background-color: #0056b3;
-        }
-
-        .discount-info {
-            font-size: 14px; /* Увеличен в 2 раза с 7px */
-            text-align: right;
-            font-style: italic;
-        }
-    </style>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/print_check.css' %}">
 </head>
 <body>
 
@@ -147,25 +40,34 @@
     {% endif %}
 
     {% if items_data %}
-    <table class="items-table">
-        <thead>
-            <tr>
-                <th class="col-desc">Наименование</th>
-            </tr>
-        </thead>
-        <tbody>
+    <div class="items-container">
+        <div class="items-header">
+            <h3>Товары</h3>
+        </div>
+        <div class="items-list">
             {% for data in items_data %}
-            <tr>
-                <td class="col-desc item-description">{{ data.full_description|default:data.item.product.name }}</td>
-            </tr>
+            <div class="item-block">
+                <div class="product-name">{{ data.item.product.name }}</div>
+                {% if data.item.variant %}<p class="item-param">Размер: {{ data.item.variant.size.name }}</p>{% endif %}
+                {% if data.item.quantity > 1 %}<p class="item-param">Количество: {{ data.item.quantity }}</p>{% endif %}
+                {% if data.item.board1 %}<p class="item-param">Борт 1: {{ data.item.board1.board.name }}</p>{% endif %}
+                {% if data.item.board2 %}<p class="item-param">Борт 2: {{ data.item.board2.board.name }}</p>{% endif %}
+                {% if data.item.sauce %}<p class="item-param">Соус: {{ data.item.sauce.name }}</p>{% endif %}
+                {% if data.item.addons.exists %}
+                <p class="item-param">Добавки:
+                {% for addon in data.item.addons.all %}
+                    {{ addon.addon.name }}{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+                </p>
+                {% endif %}
+                <p class="item-param">Стоимость: {{ data.final_line_total|floatformat:2 }} руб.</p>
+            </div>
             {% if data.calculation.discount_amount > 0 %}
-            <tr>
-                <td class="discount-info">Скидка ({{ data.calculation.discount_percent|floatformat:0 }}%): -{{ data.calculation.discount_amount|floatformat:2 }}</td>
-            </tr>
+            <div class="discount-info">Скидка ({{ data.calculation.discount_percent|floatformat:0 }}%): -{{ data.calculation.discount_amount|floatformat:2 }}</div>
             {% endif %}
             {% endfor %}
-        </tbody>
-    </table>
+        </div>
+    </div>
 
     <div class="totals">
         <div><strong>Подытог (часть):</strong> {{ subtotal_part|floatformat:2 }} руб.</div>

@@ -1,0 +1,120 @@
+/* Стили для страницы чека */
+@media print {
+    @page {
+        margin: 3mm; /* Очень маленькие поля для 80мм */
+        size: 80mm auto; /* Ширина 80мм, высота автоматическая */
+    }
+    body {
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 18px; /* Увеличен в 2 раза с 9px */
+        margin: 0;
+        padding: 2mm;
+        width: 80mm; /* Ширина 80мм */
+        box-sizing: border-box;
+    }
+    .no-print {
+        display: none !important;
+    }
+}
+
+body {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 18px; /* Увеличен в 2 раза с 9px */
+    margin: 0;
+    padding: 2mm;
+    width: 80mm; /* Для предварительного просмотра */
+    box-sizing: border-box;
+    border: 1px dashed #ccc; /* Визуальная граница при просмотре */
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 3mm;
+    font-weight: bold;
+}
+
+.order-details {
+    margin-bottom: 3mm;
+}
+
+.order-details div {
+    margin-bottom: 1mm;
+}
+
+.items-container {
+    width: 100%;
+    margin-bottom: 3mm;
+    font-size: 16px;
+}
+
+.items-header {
+    background-color: #f9f9f9;
+    padding: 1mm;
+    margin-bottom: 2mm;
+    border-bottom: 1px dotted #aaa;
+}
+
+.items-header h3 {
+    margin: 0;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.items-list {
+    width: 100%;
+}
+
+.item-block {
+    padding: 1mm;
+    margin-bottom: 2mm;
+    border-bottom: 1px dotted #aaa;
+}
+
+.item-param {
+    margin: 0.5mm 0;
+    font-size: 16px;
+    white-space: nowrap;
+    word-wrap: break-word;
+}
+
+.product-name {
+    font-size: 20px; /* Увеличен с 16px на 4 пункта */
+    font-weight: bold; /* Жирный шрифт */
+}
+
+.totals {
+    text-align: right;
+    font-weight: bold;
+    margin-top: 2mm;
+}
+
+.footer {
+    text-align: center;
+    margin-top: 5mm;
+    font-style: italic;
+    font-size: 16px; /* Увеличен в 2 раза с 8px */
+}
+
+.btn-print {
+    display: block;
+    width: 100%;
+    padding: 5px;
+    margin: 10px 0;
+    background-color: #007bff;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.btn-print:hover {
+    background-color: #0056b3;
+}
+
+.discount-info {
+    font-size: 14px; /* Увеличен в 2 раза с 7px */
+    text-align: right;
+    font-style: italic;
+}
