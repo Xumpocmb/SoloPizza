@@ -197,26 +197,31 @@ class OrderItem(models.Model):
             return f"{self.variant.value} {self.variant.get_unit_display()}"
         return ""
 
-    def get_full_description(self):
-        desc = [self.product.name]
+    def get_full_description(self, include_price_info=False, base_unit_price=None, final_line_total=None):
+        result = self.product.name
 
         size = self.get_size_display()
         if size:
-            desc.append(size)
+            result += f"\n{size}"
 
         if self.board1:
-            desc.append(f"Борт 1: {self.board1.board.name}")
+            result += f"\nБорт 1: {self.board1.board.name}"
         if self.board2:
-            desc.append(f"Борт 2: {self.board2.board.name}")
+            result += f"\nБорт 2: {self.board2.board.name}"
 
         if self.sauce:
-            desc.append(f"Соус: {self.sauce.name}")
+            result += f"\nСоус: {self.sauce.name}"
 
         if self.addons.exists():
             addons = ", ".join(a.addon.name for a in self.addons.all())
-            desc.append(f"Добавки: {addons}")
+            result += f"\nДобавки: {addons}"
+            
+        if include_price_info and base_unit_price is not None and final_line_total is not None:
+            result += f"\nКол-во: {self.quantity}"
+            result += f"\nЦена: {base_unit_price:.2f}"
+            result += f"\nСумма: {final_line_total:.2f}"
 
-        return " | ".join(desc)
+        return result
 
     def calculate_item_total(self):
         base_price = self.variant.price

@@ -26,6 +26,30 @@
     margin-bottom: 10px;
 }
 
+.page_title {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.pdf-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background-color: var(--accent-color);
+    color: white;
+    border-radius: 50%;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.pdf-button:hover {
+    background-color: var(--accent-hover);
+    transform: scale(1.05);
+}
+
 .order-items-form {
     background: var(--card-bg);
     border-radius: var(--border-radius);

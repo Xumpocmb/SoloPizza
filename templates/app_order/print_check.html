@@ -12,7 +12,7 @@
             }
             body {
                 font-family: 'Courier New', Courier, monospace;
-                font-size: 9px; /* Подобрать под ваш принтер */
+                font-size: 18px; /* Увеличен в 2 раза с 9px */
                 margin: 0;
                 padding: 2mm;
                 width: 80mm; /* Ширина 80мм */
@@ -25,7 +25,7 @@
 
         body {
             font-family: 'Courier New', Courier, monospace;
-            font-size: 9px;
+            font-size: 18px; /* Увеличен в 2 раза с 9px */
             margin: 0;
             padding: 2mm;
             width: 80mm; /* Для предварительного просмотра */
@@ -51,7 +51,7 @@
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 3mm;
-            font-size: 8px; /* Может быть чуть меньше */
+            font-size: 16px; /* Увеличен в 2 раза с 8px */
             table-layout: fixed; /* Для контроля ширины колонок */
         }
 
@@ -65,11 +65,8 @@
             word-wrap: break-word; /* Перенос слов */
         }
 
-        /* Ширины колонок */
-        .col-desc { width: 45%; }
-        .col-qty { width: 15%; text-align: center; }
-        .col-price { width: 20%; text-align: right; }
-        .col-total { width: 20%; text-align: right; }
+        /* Полная ширина для описания */
+        .col-desc { width: 100%; }
 
         .items-table th {
             background-color: #f9f9f9;
@@ -77,7 +74,8 @@
         }
 
         .item-description {
-            font-size: 8px;
+            font-size: 16px; /* Увеличен в 2 раза с 8px */
+            white-space: pre-wrap;
         }
 
         .totals {
@@ -90,7 +88,7 @@
             text-align: center;
             margin-top: 5mm;
             font-style: italic;
-            font-size: 8px;
+            font-size: 16px; /* Увеличен в 2 раза с 8px */
         }
 
         .btn-print {
@@ -111,7 +109,7 @@
         }
 
         .discount-info {
-            font-size: 7px;
+            font-size: 14px; /* Увеличен в 2 раза с 7px */
             text-align: right;
             font-style: italic;
         }
@@ -153,23 +151,16 @@
         <thead>
             <tr>
                 <th class="col-desc">Наименование</th>
-                <th class="col-qty">Кол-во</th>
-                <th class="col-price">Цена</th>
-                <th class="col-total">Сумма</th>
             </tr>
         </thead>
         <tbody>
             {% for data in items_data %}
             <tr>
-                <td class="col-desc item-description">{{ data.item.get_full_description }}</td>
-                <td class="col-qty">{{ data.item.quantity }}</td>
-                <td class="col-price">{{ data.base_unit_price|floatformat:2 }}</td>
-                <td class="col-total">{{ data.final_line_total|floatformat:2 }}</td>
+                <td class="col-desc item-description">{{ data.full_description|default:data.item.product.name }}</td>
             </tr>
             {% if data.calculation.discount_amount > 0 %}
             <tr>
-                <td colspan="3" class="discount-info">Скидка ({{ data.calculation.discount_percent|floatformat:0 }}%):</td>
-                <td class="col-total">-{{ data.calculation.discount_amount|floatformat:2 }}</td>
+                <td class="discount-info">Скидка ({{ data.calculation.discount_percent|floatformat:0 }}%): -{{ data.calculation.discount_amount|floatformat:2 }}</td>
             </tr>
             {% endif %}
             {% endfor %}
@@ -180,6 +171,9 @@
         <div><strong>Подытог (часть):</strong> {{ subtotal_part|floatformat:2 }} руб.</div>
         {% if discount_amount_part > 0 %}
         <div><strong>Скидка (часть):</strong> -{{ discount_amount_part|floatformat:2 }} руб.</div>
+        {% endif %}
+        {% if show_order_details and order.delivery_type == 'delivery' and order.delivery_cost > 0 %}
+        <div><strong>Стоимость доставки:</strong> {{ order.delivery_cost|floatformat:2 }} руб.</div>
         {% endif %}
         <div><strong>ИТОГО (часть):</strong> {{ part_total|floatformat:2 }} руб.</div>
     </div>
