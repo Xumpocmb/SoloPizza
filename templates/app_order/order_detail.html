@@ -355,10 +355,34 @@
                                 <span class="summary-value">{{ order.subtotal|floatformat:2 }} руб.</span>
                             </div>
 
-                            {% if totals.discount_amount > 0 %}
+                            {% if order.discount_amount > 0 %}
                                 <div class="summary-row discount-row">
                                     <span class="summary-label">Скидка:</span>
                                     <span class="summary-value">-{{ order.discount_amount|floatformat:2 }} руб.</span>
+                                </div>
+                                
+                                {% if order.is_partner %}
+                                <div class="summary-row discount-details">
+                                    <span class="summary-label">Тип скидки:</span>
+                                    <span class="summary-value">Партнерская ({{ order.partner_discount_percent }}%)</span>
+                                </div>
+                                {% elif order.has_pickup_discount %}
+                                <div class="summary-row discount-details">
+                                    <span class="summary-label">Тип скидки:</span>
+                                    <span class="summary-value">Самовывоз (10%)</span>
+                                </div>
+                                {% endif %}
+                            {% endif %}
+                            
+                            {% if order.delivery_cost > 0 %}
+                                <div class="summary-row">
+                                    <span class="summary-label">Стоимость доставки:</span>
+                                    <span class="summary-value">{{ order.delivery_cost|floatformat:2 }} руб.</span>
+                                </div>
+                            {% elif order.delivery_type == 'delivery' %}
+                                <div class="summary-row">
+                                    <span class="summary-label">Стоимость доставки:</span>
+                                    <span class="summary-value">Бесплатно</span>
                                 </div>
                             {% endif %}
 

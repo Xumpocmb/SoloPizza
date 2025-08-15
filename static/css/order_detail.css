@@ -263,6 +263,17 @@
     color: var(--text-color);
 }
 
+.discount-row {
+    color: var(--accent-color);
+}
+
+.discount-details {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-top: -5px;
+    margin-bottom: 5px;
+}
+
 .total-row {
     font-weight: 700;
     border-top: 1px solid var(--divider-color);

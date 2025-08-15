@@ -241,17 +241,11 @@ class OrderItem(models.Model):
         if self.product.category.name == "Пицца":
             # Если активирована скидка партнера, применяем только её
             if self.order.is_partner:
-                try:
-                    # Получаем скидку "Партнер" из базы данных по slug
-                    partner_discount = Discount.objects.get(slug="partner")
-                    discount_percent = Decimal(str(partner_discount.percent))
-                    discount_amount = (base_price * (discount_percent / Decimal("100"))) * quantity
-                    is_partner_discount = True
-                except Discount.DoesNotExist:
-                    # Если скидка не найдена, используем значение из заказа
-                    discount_percent = Decimal(str(self.order.partner_discount_percent))
-                    discount_amount = (base_price * (discount_percent / Decimal("100"))) * quantity
-                    is_partner_discount = True
+                # Используем значение процента скидки из заказа
+                discount_percent = Decimal(str(self.order.partner_discount_percent))
+                # Скидка применяется только к базовой цене товара
+                discount_amount = (base_price * (discount_percent / Decimal("100"))) * quantity
+                is_partner_discount = True
             # Иначе применяем обычные скидки
             else:
                 # Скидка на самовывоз
@@ -298,7 +292,10 @@ class OrderItem(models.Model):
 
         # Итоговые суммы
         original_total = (base_price + board1_price + board2_price + addons_price) * quantity
-        final_total = (base_price * quantity - discount_amount) + additions_total
+        # Скидка применяется только к базовой цене товара, не к бортам и добавкам
+        # При партнерской скидке используется значение из заказа (partner_discount_percent)
+        discounted_base_price = base_price * (1 - discount_percent / Decimal("100"))
+        final_total = (discounted_base_price * quantity) + additions_total
 
         return {
             "original_total": original_total.quantize(Decimal(".01")),

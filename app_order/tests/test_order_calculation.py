@@ -107,7 +107,8 @@ class OrderCalculationTest(TestCase):
             phone_number="+79001234567",
             delivery_type=delivery_type,
             payment_method="cash",
-            is_partner=is_partner
+            is_partner=is_partner,
+            partner_discount_percent=self.partner_discount.percent if is_partner else 10
         )
         
         # Добавляем товары в заказ
@@ -225,19 +226,33 @@ class OrderCalculationTest(TestCase):
         pizza_items = order.items.filter(product__category=self.pizza_category)
         for item in pizza_items:
             calculation = item.calculate_item_total()
-            self.assertTrue(calculation["is_partner_discount"])
+            self.assertTrue(calculation["is_partner_discount"], "Партнерская скидка не применена")
             # Проверяем, что процент скидки соответствует партнерской скидке
-            self.assertEqual(calculation["discount_percent"], Decimal(str(self.partner_discount.percent)))
+            self.assertEqual(calculation["discount_percent"], Decimal(str(self.partner_discount.percent)), 
+                             f"Процент скидки {calculation['discount_percent']} не соответствует ожидаемому {self.partner_discount.percent}")
         
         # Проверяем итоговые суммы
         # Сумма без скидок: 20 (пицца недели) + 14*2 (обычная пицца) + 10 (фастфуд) + 5 (напиток) = 63
         self.assertEqual(order.subtotal, Decimal("63.00"))
         
         # Проверяем, что скидка применена
-        self.assertGreater(order.discount_amount, Decimal("0.00"))
+        self.assertGreater(order.discount_amount, Decimal("0.00"), "Сумма скидки должна быть больше 0")
+        
+        # Рассчитываем ожидаемую сумму скидки: 15% от стоимости пицц (20 + 14*2 = 48)
+        expected_discount = Decimal("48.00") * Decimal(str(self.partner_discount.percent)) / Decimal("100")
+        expected_discount = expected_discount.quantize(Decimal(".01"))
+        
+        # Проверяем, что сумма скидки соответствует ожидаемой
+        self.assertEqual(order.discount_amount, expected_discount, 
+                         f"Сумма скидки {order.discount_amount} не соответствует ожидаемой {expected_discount}")
         
         # Стоимость доставки при самовывозе = 0
         self.assertEqual(order.delivery_cost, Decimal("0.00"))
         
         # Проверяем, что итоговая сумма меньше суммы без скидок
         self.assertLess(order.total_price, order.subtotal)
+        
+        # Проверяем, что итоговая сумма равна сумме без скидок минус сумма скидки
+        expected_total = order.subtotal - order.discount_amount
+        self.assertEqual(order.total_price, expected_total, 
+                         f"Итоговая сумма {order.total_price} не соответствует ожидаемой {expected_total}")
