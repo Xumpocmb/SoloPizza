@@ -98,7 +98,7 @@ class OrderEditForm(forms.ModelForm):
     class Meta:
         model = Order
         fields = ["delivery_type", "payment_method", "payment_status", "customer_name", "phone_number", "address",
-                  "ready_by", "delivery_by", "comment"]
+                  "ready_by", "delivery_by", "comment", "is_partner", "partner_discount_percent"]
         widgets = {
             "delivery_type": forms.RadioSelect(attrs={"class": "custom-radio-list"}),  # Просто указываете класс списка
             "payment_method": forms.RadioSelect(attrs={"class": "custom-radio-list"}),
@@ -110,11 +110,15 @@ class OrderEditForm(forms.ModelForm):
             "comment": forms.Textarea(attrs={"class": "form-textarea", "rows": 3, "placeholder": "Ваши пожелания..."}),
             "address": forms.TextInput(
                 attrs={"class": "form-input", "placeholder": "ул. Ленина, д. 1, кв. 1", "id": "id_address"}),
+            "is_partner": forms.CheckboxInput(attrs={"class": "partner-checkbox"}),
+            "partner_discount_percent": forms.NumberInput(attrs={"class": "form-input partner-discount", "min": "1", "max": "100"}),
         }
         labels = {
             "customer_name": "Имя заказчика",
             "phone_number": "Телефон",
             "comment": "Комментарий",
+            "is_partner": "Партнёр",
+            "partner_discount_percent": "Процент скидки",
         }
 
     def __init__(self, *args, **kwargs):

@@ -280,6 +280,16 @@
                                     <label>Комментарий:</label>
                                     {{ form.comment }}
                                 </div>
+                                
+                                <div class="form-group checkbox-group">
+                                    {{ form.is_partner }}
+                                    <label for="{{ form.is_partner.id_for_label }}">Партнёр</label>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>Процент скидки:</label>
+                                    {{ form.partner_discount_percent }}
+                                </div>
 
                                 <div class="form-actions">
                                     <button type="button" class="cancel-button" id="cancelEditBtn">Отмена</button>
@@ -340,6 +350,17 @@
                                 <span class="summary-label">Телефон:</span>
                                 <span class="summary-value">{{ order.phone_number }}</span>
                             </div>
+                            
+                            {% if order.is_partner %}
+                                <div class="summary-row">
+                                    <span class="summary-label">Партнёр:</span>
+                                    <span class="summary-value">Да</span>
+                                </div>
+                                <div class="summary-row">
+                                    <span class="summary-label">Процент скидки:</span>
+                                    <span class="summary-value">{{ order.partner_discount_percent }}%</span>
+                                </div>
+                            {% endif %}
 
                             {% if order.comment %}
                                 <div class="summary-row">
@@ -413,9 +434,23 @@
                         addressField.style.display = 'none'
                     }
                 }
+                
+                function togglePartnerDiscountField() {
+                    const isPartnerCheckbox = document.querySelector('input[name="is_partner"]')
+                    const partnerDiscountField = document.querySelector('.partner-discount').closest('.form-group')
+                    
+                    if (isPartnerCheckbox && partnerDiscountField) {
+                        if (isPartnerCheckbox.checked) {
+                            partnerDiscountField.style.display = 'block'
+                        } else {
+                            partnerDiscountField.style.display = 'none'
+                        }
+                    }
+                }
 
                 if (editBtn && editForm && viewDetails) {
                     toggleAddressField()
+                    togglePartnerDiscountField()
 
                     editBtn.addEventListener('click', function () {
                         viewDetails.style.display = 'none'
@@ -435,6 +470,11 @@
                         deliveryOptions.forEach((option) => {
                             option.addEventListener('change', toggleAddressField)
                         })
+                    }
+                    
+                    const isPartnerCheckbox = document.querySelector('input[name="is_partner"]')
+                    if (isPartnerCheckbox) {
+                        isPartnerCheckbox.addEventListener('change', togglePartnerDiscountField)
                     }
                 }
 

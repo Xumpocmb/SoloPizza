@@ -171,6 +171,7 @@ def update_order(request, order_id):
     form = OrderEditForm(request.POST, instance=order)
     if form.is_valid():
         form.save()
+        order.recalculate_totals()  # Пересчитываем стоимость заказа после сохранения
         messages.success(request, "Изменения в заказе сохранены")
     else:
         messages.error(request, "Ошибка при сохранении заказа")
