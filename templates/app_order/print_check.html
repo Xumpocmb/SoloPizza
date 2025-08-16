@@ -41,10 +41,13 @@
     <div class="order-details">
         <div><strong>Заказ #:</strong> {{ order.id }}</div>
         <div><strong>Дата:</strong> {{ order.created_at|date:"d.m.Y H:i" }}</div>
+        <div><strong>Тип:</strong> {{ order.get_delivery_type_display }}</div>
+        {% if order.delivery_type == 'delivery' %}
+        <div><strong>Адрес:</strong> {{ order.address }}</div>
+        {% endif %}
         {% if order.comment %}
         <div><strong>Комментарий:</strong> {{ order.comment }}</div>
         {% endif %}
-        <!-- Можно добавить "Тип: Фастфуд" если нужно -->
     </div>
     {% endif %}
 
