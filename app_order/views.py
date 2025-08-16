@@ -128,13 +128,23 @@ def checkout(request):
 
 @login_required
 def order_detail(request, order_id):
-    order = get_object_or_404(
-        Order.objects.select_related("user", "branch").prefetch_related(
-            "items__product", "items__variant", "items__board1__board", "items__board2__board", "items__sauce", "items__addons__addon"
-        ),
-        id=order_id,
-        user=request.user,
-    )
+    # Если пользователь является персоналом, то он может видеть любой заказ
+    # Иначе пользователь может видеть только свои заказы
+    if request.user.is_staff or request.user.is_superuser:
+        order = get_object_or_404(
+            Order.objects.select_related("user", "branch").prefetch_related(
+                "items__product", "items__variant", "items__board1__board", "items__board2__board", "items__sauce", "items__addons__addon"
+            ),
+            id=order_id,
+        )
+    else:
+        order = get_object_or_404(
+            Order.objects.select_related("user", "branch").prefetch_related(
+                "items__product", "items__variant", "items__board1__board", "items__board2__board", "items__sauce", "items__addons__addon"
+            ),
+            id=order_id,
+            user=request.user,
+        )
     totals = Order.objects.get_order_totals(order.id)  # Добавляем расчет сумм
     is_editable = order.is_editable()
 
@@ -165,7 +175,13 @@ def order_detail(request, order_id):
 @login_required
 @require_POST
 def update_order(request, order_id):
-    order = get_object_or_404(Order, id=order_id, user=request.user)
+    # Если пользователь является персоналом, то он может редактировать любой заказ
+    # Иначе пользователь может редактировать только свои заказы
+    if request.user.is_staff:
+        order = get_object_or_404(Order, id=order_id)
+    else:
+        order = get_object_or_404(Order, id=order_id, user=request.user)
+    
     if not order.is_editable():
         return HttpResponseForbidden("Заказ нельзя редактировать")
 
@@ -183,7 +199,13 @@ def update_order(request, order_id):
 @login_required
 @require_POST
 def update_order_items(request, order_id):
-    order = get_object_or_404(Order, id=order_id, user=request.user)
+    # Если пользователь является персоналом, то он может редактировать товары в любом заказе
+    # Иначе пользователь может редактировать товары только в своих заказах
+    if request.user.is_staff:
+        order = get_object_or_404(Order, id=order_id)
+    else:
+        order = get_object_or_404(Order, id=order_id, user=request.user)
+    
     if not order.is_editable():
         return HttpResponseForbidden("Заказ нельзя редактировать")
 
