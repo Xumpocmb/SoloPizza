@@ -129,7 +129,7 @@ def checkout(request):
 @login_required
 def order_detail(request, order_id):
     order = get_object_or_404(
-        Order.objects.select_related("user").prefetch_related(
+        Order.objects.select_related("user", "branch").prefetch_related(
             "items__product", "items__variant", "items__board1__board", "items__board2__board", "items__sauce", "items__addons__addon"
         ),
         id=order_id,
@@ -157,6 +157,7 @@ def order_detail(request, order_id):
             "item_formset": items_formset,
             "is_editable": is_editable,
             "breadcrumbs": breadcrumbs,
+            "selected_branch": order.branch,  # Добавляем филиал в контекст
         },
     )
 
@@ -200,10 +201,13 @@ def update_order_items(request, order_id):
 
 @login_required
 def order_list(request):
+    # Получаем выбранный филиал из сессии
+    selected_branch_id = request.session.get('selected_branch_id', DEFAULT_BRANCH_ID)
+    
     if request.user.is_staff:
-        orders = Order.objects.all().order_by("-created_at")
+        orders = Order.objects.filter(branch_id=selected_branch_id).order_by("-created_at")
     else:
-        orders = Order.objects.filter(user=request.user).order_by("-created_at")
+        orders = Order.objects.filter(user=request.user, branch_id=selected_branch_id).order_by("-created_at")
 
     search_query = request.GET.get("search", "")
     status_filter = request.GET.get("status", "")
@@ -223,12 +227,19 @@ def order_list(request):
         {'title': 'Мои заказы', 'url': reverse('app_order:order_list')}  # Текущая страница
     ]
 
+    # Получаем информацию о выбранном филиале
+    try:
+        selected_branch = CafeBranch.objects.get(id=selected_branch_id)
+    except CafeBranch.DoesNotExist:
+        selected_branch = CafeBranch.objects.get(id=DEFAULT_BRANCH_ID)
+    
     context = {
         "page_obj": page_obj,
         "status_choices": Order.STATUS_CHOICES,
         "search_query": search_query,
         "status_filter": status_filter,
         "breadcrumbs": breadcrumbs,
+        "selected_branch": selected_branch,
     }
     return render(request, "app_order/order_list.html", context)
 

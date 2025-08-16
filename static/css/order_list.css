@@ -17,8 +17,22 @@
 
 .page-title {
     font-size: 1.8rem;
-    margin-bottom: 25px;
+    margin-bottom: 15px;
     color: var(--text-color);
+}
+
+.selected-branch-info {
+    margin-bottom: 20px;
+    padding: 10px 15px;
+    background-color: var(--accent-light);
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+}
+
+.selected-branch-info p {
+    margin: 0;
+    color: var(--text-color);
+    font-weight: 500;
 }
 
 /* Панель управления */

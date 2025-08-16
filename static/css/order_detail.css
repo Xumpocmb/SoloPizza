@@ -32,6 +32,12 @@
     gap: 10px;
 }
 
+.branch-info {
+    color: var(--text-muted);
+    margin: 5px 0;
+    font-size: 0.95rem;
+}
+
 .pdf-button {
     display: inline-flex;
     align-items: center;
