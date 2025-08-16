@@ -22,7 +22,7 @@
         <div><strong>Клиент:</strong> {{ order.customer_name }}</div>
         <div><strong>Телефон:</strong> {{ order.phone_number }}</div>
         {% if order.delivery_type == 'delivery' %}
-        <div><strong>Адрес:</strong> {{ order.address }}</div>
+        <div><strong>Адрес:</strong> {{ order.address|linebreaks }}</div>
         {% endif %}
         <div><strong>Тип:</strong> {{ order.get_delivery_type_display }}</div>
         <div><strong>Оплата:</strong> {{ order.get_payment_method_display }}</div>
