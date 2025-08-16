@@ -113,21 +113,15 @@
 
     {% if show_order_details %}
     <div class="totals">
-        <div><strong>Подытог (часть):</strong> {{ subtotal_part|floatformat:2 }} руб.</div>
-        {% if discount_amount_part > 0 %}
-        <div><strong>Скидка (часть):</strong> -{{ discount_amount_part|floatformat:2 }} руб.</div>
-        {% endif %}
         {% if order.delivery_type == 'delivery' and order.delivery_cost > 0 %}
         <div><strong>Стоимость доставки:</strong> {{ order.delivery_cost|floatformat:2 }} руб.</div>
         {% endif %}
-        <div><strong>ИТОГО (часть):</strong> {{ part_total|floatformat:2 }} руб.</div>
+        <div><strong>ИТОГО:</strong> {{ part_total|floatformat:2 }} руб.</div>
     </div>
     {% endif %}
     {% else %}
     <p>Нет позиций для печати в этом чеке.</p>
     {% endif %}
-
-    <!-- Убрана надпись "Спасибо за заказ" -->
 
     <!-- Кнопка печати внизу -->
     <button class="btn-print no-print" onclick="window.print()">Печать Чека</button>
