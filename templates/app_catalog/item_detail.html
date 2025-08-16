@@ -28,7 +28,7 @@
                     {% if item.image %}
                         <img src="{{ item.image.url }}" alt="{{ item.name }}" class="item-image-border">
                     {% else %}
-                        <img src="{% static 'img/test.jpg' %}" alt="{{ item.name }}" class="item-image-border">
+                        <img src="{% static 'img/No-Image-Placeholder.svg' %}" alt="{{ item.name }}" class="item-image-border">
                     {% endif %}
                 </div>
 
