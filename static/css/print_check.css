@@ -5,8 +5,9 @@
         size: 80mm auto; /* Ширина 80мм, высота автоматическая */
     }
     body {
-        font-family: 'Courier New', Courier, monospace;
+        font-family: 'Arial', 'Helvetica', sans-serif; /* Заменен шрифт на более читабельный */
         font-size: 18px; /* Увеличен в 2 раза с 9px */
+        font-weight: 600; /* Увеличена толщина шрифта */
         margin: 0;
         padding: 2mm;
         width: 80mm; /* Ширина 80мм */
@@ -18,8 +19,9 @@
 }
 
 body {
-    font-family: 'Courier New', Courier, monospace;
+    font-family: 'Arial', 'Helvetica', sans-serif; /* Заменен шрифт на более читабельный */
     font-size: 18px; /* Увеличен в 2 раза с 9px */
+    font-weight: 600; /* Увеличена толщина шрифта */
     margin: 0;
     padding: 2mm;
     width: 80mm; /* Для предварительного просмотра */
@@ -30,7 +32,8 @@ body {
 .header {
     text-align: center;
     margin-bottom: 3mm;
-    font-weight: bold;
+    font-weight: 800; /* Увеличена толщина шрифта заголовка */
+    font-size: 20px; /* Увеличен размер шрифта заголовка */
 }
 
 .order-details {
@@ -39,6 +42,7 @@ body {
 
 .order-details div {
     margin-bottom: 1mm;
+    line-height: 1.3; /* Увеличен интервал между строками */
 }
 
 .items-container {
@@ -79,13 +83,14 @@ body {
 
 .product-name {
     font-size: 20px; /* Увеличен с 16px на 4 пункта */
-    font-weight: bold; /* Жирный шрифт */
+    font-weight: 800; /* Экстра-жирный шрифт */
 }
 
 .totals {
     text-align: right;
-    font-weight: bold;
+    font-weight: 800; /* Экстра-жирный шрифт */
     margin-top: 2mm;
+    font-size: 20px; /* Увеличен размер шрифта итогов */
 }
 
 .footer {
