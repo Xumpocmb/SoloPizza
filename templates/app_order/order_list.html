@@ -29,7 +29,28 @@
         <div class="order-list-container">
             <h1 class="page-title">Мои заказы</h1>
             <div class="selected-branch-info">
-                <p>Филиал: {{ selected_branch.name }}</p>
+                <div class="branch-display">
+                    <p>Филиал: {{ selected_branch.name }}</p>
+                    {% if request.user.is_staff %}
+                    <button type="button" class="change-branch-btn" onclick="toggleBranchSelector()">Изменить филиал</button>
+                    {% endif %}
+                </div>
+                {% if request.user.is_staff %}
+                <div class="branch-selector" id="branchSelector" style="display: none;">
+                    <form method="post" action="{% url 'app_home:select_branch' %}">
+                        {% csrf_token %}
+                        <select name="branch_id" class="branch-select">
+                            {% for branch in branches %}
+                                <option value="{{ branch.id }}" {% if branch.id|stringformat:"s" == selected_branch_id %}selected{% endif %}>
+                                    {{ branch.name }} ({{ branch.address }})
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="apply-branch-btn">Применить</button>
+                        <button type="button" class="cancel-branch-btn" onclick="toggleBranchSelector()">Отмена</button>
+                    </form>
+                </div>
+                {% endif %}
             </div>
 
             <!-- Панель фильтров и поиска -->
@@ -66,11 +87,11 @@
                 <div class="table-header">
                     <div class="header-cell">ID</div>
                     <div class="header-cell">Имя</div>
-                    <div class="header-cell">Дата</div>
                     <div class="header-cell">Статус</div>
-                    <div class="header-cell">Сумма</div>
-                    <div class="header-cell">Способ получения</div>
                     <div class="header-cell">Оплата</div>
+                    {% if request.user.is_staff %}
+                    <div class="header-cell">Филиал</div>
+                    {% endif %}
                     <div class="header-cell">Детали</div>
                     {% if request.user.is_staff or request.user.is_superuser %}
                     <div class="header-cell">Чек</div>
@@ -82,7 +103,6 @@
                     <div class="table-row status-{{ order.status }}">
                         <div class="table-cell" data-label="ID">#{{ order.id }}</div>
                         <div class="table-cell" data-label="Имя">{{ order.customer_name }}</div>
-                        <div class="table-cell" data-label="Дата">{{ order.created_at|date:"d.m.Y H:i" }}</div>
                         <div class="table-cell" data-label="Статус">
                             {% if request.user.is_staff %}
                                 <form method="post" action="{% url 'app_order:update_order_status' order.id %}">
@@ -104,8 +124,6 @@
                                 </span>
                             {% endif %}
                         </div>
-                        <div class="table-cell" data-label="Сумма">{{ order.total_price|floatformat:2 }} руб.</div>
-                        <div class="table-cell" data-label="Способ получения">{{ order.get_delivery_type_display }}</div>
                         <div class="table-cell" data-label="Оплата">
                             {% if order.payment_status %}
                                 <span class="payment-paid">Оплачено</span>
@@ -113,6 +131,34 @@
                                 <span class="payment-unpaid">Не оплачено</span>
                             {% endif %}
                         </div>
+                        {% if request.user.is_staff %}
+                        <div class="table-cell" data-label="Филиал">
+                            <div class="branch-info">
+                                <span class="branch-name">{{ order.branch.name }}</span>
+                                <button type="button" class="change-order-branch-btn" onclick="toggleOrderBranchSelector('order-branch-{{ order.id }}')">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                            </div>
+                            <div id="order-branch-{{ order.id }}" class="order-branch-selector" style="display: none;">
+                                <form method="post" action="{% url 'app_order:update_order_branch' order.id %}">
+                                    {% csrf_token %}
+                                    <select name="branch_id" class="branch-select">
+                                        {% for branch in branches %}
+                                            <option value="{{ branch.id }}" {% if branch.id == order.branch.id %}selected{% endif %}>
+                                                {{ branch.name }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                    <div class="branch-selector-buttons">
+                                        <button type="submit" class="apply-branch-btn">OK</button>
+                                        <button type="button" class="cancel-branch-btn" onclick="toggleOrderBranchSelector('order-branch-{{ order.id }}')">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        {% endif %}
                         <div class="table-cell actions-cell" data-label="Детали">
                             <a href="{% url 'app_order:order_detail' order.id %}"
                                class="view-button"

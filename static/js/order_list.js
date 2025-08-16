@@ -15,3 +15,27 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// Функция для переключения отображения селектора филиалов
+function toggleBranchSelector() {
+    const branchSelector = document.getElementById('branchSelector');
+    if (branchSelector) {
+        if (branchSelector.style.display === 'none') {
+            branchSelector.style.display = 'block';
+        } else {
+            branchSelector.style.display = 'none';
+        }
+    }
+}
+
+// Функция для переключения отображения селектора филиала для конкретного заказа
+function toggleOrderBranchSelector(selectorId) {
+    const branchSelector = document.getElementById(selectorId);
+    if (branchSelector) {
+        if (branchSelector.style.display === 'none') {
+            branchSelector.style.display = 'block';
+        } else {
+            branchSelector.style.display = 'none';
+        }
+    }
+}

@@ -26,6 +26,12 @@
         {% endif %}
         <div><strong>Тип:</strong> {{ order.get_delivery_type_display }}</div>
         <div><strong>Оплата:</strong> {{ order.get_payment_method_display }}</div>
+        {% if order.ready_by %}
+        <div><strong>Готов к:</strong> {{ order.ready_by|date:"d.m.Y H:i" }}</div>
+        {% endif %}
+        {% if order.delivery_by %}
+        <div><strong>Доставка к:</strong> {{ order.delivery_by|date:"d.m.Y H:i" }}</div>
+        {% endif %}
         {% if order.comment %}
         <div><strong>Комментарий:</strong> {{ order.comment }}</div>
         {% endif %}
@@ -35,6 +41,9 @@
     <div class="order-details">
         <div><strong>Заказ #:</strong> {{ order.id }}</div>
         <div><strong>Дата:</strong> {{ order.created_at|date:"d.m.Y H:i" }}</div>
+        {% if order.comment %}
+        <div><strong>Комментарий:</strong> {{ order.comment }}</div>
+        {% endif %}
         <!-- Можно добавить "Тип: Фастфуд" если нужно -->
     </div>
     {% endif %}
@@ -48,7 +57,8 @@
             {% for data in items_data %}
             <div class="item-block">
                 <div class="product-name">{{ data.item.product.name }}</div>
-                {% if data.item.variant %}<p class="item-param">Размер: {{ data.item.variant.size.name }}</p>{% endif %}
+                {% if data.item.variant.size %}<p class="item-param">Размер: {{ data.item.variant.size.name }}</p>{% endif %}
+                {% if data.item.variant.value %}<p class="item-param">{{ data.item.variant.value }} {{ data.item.variant.get_unit_display }}</p>{% endif %}
                 {% if data.item.quantity > 1 %}<p class="item-param">Количество: {{ data.item.quantity }}</p>{% endif %}
                 {% if data.item.board1 %}<p class="item-param">Борт 1: {{ data.item.board1.board.name }}</p>{% endif %}
                 {% if data.item.board2 %}<p class="item-param">Борт 2: {{ data.item.board2.board.name }}</p>{% endif %}

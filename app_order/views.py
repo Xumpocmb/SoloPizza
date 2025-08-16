@@ -233,6 +233,9 @@ def order_list(request):
     except CafeBranch.DoesNotExist:
         selected_branch = CafeBranch.objects.get(id=DEFAULT_BRANCH_ID)
     
+    # Получаем список всех филиалов для возможности изменения филиала заказа
+    branches = CafeBranch.objects.filter(is_active=True)
+    
     context = {
         "page_obj": page_obj,
         "status_choices": Order.STATUS_CHOICES,
@@ -240,6 +243,7 @@ def order_list(request):
         "status_filter": status_filter,
         "breadcrumbs": breadcrumbs,
         "selected_branch": selected_branch,
+        "branches": branches,
     }
     return render(request, "app_order/order_list.html", context)
 
@@ -259,6 +263,27 @@ def update_order_status(request, order_id):
     else:
         messages.error(request, "Неверный статус заказа")
 
+    return redirect(request.META.get("HTTP_REFERER", "app_order:order_list"))
+
+
+@require_POST
+@login_required
+def update_order_branch(request, order_id):
+    """Изменение филиала для конкретного заказа"""
+    if not request.user.is_staff:
+        return HttpResponseForbidden("Доступ запрещен")
+        
+    order = get_object_or_404(Order, id=order_id)
+    new_branch_id = request.POST.get("branch_id")
+    
+    try:
+        new_branch = CafeBranch.objects.get(id=new_branch_id)
+        order.branch = new_branch
+        order.save()
+        messages.success(request, f"Филиал заказа #{order_id} изменен на «{new_branch.name}»")
+    except CafeBranch.DoesNotExist:
+        messages.error(request, "Выбранный филиал не найден")
+    
     return redirect(request.META.get("HTTP_REFERER", "app_order:order_list"))
 
 

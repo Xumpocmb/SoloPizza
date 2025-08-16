@@ -104,6 +104,125 @@
     background-color: #068a50;
 }
 
+/* Информация о филиале */
+.selected-branch-info {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.branch-display {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.change-branch-btn {
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.change-branch-btn:hover {
+    background-color: #068a50;
+}
+
+.branch-selector {
+    margin-top: 15px;
+    padding: 15px;
+    background-color: var(--hover-bg);
+    border-radius: var(--border-radius);
+}
+
+.branch-select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: var(--border-radius);
+    background-color: var(--card-bg);
+    color: var(--text-color);
+}
+
+.apply-branch-btn, .cancel-branch-btn {
+    padding: 8px 15px;
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-right: 10px;
+}
+
+.apply-branch-btn {
+    background-color: var(--accent-color);
+    color: white;
+}
+
+.apply-branch-btn:hover {
+    background-color: #068a50;
+}
+
+.cancel-branch-btn {
+    background-color: #f44336;
+    color: white;
+}
+
+.cancel-branch-btn:hover {
+    background-color: #d32f2f;
+}
+
+/* Стили для изменения филиала заказа */
+.branch-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.branch-name {
+    font-size: 0.9rem;
+    margin-right: 5px;
+}
+
+.change-order-branch-btn {
+    background: none;
+    border: none;
+    color: var(--accent-color);
+    cursor: pointer;
+    padding: 3px;
+    border-radius: 3px;
+    transition: background-color 0.2s;
+}
+
+.change-order-branch-btn:hover {
+    background-color: var(--accent-color-rgba);
+}
+
+.order-branch-selector {
+    margin-top: 8px;
+    padding: 8px;
+    background-color: var(--hover-bg);
+    border-radius: var(--border-radius);
+}
+
+.branch-selector-buttons {
+    display: flex;
+    margin-top: 8px;
+    gap: 5px;
+}
+
+.branch-selector-buttons .apply-branch-btn,
+.branch-selector-buttons .cancel-branch-btn {
+    padding: 4px 8px;
+    font-size: 0.8rem;
+    margin: 0;
+}
+
 /* Таблица заказов */
 .orders-table {
     margin-bottom: 30px;
@@ -113,7 +232,7 @@
 
 .table-header {
     display: grid;
-    grid-template-columns: 80px 100px 120px 140px 120px 150px 120px 100px 50px 50px;
+    grid-template-columns: 80px 100px 140px 120px 120px 100px 50px 50px;
     background-color: var(--accent-color);
     color: white;
     font-weight: 600;
@@ -126,7 +245,7 @@
 
 .table-row {
     display: grid;
-    grid-template-columns: 80px 100px 120px 140px 120px 150px 120px 100px 50px 50px;
+    grid-template-columns: 80px 100px 140px 120px 120px 100px 50px 50px;
     padding: 12px 15px;
     border-bottom: 1px solid var(--hover-bg);
     transition: background-color 0.2s;
@@ -271,7 +390,7 @@
 
     .table-header,
     .table-row {
-        grid-template-columns: 80px 120px 140px 120px 120px 100px 80px;
+        grid-template-columns: 80px 120px 140px 120px 120px 120px 100px 80px;
     }
 }
 
@@ -282,8 +401,8 @@
 
     .table-header,
     .table-row {
-        grid-template-columns: repeat(8, minmax(100px, 1fr));
-        width: 900px;
+        grid-template-columns: repeat(9, minmax(100px, 1fr));
+        width: 1000px;
     }
 
     .table-container {

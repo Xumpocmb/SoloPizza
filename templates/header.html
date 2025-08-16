@@ -81,7 +81,7 @@
         </div>
     </div>
     <div class="has-submenu">
-        <button onclick="toggleSubmenu('profileSub')">Профиль ▾</button>
+        <button onclick="toggleSubmenu('profileSub')">{% if user.is_authenticated %}{{ user.username }}{% else %}Профиль{% endif %} ▾</button>
         <div class="submenu" id="profileSub">
             {% if user.is_authenticated %}
                 {% if user.is_superuser %}
