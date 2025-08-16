@@ -41,8 +41,7 @@ body {
 }
 
 .order-details div {
-    margin-bottom: 1mm;
-    line-height: 1.3; /* Увеличен интервал между строками */
+    line-height: 1.0; /* Увеличен интервал между строками */
 }
 
 .items-container {
@@ -90,7 +89,7 @@ body {
     text-align: right;
     font-weight: 800; /* Экстра-жирный шрифт */
     margin-top: 2mm;
-    font-size: 20px; /* Увеличен размер шрифта итогов */
+    font-size: 18px; /* Увеличен размер шрифта итогов */
 }
 
 .footer {

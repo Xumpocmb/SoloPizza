@@ -13,7 +13,7 @@
     <!-- Кнопка печати для удобства в браузере -->
     <button class="btn-print no-print" onclick="window.print()">Печать Чека</button>
 
-    <div class="header">{{ check_title }}</div>
+    <!-- Заголовок чека убран по требованию -->
 
     {% if show_order_details %}
     <div class="order-details">
@@ -42,9 +42,6 @@
         <div><strong>Заказ #:</strong> {{ order.id }}</div>
         <div><strong>Дата:</strong> {{ order.created_at|date:"d.m.Y H:i" }}</div>
         <div><strong>Тип:</strong> {{ order.get_delivery_type_display }}</div>
-        {% if order.delivery_type == 'delivery' %}
-        <div><strong>Адрес:</strong> {{ order.address }}</div>
-        {% endif %}
         {% if order.comment %}
         <div><strong>Комментарий:</strong> {{ order.comment }}</div>
         {% endif %}
@@ -82,23 +79,23 @@
         </div>
     </div>
 
+    {% if show_order_details %}
     <div class="totals">
         <div><strong>Подытог (часть):</strong> {{ subtotal_part|floatformat:2 }} руб.</div>
         {% if discount_amount_part > 0 %}
         <div><strong>Скидка (часть):</strong> -{{ discount_amount_part|floatformat:2 }} руб.</div>
         {% endif %}
-        {% if show_order_details and order.delivery_type == 'delivery' and order.delivery_cost > 0 %}
+        {% if order.delivery_type == 'delivery' and order.delivery_cost > 0 %}
         <div><strong>Стоимость доставки:</strong> {{ order.delivery_cost|floatformat:2 }} руб.</div>
         {% endif %}
         <div><strong>ИТОГО (часть):</strong> {{ part_total|floatformat:2 }} руб.</div>
     </div>
+    {% endif %}
     {% else %}
     <p>Нет позиций для печати в этом чеке.</p>
     {% endif %}
 
-    <div class="footer">
-        Спасибо за заказ!
-    </div>
+    <!-- Убрана надпись "Спасибо за заказ" -->
 
     <!-- Кнопка печати внизу -->
     <button class="btn-print no-print" onclick="window.print()">Печать Чека</button>
