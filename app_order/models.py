@@ -98,7 +98,7 @@ class Order(models.Model):
     )
     branch = models.ForeignKey(CafeBranch, on_delete=models.SET_NULL, verbose_name="Филиал", null=True)
     customer_name = models.CharField(max_length=255, verbose_name="Имя заказчика")
-    phone_number = models.CharField(max_length=20, verbose_name="Номер телефона")
+    phone_number = models.CharField(max_length=20, verbose_name="Номер телефона", null=True, blank=True)
     address = models.TextField(verbose_name="Адрес доставки", null=True, blank=True)
     is_partner = models.BooleanField(default=False, verbose_name="Партнер")
     partner_discount_percent = models.PositiveIntegerField(default=10, verbose_name="Процент скидки партнера")

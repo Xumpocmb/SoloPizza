@@ -69,9 +69,18 @@ class CheckoutForm(forms.ModelForm):
         cleaned_data = super().clean()
         delivery_type = cleaned_data.get("delivery_type")
         address = cleaned_data.get("address")
+        phone = cleaned_data.get("phone_number")
 
         if delivery_type == "delivery" and not address:
             self.add_error("address", "Укажите адрес для доставки")
+            
+        # Делаем поле телефона необязательным для заказов "на месте"
+        if delivery_type == "cafe" and not phone:
+            # Если телефон не указан для заказа "на месте", это допустимо
+            pass
+        elif not phone:
+            # Для других типов доставки телефон обязателен
+            self.add_error("phone_number", "Укажите номер телефона")
 
         return cleaned_data
 
@@ -147,11 +156,20 @@ class OrderEditForm(forms.ModelForm):
         cleaned_data = super().clean()
         delivery_type = cleaned_data.get("delivery_type")
         address = cleaned_data.get("address")
+        phone = cleaned_data.get("phone_number")
 
         if delivery_type == "delivery" and not address:
             self.add_error("address", "Укажите адрес для доставки")
         elif delivery_type == "pickup":
             cleaned_data["address"] = "Самовывоз"
+            
+        # Делаем поле телефона необязательным для заказов "на месте"
+        if delivery_type == "cafe" and not phone:
+            # Если телефон не указан для заказа "на месте", это допустимо
+            pass
+        elif not phone:
+            # Для других типов доставки телефон обязателен
+            self.add_error("phone_number", "Укажите номер телефона")
 
         return cleaned_data
 

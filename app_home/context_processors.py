@@ -35,7 +35,7 @@ def site_context_processor(request):
 
     # Получаем категории для конкретного филиала
     try:
-        if request.user.is_superuser:
+        if request.user.is_superuser or request.user.is_staff:
             categories = Category.objects.filter(is_active=True, branch=selected_branch).order_by("order")
         else:
             categories = Category.objects.filter(is_active=True, branch=selected_branch, is_for_admin=False).order_by("order")
