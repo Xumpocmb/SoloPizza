@@ -104,9 +104,6 @@
                 {% endif %}
                 <p class="item-param">Стоимость: {{ data.final_line_total|floatformat:2 }} руб.</p>
             </div>
-            {% if data.calculation.discount_amount > 0 %}
-            <div class="discount-info">Скидка ({{ data.calculation.discount_percent|floatformat:0 }}%): -{{ data.calculation.discount_amount|floatformat:2 }}</div>
-            {% endif %}
             {% endfor %}
         </div>
     </div>
