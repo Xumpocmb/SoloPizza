@@ -72,7 +72,9 @@ def add_to_cart(request, slug):
 
             cart_item.addons.set(addons)
 
-            messages.success(request, f'Товар "{item.name}" добавлен в корзину!')
+            # Показываем уведомление только если пользователь не персонал и не суперпользователь
+            if not request.user.is_staff and not request.user.is_superuser:
+                messages.success(request, f'Товар "{item.name}" добавлен в корзину!')
             return redirect('app_catalog:item_detail', slug=slug)
         else:
             messages.error(request, 'Ошибка в форме. Пожалуйста, проверьте данные.')
