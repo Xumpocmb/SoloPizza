@@ -54,6 +54,10 @@ class CafeBranch(models.Model):
     latitude = models.FloatField(verbose_name="Широта", null=True, blank=True)
     longitude = models.FloatField(verbose_name="Долгота", null=True, blank=True)
     delivery_zone = models.JSONField(verbose_name="Зона доставки (полигон)", help_text="Массив координат в формате [[lat1, lng1], [lat2, lng2], ...]", null=True, blank=True)
+    
+    # Настройки для печати чеков
+    check_font_size = models.PositiveSmallIntegerField(verbose_name="Размер шрифта для чеков", default=18, help_text="Размер шрифта в пикселях")
+    check_tape_width = models.PositiveSmallIntegerField(verbose_name="Ширина ленты для чеков", default=80, help_text="Ширина ленты в миллиметрах")
 
     class Meta:
         db_table = "branches"

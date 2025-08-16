@@ -1,33 +1,10 @@
 /* Стили для страницы чека */
 @media print {
-    @page {
-        margin: 3mm; /* Очень маленькие поля для 80мм */
-        size: 80mm auto; /* Ширина 80мм, высота автоматическая */
-    }
-    body {
-        font-family: 'Arial', 'Helvetica', sans-serif; /* Заменен шрифт на более читабельный */
-        font-size: 18px; /* Увеличен в 2 раза с 9px */
-        font-weight: 600; /* Увеличена толщина шрифта */
-        margin: 0;
-        padding: 2mm;
-        width: 80mm; /* Ширина 80мм */
-        box-sizing: border-box;
-    }
     .no-print {
         display: none !important;
     }
 }
 
-body {
-    font-family: 'Arial', 'Helvetica', sans-serif; /* Заменен шрифт на более читабельный */
-    font-size: 18px; /* Увеличен в 2 раза с 9px */
-    font-weight: 600; /* Увеличена толщина шрифта */
-    margin: 0;
-    padding: 2mm;
-    width: 80mm; /* Для предварительного просмотра */
-    box-sizing: border-box;
-    border: 1px dashed #ccc; /* Визуальная граница при просмотре */
-}
 
 .header {
     text-align: center;

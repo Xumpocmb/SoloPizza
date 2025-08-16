@@ -364,6 +364,7 @@ def print_check_non_fastfood(request, order_id):
         "part_total": part_total.quantize(Decimal("0.01")),  # Итог только для этой части
         "check_title": "ЧЕК (Все товары)",
         "show_order_details": True,  # Флаг для отображения деталей заказа
+        "branch": order.branch,  # Передаем филиал для доступа к настройкам печати
     }
     return render(request, "app_order/print_check.html", context)
 
@@ -419,5 +420,6 @@ def print_check_fastfood_only(request, order_id):
         "part_total": part_total.quantize(Decimal("0.01")),  # Итог только для этой части
         "check_title": "ЧЕК (Только Фастфуд)",
         "show_order_details": False,  # Флаг для НЕ отображения деталей заказа
+        "branch": order.branch,  # Передаем филиал для доступа к настройкам печати
     }
     return render(request, "app_order/print_check.html", context)

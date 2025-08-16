@@ -7,6 +7,39 @@
     <title>{{ check_title }} - Заказ #{{ order.id }}</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/print_check.css' %}">
+    <style>
+        :root {
+            --check-font-size: {{ branch.check_font_size }}px;
+            --check-tape-width: {{ branch.check_tape_width }}mm;
+        }
+        
+        @media print {
+            @page {
+                margin: 3mm; /* Очень маленькие поля */
+                size: var(--check-tape-width) auto; /* Ширина из настроек филиала, высота автоматическая */
+            }
+            body {
+                font-family: 'Arial', 'Helvetica', sans-serif;
+                font-size: var(--check-font-size); /* Размер шрифта из настроек филиала */
+                font-weight: 600;
+                margin: 0;
+                padding: 2mm;
+                width: var(--check-tape-width); /* Ширина из настроек филиала */
+                box-sizing: border-box;
+            }
+        }
+        
+        body {
+            font-family: 'Arial', 'Helvetica', sans-serif;
+            font-size: var(--check-font-size); /* Размер шрифта из настроек филиала */
+            font-weight: 600;
+            margin: 0;
+            padding: 2mm;
+            width: var(--check-tape-width); /* Ширина из настроек филиала */
+            box-sizing: border-box;
+            border: 1px dashed #ccc;
+        }
+    </style>
 </head>
 <body>
 
