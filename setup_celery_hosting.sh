@@ -48,6 +48,7 @@ autorestart=true
 startsecs=10
 stopwaitsecs=600
 priority=998
+environment=DJANGO_SETTINGS_MODULE="SoloPizza.settings"
 EOF
 
 # Создаем конфигурацию для Celery beat
@@ -64,6 +65,7 @@ autorestart=true
 startsecs=10
 stopwaitsecs=10
 priority=999
+environment=DJANGO_SETTINGS_MODULE="SoloPizza.settings"
 EOF
 
 # Создаем директорию для логов

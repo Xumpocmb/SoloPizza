@@ -77,7 +77,21 @@ tail -f celery_beat.log
 
 ## Возможные проблемы и их решения
 
-### 1. Redis недоступен
+### 1. Ошибка ImproperlyConfigured
+
+Если вы видите ошибку `django.core.exceptions.ImproperlyConfigured`, это означает, что Django не может найти настройки. Убедитесь, что переменная окружения `DJANGO_SETTINGS_MODULE` установлена:
+
+```bash
+export DJANGO_SETTINGS_MODULE="SoloPizza.settings"
+```
+
+Все скрипты запуска Celery (`run_celery.sh`, `run_celery_worker.sh`, `run_celery_beat.sh`) уже обновлены для установки этой переменной. Если вы используете Supervisor, убедитесь, что в конфигурационных файлах также установлена эта переменная:
+
+```ini
+environment=DJANGO_SETTINGS_MODULE="SoloPizza.settings"
+```
+
+### 2. Redis недоступен
 
 Celery использует Redis в качестве брокера сообщений. Убедитесь, что Redis запущен и доступен:
 
@@ -87,7 +101,7 @@ redis-cli ping
 
 Должен вернуть `PONG`. Если это не так, проверьте настройки Redis в `settings.py` и убедитесь, что Redis запущен на хостинге.
 
-### 2. Неправильный часовой пояс
+### 3. Неправильный часовой пояс
 
 Убедитесь, что в `settings.py` установлен правильный часовой пояс:
 
@@ -97,7 +111,7 @@ USE_TZ = True
 CELERY_TIMEZONE = TIME_ZONE
 ```
 
-### 3. Задача не активирована в Django Celery Beat
+### 4. Задача не активирована в Django Celery Beat
 
 Проверьте, что задача активирована в административной панели Django:
 

@@ -5,6 +5,18 @@
 # Переходим в директорию проекта
 cd "$(dirname "$0")"
 
+# Устанавливаем переменную окружения DJANGO_SETTINGS_MODULE
+export DJANGO_SETTINGS_MODULE="SoloPizza.settings"
+
+# Проверяем, установлена ли переменная окружения DJANGO_SETTINGS_MODULE
+if [ -z "$DJANGO_SETTINGS_MODULE" ]; then
+    echo "✗ Переменная окружения DJANGO_SETTINGS_MODULE не установлена!"
+    echo "Устанавливаем DJANGO_SETTINGS_MODULE=SoloPizza.settings"
+    export DJANGO_SETTINGS_MODULE="SoloPizza.settings"
+else
+    echo "✓ DJANGO_SETTINGS_MODULE установлена: $DJANGO_SETTINGS_MODULE"
+fi
+
 # Проверяем, запущены ли процессы Celery
 celery_worker_running=$(pgrep -f "celery -A SoloPizza worker")
 celery_beat_running=$(pgrep -f "celery -A SoloPizza beat")
