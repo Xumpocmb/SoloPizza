@@ -4,8 +4,8 @@
 cd /home/solopizzaadmin/SoloPizza || { echo "❌ Не удалось перейти в директорию проекта"; exit 1; }
 
 # Проверяем, существует ли celery_app.py
-if [ ! -f "celery_app.py" ]; then
-    echo "❌ Файл celery_app.py не найден в текущей директории"
+if [ ! -f "SoloPizza/celery.py" ]; then
+    echo "❌ Файл celery.py не найден в текущей директории"
     exit 1
 fi
 
