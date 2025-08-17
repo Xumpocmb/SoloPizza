@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Перейти в корень проекта
-cd /home/x93/x-code/kiberone_web_service || { echo "❌ Не удалось перейти в директорию проекта"; exit 1; }
+cd /home/solopizzaadmin/SoloPizza || { echo "❌ Не удалось перейти в директорию проекта"; exit 1; }
 
 # Проверяем, существует ли celery_app.py
 if [ ! -f "celery_app.py" ]; then
