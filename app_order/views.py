@@ -15,7 +15,9 @@ from app_home.models import CafeBranch
 from app_order.forms import CheckoutForm, OrderEditForm, OrderItemFormSet
 from app_order.models import OrderItem, Order
 from decimal import Decimal, ROUND_HALF_UP
-
+from django.conf import settings
+import requests
+import os
 
 
 DEFAULT_BRANCH_ID = 1
@@ -96,6 +98,8 @@ def checkout(request):
                 ).addons.set(cart_item.addons.all())
 
             cart_items.delete()
+            if not settings.DEBUG and not request.user.is_superuser and not request.user.is_staff:
+                send_notify(order)
             return redirect("app_order:order_detail", order_id=order.id)
     else:
         # Проверяем товары при заходе на страницу оформления
@@ -124,6 +128,18 @@ def checkout(request):
             "selected_branch": selected_branch,
         },
     )
+
+
+def send_notify(order):
+    from SoloPizza.settings import BOT_TOKEN, CHAT_ID
+    order_text = (f'ФИЛИАЛ: {order.branch.name}\n\n'
+                  f'Заказ {order.id}\n'
+                  f'Способ доставки: {dict(Order.DELIVERY_CHOICES)[order.delivery_type]}\n'
+                  f'Телефон: {order.phone_number}\n'
+                  f'Создан: {order.created_at.strftime("%d.%m.%Y %H:%M:%S")}\n'
+                  f'\nПодробности: https://solo-pizza.by/order/order/{order.id}/')
+    url = f'https://api.telegram.org/bot{BOT_TOKEN}/sendMessage?chat_id={CHAT_ID}&text={order_text}'
+    requests.get(url=url)
 
 
 @login_required

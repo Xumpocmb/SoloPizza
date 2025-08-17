@@ -20,6 +20,9 @@ SITEMAP_URLS = [
 ]
 
 SITE_ID = 1
+BOT_TOKEN = os.getenv("BOT_TOKEN")
+CHAT_ID = os.getenv("CHAT_ID")
+
 
 INSTALLED_APPS = [
     "django.contrib.sites",
