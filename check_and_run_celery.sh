@@ -17,6 +17,18 @@ else
     echo "✓ DJANGO_SETTINGS_MODULE установлена: $DJANGO_SETTINGS_MODULE"
 fi
 
+# Активируем виртуальное окружение
+if [ -d "venv" ]; then
+    echo "✓ Активация локального виртуального окружения..."
+    source venv/bin/activate
+elif [ -d "/home/solopizzaadmin/SoloPizza/venv" ]; then
+    echo "✓ Активация виртуального окружения на сервере..."
+    source /home/solopizzaadmin/SoloPizza/venv/bin/activate
+else
+    echo "✗ ВНИМАНИЕ: Виртуальное окружение не найдено!"
+    echo "  Celery может работать некорректно без активации виртуального окружения."
+fi
+
 # Проверяем, запущены ли процессы Celery
 celery_worker_running=$(pgrep -f "celery -A SoloPizza worker")
 celery_beat_running=$(pgrep -f "celery -A SoloPizza beat")
