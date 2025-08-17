@@ -131,7 +131,14 @@ fi
 echo ""
 echo "Проверка задач в расписании Celery Beat:"
 echo "----------------------------"
-python -c "import django; django.setup(); from django_celery_beat.models import PeriodicTask; print('\n'.join([f'{task.name} - {task.enabled}' for task in PeriodicTask.objects.all()]))"
+
+# Проверяем, запущены ли уже компоненты Celery
+if [ -n "$celery_worker_running" ] && [ -n "$celery_beat_running" ]; then
+    echo "Celery уже запущен, пропускаем проверку задач для избежания ошибок импорта Django"
+    echo "Для просмотра задач используйте Django admin или запустите скрипт, когда Celery не запущен"
+else
+    # Выполняем проверку задач только если Celery не запущен
+    python -c "import django; django.setup(); from django_celery_beat.models import PeriodicTask; print('\n'.join([f'{task.name} - {task.enabled}' for task in PeriodicTask.objects.all()]))" 2>/dev/null || echo "Не удалось получить список задач. Возможно, проблема с импортом Django."
 
 echo ""
 echo "Для просмотра логов Celery beat используйте: tail -f celery_beat.log"
