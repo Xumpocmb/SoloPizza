@@ -42,7 +42,8 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    color: white;
+    color: var(--accent-color);
+
     border-radius: 50%;
     text-decoration: none;
     transition: all 0.2s ease;
