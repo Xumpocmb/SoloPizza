@@ -91,6 +91,7 @@
             <div class="item-block">
                 <div class="product-name">{{ data.item.product.name }}</div>
                 {% if data.item.variant.size %}<p class="item-param">Размер: {{ data.item.variant.size.name }}</p>{% endif %}
+                {% if data.item.variant.value %}<p class="item-param">{{ data.item.variant.value }} {{data.item.variant.get_unit_display }}</p>{% endif %}
                 {% if data.item.quantity > 0 %}<p class="item-param">Количество: {{ data.item.quantity }}</p>{% endif %}
                 {% if data.item.board1 %}<p class="item-param">Борт 1: {{ data.item.board1.board.name }}</p>{% endif %}
                 {% if data.item.board2 %}<p class="item-param">Борт 2: {{ data.item.board2.board.name }}</p>{% endif %}
