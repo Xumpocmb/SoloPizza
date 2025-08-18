@@ -1,0 +1,18 @@
+[Unit]
+Description=Celery Beat Service
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/path/to/SoloPizza
+Environment="PATH=/path/to/SoloPizza/venv/bin"
+ExecStart=/path/to/SoloPizza/venv/bin/celery -A SoloPizza beat -l info
+Restart=on-failure
+RestartSec=5
+KillMode=mixed
+TimeoutStopSec=5
+
+[Install]
+WantedBy=multi-user.target
