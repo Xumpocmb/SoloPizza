@@ -53,20 +53,9 @@
         <div><strong>Заказ #:</strong> 00{{ order.id }}</div>
         <div><strong>Дата:</strong> {{ order.created_at|date:"d.m.Y H:i" }}</div>
         <div><strong>Клиент:</strong> {{ order.customer_name }}</div>
-        <div><strong>Телефон:</strong> {{ order.phone_number }}</div>
         {% if order.delivery_type == 'delivery' %}
+        <div><strong>Телефон:</strong> {{ order.phone_number }}</div>
         <div><strong>Адрес:</strong> {{ order.address|linebreaks }}</div>
-        {% endif %}
-        <div><strong>Тип:</strong> {{ order.get_delivery_type_display }}</div>
-        <div><strong>Оплата:</strong> {{ order.get_payment_method_display }}</div>
-        {% if order.ready_by %}
-        <div><strong>Готов к:</strong> {{ order.ready_by|date:"d.m.Y H:i" }}</div>
-        {% endif %}
-        {% if order.delivery_by %}
-        <div><strong>Доставка к:</strong> {{ order.delivery_by|date:"d.m.Y H:i" }}</div>
-        {% endif %}
-        {% if order.comment %}
-        <div><strong>Комментарий:</strong> {{ order.comment }}</div>
         {% endif %}
     </div>
     {% else %}
@@ -74,10 +63,6 @@
     <div class="order-details">
         <div><strong>Заказ #:</strong> 00{{ order.id }}</div>
         <div><strong>Дата:</strong> {{ order.created_at|date:"d.m.Y H:i" }}</div>
-        <div><strong>Тип:</strong> {{ order.get_delivery_type_display }}</div>
-        {% if order.comment %}
-        <div><strong>Комментарий:</strong> {{ order.comment }}</div>
-        {% endif %}
     </div>
     {% endif %}
 
@@ -109,6 +94,30 @@
         </div>
     </div>
 
+
+    {% if show_order_details %}
+    <div class="order-details">
+        <div><strong>Тип:</strong> {{ order.get_delivery_type_display }}</div>
+        <div><strong>Оплата:</strong> {{ order.get_payment_method_display }}</div>
+        {% if order.ready_by %}
+        <div><strong>Готов к:</strong> {{ order.ready_by|date:"d.m.Y H:i" }}</div>
+        {% endif %}
+        {% if order.delivery_by %}
+        <div><strong>Доставка к:</strong> {{ order.delivery_by|date:"d.m.Y H:i" }}</div>
+        {% endif %}
+        {% if order.comment %}
+        <div><strong>Комментарий:</strong> {{ order.comment }}</div>
+        {% endif %}
+    </div>
+    {% else %}
+    <!-- Для чека "Только Фастфуд" показываем минимум -->
+    <div class="order-details">
+        <div><strong>Тип:</strong> {{ order.get_delivery_type_display }}</div>
+        {% if order.comment %}
+        <div><strong>Комментарий:</strong> {{ order.comment }}</div>
+        {% endif %}
+    </div>
+    {% endif %}
     {% if show_order_details %}
     <div class="totals">
         {% if order.delivery_type == 'delivery' and order.delivery_cost > 0 %}

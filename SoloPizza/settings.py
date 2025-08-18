@@ -26,6 +26,7 @@ CHAT_ID = os.getenv("CHAT_ID")
 
 INSTALLED_APPS = [
     "django.contrib.sites",
+    "django.contrib.sitemaps",
     "allauth",
     "allauth.account",
     "allauth.socialaccount",

@@ -23,7 +23,7 @@ class CategorySitemap(Sitemap):
     changefreq = 'weekly'
 
     def items(self):
-        return Category.objects.filter(is_active=True)
+        return Category.objects.filter(is_active=True).exclude(slug='napitki-v-zal')
 
     def location(self, obj):
         return obj.get_absolute_url()
@@ -48,7 +48,7 @@ class VacancySitemap(Sitemap):
         return Vacancy.objects.filter(is_active=True)
 
     def location(self, obj):
-        return reverse('app_home:vacancy_detail', kwargs={'pk': obj.pk})
+        return reverse('app_home:vacancy_detail', kwargs={'vacancy_id': obj.id})
 
 
 class ReviewSitemap(Sitemap):

@@ -65,7 +65,7 @@ class Product(models.Model):
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
-        return reverse('app_catalog:product_detail', kwargs={'slug': self.slug})
+        return reverse('app_catalog:item_detail', kwargs={'slug': self.slug})
 
 
 class PizzaSizes(models.Model):
