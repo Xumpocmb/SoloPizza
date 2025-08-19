@@ -338,9 +338,9 @@ a:hover {
     justify-content: center;
 }
 
-.cart-wrapper {
-    /* margin-left: 10px; */
-}
+/* .cart-wrapper {
+    margin-left: 10px;
+} */
 
 .cart-wrapper a {
     display: flex;

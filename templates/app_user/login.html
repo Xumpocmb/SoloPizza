@@ -17,9 +17,9 @@
             <div class="auth_form_wrapper">
                 <h2 class="auth_form_title">Вход</h2>
                 <div class="register-link">
-                    <p>Воспользуйтесь быстрой авторизацией с помощью социальных сетей:</p>
-                    <a href="{% url 'google_login' %}">Войти через Google</a><br><br>
-                    <p>Либо используйте логин и пароль от сайта:</p>
+                    <p><strong>Быстрый вход через социальные сети:</strong></p>
+                    <a href="{% url 'google_login' %}" class="google-login-btn"><i class="fab fa-google"></i>Войти через Google</a>
+                    <p>или используйте логин и пароль от сайта:</p>
                 </div>
                 <form class="auth_form" action="{% url 'app_user:login' %}" method="post">
                     {% csrf_token %}
@@ -52,7 +52,8 @@
                 </form>
                 <!-- Ссылка на регистрацию -->
                 <div class="register-link">
-                    <p>Ещё не зарегистрированы?<a href="{% url 'app_user:register' %}"> Зарегистрироваться на сайте</a></p>
+                    <p>Ещё не зарегистрированы?</p>
+                    <a href="{% url 'app_user:register' %}" class="register-site-btn">Зарегистрироваться на сайте</a>
                 </div>
 
             </div>
