@@ -17,6 +17,8 @@
     <meta name="twitter:title" content="{{ title|default:"Solo Pizza" }}">
     <meta name="twitter:description" content="{% block twitter_description %}Solo Pizza - вкусная пицца и другие блюда с доставкой. Заказывайте онлайн!{% endblock %}">
     <link rel="canonical" href="{{ request.build_absolute_uri }}">
+    <link rel="icon" href="{% static 'img/favicon.ico' %}" type="image/x-icon">
+    <link rel="shortcut icon" href="{% static 'img/favicon.ico' %}" type="image/x-icon">
     <title>{{ title|default:"Solo Pizza" }}</title>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     <link rel="stylesheet" href="{% static 'css/alert.css' %}">
