@@ -63,6 +63,7 @@
 .product-name {
     font-size: 20px; /* Увеличен с 16px на 4 пункта */
     font-weight: 800; /* Экстра-жирный шрифт */
+    margin-top: -5px;
 }
 
 .totals {
