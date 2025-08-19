@@ -75,20 +75,20 @@
             {% for data in items_data %}
             <div class="item-block">
                 <div class="product-name">{{ data.item.product.name }}</div>
-                {% if data.item.variant.size %}<p class="item-param">Размер: {{ data.item.variant.size.name }}</p>{% endif %}
+                {% if data.item.variant.size %}<p class="item-param"><strong>Размер:</strong> {{ data.item.variant.size.name }}</p>{% endif %}
                 {% if data.item.variant.value %}<p class="item-param">{{ data.item.variant.value }} {{data.item.variant.get_unit_display }}</p>{% endif %}
-                {% if data.item.quantity > 0 %}<p class="item-param">Количество: {{ data.item.quantity }}</p>{% endif %}
-                {% if data.item.board1 %}<p class="item-param">Борт 1: {{ data.item.board1.board.name }}</p>{% endif %}
-                {% if data.item.board2 %}<p class="item-param">Борт 2: {{ data.item.board2.board.name }}</p>{% endif %}
-                {% if data.item.sauce %}<p class="item-param">Соус: {{ data.item.sauce.name }}</p>{% endif %}
+                {% if data.item.quantity > 0 %}<p class="item-param"><strong>Количество:</strong> {{ data.item.quantity }}</p>{% endif %}
+                {% if data.item.board1 %}<p class="item-param"><strong>Борт 1:</strong> {{ data.item.board1.board.name }}</p>{% endif %}
+                {% if data.item.board2 %}<p class="item-param"><strong>Борт 2:</strong> {{ data.item.board2.board.name }}</p>{% endif %}
+                {% if data.item.sauce %}<p class="item-param"><strong>Соус:</strong> {{ data.item.sauce.name }}</p>{% endif %}
                 {% if data.item.addons.exists %}
-                <p class="item-param">Добавки:
+                <p class="item-param"><strong>Добавки:</strong>
                 {% for addon in data.item.addons.all %}
                     {{ addon.addon.name }}{% if not forloop.last %}, {% endif %}
                 {% endfor %}
                 </p>
                 {% endif %}
-                <p class="item-param">Стоимость: {{ data.final_line_total|floatformat:2 }} руб.</p>
+                <p class="item-param"><strong>Стоимость:</strong> {{ data.final_line_total|floatformat:2 }} руб.</p>
             </div>
             {% endfor %}
         </div>
