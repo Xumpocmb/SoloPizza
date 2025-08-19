@@ -36,8 +36,8 @@
 
 .items-header h3 {
     margin: 0;
-    font-weight: bold;
-    font-size: 18px;
+    font-weight: 800;
+    font-size: 22px;
 }
 
 .items-list {
@@ -45,16 +45,15 @@
 }
 
 .item-block {
-    padding: 1mm;
-    margin-bottom: 2mm;
     border-bottom: 1px dotted #aaa;
 }
 
 .item-param {
     margin: 0.5mm 0;
-    font-size: 16px;
-    white-space: nowrap;
+    font-size: 18px;
+    white-space: normal;
     word-wrap: break-word;
+    line-height: 16px;
 }
 
 .product-name {
