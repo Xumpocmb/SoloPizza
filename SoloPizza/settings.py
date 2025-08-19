@@ -178,3 +178,11 @@ CELERY_BEAT_SCHEDULE = CELERYBEAT_SCHEDULE
 # Настройки для хранения задач Celery в базе данных
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 INSTALLED_APPS += ['django_celery_beat', 'django_celery_results']
+
+
+
+EMAIL_HOST = 'smtp.yandex.ru'
+EMAIL_PORT = 465
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+EMAIL_USE_SSL = True
