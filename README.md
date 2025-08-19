@@ -75,27 +75,6 @@ gunicorn SoloPizza.wsgi:application --bind 0.0.0.0:8000 --workers 3
 - **app_order**: Ежедневная очистка заказов
 - **app_catalog**: Управление категорией "Комбо" по расписанию
 
-### Запуск Celery
-
-```bash
-# Запуск воркера и планировщика
-./run_celery.sh
-
-# Запуск только воркера
-./run_celery_worker.sh
-
-# Запуск только планировщика
-./run_celery_beat.sh
-
-# Запуск конкретной задачи
-./run_celery_task.sh app_catalog.tasks.activate_combo_category
-
-# Запуск мониторинга Flower
-./run_celery_flower.sh  # Доступен на http://localhost:5555
-
-# Остановка всех процессов Celery
-./stop_celery.sh
-```
 
 ## Обслуживание
 
