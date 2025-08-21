@@ -82,7 +82,7 @@ class Order(models.Model):
     DELIVERY_CHOICES = [
         ("pickup", "Самовывоз"),
         ("delivery", "Доставка"),
-        ("cafe", "На месте")
+        ("cafe", "Зал")
     ]
 
     EDITABLE_STATUSES = ["new", "confirmed"]
