@@ -12,7 +12,7 @@ from datetime import time
 from app_cart.models import CartItem
 from app_cart.utils import validate_cart_items_for_branch
 from app_home.models import CafeBranch
-from app_order.forms import CheckoutForm, OrderEditForm, OrderItemFormSet
+from app_order.forms import CheckoutForm, OrderEditForm, OrderItemFormSet, AddToOrderForm
 from app_order.models import OrderItem, Order
 from decimal import Decimal, ROUND_HALF_UP
 from django.conf import settings
@@ -383,6 +383,64 @@ def print_check_non_fastfood(request, order_id):
         "branch": order.branch,  # Передаем филиал для доступа к настройкам печати
     }
     return render(request, "app_order/print_check.html", context)
+
+
+@login_required
+def add_item_to_order(request, order_id):
+    """Добавление товара в существующий заказ"""
+    # Проверка прав доступа - только для администраторов и персонала
+    if not request.user.is_staff:
+        return redirect('app_order:order_list')
+        
+    order = get_object_or_404(Order, id=order_id)
+    
+    # Проверяем, можно ли редактировать заказ
+    if not order.is_editable():
+        messages.error(request, "Этот заказ нельзя редактировать")
+        return redirect('app_order:order_detail', order_id=order.id)
+    
+    if request.method == "POST":
+        form = AddToOrderForm(request.POST, order=order)
+        if form.is_valid():
+            product = form.cleaned_data['product']
+            variant = form.cleaned_data['variant']
+            quantity = form.cleaned_data['quantity']
+            board1 = form.cleaned_data.get('board1')
+            board2 = form.cleaned_data.get('board2')
+            sauce = form.cleaned_data.get('sauce')
+            addons = form.cleaned_data.get('addons', [])
+            
+            # Создаем новый элемент заказа
+            order_item = OrderItem.objects.create(
+                order=order,
+                product=product,
+                variant=variant,
+                quantity=quantity,
+                board1=board1,
+                board2=board2,
+                sauce=sauce
+            )
+            
+            # Добавляем добавки, если они есть
+            if addons:
+                order_item.addons.set(addons)
+            
+            # Пересчитываем итоги заказа
+            order.recalculate_totals()
+            
+            messages.success(request, f"Товар '{product.name}' добавлен в заказ")
+            return redirect('app_order:order_detail', order_id=order.id)
+    else:
+        form = AddToOrderForm(order=order)
+    
+    return render(
+        request,
+        "app_order/add_item_to_order.html",
+        {
+            "form": form,
+            "order": order,
+        },
+    )
 
 
 @login_required

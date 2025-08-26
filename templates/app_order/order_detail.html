@@ -12,7 +12,6 @@
 
 {% block scripts %}
     {{ block.super }}
-    <script src="{% static 'js/datetime_format.js' %}"></script>
 {% endblock %}
 
 {% block main %}
@@ -48,6 +47,13 @@
                            title="Скачать чек фастфуд">
                             <i class="fas fa-file-pdf"></i>
                         </a>
+                        {% if is_editable %}
+                        <a href="{% url 'app_order:add_item_to_order' order.id %}" 
+                           class="add-item-button" 
+                           title="Добавить товар">
+                            <i class="fas fa-plus"></i> Добавить товар
+                        </a>
+                        {% endif %}
                     {% endif %}
                 </h1>
                 <div class="order-status {{ order.status }}">{{ order.get_status_display }}</div>

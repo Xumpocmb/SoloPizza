@@ -1,0 +1,222 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block meta_description %}Добавление товара в заказ Solo Pizza - выберите товар и его параметры для добавления в существующий заказ.{% endblock %}
+{% block meta_keywords %}добавление товара, заказ пиццы, Solo Pizza заказ{% endblock %}
+{% block og_description %}Добавление товара в заказ Solo Pizza - выберите товар и его параметры для добавления в существующий заказ.{% endblock %}
+{% block twitter_description %}Добавление товара в заказ Solo Pizza - выберите товар и его параметры для добавления в существующий заказ.{% endblock %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'css/add_item_to_order.css' %}"/>
+{% endblock %}
+
+{% block main %}
+    <main class="add-item-page">
+        <div class="checkout-container">
+            <h1 class="checkout-title">Добавление товара в заказ #{{ order.id }}</h1>
+
+            <div class="checkout-content">
+                <form method="POST" class="checkout-form">
+                    {% csrf_token %}
+
+                    <div class="form-section">
+                        <h2 class="section-title">Выберите товар</h2>
+
+                        <div class="form-group">
+                            <label for="{{ form.product.id_for_label }}">{{ form.product.label }}</label>
+                            {{ form.product }}
+                            {{ form.product.errors }}
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.variant.id_for_label }}">{{ form.variant.label }}</label>
+                            {{ form.variant }}
+                            {{ form.variant.errors }}
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.quantity.id_for_label }}">{{ form.quantity.label }}</label>
+                            {{ form.quantity }}
+                            {{ form.quantity.errors }}
+                        </div>
+                    </div>
+
+                    <div id="pizza-options" class="form-section" style="display: none;">
+                        <h2 class="section-title">Параметры пиццы</h2>
+
+                        <div class="form-group">
+                            <label for="{{ form.board1.id_for_label }}">{{ form.board1.label }}</label>
+                            {{ form.board1 }}
+                            {{ form.board1.errors }}
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.board2.id_for_label }}">{{ form.board2.label }}</label>
+                            {{ form.board2 }}
+                            {{ form.board2.errors }}
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.sauce.id_for_label }}">{{ form.sauce.label }}</label>
+                            {{ form.sauce }}
+                            {{ form.sauce.errors }}
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.addons.id_for_label }}">{{ form.addons.label }}</label>
+                            {{ form.addons }}
+                            {{ form.addons.errors }}
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Добавить в заказ</button>
+                        <a href="{% url 'app_order:order_detail' order.id %}" class="btn btn-secondary">Отмена</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+{% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+    <script>
+        // Получаем категории продуктов из формы
+        const productCategories = JSON.parse("{{ form.product_categories|escapejs }}");
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const productSelect = document.getElementById('{{ form.product.id_for_label }}');
+            const variantSelect = document.getElementById('{{ form.variant.id_for_label }}');
+            const pizzaOptions = document.getElementById('pizza-options');
+            const board1Select = document.getElementById('{{ form.board1.id_for_label }}');
+            const board2Select = document.getElementById('{{ form.board2.id_for_label }}');
+            const sauceSelect = document.getElementById('{{ form.sauce.id_for_label }}');
+            const addonsSelect = document.getElementById('{{ form.addons.id_for_label }}');
+            
+            // Добавляем классы для стилизации
+            document.querySelectorAll('select').forEach(select => {
+                select.classList.add('styled-select');
+            });
+            
+            // Устанавливаем атрибуты data-category для всех опций продуктов
+            for (let i = 0; i < productSelect.options.length; i++) {
+                const option = productSelect.options[i];
+                const productId = option.value;
+                if (productId && productCategories[productId]) {
+                    option.dataset.category = productCategories[productId];
+                }
+            }
+            
+            function updatePizzaOptions() {
+                // Получаем выбранный элемент
+                const selectedOption = productSelect.options[productSelect.selectedIndex];
+                
+                // Проверяем, является ли продукт пиццей или кальцоне
+                if (selectedOption && (selectedOption.dataset.category === 'Пицца' || selectedOption.dataset.category === 'Кальцоне')) {
+                    // Плавное появление секции параметров пиццы
+                    pizzaOptions.style.display = 'block';
+                    pizzaOptions.style.opacity = '0';
+                    setTimeout(() => {
+                        pizzaOptions.style.opacity = '1';
+                    }, 10);
+                } else {
+                    // Плавное скрытие секции параметров пиццы
+                    pizzaOptions.style.opacity = '0';
+                    setTimeout(() => {
+                        pizzaOptions.style.display = 'none';
+                    }, 300);
+                }
+            }
+            
+            // Функция для обновления вариантов при выборе продукта
+            function updateVariants() {
+                const productId = productSelect.value;
+                if (!productId) return;
+                
+                // Очищаем текущие варианты
+                variantSelect.innerHTML = '<option value="">---------</option>';
+                
+                // Запрашиваем варианты для выбранного продукта
+                fetch(`/api/product/${productId}/variants/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        data.forEach(variant => {
+                            const option = document.createElement('option');
+                            option.value = variant.id;
+                            option.textContent = variant.name;
+                            if (variant.size) {
+                                option.dataset.size = variant.size.id;
+                            }
+                            variantSelect.appendChild(option);
+                        });
+                    })
+                    .catch(error => console.error('Ошибка при загрузке вариантов:', error));
+            }
+            
+            // Функция для обновления параметров пиццы при выборе варианта
+            function updatePizzaParams() {
+                const variantOption = variantSelect.options[variantSelect.selectedIndex];
+                if (!variantOption || !variantOption.dataset.size) return;
+                
+                const sizeId = variantOption.dataset.size;
+                const productId = productSelect.value;
+                
+                // Проверяем, является ли продукт пиццей или кальцоне
+                const selectedProductOption = productSelect.options[productSelect.selectedIndex];
+                if (!selectedProductOption || !(selectedProductOption.dataset.category === 'Пицца' || selectedProductOption.dataset.category === 'Кальцоне')) {
+                    return;
+                }
+                
+                // Загружаем борты для выбранного размера
+                fetch(`/api/size/${sizeId}/boards/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        // Обновляем борт 1
+                        board1Select.innerHTML = '<option value="">---------</option>';
+                        data.forEach(board => {
+                            const option = document.createElement('option');
+                            option.value = board.id;
+                            option.textContent = `${board.name} (+${board.price} руб.)`;
+                            board1Select.appendChild(option);
+                        });
+                        
+                        // Обновляем борт 2
+                        board2Select.innerHTML = '<option value="">---------</option>';
+                        data.forEach(board => {
+                            const option = document.createElement('option');
+                            option.value = board.id;
+                            option.textContent = `${board.name} (+${board.price} руб.)`;
+                            board2Select.appendChild(option);
+                        });
+                    })
+                    .catch(error => console.error('Ошибка при загрузке бортов:', error));
+                
+                // Загружаем добавки для выбранного размера
+                fetch(`/api/size/${sizeId}/addons/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        addonsSelect.innerHTML = '';
+                        data.forEach(addon => {
+                            const option = document.createElement('option');
+                            option.value = addon.id;
+                            option.textContent = `${addon.name} (+${addon.price} руб.)`;
+                            addonsSelect.appendChild(option);
+                        });
+                    })
+                    .catch(error => console.error('Ошибка при загрузке добавок:', error));
+            }
+            
+            // Вызываем функцию при загрузке страницы
+            updatePizzaOptions();
+            
+            // Добавляем обработчики событий
+            productSelect.addEventListener('change', function() {
+                updatePizzaOptions();
+                updateVariants();
+            });
+            
+            variantSelect.addEventListener('change', updatePizzaParams);
+        });
+    </script>
+{% endblock %}

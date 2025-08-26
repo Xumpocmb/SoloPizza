@@ -2,7 +2,7 @@ from django import forms
 from django.forms import inlineformset_factory
 from django.contrib import messages
 from django.utils import timezone
-from app_catalog.models import AddonParams, PizzaSauce, ProductVariant, BoardParams
+from app_catalog.models import AddonParams, PizzaSauce, ProductVariant, BoardParams, Product
 from app_order.models import Order, OrderItem
 from app_home.models import Discount
 
@@ -281,3 +281,108 @@ class OrderItemEditForm(forms.ModelForm):
 
 OrderItemFormSet = inlineformset_factory(Order, OrderItem, form=OrderItemEditForm, extra=0, can_delete=False,
                                          fields=["variant", "quantity", "board1", "board2", "sauce", "addons"])
+
+
+class AddToOrderForm(forms.Form):
+    product = forms.ModelChoiceField(
+        queryset=Product.objects.filter(is_active=True),
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        label="Товар"
+    )
+    variant = forms.ModelChoiceField(
+        queryset=ProductVariant.objects.none(),
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        label="Вариант"
+    )
+    quantity = forms.IntegerField(
+        min_value=1,
+        max_value=10,
+        initial=1,
+        widget=forms.NumberInput(attrs={'class': 'form-control'}),
+        label="Количество"
+    )
+    
+    # Поля для пиццы / кальцоне
+    board1 = forms.ModelChoiceField(
+        queryset=BoardParams.objects.none(),
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        label="Борт 1"
+    )
+    board2 = forms.ModelChoiceField(
+        queryset=BoardParams.objects.none(),
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        label="Борт 2"
+    )
+    sauce = forms.ModelChoiceField(
+        queryset=PizzaSauce.objects.all(),
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        label="Соус"
+    )
+    addons = forms.ModelMultipleChoiceField(
+        queryset=AddonParams.objects.none(),
+        required=False,
+        widget=forms.SelectMultiple(attrs={'class': 'form-select multiple-select'}),
+        label="Добавки"
+    )
+
+    def __init__(self, *args, **kwargs):
+        self.order = kwargs.pop('order', None)
+        super().__init__(*args, **kwargs)
+        
+        # Добавляем атрибуты data-category для всех продуктов
+        product_field = self.fields['product']
+        product_field.widget.attrs['class'] = 'form-select'
+        
+        # Получаем все продукты и устанавливаем атрибуты data-category
+        products = Product.objects.all()
+        choices = []
+        for product in products:
+            option_attrs = {'data-category': product.category.name}
+            choices.append((product.id, product.name))
+            
+        product_field.choices = choices
+        
+        # Добавляем JavaScript для установки атрибутов data-category
+        import json
+        self.product_categories = json.dumps({str(p.id): p.category.name for p in products})
+        
+        # Если форма уже заполнена и выбран продукт
+        if args and 'product' in args[0]:
+            product_id = args[0].get('product')
+            try:
+                product = Product.objects.get(id=product_id)
+                self.fields['variant'].queryset = ProductVariant.objects.filter(product=product)
+                
+                # Если выбран вариант, настраиваем поля для пиццы
+                if 'variant' in args[0]:
+                    variant_id = args[0].get('variant')
+                    try:
+                        variant = ProductVariant.objects.get(id=variant_id)
+                        if variant.size and product.category.name in ["Пицца", "Кальцоне"]:
+                            self.fields['board1'].queryset = BoardParams.objects.filter(size=variant.size)
+                            self.fields['board2'].queryset = BoardParams.objects.filter(size=variant.size)
+                            self.fields['addons'].queryset = AddonParams.objects.filter(size=variant.size)
+                    except ProductVariant.DoesNotExist:
+                        pass
+            except Product.DoesNotExist:
+                pass
+
+    def clean(self):
+        cleaned_data = super().clean()
+        product = cleaned_data.get('product')
+        variant = cleaned_data.get('variant')
+        board1 = cleaned_data.get('board1')
+        board2 = cleaned_data.get('board2')
+        
+        # Проверка, что вариант принадлежит выбранному продукту
+        if product and variant and variant.product != product:
+            self.add_error('variant', 'Выбранный вариант не принадлежит выбранному товару')
+        
+        # Проверка на одинаковые борты
+        if board1 and board2 and board1.id == board2.id:
+            self.add_error('board2', 'Нельзя выбрать одинаковые борты')
+            
+        return cleaned_data

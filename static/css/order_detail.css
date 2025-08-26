@@ -49,6 +49,25 @@
     transition: all 0.2s ease;
 }
 
+.add-item-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    background-color: var(--accent-color);
+    padding: 5px 10px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    margin-left: 10px;
+}
+
+.add-item-button:hover {
+    background-color: var(--accent-hover);
+    transform: translateY(-2px);
+}
+
 .pdf-button:hover {
     background-color: var(--accent-hover);
     transform: scale(1.05);
