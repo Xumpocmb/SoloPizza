@@ -35,7 +35,7 @@
                             {% if item.image %}
                                 <img src="{{ item.image.url }}" alt="{{ item.name }}">
                             {% else %}
-                                <img src="{% static 'img/test.jpg' %}" alt="{{ item.name }}">
+                                <img src="{% static 'img/No-Image-Placeholder.svg' %}" alt="{{ item.name }}">
                             {% endif %}
                             <h2>{{ item.name }}</h2>
                             <p>{{ item.description }}</p>
