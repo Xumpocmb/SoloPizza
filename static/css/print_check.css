@@ -95,3 +95,8 @@
     text-align: right;
     font-style: italic;
 }
+
+
+.underlined_text {
+    text-decoration: underline;
+}

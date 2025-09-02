@@ -120,7 +120,7 @@
         <div><strong>Клиент:</strong> {{ order.customer_name }}</div>
         {% if order.delivery_type == 'delivery' %}
         <div><strong>Телефон:</strong> {{ order.phone_number }}</div>
-        <div><strong>Адрес:</strong> {{ order.address|linebreaks }}</div>
+        <div><strong>Адрес:</strong> {{ order.address }}</div>
         {% endif %}
     </div>
     {% else %}
@@ -161,13 +161,13 @@
         <div><strong>Тип:</strong> {{ order.get_delivery_type_display }}</div>
         <div><strong>Оплата:</strong> {{ order.get_payment_method_display }}</div>
         {% if order.ready_by %}
-        <div><strong>Готов к:</strong> {{ order.ready_by|date:"d.m.Y H:i" }}</div>
+        <div><strong>Готов к:</strong> <span class="underlined_text">{{ order.ready_by|date:"d.m.Y H:i" }}</span></div>
         {% endif %}
         {% if order.delivery_by %}
-        <div><strong>Доставка к:</strong> {{ order.delivery_by|date:"d.m.Y H:i" }}</div>
+        <div><strong>Доставка к:</strong> <span class="underlined_text">{{ order.delivery_by|date:"d.m.Y H:i" }}</span></div>
         {% endif %}
         {% if order.comment %}
-        <div><strong>Комментарий:</strong> {{ order.comment }}</div>
+        <div><strong>Комментарий:</strong><span class="underlined_text">{{ order.comment }}</span></div>
         {% endif %}
     </div>
     {% else %}
@@ -181,7 +181,7 @@
         <div><strong>Доставка к:</strong> {{ order.delivery_by|date:"d.m.Y H:i" }}</div>
         {% endif %}
         {% if order.comment %}
-        <div><strong>Комментарий:</strong> {{ order.comment }}</div>
+        <div><strong>Комментарий:</strong><span class="underlined_text">{{ order.comment }}</span></div>
         {% endif %}
     </div>
     {% endif %}
