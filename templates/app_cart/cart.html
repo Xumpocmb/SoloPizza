@@ -79,6 +79,14 @@
                                             <span class="option-value">{{ item.sauce.name }}</span>
                                         </div>
                                     {% endif %}
+                                    
+                                    <!-- Напиток -->
+                                    {% if item.drink %}
+                                        <div class="item-option">
+                                            <span class="option-label">Напиток:</span>
+                                            <span class="option-value">{{ item.drink }}</span>
+                                        </div>
+                                    {% endif %}
 
                                     <!-- Добавки -->
                                     {% if item.addons.exists %}

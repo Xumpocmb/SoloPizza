@@ -87,7 +87,7 @@ def checkout(request):
             order.save()
 
             for cart_item in cart_items:
-                OrderItem.objects.create(
+                order_item = OrderItem.objects.create(
                     order=order,
                     product=cart_item.item,
                     variant=cart_item.item_variant,
@@ -95,7 +95,9 @@ def checkout(request):
                     board1=cart_item.board1,
                     board2=cart_item.board2,
                     sauce=cart_item.sauce,
-                ).addons.set(cart_item.addons.all())
+                    drink=cart_item.drink,
+                )
+                order_item.addons.set(cart_item.addons.all())
 
             cart_items.delete()
             if not settings.DEBUG and not request.user.is_superuser and not request.user.is_staff:

@@ -145,6 +145,13 @@
                                                 </div>
                                             {% endif %}
 
+                                            {% if form.instance.drink %}
+                                                <div class="item-option">
+                                                    <span class="option-label">Напиток:</span>
+                                                    <span class="option-value">{{ form.instance.drink }}</span>
+                                                </div>
+                                            {% endif %}
+
                                             {% if form.instance.addons.exists %}
                                                 <div class="item-option">
                                                     <span class="option-label">Добавки:</span>
@@ -200,6 +207,13 @@
                                             <label>Соус:</label>
                                             {{ form.sauce }}
                                         </div>
+
+                                        {% if form.instance.product.category.name == 'Комбо' %}
+                                        <div class="form-group">
+                                            <label>Напиток:</label>
+                                            {{ form.drink }}
+                                        </div>
+                                        {% endif %}
 
                                         <div class="form-group">
                                             <label>Добавки:</label>

@@ -182,6 +182,7 @@ class OrderItem(models.Model):
     )
     sauce = models.ForeignKey(PizzaSauce, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Соус")
     addons = models.ManyToManyField(AddonParams, blank=True, verbose_name="Добавки")
+    drink = models.CharField(max_length=100, null=True, blank=True, verbose_name="Напиток", help_text="Только для комбо наборов")
 
     class Meta:
         verbose_name = "Позиция заказа"
@@ -215,6 +216,9 @@ class OrderItem(models.Model):
         if self.addons.exists():
             addons = ", ".join(a.addon.name for a in self.addons.all())
             result += f"\nДобавки: {addons}"
+            
+        if self.drink:
+            result += f"\nНапиток: {self.drink}"
             
         if include_price_info and base_unit_price is not None and final_line_total is not None:
             result += f"\nКол-во: {self.quantity}"

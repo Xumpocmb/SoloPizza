@@ -177,13 +177,14 @@ class OrderEditForm(forms.ModelForm):
 class OrderItemEditForm(forms.ModelForm):
     class Meta:
         model = OrderItem
-        fields = ["variant", "quantity", "board1", "board2", "sauce", "addons"]
+        fields = ["variant", "quantity", "board1", "board2", "sauce", "drink", "addons"]
         widgets = {
             "variant": forms.Select(attrs={"class": "form-select"}),
             "quantity": forms.NumberInput(attrs={"class": "form-input quantity-edit", "min": 1, "max": 20}),
             "board1": forms.Select(attrs={"class": "form-select board1-edit"}),
             "board2": forms.Select(attrs={"class": "form-select board2-edit"}),
             "sauce": forms.Select(attrs={"class": "form-select sauce-edit"}),
+            "drink": forms.TextInput(attrs={"class": "form-input drink-edit"}),
             "addons": forms.SelectMultiple(attrs={"class": "form-select multiple-select"}),
         }
 
@@ -280,7 +281,7 @@ class OrderItemEditForm(forms.ModelForm):
 
 
 OrderItemFormSet = inlineformset_factory(Order, OrderItem, form=OrderItemEditForm, extra=0, can_delete=False,
-                                         fields=["variant", "quantity", "board1", "board2", "sauce", "addons"])
+                                         fields=["variant", "quantity", "board1", "board2", "sauce", "drink", "addons"])
 
 
 class AddToOrderForm(forms.Form):

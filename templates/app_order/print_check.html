@@ -142,6 +142,7 @@
                 {% if data.item.board1 %}<p class="item-param"><strong>Борт 1:</strong> {{ data.item.board1.board.name }}</p>{% endif %}
                 {% if data.item.board2 %}<p class="item-param"><strong>Борт 2:</strong> {{ data.item.board2.board.name }}</p>{% endif %}
                 {% if data.item.sauce %}<p class="item-param"><strong>Соус:</strong> {{ data.item.sauce.name }}</p>{% endif %}
+                {% if data.item.drink %}<p class="item-param"><strong>Напиток:</strong> {{ data.item.drink }}</p>{% endif %}
                 {% if data.item.addons.exists %}
                 <p class="item-param"><strong>Добавки:</strong>
                 {% for addon in data.item.addons.all %}

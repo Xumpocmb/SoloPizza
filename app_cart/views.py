@@ -55,6 +55,9 @@ def add_to_cart(request, slug):
             # Обработка добавок
             addons = AddonParams.objects.filter(id__in=addon_ids) if addon_ids else []
 
+            # Получаем выбранный напиток для комбо
+            drink = request.POST.get('drink') if item.category.name == "Комбо" else None
+            
             # Создание/обновление элемента корзины
             cart_item, created = CartItem.objects.get_or_create(
                 user=request.user,
@@ -63,6 +66,7 @@ def add_to_cart(request, slug):
                 sauce=sauce,
                 board1=board1,
                 board2=board2,
+                drink=drink,
                 defaults={'quantity': quantity}
             )
 

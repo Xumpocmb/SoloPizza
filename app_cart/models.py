@@ -40,6 +40,7 @@ class CartItem(models.Model):
     )
     addons = models.ManyToManyField(AddonParams, blank=True, verbose_name="Добавки", help_text="Только для пиццы")
     sauce = models.ForeignKey(PizzaSauce, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Соус", help_text="Только для пиццы и кальцоне")
+    drink = models.CharField(max_length=100, null=True, blank=True, verbose_name="Напиток", help_text="Только для комбо наборов")
     created_at = models.DateTimeField(default=timezone.now, verbose_name="Дата добавления")
     updated_at = models.DateTimeField(default=timezone.now, verbose_name="Дата обновления")
 
@@ -94,6 +95,9 @@ class CartItem(models.Model):
         if self.addons.exists():
             addons = ", ".join(a.addon.name for a in self.addons.all())
             desc.append(f"Добавки: {addons}")
+            
+        if self.drink:
+            desc.append(f"Напиток: {self.drink}")
 
         return " | ".join(desc)
 
