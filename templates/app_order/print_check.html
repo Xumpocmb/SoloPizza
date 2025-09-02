@@ -120,7 +120,7 @@
         <div><strong>Клиент:</strong> {{ order.customer_name }}</div>
         {% if order.delivery_type == 'delivery' %}
         <div><strong>Телефон:</strong> {{ order.phone_number }}</div>
-        <div><strong>Адрес:</strong> {{ order.address }}</div>
+        <div><strong>Адрес:</strong> <span class="underlined_text">{{ order.address }}</span></div>
         {% endif %}
     </div>
     {% else %}
