@@ -15,19 +15,20 @@
         
         @media print {
             @page {
-                margin: 3mm; /* Очень маленькие поля */
+                margin: 1mm; /* Очень маленькие поля */
                 size: var(--check-tape-width) auto; /* Ширина из настроек филиала, высота автоматическая */
             }
             body {
-            font-family: 'Arial', 'Helvetica', sans-serif;
+            font-family: serif;
             font-size: var(--check-font-size); /* Размер шрифта из настроек филиала */
             font-weight: 600;
             margin: 0;
-            padding: 2mm;
+            padding: 0;
             width: var(--check-tape-width); /* Ширина из настроек филиала */
             box-sizing: border-box;
             color: #000;
             background-color: white;
+            letter-spacing: -1px;
         }
         
         /* Применяем размер шрифта ко всем элементам чека */
@@ -48,10 +49,6 @@
             line-height: calc(var(--check-font-size) * 1.2) !important;
         }
         
-        .product-name {
-            font-size: calc(var(--check-font-size) * 1.2) !important;
-        }
-        
         .totals {
             font-size: calc(var(--check-font-size) * 1.1) !important;
         }
@@ -66,14 +63,15 @@
         }
         
         body {
-            font-family: 'Arial', 'Helvetica', sans-serif;
+            font-family: serif;
             font-size: var(--check-font-size); /* Размер шрифта из настроек филиала */
-            font-weight: 600;
+            font-weight: 400;
             margin: 0;
-            padding: 2mm;
+            padding: 0;
             width: var(--check-tape-width); /* Ширина из настроек филиала */
             box-sizing: border-box;
             border: 1px dashed #ccc;
+            letter-spacing: -1px;
         }
         
         /* Применяем размер шрифта ко всем элементам чека в обычном режиме */
@@ -91,11 +89,13 @@
         
         .item-param {
             font-size: calc(var(--check-font-size) * 1.1) !important;
-            line-height: calc(var(--check-font-size) * 1.2) !important;
+            line-height: calc(var(--check-font-size) * 1.0) !important;
         }
         
         .product-name {
             font-size: calc(var(--check-font-size) * 1.2) !important;
+            line-height: calc(var(--check-font-size) * 0.9) !important;
+
         }
         
         .totals {
@@ -112,11 +112,6 @@
     </style>
 </head>
 <body>
-
-    <!-- Кнопка печати для удобства в браузере -->
-    <button class="btn-print no-print" onclick="window.print()">Печать Чека</button>
-
-    <!-- Заголовок чека убран по требованию -->
 
     {% if show_order_details %}
     <div class="order-details">
@@ -138,16 +133,12 @@
 
     {% if items_data %}
     <div class="items-container">
-        <div class="items-header">
-            <h3>Товары</h3>
-        </div>
         <div class="items-list">
             {% for data in items_data %}
             <div class="item-block">
-                <div class="product-name">{{ data.item.product.name }}</div>
+                <div class="product-name">{{ data.item.product.name }} {% if data.item.quantity > 0 %} - <strong>{{ data.item.quantity }}</strong>{% endif%}</div>
                 {% if data.item.variant.size %}<p class="item-param"><strong>Размер:</strong> {{ data.item.variant.size.name }}</p>{% endif %}
                 {% if data.item.variant.value %}<p class="item-param">{{ data.item.variant.value }} {{data.item.variant.get_unit_display }}</p>{% endif %}
-                {% if data.item.quantity > 0 %}<p class="item-param"><strong>Количество:</strong> {{ data.item.quantity }}</p>{% endif %}
                 {% if data.item.board1 %}<p class="item-param"><strong>Борт 1:</strong> {{ data.item.board1.board.name }}</p>{% endif %}
                 {% if data.item.board2 %}<p class="item-param"><strong>Борт 2:</strong> {{ data.item.board2.board.name }}</p>{% endif %}
                 {% if data.item.sauce %}<p class="item-param"><strong>Соус:</strong> {{ data.item.sauce.name }}</p>{% endif %}
@@ -217,8 +208,5 @@
 
     <!-- Кнопка печати внизу -->
     <button class="btn-print no-print" onclick="window.print()">Печать Чека</button>
-    
-    
-
 </body>
 </html>

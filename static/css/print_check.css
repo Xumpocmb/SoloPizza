@@ -13,9 +13,9 @@
     font-size: 20px; /* Увеличен размер шрифта заголовка */
 }
 
-.order-details {
+/* .order-details {
     margin-bottom: 3mm;
-}
+} */
 
 .order-details div {
     line-height: 1.0; /* Увеличен интервал между строками */
@@ -24,7 +24,6 @@
 .items-container {
     width: 100%;
     margin-bottom: 3mm;
-    font-size: 16px;
 }
 
 .items-header {
@@ -42,6 +41,7 @@
 
 .items-list {
     width: 100%;
+    border-top: 1px dotted #aaa;
 }
 
 .item-block {
@@ -49,21 +49,18 @@
 }
 
 .item-param {
-    margin: 0.5mm 0;
-    font-size: 18px;
+    margin: 0;
     white-space: normal;
     word-wrap: break-word;
-    line-height: 16px;
 }
 
 .item-param strong {
-    font-weight: 800; /* Жирный шрифт для названий параметров */
+    font-weight: 600; /* Жирный шрифт для названий параметров */
 }
 
 .product-name {
     font-size: 20px; /* Увеличен с 16px на 4 пункта */
     font-weight: 800; /* Экстра-жирный шрифт */
-    margin-top: -5px;
 }
 
 .totals {
