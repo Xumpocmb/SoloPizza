@@ -118,8 +118,8 @@
         <div><strong>Заказ #:</strong> 00{{ order.id }}</div>
         <div><strong>Дата:</strong> {{ order.created_at|date:"d.m.Y H:i" }}</div>
         <div><strong>Клиент:</strong> {{ order.customer_name }}</div>
-        {% if order.delivery_type == 'delivery' %}
         <div><strong>Телефон:</strong> {{ order.phone_number }}</div>
+        {% if order.delivery_type == 'delivery' %}
         <div><strong>Адрес:</strong><span class="underlined_text">{{ order.address }}</span></div>
         {% endif %}
     </div>
