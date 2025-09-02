@@ -95,6 +95,8 @@
         .product-name {
             font-size: calc(var(--check-font-size) * 1.2) !important;
             line-height: calc(var(--check-font-size) * 0.9) !important;
+            margin-top: 5px;
+            font-weight: 600;
 
         }
         
@@ -149,7 +151,6 @@
                 {% endfor %}
                 </p>
                 {% endif %}
-                <p class="item-param"><strong>Стоимость:</strong> {{ data.final_line_total|floatformat:2 }} руб.</p>
             </div>
             {% endfor %}
         </div>
