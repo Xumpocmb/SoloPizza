@@ -77,21 +77,18 @@ def item_detail(request, slug):
 
         # Получаем размеры в зависимости от типа товара
         if is_pizza_or_calzone:
-            sauces = PizzaSauce.objects.all() if is_pizza_or_calzone else []
+            sauces = PizzaSauce.objects.all()
             boards = BoardParams.objects.filter(size=selected_variant.size) if selected_variant.size else []
             addons = AddonParams.objects.filter(size=selected_variant.size) if selected_variant.size else []
             
 
         if item.category.name in ["Комбо"]:
-            is_pizza_or_calzone = True
-            # Для комбо-наборов также добавляем возможность выбора бортов для пиццы
-            if item.is_combo and selected_variant and selected_variant.size:
-                boards = BoardParams.objects.filter(size=selected_variant.size)
+            size_32 = PizzaSizes.objects.filter(name="32").first()
+            if size_32:
+                boards = BoardParams.objects.filter(size=size_32)
             else:
                 boards = []
             drinks = ["Кола 1л.", "Sprite 1л.", "Фанта 1л."]
-            sauces = []
-            addons = []
 
     category = item.category
     breadcrumbs = [
