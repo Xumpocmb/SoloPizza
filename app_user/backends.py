@@ -1,6 +1,8 @@
 from django.contrib.auth.backends import ModelBackend
-from .models import CustomUser
+from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import BaseBackend
+
+User = get_user_model()
 
 
 # class PhoneNumberBackend(ModelBackend):
@@ -24,20 +26,20 @@ from django.contrib.auth.backends import BaseBackend
 
 class PhoneNumberAuthBackend(BaseBackend):
     """
-    Кастомный бэкенд аутентификации, использующий phone_number вместо username.
+    Кастомный бэкенд аутентификации, использующий phone вместо username.
     """
-    def authenticate(self, request, phone_number=None, password=None, **kwargs):
+    def authenticate(self, request, phone=None, password=None, **kwargs):
         try:
-            # Ищем пользователя по phone_number
-            user = CustomUser.objects.get(phone_number=phone_number)
+            # Ищем пользователя по phone
+            user = User.objects.get(phone=phone)
             # Проверяем пароль
             if user.check_password(password):
                 return user
-        except CustomUser.DoesNotExist:
+        except User.DoesNotExist:
             return None
 
     def get_user(self, user_id):
         try:
-            return CustomUser.objects.get(pk=user_id)
-        except CustomUser.DoesNotExist:
+            return User.objects.get(pk=user_id)
+        except User.DoesNotExist:
             return None

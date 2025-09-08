@@ -3,15 +3,25 @@ from .models import Category, Product, ProductVariant, PizzaSizes, PizzaBoard, P
 
 class CategorySerializer(serializers.ModelSerializer):
     """Сериализатор для категорий товаров"""
+    image = serializers.SerializerMethodField()
+    
     class Meta:
         model = Category
-        fields = ('id', 'name', 'slug', 'description', 'image', 'parent', 'is_active')
+        fields = ('id', 'name', 'slug', 'image', 'is_active')
+    
+    def get_image(self, obj):
+        if obj.image and obj.image.url:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.image.url)
+            return obj.image.url
+        return ""  # Возвращаем пустую строку вместо null"}]}}}
 
 class PizzaSizesSerializer(serializers.ModelSerializer):
     """Сериализатор для размеров пиццы"""
     class Meta:
         model = PizzaSizes
-        fields = ('id', 'name', 'diameter')
+        fields = ('id', 'name')
 
 class BoardSerializer(serializers.ModelSerializer):
     """Сериализатор для бортов пиццы"""
@@ -31,7 +41,7 @@ class ProductVariantSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = ProductVariant
-        fields = ('id', 'product', 'size', 'value', 'unit', 'price', 'old_price', 'weight')
+        fields = ('id', 'product', 'size', 'value', 'unit', 'price')
 
 class BoardParamsSerializer(serializers.ModelSerializer):
     """Сериализатор для параметров бортов пиццы"""
@@ -66,6 +76,5 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = (
             'id', 'name', 'slug', 'description', 'image', 'category', 
-            'is_active', 'is_new', 'is_hit', 'created_at', 'updated_at',
-            'variants'
+            'is_active', 'created_at', 'variants'
         )

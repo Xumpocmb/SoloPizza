@@ -66,8 +66,12 @@ class CategoryListView(generics.ListAPIView):
     serializer_class = CategorySerializer
     permission_classes = [permissions.AllowAny]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-    filterset_fields = ['parent']
+    # Удалено поле 'parent', так как оно отсутствует в модели Category
     search_fields = ['name']
+    
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        return context
 
 
 class CategoryDetailView(generics.RetrieveAPIView):
@@ -77,6 +81,10 @@ class CategoryDetailView(generics.RetrieveAPIView):
     queryset = Category.objects.filter(is_active=True)
     serializer_class = CategorySerializer
     permission_classes = [permissions.AllowAny]
+    
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        return context
 
 
 class ProductListView(generics.ListAPIView):
@@ -87,7 +95,7 @@ class ProductListView(generics.ListAPIView):
     serializer_class = ProductSerializer
     permission_classes = [permissions.AllowAny]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['category', 'is_new', 'is_hit']
+    filterset_fields = ['category']
     search_fields = ['name', 'description']
     ordering_fields = ['name', 'created_at', 'price']
 

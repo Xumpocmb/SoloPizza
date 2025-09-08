@@ -7,6 +7,7 @@ from rest_framework_simplejwt.views import (
 from .api_views import (
     UserRegistrationView,
     UserProfileView,
+    UserLoginView,
 )
 
 urlpatterns = [
@@ -17,5 +18,6 @@ urlpatterns = [
     
     # User endpoints
     path('register/', UserRegistrationView.as_view(), name='user_register'),
+    path('login/', UserLoginView.as_view(), name='user_login'),
     path('profile/', UserProfileView.as_view(), name='user_profile'),
 ]
