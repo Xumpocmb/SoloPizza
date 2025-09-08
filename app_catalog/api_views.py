@@ -1,7 +1,12 @@
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
+from rest_framework import generics, permissions, filters
+from django_filters.rest_framework import DjangoFilterBackend
 
-from app_catalog.models import Product, PizzaSizes, BoardParams, AddonParams
+from app_catalog.models import Product, PizzaSizes, BoardParams, AddonParams, Category, ProductVariant, PizzaBoard, PizzaAddon, PizzaSauce
+from .serializers import (CategorySerializer, ProductSerializer, ProductVariantSerializer,
+                         BoardParamsSerializer, AddonParamsSerializer, PizzaSauceSerializer,
+                         BoardSerializer, AddonSerializer, PizzaSizesSerializer)
 
 
 def get_product_variants(request, product_id):
@@ -37,15 +42,8 @@ def get_size_boards(request, size_id):
     size = get_object_or_404(PizzaSizes, id=size_id)
     board_params = BoardParams.objects.filter(size=size)
     
-    boards_data = []
-    for board_param in board_params:
-        boards_data.append({
-            'id': board_param.board.id,
-            'name': board_param.board.name,
-            'price': float(board_param.price)
-        })
-    
-    return JsonResponse(boards_data, safe=False)
+    serializer = BoardParamsSerializer(board_params, many=True)
+    return JsonResponse(serializer.data, safe=False)
 
 
 def get_size_addons(request, size_id):
@@ -55,12 +53,100 @@ def get_size_addons(request, size_id):
     size = get_object_or_404(PizzaSizes, id=size_id)
     addon_params = AddonParams.objects.filter(size=size)
     
-    addons_data = []
-    for addon_param in addon_params:
-        addons_data.append({
-            'id': addon_param.addon.id,
-            'name': addon_param.addon.name,
-            'price': float(addon_param.price)
-        })
-    
-    return JsonResponse(addons_data, safe=False)
+    serializer = AddonParamsSerializer(addon_params, many=True)
+    return JsonResponse(serializer.data, safe=False)
+
+
+# DRF API Views
+class CategoryListView(generics.ListAPIView):
+    """
+    API endpoint для получения списка категорий
+    """
+    queryset = Category.objects.filter(is_active=True)
+    serializer_class = CategorySerializer
+    permission_classes = [permissions.AllowAny]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_fields = ['parent']
+    search_fields = ['name']
+
+
+class CategoryDetailView(generics.RetrieveAPIView):
+    """
+    API endpoint для получения детальной информации о категории
+    """
+    queryset = Category.objects.filter(is_active=True)
+    serializer_class = CategorySerializer
+    permission_classes = [permissions.AllowAny]
+
+
+class ProductListView(generics.ListAPIView):
+    """
+    API endpoint для получения списка продуктов
+    """
+    queryset = Product.objects.filter(is_active=True)
+    serializer_class = ProductSerializer
+    permission_classes = [permissions.AllowAny]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['category', 'is_new', 'is_hit']
+    search_fields = ['name', 'description']
+    ordering_fields = ['name', 'created_at', 'price']
+
+
+class ProductDetailView(generics.RetrieveAPIView):
+    """
+    API endpoint для получения детальной информации о продукте
+    """
+    queryset = Product.objects.filter(is_active=True)
+    serializer_class = ProductSerializer
+    permission_classes = [permissions.AllowAny]
+
+
+class ProductVariantListView(generics.ListAPIView):
+    """
+    API endpoint для получения списка вариантов продуктов
+    """
+    queryset = ProductVariant.objects.all()
+    serializer_class = ProductVariantSerializer
+    permission_classes = [permissions.AllowAny]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['product', 'size']
+
+
+class PizzaSauceListView(generics.ListAPIView):
+    """
+    API endpoint для получения списка соусов для пиццы
+    """
+    queryset = PizzaSauce.objects.filter(is_active=True)
+    serializer_class = PizzaSauceSerializer
+    permission_classes = [permissions.AllowAny]
+
+
+class PizzaBoardListView(generics.ListAPIView):
+    """
+    API endpoint для получения списка бортов для пиццы
+    """
+    queryset = PizzaBoard.objects.filter(is_active=True)
+    serializer_class = BoardSerializer
+    permission_classes = [permissions.AllowAny]
+
+
+class PizzaAddonListView(generics.ListAPIView):
+    """
+    API endpoint для получения списка добавок для пиццы
+    """
+    queryset = PizzaAddon.objects.filter(is_active=True)
+    serializer_class = AddonSerializer
+    permission_classes = [permissions.AllowAny]
+
+
+class PizzaSizesListView(generics.ListAPIView):
+    """
+    API endpoint для получения списка размеров пиццы
+    """
+    queryset = PizzaSizes.objects.all()
+    serializer_class = PizzaSizesSerializer
+    permission_classes = [permissions.AllowAny]
+
+
+# Вторая функция get_size_addons удалена, так как она дублирует функционал
+# первой функции get_size_addons, которая использует сериализатор AddonParamsSerializer

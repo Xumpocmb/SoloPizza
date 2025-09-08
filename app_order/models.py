@@ -156,6 +156,43 @@ class Order(models.Model):
             totals = Order.objects.get_order_totals(self.id)
             self._pickup_discount = totals["pickup_discount_applied"]
         return self._pickup_discount
+        
+    def add_item_from_cart(self, cart_item):
+        """Добавляет товар из корзины в заказ"""
+        order_item = OrderItem.objects.create(
+            order=self,
+            product=cart_item.product,
+            variant=cart_item.variant,
+            quantity=cart_item.quantity
+        )
+        
+        # Копируем дополнительные параметры
+        if cart_item.boards:
+            boards = cart_item.boards.split(',')
+            if len(boards) > 0 and boards[0]:
+                board1_id = int(boards[0])
+                order_item.board1 = BoardParams.objects.get(id=board1_id)
+            if len(boards) > 1 and boards[1]:
+                board2_id = int(boards[1])
+                order_item.board2 = BoardParams.objects.get(id=board2_id)
+                
+        if cart_item.sauce:
+            order_item.sauce = PizzaSauce.objects.get(id=cart_item.sauce)
+            
+        if cart_item.drink:
+            order_item.drink = cart_item.drink
+            
+        order_item.save()
+        
+        # Добавляем добавки
+        if cart_item.addons:
+            addon_ids = [int(id) for id in cart_item.addons.split(',') if id]
+            if addon_ids:
+                addons = AddonParams.objects.filter(id__in=addon_ids)
+                order_item.addons.set(addons)
+                
+        self.recalculate_totals()
+        return order_item
 
 
 class OrderItem(models.Model):
