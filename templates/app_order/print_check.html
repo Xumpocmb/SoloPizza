@@ -163,7 +163,7 @@
         {% if order.ready_by %}
         <div><strong>Готов к:</strong> <span class="underlined_text">{{ order.ready_by|date:"d.m.Y H:i" }}</span></div>
         {% endif %}
-        {% if order.delivery_by %}
+        {% if order.delivery_by and order.delivery_type == 'delivery' %}
         <div><strong>Доставка к:</strong> <span class="underlined_text">{{ order.delivery_by|date:"d.m.Y H:i" }}</span></div>
         {% endif %}
         {% if order.comment %}
@@ -177,7 +177,7 @@
         {% if order.ready_by %}
         <div><strong>Готов к:</strong> {{ order.ready_by|date:"d.m.Y H:i" }}</div>
         {% endif %}
-        {% if order.delivery_by %}
+        {% if order.delivery_by and order.delivery_type == 'delivery' %}
         <div><strong>Доставка к:</strong> {{ order.delivery_by|date:"d.m.Y H:i" }}</div>
         {% endif %}
         {% if order.comment %}
@@ -197,6 +197,7 @@
     <p>Нет позиций для печати в этом чеке.</p>
     {% endif %}
 
+    {% if branch.id == 2 %}
     <!-- Пустые строки для корректной печати чека -->
     <div class="print-spacer">
         <br>
@@ -204,7 +205,9 @@
         <br>
         <br>
         <br>
+        <hr>
     </div>
+    {% endif %}
 
     <!-- Кнопка печати внизу -->
     <button class="btn-print no-print" onclick="window.print()">Печать Чека</button>
