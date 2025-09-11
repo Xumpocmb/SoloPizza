@@ -2,486 +2,690 @@
 
 ## Обзор
 
-API SoloPizza предоставляет доступ к функциональности сайта через RESTful интерфейс. API позволяет мобильным приложениям взаимодействовать с сайтом, получать информацию о товарах, управлять корзиной и заказами, а также работать с профилем пользователя.
+SoloPizza API предоставляет RESTful интерфейс для мобильного приложения доставки пиццы. API использует JWT аутентификацию и возвращает данные в формате JSON.
+
+**Базовый URL:** `https://api.solo-pizza.by/api/`
+
+**Версия API:** v1
+
+**Документация Swagger:** `/api/swagger/`
+
+**Документация ReDoc:** `/api/redoc/`
 
 ## Аутентификация
 
-API использует JWT (JSON Web Tokens) для аутентификации. Для доступа к защищенным эндпоинтам необходимо получить токен доступа.
+API использует JWT (JSON Web Token) для аутентификации. Для получения токена необходимо отправить POST запрос на эндпоинт `/auth/token/` с учетными данными пользователя.
 
 ### Получение токена
 
-```
-POST /api/auth/token/
-```
+**Endpoint:** `POST /auth/token/`
 
-Параметры запроса:
-- `username`: имя пользователя
-- `password`: пароль пользователя
-
-Ответ:
+**Тело запроса:**
 ```json
 {
-  "access": "access_token",
-  "refresh": "refresh_token"
+    "username": "your_username",
+    "password": "your_password"
+}
+```
+
+**Ответ:**
+```json
+{
+    "access": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
+    "refresh": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
 }
 ```
 
 ### Обновление токена
 
-```
-POST /api/auth/token/refresh/
-```
+**Endpoint:** `POST /auth/token/refresh/`
 
-Параметры запроса:
-- `refresh`: refresh токен
-
-Ответ:
+**Тело запроса:**
 ```json
 {
-  "access": "new_access_token"
+    "refresh": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+}
+```
+
+**Ответ:**
+```json
+{
+    "access": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
 }
 ```
 
 ### Проверка токена
 
-```
-POST /api/auth/token/verify/
+**Endpoint:** `POST /auth/token/verify/`
+
+**Тело запроса:**
+```json
+{
+    "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+}
 ```
 
-Параметры запроса:
-- `token`: access токен
+**Ответ:** `200 OK` если токен валиден, `401 Unauthorized` если нет.
 
 ## Пользователи
 
 ### Регистрация пользователя
 
-```
-POST /api/auth/register/
-```
+**Endpoint:** `POST /auth/register/`
 
-Параметры запроса:
-- `username`: имя пользователя
-- `password`: пароль
-- `password2`: подтверждение пароля
-- `email`: email пользователя
-- `first_name`: имя
-- `last_name`: фамилия
-
-### Профиль пользователя
-
-```
-GET /api/auth/profile/
-```
-
-Ответ:
+**Тело запроса:**
 ```json
 {
-  "id": 1,
-  "username": "user",
-  "email": "user@example.com",
-  "first_name": "Имя",
-  "last_name": "Фамилия",
-  "phone": "+375291234567"
+    "phone": "+375291234567",
+    "password": "your_password",
+    "password2": "your_password"
 }
 ```
 
-```
-PUT /api/auth/profile/
+**Ответ:**
+```json
+{
+    "id": 1,
+    "username": "user_a1b2c3d4",
+    "email": "user_a1b2c3d4@example.com",
+    "first_name": "Пользователь",
+    "last_name": "12345",
+    "phone": "+375291234567",
+    "address": null
+}
 ```
 
-Параметры запроса:
-- `email`: email пользователя
-- `first_name`: имя
-- `last_name`: фамилия
-- `phone`: телефон
-- `address`: адрес пользователя
+### Авторизация пользователя
+
+**Endpoint:** `POST /auth/login/`
+
+**Тело запроса:**
+```json
+{
+    "phone": "+375291234567",
+    "password": "your_password"
+}
+```
+
+**Ответ:**
+```json
+{
+    "user": {
+        "id": 1,
+        "username": "user_a1b2c3d4",
+        "phone": "+375291234567"
+    },
+    "message": "Авторизация прошла успешно"
+}
+```
+
+### Получение профиля пользователя
+
+**Endpoint:** `GET /auth/profile/`
+
+**Заголовки:**
+- `Authorization: Bearer <access_token>`
+
+**Ответ:**
+```json
+{
+    "id": 1,
+    "username": "user_a1b2c3d4",
+    "email": "user_a1b2c3d4@example.com",
+    "first_name": "Пользователь",
+    "last_name": "12345",
+    "phone": "+375291234567",
+    "address": "г. Минск, ул. Примерная, 1"
+}
+```
+
+### Обновление профиля пользователя
+
+**Endpoint:** `PUT /auth/profile/`
+
+**Заголовки:**
+- `Authorization: Bearer <access_token>`
+
+**Тело запроса:**
+```json
+{
+    "email": "newemail@example.com",
+    "first_name": "Новое Имя",
+    "last_name": "Новая Фамилия",
+    "phone": "+375291234567",
+    "address": "г. Минск, ул. Новая, 2"
+}
+```
+
+**Ответ:**
+```json
+{
+    "id": 1,
+    "username": "user_a1b2c3d4",
+    "email": "newemail@example.com",
+    "first_name": "Новое Имя",
+    "last_name": "Новая Фамилия",
+    "phone": "+375291234567",
+    "address": "г. Минск, ул. Новая, 2"
+}
+```
 
 ## Каталог
 
-### Соусы для пиццы
-
-```
-GET /api/catalog/sauces/
-```
-
-Ответ:
-```json
-[
-  {
-    "id": 1,
-    "name": "Томатный",
-    "slug": "tomatnyj",
-    "is_active": true
-  },
-  {
-    "id": 2,
-    "name": "Сливочный",
-    "slug": "slivochnyj",
-    "is_active": true
-  }
-]
-```
-
-### Борты для пиццы
-
-```
-GET /api/catalog/boards/
-```
-
-Ответ:
-```json
-[
-  {
-    "id": 1,
-    "name": "Сырный",
-    "slug": "syrnyj",
-    "is_active": true
-  },
-  {
-    "id": 2,
-    "name": "Стандартный",
-    "slug": "standartnyj",
-    "is_active": true
-  }
-]
-```
-
-### Добавки для пиццы
-
-```
-GET /api/catalog/addons/
-```
-
-Ответ:
-```json
-[
-  {
-    "id": 1,
-    "name": "Грибы",
-    "slug": "griby",
-    "is_active": true
-  },
-  {
-    "id": 2,
-    "name": "Бекон",
-    "slug": "bekon",
-    "is_active": true
-  }
-]
-```
-
-### Борты для размера пиццы
-
-```
-GET /api/catalog/size-boards/{size_id}/
-```
-
-Параметры запроса:
-- `size_id`: ID размера пиццы
-
-Ответ:
-```json
-[
-  {
-    "id": 1,
-    "board": {
-      "id": 1,
-      "name": "Сырный"
-    },
-    "size": {
-      "id": 1,
-      "name": "32"
-    },
-    "price": "2.00"
-  },
-  {
-    "id": 2,
-    "board": {
-      "id": 2,
-      "name": "Стандартный"
-    },
-    "size": {
-      "id": 1,
-      "name": "32"
-    },
-    "price": "0.00"
-  }
-]
-```
-
-### Добавки для размера пиццы
-
-```
-GET /api/catalog/size-addons/{size_id}/
-```
-
-Параметры запроса:
-- `size_id`: ID размера пиццы
-
-Ответ:
-```json
-[
-  {
-    "id": 1,
-    "addon": {
-      "id": 1,
-      "name": "Грибы"
-    },
-    "size": {
-      "id": 1,
-      "name": "32"
-    },
-    "price": "1.50"
-  },
-  {
-    "id": 2,
-    "addon": {
-      "id": 2,
-      "name": "Бекон"
-    },
-    "size": {
-      "id": 1,
-      "name": "32"
-    },
-    "price": "2.00"
-  }
-]
-```
-
-### Размеры пиццы
-
-```
-GET /api/catalog/sizes/
-```
-
-Ответ:
-```json
-[
-  {
-    "id": 1,
-    "name": "32"
-  },
-  {
-    "id": 2,
-    "name": "42"
-  }
-]
-```
-
 ### Категории
 
-```
-GET /api/catalog/categories/
-```
+#### Получение списка категорий
 
-Ответ:
+**Endpoint:** `GET /catalog/categories/`
+
+**Параметры запроса:**
+- `search`: поиск по названию категории
+
+**Ответ:**
 ```json
 [
-  {
+    {
+        "id": 1,
+        "name": "Пицца",
+        "slug": "pizza",
+        "image": "https://api.solo-pizza.by/media/categories/pizza.jpg",
+        "is_active": true
+    },
+    {
+        "id": 2,
+        "name": "Напитки",
+        "slug": "drinks",
+        "image": "https://api.solo-pizza.by/media/categories/drinks.jpg",
+        "is_active": true
+    }
+]
+```
+
+#### Получение детальной информации о категории
+
+**Endpoint:** `GET /catalog/categories/{id}/`
+
+**Ответ:**
+```json
+{
     "id": 1,
     "name": "Пицца",
     "slug": "pizza",
-    "description": "Вкусная пицца",
-    "image": "http://example.com/media/categories/pizza.jpg",
-    "parent": null,
+    "image": "https://api.solo-pizza.by/media/categories/pizza.jpg",
     "is_active": true
-  }
-]
+}
 ```
 
 ### Продукты
 
-```
-GET /api/catalog/products/
-```
+#### Получение списка продуктов
 
-Параметры запроса:
-- `category`: ID категории (фильтр)
-- `is_new`: новинки (фильтр)
-- `is_hit`: хиты (фильтр)
-- `search`: поиск по названию или описанию
-- `ordering`: сортировка (name, -name, created_at, -created_at, price, -price)
+**Endpoint:** `GET /catalog/products/`
 
-Ответ:
+**Параметры запроса:**
+- `category`: фильтр по ID категории
+- `search`: поиск по названию и описанию
+- `ordering`: сортировка (name, created_at, price)
+
+**Ответ:**
 ```json
-{
-  "count": 10,
-  "next": "http://example.com/api/catalog/products/?page=2",
-  "previous": null,
-  "results": [
+[
     {
-      "id": 1,
-      "name": "Маргарита",
-      "slug": "margarita",
-      "description": "Классическая пицца",
-      "image": "http://example.com/media/products/margarita.jpg",
-      "category": {
         "id": 1,
-        "name": "Пицца",
-        "slug": "pizza"
-      },
-      "is_active": true,
-      "is_new": false,
-      "is_hit": true,
-      "created_at": "2023-01-01T12:00:00Z",
-      "updated_at": "2023-01-01T12:00:00Z",
-      "variants": [
-        {
-          "id": 1,
-          "product": 1,
-          "size": {
+        "name": "Маргарита",
+        "slug": "margarita",
+        "description": "Классическая пицца с томатным соусом и моцареллой",
+        "image": "https://api.solo-pizza.by/media/products/margarita.jpg",
+        "category": {
             "id": 1,
-            "name": "Маленькая",
-            "diameter": 25
-          },
-          "value": null,
-          "unit": "см",
-          "price": "10.00",
-          "old_price": null,
-          "weight": 450
-        }
-      ]
+            "name": "Пицца",
+            "slug": "pizza",
+            "image": "https://api.solo-pizza.by/media/categories/pizza.jpg",
+            "is_active": true
+        },
+        "is_active": true,
+        "created_at": "2024-01-15T10:30:00Z",
+        "variants": [
+            {
+                "id": 1,
+                "product": 1,
+                "size": {
+                    "id": 1,
+                    "name": "Маленькая"
+                },
+                "value": 25,
+                "unit": "см",
+                "price": "15.90"
+            }
+        ]
     }
-  ]
-}
+]
+```
+
+#### Получение детальной информации о продукте
+
+**Endpoint:** `GET /catalog/products/{id}/`
+
+### Варианты продуктов
+
+#### Получение списка вариантов
+
+**Endpoint:** `GET /catalog/variants/`
+
+#### Получение вариантов для конкретного продукта
+
+**Endpoint:** `GET /catalog/product-variants/{product_id}/`
+
+### Соусы
+
+#### Получение списка соусов
+
+**Endpoint:** `GET /catalog/sauces/`
+
+**Ответ:**
+```json
+[
+    {
+        "id": 1,
+        "name": "Томатный",
+        "slug": "tomato",
+        "is_active": true
+    },
+    {
+        "id": 2,
+        "name": "Белый",
+        "slug": "white",
+        "is_active": true
+    }
+]
+```
+
+### Борты
+
+#### Получение списка бортов
+
+**Endpoint:** `GET /catalog/boards/`
+
+**Ответ:**
+```json
+[
+    {
+        "id": 1,
+        "name": "Обычный",
+        "slug": "regular",
+        "is_active": true
+    },
+    {
+        "id": 2,
+        "name": "Сырный",
+        "slug": "cheese",
+        "is_active": true
+    }
+]
+```
+
+#### Получение бортов для размера
+
+**Endpoint:** `GET /catalog/size-boards/{size_id}/`
+
+**Ответ:**
+```json
+[
+    {
+        "id": 1,
+        "board": {
+            "id": 1,
+            "name": "Обычный",
+            "slug": "regular",
+            "is_active": true
+        },
+        "size": {
+            "id": 1,
+            "name": "Маленькая"
+        },
+        "price": "0.00"
+    }
+]
+```
+
+### Добавки
+
+#### Получение списка добавок
+
+**Endpoint:** `GET /catalog/addons/`
+
+**Ответ:**
+```json
+[
+    {
+        "id": 1,
+        "name": "Моцарелла",
+        "slug": "mozzarella",
+        "is_active": true
+    },
+    {
+        "id": 2,
+        "name": "Пепперони",
+        "slug": "pepperoni",
+        "is_active": true
+    }
+]
+```
+
+#### Получение добавок для размера
+
+**Endpoint:** `GET /catalog/size-addons/{size_id}/`
+
+**Ответ:**
+```json
+[
+    {
+        "id": 1,
+        "addon": {
+            "id": 1,
+            "name": "Моцарелла",
+            "slug": "mozzarella",
+            "is_active": true
+        },
+        "size": {
+            "id": 1,
+            "name": "Маленькая"
+        },
+        "price": "2.50"
+    }
+]
+```
+
+### Размеры
+
+#### Получение списка размеров
+
+**Endpoint:** `GET /catalog/sizes/`
+
+**Ответ:**
+```json
+[
+    {
+        "id": 1,
+        "name": "Маленькая"
+    },
+    {
+        "id": 2,
+        "name": "Средняя"
+    },
+    {
+        "id": 3,
+        "name": "Большая"
+    }
+]
 ```
 
 ## Корзина
 
-### Список товаров в корзине
+### Получение товаров в корзине
 
-```
-GET /api/cart/items/
-```
+**Endpoint:** `GET /cart/items/`
 
-Ответ:
+**Заголовки:**
+- `Authorization: Bearer <access_token>`
+
+**Ответ:**
 ```json
 [
-  {
-    "id": 1,
-    "product": 1,
-    "variant": 1,
-    "variant_details": {
-      "id": 1,
-      "product": 1,
-      "size": {
+    {
         "id": 1,
-        "name": "Маленькая",
-        "diameter": 25
-      },
-      "value": null,
-      "unit": "см",
-      "price": "10.00",
-      "old_price": null,
-      "weight": 450
-    },
-    "quantity": 1,
-    "boards": [1],
-    "addons": [2, 3],
-    "sauce": 1,
-    "drink": null,
-    "total_price": "15.00"
-  }
+        "product": 1,
+        "variant": 1,
+        "variant_details": {
+            "id": 1,
+            "product": 1,
+            "size": {
+                "id": 1,
+                "name": "Маленькая"
+            },
+            "value": 25,
+            "unit": "см",
+            "price": "15.90"
+        },
+        "quantity": 2,
+        "boards": [1],
+        "addons": [1, 2],
+        "sauce": 1,
+        "drink": null,
+        "total_price": "35.80"
+    }
 ]
 ```
 
 ### Добавление товара в корзину
 
-```
-POST /api/cart/items/
+**Endpoint:** `POST /cart/items/`
+
+**Заголовки:**
+- `Authorization: Bearer <access_token>`
+
+**Тело запроса:**
+```json
+{
+    "product": 1,
+    "variant": 1,
+    "quantity": 2,
+    "boards": [1],
+    "addons": [1, 2],
+    "sauce": 1,
+    "drink": null
+}
 ```
 
-Параметры запроса:
-- `product`: ID продукта
-- `variant`: ID варианта
-- `quantity`: количество
-- `boards`: список ID бортов (опционально)
-- `addons`: список ID добавок (опционально)
-- `sauce`: ID соуса (опционально)
-- `drink`: ID напитка (опционально)
+**Ответ:**
+```json
+{
+    "id": 1,
+    "product": 1,
+    "variant": 1,
+    "variant_details": {
+        "id": 1,
+        "product": 1,
+        "size": {
+            "id": 1,
+            "name": "Маленькая"
+        },
+        "value": 25,
+        "unit": "см",
+        "price": "15.90"
+    },
+    "quantity": 2,
+    "boards": [1],
+    "addons": [1, 2],
+    "sauce": 1,
+    "drink": null,
+    "total_price": "35.80"
+}
+```
+
+### Обновление товара в корзине
+
+**Endpoint:** `PUT /cart/items/{id}/`
+
+**Заголовки:**
+- `Authorization: Bearer <access_token>`
+
+**Тело запроса:** те же поля, что и при добавлении
+
+### Удаление товара из корзины
+
+**Endpoint:** `DELETE /cart/items/{id}/`
+
+**Заголовки:**
+- `Authorization: Bearer <access_token>`
+
+**Ответ:** `204 No Content`
 
 ### Сводная информация о корзине
 
-```
-GET /api/cart/summary/
-```
+**Endpoint:** `GET /cart/summary/`
 
-Ответ:
+**Заголовки:**
+- `Authorization: Bearer <access_token>`
+
+**Ответ:**
 ```json
 {
-  "items_count": 2,
-  "total_price": "25.00",
-  "items": [...]
+    "items_count": 3,
+    "total_price": "45.50",
+    "items": [
+        {
+            "id": 1,
+            "product": 1,
+            "variant": 1,
+            "variant_details": {
+                "id": 1,
+                "product": 1,
+                "size": {
+                    "id": 1,
+                    "name": "Маленькая"
+                },
+                "value": 25,
+                "unit": "см",
+                "price": "15.90"
+            },
+            "quantity": 2,
+            "boards": [1],
+            "addons": [1, 2],
+            "sauce": 1,
+            "drink": null,
+            "total_price": "35.80"
+        }
+    ]
 }
 ```
 
 ## Заказы
 
-### Список заказов
+### Список заказов пользователя
 
-```
-GET /api/order/
-```
+**Endpoint:** `GET /order/`
 
-Ответ:
+**Заголовки:**
+- `Authorization: Bearer <access_token>`
+
+**Ответ:**
 ```json
 [
-  {
-    "id": 1,
-    "order_number": "ORD-2023-001",
-    "status": "new",
-    "status_display": "Новый",
-    "payment": "cash",
-    "payment_display": "Наличными",
-    "delivery_type": "delivery",
-    "delivery_type_display": "Доставка",
-    "delivery_cost": "5.00",
-    "total_price": "30.00",
-    "customer_name": "Иван Иванов",
-    "customer_phone": "+375291234567",
-    "delivery_address": "ул. Примерная, 123, кв. 42",
-    "delivery_time": "2023-01-01T15:00:00Z",
-    "delivery_by": "Как можно скорее",
-    "comment": "Позвонить перед доставкой",
-    "created_at": "2023-01-01T12:00:00Z",
-    "updated_at": "2023-01-01T12:00:00Z",
-    "items": [...]
-  }
+    {
+        "id": 1,
+        "order_number": "ORD-001",
+        "status": "pending",
+        "status_display": "В обработке",
+        "payment": "cash",
+        "payment_display": "Наличными",
+        "delivery_type": "delivery",
+        "delivery_type_display": "Доставка",
+        "delivery_cost": "3.00",
+        "total_price": "28.00",
+        "customer_name": "Иван Иванов",
+        "customer_phone": "+375291234567",
+        "address": "г. Минск, ул. Примерная, 1",
+        "delivery_time": "2023-12-01T18:30:00Z",
+        "delivery_by": null,
+        "comment": "Без лука",
+        "created_at": "2023-12-01T17:00:00Z",
+        "updated_at": "2023-12-01T17:00:00Z",
+        "items": [
+            {
+                "id": 1,
+                "product_name": "Маргарита",
+                "variant_name": "Маленькая",
+                "variant": 1,
+                "variant_details": {
+                    "id": 1,
+                    "product": 1,
+                    "size": {
+                        "id": 1,
+                        "name": "Маленькая"
+                    },
+                    "value": 25,
+                    "unit": "см",
+                    "price": "15.90"
+                },
+                "quantity": 2,
+                "price": "15.90",
+                "total_price": "31.80",
+                "boards": [1],
+                "addons": [2],
+                "sauce": 1,
+                "drink": null
+            }
+        ]
+    }
 ]
 ```
 
+### Получение детальной информации о заказе
+
+**Endpoint:** `GET /order/{id}/`
+
+**Заголовки:**
+- `Authorization: Bearer <access_token>`
+
+**Ответ:** аналогичен элементу из списка заказов
+
 ### Создание заказа
 
-```
-POST /api/order/create/
-```
+**Endpoint:** `POST /order/create/`
 
-Параметры запроса:
-- `payment`: способ оплаты (cash, card, online)
-- `delivery_type`: тип доставки (delivery, pickup)
-- `customer_name`: имя клиента
-- `customer_phone`: телефон клиента
-- `delivery_address`: адрес доставки (для delivery)
-- `delivery_time`: время доставки (опционально)
-- `delivery_by`: пожелания по доставке (опционально)
-- `comment`: комментарий к заказу (опционально)
-- `branch`: ID филиала (для pickup)
+**Заголовки:**
+- `Authorization: Bearer <access_token>`
 
-### Статус заказа
-
-```
-GET /api/order/{id}/status/
-```
-
-Ответ:
+**Тело запроса:**
 ```json
 {
-  "id": 1,
-  "order_number": "ORD-2023-001",
-  "status": "processing",
-  "status_display": "В обработке",
-  "created_at": "2023-01-01T12:00:00Z",
-  "updated_at": "2023-01-01T12:05:00Z"
+    "branch": 1,
+    "customer_name": "Иван Иванов",
+    "customer_phone": "+375291234567",
+    "delivery_type": "delivery",
+    "address": "г. Минск, ул. Примерная, 1",
+    "payment": "cash",
+    "comment": "Без лука"
+}
+```
+
+**Параметры:**
+- `branch`: ID филиала
+- `customer_name`: имя клиента
+- `customer_phone`: телефон клиента
+- `delivery_type`: тип доставки (delivery/pickup)
+- `address`: адрес доставки (для delivery)
+- `payment`: способ оплаты (cash/card/online)
+- `comment`: комментарий к заказу (опционально)
+
+**Ответ:**
+```json
+{
+    "id": 1,
+    "order_number": "ORD-001",
+    "status": "pending",
+    "total_price": "28.00",
+    "message": "Заказ успешно создан"
+}
+```
+
+### Получение статуса заказа
+
+**Endpoint:** `GET /order/{id}/status/`
+
+**Заголовки:**
+- `Authorization: Bearer <access_token>`
+
+**Ответ:**
+```json
+{
+    "id": 1,
+    "order_number": "ORD-001",
+    "status": "in_progress",
+    "status_display": "Готовится",
+    "created_at": "2023-12-01T17:00:00Z",
+    "updated_at": "2023-12-01T17:15:00Z"
 }
 ```
 
