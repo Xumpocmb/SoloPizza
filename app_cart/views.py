@@ -32,7 +32,7 @@ def add_to_cart(request, slug):
             sauce_id = data.get('sauce_id')
             board1_id = data.get('board1_id')
             board2_id = data.get('board2_id')
-            addon_ids = data.get('addons', [])
+            addons = data.get('addons', [])
 
             # Обработка бортов
             board1 = BoardParams.objects.filter(id=board1_id).first() if board1_id else None
@@ -51,9 +51,6 @@ def add_to_cart(request, slug):
 
             # Обработка соуса
             sauce = PizzaSauce.objects.filter(id=sauce_id).first() if sauce_id else None
-
-            # Обработка добавок
-            addons = AddonParams.objects.filter(id__in=addon_ids) if addon_ids else []
 
             # Получаем выбранный напиток для комбо
             drink = request.POST.get('drink') if item.category.name == "Комбо" else None

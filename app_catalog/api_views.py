@@ -89,7 +89,7 @@ def get_variant_data(request, variant_id):
         # Получаем доски для размера
         boards = BoardParams.objects.filter(size=variant.size)
         variant_data['boards'] = [{
-            'id': board.board.id,
+            'id': board.id,  # Возвращаем ID BoardParams, чтобы форма получала корректный идентификатор
             'name': board.board.name,
             'price': float(board.price)
         } for board in boards]
@@ -97,7 +97,7 @@ def get_variant_data(request, variant_id):
         # Получаем добавки для размера
         addons = AddonParams.objects.filter(size=variant.size)
         variant_data['addons'] = [{
-            'id': addon.addon.id,
+            'id': addon.id,  # Возвращаем ID AddonParams, чтобы форма получала корректный идентификатор
             'name': addon.addon.name,
             'price': float(addon.price)
         } for addon in addons]

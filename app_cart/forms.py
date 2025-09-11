@@ -16,7 +16,11 @@ class AddToCartForm(forms.Form):
     sauce_id = forms.IntegerField(required=False, widget=forms.HiddenInput())
     board1_id = forms.IntegerField(required=False, widget=forms.HiddenInput())
     board2_id = forms.IntegerField(required=False, widget=forms.HiddenInput())
-    addons = forms.MultipleChoiceField(required=False, widget=forms.CheckboxSelectMultiple())
+    addons = forms.ModelMultipleChoiceField(
+        queryset=AddonParams.objects.none(),
+        required=False,
+        widget=forms.MultipleHiddenInput()
+    )
 
     def __init__(self, *args, **kwargs):
         self.product = kwargs.pop('product', None)
@@ -33,10 +37,7 @@ class AddToCartForm(forms.Form):
             # Для пиццы и комбо-наборов с пиццей добавляем опции
             if self.product.category.name in ["Пицца", "Кальцоне"]:
                 # Для пиццы добавляем опции для addons
-                self.fields['addons'].choices = [
-                    (addon.id, f"{addon.addon.name} (+{addon.price} руб.)")
-                    for addon in AddonParams.objects.filter(size=self.variant.size)
-                ]
+                self.fields['addons'].queryset = AddonParams.objects.filter(size=self.variant.size)
             elif self.product.category.name == "Комбо" and self.product.is_combo:
                 # Для комбо оставляем только поля для бортов
                 if 'sauce_id' in self.fields:

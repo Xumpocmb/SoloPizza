@@ -168,7 +168,7 @@
                         </div>
 
                         <!-- Кнопка добавления в заказ -->
-                        <button type="submit" class="order-link">Добавить в заказ</button>
+                        <button type="submit" class="order-link" id="add-to-cart-btn">Добавить в заказ</button>
                     </form>
                 </div>
             </div>
@@ -179,22 +179,32 @@
 <script>
 // Категория товара для проверки доступности бортов
 const itemCategory = '{{ item.category.name }}';
+// Флаг обновления варианта, чтобы предотвратить отправку формы во время загрузки
+let isVariantUpdating = false;
 
 // Функция для динамического изменения размера товара
 function changeSizeVariant(variantId) {
-    // Показываем индикатор загрузки
     const priceElement = document.getElementById('item-price');
+    const variantInput = document.getElementById('variant_id');
+    const submitBtn = document.getElementById('add-to-cart-btn');
+
+    // 1) Немедленно обновляем скрытое поле с ID варианта (во избежание рассинхронизации при быстрой отправке формы)
+    variantInput.value = variantId;
+
+    // 2) Показываем индикатор загрузки и временно блокируем кнопку отправки
     priceElement.innerHTML = '<span>Загрузка...</span>';
+    isVariantUpdating = true;
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.classList.add('disabled');
+    }
     
-    // Отправляем AJAX запрос
+    // 3) Отправляем AJAX запрос
     fetch(`/api/catalog/variant-data/${variantId}/`)
         .then(response => response.json())
         .then(data => {
             // Обновляем цену
             priceElement.innerHTML = `<span>Цена: ${data.price} руб.</span>`;
-            
-            // Обновляем скрытое поле с ID варианта
-            document.getElementById('variant_id').value = variantId;
             
             // Обновляем соусы
             updateSauces(data.sauces);
@@ -211,6 +221,13 @@ function changeSizeVariant(variantId) {
         .catch(error => {
             console.error('Ошибка при загрузке данных варианта:', error);
             priceElement.innerHTML = '<span>Ошибка загрузки цены</span>';
+        })
+        .finally(() => {
+            isVariantUpdating = false;
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('disabled');
+            }
         });
 }
 
@@ -238,6 +255,7 @@ function updateSauces(sauces) {
         });
     } else {
         sauceSelector.classList.add('hidden');
+        sauceList.innerHTML = '';
     }
 }
 
@@ -248,7 +266,7 @@ function updateBoards(boards) {
     const board2Select = document.getElementById('board2');
     
     // Проверяем категорию товара - борты доступны только для пиццы и комбо
-    const isPizzaOrCombo = itemCategory === 'Пицца' || itemCategory === 'Комбо';
+    const isPizzaOrCombo = itemCategory === 'Пицца' || itemCategory === 'Комбо' || itemCategory === 'Кальцоне';
     
     if (boards && boards.length > 0 && isPizzaOrCombo) {
         boardSelector.classList.remove('hidden');
@@ -271,6 +289,8 @@ function updateBoards(boards) {
         });
     } else {
         boardSelector.classList.add('hidden');
+        board1Select.innerHTML = '<option value="">Не выбран</option>';
+        board2Select.innerHTML = '<option value="">Не выбран</option>';
     }
 }
 
@@ -288,7 +308,7 @@ function updateAddons(addons) {
             li.innerHTML = `
                 <label class="custom-checkbox">
                     <input type="checkbox" name="addons" value="${addon.id}"
-                           style="display: none;">
+                           id="id_addons_${addon.id}" style="display: none;">
                     <span class="checkbox-icon"></span>
                     ${addon.name} (+${addon.price} руб.)
                 </label>
@@ -297,6 +317,7 @@ function updateAddons(addons) {
         });
     } else {
         addonSelector.classList.add('hidden');
+        addonList.innerHTML = '';
     }
 }
 
@@ -324,13 +345,15 @@ function updateDrinks(drinks) {
         });
     } else {
         drinkSelector.classList.add('hidden');
+        drinkList.innerHTML = '';
     }
 }
 
 // Добавляем обработчики событий для кнопок размеров
 document.addEventListener('DOMContentLoaded', function() {
     const sizeButtons = document.querySelectorAll('.size-option');
-    
+    const form = document.querySelector('.add-to-cart-form');
+
     sizeButtons.forEach(button => {
         button.addEventListener('click', function() {
             // Убираем класс selected у всех кнопок
@@ -344,6 +367,15 @@ document.addEventListener('DOMContentLoaded', function() {
             changeSizeVariant(variantId);
         });
     });
+
+    // Блокируем отправку формы, если данные варианта ещё загружаются
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            if (isVariantUpdating) {
+                e.preventDefault();
+            }
+        });
+    }
 });
 </script>
 
