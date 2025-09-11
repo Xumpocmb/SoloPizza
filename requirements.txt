@@ -1,30 +1,43 @@
-asgiref==3.8.1
-certifi==2025.6.15
-cffi==1.17.1
-charset-normalizer==3.4.2
-cryptography==45.0.4
-Django==5.1.7
-django-allauth==65.9.0
-idna==3.10
-numpy==2.2.3
-pillow==11.1.0
-pycparser==2.22
-PyJWT==2.10.1
-python-dotenv==1.0.1
-requests==2.32.4
-shapely==2.0.7
-sqlparse==0.5.3
-tzdata==2025.1
-urllib3==2.5.0
-celery==5.3.6
-redis==5.0.1
-django-redis==5.4.0
-django-celery-beat>=2.8.0
-django-celery-results>=2.5.1
-gunicorn==21.2.0
-# API requirements
-djangorestframework==3.14.0
-djangorestframework-simplejwt==5.3.0
-drf-yasg==1.21.7
-django-cors-headers==4.3.1
-django-filter==23.5
+# Django и основные компоненты
+Django>=4.2,<5.0
+django-allauth>=0.57.0
+cryptography
+django-cors-headers>=4.3.0
+django-filter>=23.3
+django-redis>=5.4.0
+
+# Django REST Framework
+djangorestframework>=3.14.0
+djangorestframework-simplejwt>=5.3.0
+
+# API документация
+drf-yasg>=1.21.7
+
+# Celery для асинхронных задач
+celery>=5.3.0
+django-celery-beat>=2.5.0
+django-celery-results>=2.5.0
+redis>=5.0.0
+
+# База данных
+# SQLite включена в Django по умолчанию
+# Раскомментируйте для PostgreSQL:
+# psycopg2-binary>=2.9.7
+
+# Работа с изображениями
+Pillow>=10.0.0
+
+# Переменные окружения
+python-dotenv>=1.0.0
+
+# Веб-сервер для продакшена
+gunicorn>=21.2.0
+
+# Дополнительные утилиты
+requests>=2.31.0
+
+# Для разработки (опционально)
+# django-debug-toolbar>=4.2.0
+# pytest-django>=4.5.2
+# black>=23.9.1
+# flake8>=6.1.0

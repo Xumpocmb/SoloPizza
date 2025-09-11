@@ -1,7 +1,7 @@
 from decimal import Decimal
 from django.db import models
 from django.conf import settings
-from django.db.models.signals import post_save, post_delete
+from django.db.models.signals import post_save, post_delete, m2m_changed
 from django.dispatch import receiver
 from app_catalog.models import AddonParams, ProductVariant, BoardParams, PizzaSauce
 from app_home.models import CafeBranch, Discount
@@ -161,35 +161,29 @@ class Order(models.Model):
         """Добавляет товар из корзины в заказ"""
         order_item = OrderItem.objects.create(
             order=self,
-            product=cart_item.product,
-            variant=cart_item.variant,
+            product=cart_item.item,  # Исправлено: cart_item.item вместо cart_item.product
+            variant=cart_item.item_variant,  # Исправлено: cart_item.item_variant вместо cart_item.variant
             quantity=cart_item.quantity
         )
         
         # Копируем дополнительные параметры
-        if cart_item.boards:
-            boards = cart_item.boards.split(',')
-            if len(boards) > 0 and boards[0]:
-                board1_id = int(boards[0])
-                order_item.board1 = BoardParams.objects.get(id=board1_id)
-            if len(boards) > 1 and boards[1]:
-                board2_id = int(boards[1])
-                order_item.board2 = BoardParams.objects.get(id=board2_id)
+        if cart_item.board1:
+            order_item.board1 = cart_item.board1
+            
+        if cart_item.board2:
+            order_item.board2 = cart_item.board2
                 
         if cart_item.sauce:
-            order_item.sauce = PizzaSauce.objects.get(id=cart_item.sauce)
+            order_item.sauce = cart_item.sauce
             
         if cart_item.drink:
             order_item.drink = cart_item.drink
             
         order_item.save()
         
-        # Добавляем добавки
-        if cart_item.addons:
-            addon_ids = [int(id) for id in cart_item.addons.split(',') if id]
-            if addon_ids:
-                addons = AddonParams.objects.filter(id__in=addon_ids)
-                order_item.addons.set(addons)
+        # Добавляем добавки - исправлено для работы с ManyToManyField
+        if cart_item.addons.exists():
+            order_item.addons.set(cart_item.addons.all())
                 
         self.recalculate_totals()
         return order_item
@@ -362,3 +356,10 @@ def update_order_on_item_change(sender, instance, **kwargs):
 @receiver(post_delete, sender=OrderItem)
 def update_order_on_item_delete(sender, instance, **kwargs):
     instance.order.update_order_items()
+
+
+@receiver(m2m_changed, sender=OrderItem.addons.through)
+def update_order_on_addons_change(sender, instance, action, **kwargs):
+    """Обновляет итоги заказа при изменении добавок в позиции заказа"""
+    if action in ['post_add', 'post_remove', 'post_clear']:
+        instance.order.update_order_items()

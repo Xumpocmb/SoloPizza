@@ -99,6 +99,8 @@ def checkout(request):
                 )
                 order_item.addons.set(cart_item.addons.all())
 
+            # Пересчитываем итоги заказа после добавления всех товаров
+            order.recalculate_totals()
             cart_items.delete()
             if not settings.DEBUG and not request.user.is_superuser and not request.user.is_staff:
                 send_notify(order)
