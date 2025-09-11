@@ -96,7 +96,7 @@ class CheckoutForm(forms.ModelForm):
         delivery_by = order.delivery_by
         if ready_by and not delivery_by:
             order.ready_by = ready_by
-            order.delivery_by = ready_by + timezone.timedelta(minutes=30)
+            order.delivery_by = ready_by + timezone.timedelta(minutes=20)
 
         if commit:
             order.save()
