@@ -3,6 +3,7 @@ from .api_views import (
     get_product_variants,
     get_size_boards,
     get_size_addons,
+    get_variant_data,
     CategoryListView,
     CategoryDetailView,
     ProductListView,
@@ -19,6 +20,7 @@ urlpatterns = [
     path('product-variants/<int:product_id>/', get_product_variants, name='get_product_variants'),
     path('size-boards/<int:size_id>/', get_size_boards, name='get_size_boards'),
     path('size-addons/<int:size_id>/', get_size_addons, name='get_size_addons'),
+    path('variant-data/<int:variant_id>/', get_variant_data, name='get_variant_data'),
     
     # Новые API endpoints с использованием DRF
     path('categories/', CategoryListView.as_view(), name='category_list'),

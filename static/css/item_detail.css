@@ -123,10 +123,12 @@
     border: 1px solid var(--hover-bg);
     /* Цвет границы */
     border-radius: var(--border-radius);
-    text-decoration: none;
+    background: none;
     color: var(--text-color);
     cursor: pointer;
     transition: all 0.3s ease;
+    font-family: inherit;
+    font-size: inherit;
 }
 
 .size-selector .size-option:hover {

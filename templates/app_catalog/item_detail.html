@@ -39,7 +39,7 @@
                     <p class="item-description">{{ item.description }}</p>
 
                     <!-- Цена -->
-                    <div class="item-price">
+                    <div class="item-price" id="item-price">
                         {% if min_price %}
                             <span>Цена: {{ min_price }} руб.</span>
                         {% else %}
@@ -52,14 +52,15 @@
                         <h3>Выберите размер:</h3>
                         <div class="size-options">
                             {% for variant in variants %}
-                                <a href="?size={{ variant.id }}"
-                                   class="size-option {% if selected_variant and selected_variant.id == variant.id %}selected{% endif %}">
+                                <button type="button" 
+                                        class="size-option {% if selected_variant and selected_variant.id == variant.id %}selected{% endif %}"
+                                        data-variant-id="{{ variant.id }}">
                                     {% if is_pizza_or_calzone and variant.size %}
                                         {{ variant.size.name }}
                                     {% elif variant.value %}
                                         {{ variant.value }} {{ variant.get_unit_display }}
                                     {% endif %}
-                                </a>
+                                </button>
                             {% empty %}
                                 <span>Размеры не доступны</span>
                             {% endfor %}
@@ -70,7 +71,7 @@
                         {% csrf_token %}
 
                         <!-- Размер -->
-                        <input type="hidden" name="variant_id" value="{{ selected_variant.id }}">
+                        <input type="hidden" name="variant_id" id="variant_id" value="{{ selected_variant.id }}">
 
                         <!-- Количество -->
                         <div class="form-group">
@@ -79,100 +80,92 @@
                         </div>
 
                         <!-- Соус -->
-                        {% if sauces %}
-                            <div class="form-group option-selector">
-                                <h3>Выберите соус (один вариант):</h3>
-                                <ul class="custom-radio-list">
-                                    {% for sauce in sauces %}
-                                        <li>
-                                            <label class="custom-radio">
-                                                <input type="radio" name="sauce_id" value="{{ sauce.id }}"
-                                                       {% if forloop.first %}checked{% endif %}
-                                                       style="display: none;">
-                                                <span class="radio-button"></span>
-                                                {{ sauce.name }}
-                                            </label>
-                                        </li>
-                                    {% empty %}
-                                        <li>Соусы не доступны</li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
-                        {% endif %}
+                        <div class="form-group option-selector" id="sauce-selector" {% if not sauces %}style="display: none;"{% endif %}>
+                            <h3>Выберите соус (один вариант):</h3>
+                            <ul class="custom-radio-list" id="sauce-list">
+                                {% for sauce in sauces %}
+                                    <li>
+                                        <label class="custom-radio">
+                                            <input type="radio" name="sauce_id" value="{{ sauce.id }}"
+                                                   {% if forloop.first %}checked{% endif %}
+                                                   style="display: none;">
+                                            <span class="radio-button"></span>
+                                            {{ sauce.name }}
+                                        </label>
+                                    </li>
+                                {% empty %}
+                                    <li>Соусы не доступны</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
 
                         <!-- Борты -->
-                        {% if boards %}
-                            <div class="form-group board-selector">
-                                <h3>Выберите борт:</h3>
+                        <div class="form-group board-selector" id="board-selector" {% if not boards %}style="display: none;"{% endif %}>
+                            <h3>Выберите борт:</h3>
 
-                                <div class="board-pair">
-                                    <label for="board1">Первый борт:</label>
-                                    <select name="board1_id" id="board1" class="custom-select">
-                                        <option value="">Не выбран</option>
-                                        {% for board in boards %}
-                                            <option value="{{ board.id }}">
-                                                {{ board.board.name }} (+{{ board.price }} руб.)
-                                            </option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-
-                                <div class="board-pair">
-                                    <label for="board2">Второй борт:</label>
-                                    <select name="board2_id" id="board2" class="custom-select">
-                                        <option value="">Не выбран</option>
-                                        {% for board in boards %}
-                                            <option value="{{ board.id }}">
-                                                {{ board.board.name }} (+{{ board.price }} руб.)
-                                            </option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
+                            <div class="board-pair">
+                                <label for="board1">Первый борт:</label>
+                                <select name="board1_id" id="board1" class="custom-select">
+                                    <option value="">Не выбран</option>
+                                    {% for board in boards %}
+                                        <option value="{{ board.id }}">
+                                            {{ board.board.name }} (+{{ board.price }} руб.)
+                                        </option>
+                                    {% endfor %}
+                                </select>
                             </div>
-                        {% endif %}
+
+                            <div class="board-pair">
+                                <label for="board2">Второй борт:</label>
+                                <select name="board2_id" id="board2" class="custom-select">
+                                    <option value="">Не выбран</option>
+                                    {% for board in boards %}
+                                        <option value="{{ board.id }}">
+                                            {{ board.board.name }} (+{{ board.price }} руб.)
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
 
                         <!-- Добавки -->
-                        {% if addons %}
-                            <div class="form-group option-selector">
-                                <h3>Добавки (можно выбрать несколько):</h3>
-                                <ul class="custom-checkbox-list">
-                                    {% for addon in addons %}
-                                        <li>
-                                            <label class="custom-checkbox">
-                                                <input type="checkbox" name="addons" value="{{ addon.id }}"
-                                                       style="display: none;">
-                                                <span class="checkbox-icon"></span>
-                                                {{ addon.addon.name }} (+{{ addon.price }} руб.)
-                                            </label>
-                                        </li>
-                                    {% empty %}
-                                        <li>Добавки не доступны</li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
-                        {% endif %}
+                        <div class="form-group option-selector" id="addon-selector" {% if not addons %}style="display: none;"{% endif %}>
+                            <h3>Добавки (можно выбрать несколько):</h3>
+                            <ul class="custom-checkbox-list" id="addon-list">
+                                {% for addon in addons %}
+                                    <li>
+                                        <label class="custom-checkbox">
+                                            <input type="checkbox" name="addons" value="{{ addon.id }}"
+                                                   style="display: none;">
+                                            <span class="checkbox-icon"></span>
+                                            {{ addon.addon.name }} (+{{ addon.price }} руб.)
+                                        </label>
+                                    </li>
+                                {% empty %}
+                                    <li>Добавки не доступны</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
 
                         <!-- Напитки для комбо -->
-                        {% if drinks %}
-                            <div class="form-group option-selector">
-                                <h3>Выберите напиток (один вариант):</h3>
-                                <ul class="custom-radio-list">
-                                    {% for drink in drinks %}
-                                        <li>
-                                            <label class="custom-radio">
-                                                <input type="radio" name="drink" value="{{ drink }}"
-                                                       {% if forloop.first %}checked{% endif %}
-                                                       style="display: none;">
-                                                <span class="radio-button"></span>
-                                                {{ drink }}
-                                            </label>
-                                        </li>
-                                    {% empty %}
-                                        <li>Соусы не доступны</li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
-                        {% endif %}
+                        <div class="form-group option-selector" id="drink-selector" {% if not drinks %}style="display: none;"{% endif %}>
+                            <h3>Выберите напиток (один вариант):</h3>
+                            <ul class="custom-radio-list" id="drink-list">
+                                {% for drink in drinks %}
+                                    <li>
+                                        <label class="custom-radio">
+                                            <input type="radio" name="drink" value="{{ drink }}"
+                                                   {% if forloop.first %}checked{% endif %}
+                                                   style="display: none;">
+                                            <span class="radio-button"></span>
+                                            {{ drink }}
+                                        </label>
+                                    </li>
+                                {% empty %}
+                                    <li>Напитки не доступны</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
 
                         <!-- Кнопка добавления в заказ -->
                         <button type="submit" class="order-link">Добавить в заказ</button>
@@ -182,5 +175,171 @@
 
         </section>
     </main>
+
+<script>
+// Функция для динамического изменения размера товара
+function changeSizeVariant(variantId) {
+    // Показываем индикатор загрузки
+    const priceElement = document.getElementById('item-price');
+    priceElement.innerHTML = '<span>Загрузка...</span>';
+    
+    // Отправляем AJAX запрос
+    fetch(`/api/catalog/variant-data/${variantId}/`)
+        .then(response => response.json())
+        .then(data => {
+            // Обновляем цену
+            priceElement.innerHTML = `<span>Цена: ${data.price} руб.</span>`;
+            
+            // Обновляем скрытое поле с ID варианта
+            document.getElementById('variant_id').value = variantId;
+            
+            // Обновляем соусы
+            updateSauces(data.sauces);
+            
+            // Обновляем борты
+            updateBoards(data.boards);
+            
+            // Обновляем добавки
+            updateAddons(data.addons);
+            
+            // Обновляем напитки (для комбо)
+            updateDrinks(data.drinks);
+        })
+        .catch(error => {
+            console.error('Ошибка при загрузке данных варианта:', error);
+            priceElement.innerHTML = '<span>Ошибка загрузки цены</span>';
+        });
+}
+
+// Функция обновления соусов
+function updateSauces(sauces) {
+    const sauceSelector = document.getElementById('sauce-selector');
+    const sauceList = document.getElementById('sauce-list');
+    
+    if (sauces && sauces.length > 0) {
+        sauceSelector.style.display = 'block';
+        sauceList.innerHTML = '';
+        
+        sauces.forEach((sauce, index) => {
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <label class="custom-radio">
+                    <input type="radio" name="sauce_id" value="${sauce.id}"
+                           ${index === 0 ? 'checked' : ''}
+                           style="display: none;">
+                    <span class="radio-button"></span>
+                    ${sauce.name}
+                </label>
+            `;
+            sauceList.appendChild(li);
+        });
+    } else {
+        sauceSelector.style.display = 'none';
+    }
+}
+
+// Функция обновления бортов
+function updateBoards(boards) {
+    const boardSelector = document.getElementById('board-selector');
+    const board1Select = document.getElementById('board1');
+    const board2Select = document.getElementById('board2');
+    
+    if (boards && boards.length > 0) {
+        boardSelector.style.display = 'block';
+        
+        // Очищаем селекты
+        board1Select.innerHTML = '<option value="">Не выбран</option>';
+        board2Select.innerHTML = '<option value="">Не выбран</option>';
+        
+        // Добавляем опции
+        boards.forEach(board => {
+            const option1 = document.createElement('option');
+            option1.value = board.id;
+            option1.textContent = `${board.name} (+${board.price} руб.)`;
+            board1Select.appendChild(option1);
+            
+            const option2 = document.createElement('option');
+            option2.value = board.id;
+            option2.textContent = `${board.name} (+${board.price} руб.)`;
+            board2Select.appendChild(option2);
+        });
+    } else {
+        boardSelector.style.display = 'none';
+    }
+}
+
+// Функция обновления добавок
+function updateAddons(addons) {
+    const addonSelector = document.getElementById('addon-selector');
+    const addonList = document.getElementById('addon-list');
+    
+    if (addons && addons.length > 0) {
+        addonSelector.style.display = 'block';
+        addonList.innerHTML = '';
+        
+        addons.forEach(addon => {
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <label class="custom-checkbox">
+                    <input type="checkbox" name="addons" value="${addon.id}"
+                           style="display: none;">
+                    <span class="checkbox-icon"></span>
+                    ${addon.name} (+${addon.price} руб.)
+                </label>
+            `;
+            addonList.appendChild(li);
+        });
+    } else {
+        addonSelector.style.display = 'none';
+    }
+}
+
+// Функция обновления напитков
+function updateDrinks(drinks) {
+    const drinkSelector = document.getElementById('drink-selector');
+    const drinkList = document.getElementById('drink-list');
+    
+    if (drinks && drinks.length > 0) {
+        drinkSelector.style.display = 'block';
+        drinkList.innerHTML = '';
+        
+        drinks.forEach((drink, index) => {
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <label class="custom-radio">
+                    <input type="radio" name="drink" value="${drink}"
+                           ${index === 0 ? 'checked' : ''}
+                           style="display: none;">
+                    <span class="radio-button"></span>
+                    ${drink}
+                </label>
+            `;
+            drinkList.appendChild(li);
+        });
+    } else {
+        drinkSelector.style.display = 'none';
+    }
+}
+
+// Добавляем обработчики событий для кнопок размеров
+document.addEventListener('DOMContentLoaded', function() {
+    const sizeButtons = document.querySelectorAll('.size-option');
+    
+    sizeButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Убираем класс selected у всех кнопок
+            sizeButtons.forEach(btn => btn.classList.remove('selected'));
+            
+            // Добавляем класс selected к нажатой кнопке
+            this.classList.add('selected');
+            
+            // Получаем ID варианта и вызываем функцию изменения
+            const variantId = this.getAttribute('data-variant-id');
+            changeSizeVariant(variantId);
+        });
+    });
+});
+</script>
+
 {% endblock %}
 

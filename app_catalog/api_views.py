@@ -57,6 +57,74 @@ def get_size_addons(request, size_id):
     return JsonResponse(serializer.data, safe=False)
 
 
+def get_variant_data(request, variant_id):
+    """
+    API-представление для получения полных данных варианта товара
+    включая цену, соусы, доски и добавки
+    """
+    variant = get_object_or_404(ProductVariant, id=variant_id)
+    product = variant.product
+    
+    # Базовые данные варианта
+    variant_data = {
+        'id': variant.id,
+        'price': float(variant.price),
+        'size_name': variant.size.name if variant.size else None,
+        'value': variant.value,
+        'unit': variant.get_unit_display() if variant.unit else None,
+    }
+    
+    # Проверяем, является ли товар пиццей или кальцоне
+    is_pizza_or_calzone = product.category.name in ["Пицца", "Кальцоне"]
+    
+    if is_pizza_or_calzone and variant.size:
+        # Получаем соусы
+        sauces = PizzaSauce.objects.filter(is_active=True)
+        variant_data['sauces'] = [{
+            'id': sauce.id,
+            'name': sauce.name,
+            'price': 0.0
+        } for sauce in sauces]
+        
+        # Получаем доски для размера
+        boards = BoardParams.objects.filter(size=variant.size)
+        variant_data['boards'] = [{
+            'id': board.board.id,
+            'name': board.board.name,
+            'price': float(board.price)
+        } for board in boards]
+        
+        # Получаем добавки для размера
+        addons = AddonParams.objects.filter(size=variant.size)
+        variant_data['addons'] = [{
+            'id': addon.addon.id,
+            'name': addon.addon.name,
+            'price': float(addon.price)
+        } for addon in addons]
+    else:
+        variant_data['sauces'] = []
+        variant_data['boards'] = []
+        variant_data['addons'] = []
+    
+    # Проверяем, является ли товар комбо
+    if product.category.name == "Комбо":
+        # Получаем напитки (предполагаем, что они в категории "Напитки")
+        try:
+            drinks_category = Category.objects.get(name="Напитки")
+            drinks = Product.objects.filter(category=drinks_category, is_active=True)
+            variant_data['drinks'] = [{
+                'id': drink.id,
+                'name': drink.name,
+                'price': float(drink.price) if hasattr(drink, 'price') else 0
+            } for drink in drinks]
+        except Category.DoesNotExist:
+            variant_data['drinks'] = []
+    else:
+        variant_data['drinks'] = []
+    
+    return JsonResponse(variant_data)
+
+
 # DRF API Views
 class CategoryListView(generics.ListAPIView):
     """
