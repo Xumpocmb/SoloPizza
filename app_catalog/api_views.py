@@ -74,8 +74,8 @@ def get_variant_data(request, variant_id):
         'unit': variant.get_unit_display() if variant.unit else None,
     }
     
-    # Проверяем, является ли товар пиццей или комбо
-    is_pizza_or_combo = product.category.name in ["Пицца", "Комбо"]
+    # Проверяем, является ли товар пиццей, кальцоне или комбо
+    is_pizza_or_combo = product.category.name in ["Пицца", "Кальцоне", "Комбо"]
     
     if is_pizza_or_combo and variant.size:
         # Получаем соусы
