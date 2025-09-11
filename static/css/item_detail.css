@@ -173,5 +173,10 @@
     margin-bottom: 20px;
 }
 
+/* Класс для скрытия селекторов */
+.option-selector.hidden {
+    display: none;
+}
+
 
 

@@ -80,7 +80,7 @@
                         </div>
 
                         <!-- Соус -->
-                        <div class="form-group option-selector" id="sauce-selector" {% if not sauces %}style="display: none;"{% endif %}>
+                        <div class="form-group option-selector{% if not sauces %} hidden{% endif %}" id="sauce-selector">
                             <h3>Выберите соус (один вариант):</h3>
                             <ul class="custom-radio-list" id="sauce-list">
                                 {% for sauce in sauces %}
@@ -100,7 +100,7 @@
                         </div>
 
                         <!-- Борты -->
-                        <div class="form-group board-selector" id="board-selector" {% if not boards %}style="display: none;"{% endif %}>
+                        <div class="form-group board-selector{% if not boards %} hidden{% endif %}" id="board-selector">
                             <h3>Выберите борт:</h3>
 
                             <div class="board-pair">
@@ -129,7 +129,7 @@
                         </div>
 
                         <!-- Добавки -->
-                        <div class="form-group option-selector" id="addon-selector" {% if not addons %}style="display: none;"{% endif %}>
+                        <div class="form-group option-selector{% if not addons %} hidden{% endif %}" id="addon-selector">
                             <h3>Добавки (можно выбрать несколько):</h3>
                             <ul class="custom-checkbox-list" id="addon-list">
                                 {% for addon in addons %}
@@ -148,7 +148,7 @@
                         </div>
 
                         <!-- Напитки для комбо -->
-                        <div class="form-group option-selector" id="drink-selector" {% if not drinks %}style="display: none;"{% endif %}>
+                        <div class="form-group option-selector{% if not drinks %} hidden{% endif %}" id="drink-selector">
                             <h3>Выберите напиток (один вариант):</h3>
                             <ul class="custom-radio-list" id="drink-list">
                                 {% for drink in drinks %}
@@ -217,7 +217,7 @@ function updateSauces(sauces) {
     const sauceList = document.getElementById('sauce-list');
     
     if (sauces && sauces.length > 0) {
-        sauceSelector.style.display = 'block';
+        sauceSelector.classList.remove('hidden');
         sauceList.innerHTML = '';
         
         sauces.forEach((sauce, index) => {
@@ -234,7 +234,7 @@ function updateSauces(sauces) {
             sauceList.appendChild(li);
         });
     } else {
-        sauceSelector.style.display = 'none';
+        sauceSelector.classList.add('hidden');
     }
 }
 
@@ -245,7 +245,7 @@ function updateBoards(boards) {
     const board2Select = document.getElementById('board2');
     
     if (boards && boards.length > 0) {
-        boardSelector.style.display = 'block';
+        boardSelector.classList.remove('hidden');
         
         // Очищаем селекты
         board1Select.innerHTML = '<option value="">Не выбран</option>';
@@ -264,7 +264,7 @@ function updateBoards(boards) {
             board2Select.appendChild(option2);
         });
     } else {
-        boardSelector.style.display = 'none';
+        boardSelector.classList.add('hidden');
     }
 }
 
@@ -274,7 +274,7 @@ function updateAddons(addons) {
     const addonList = document.getElementById('addon-list');
     
     if (addons && addons.length > 0) {
-        addonSelector.style.display = 'block';
+        addonSelector.classList.remove('hidden');
         addonList.innerHTML = '';
         
         addons.forEach(addon => {
@@ -290,7 +290,7 @@ function updateAddons(addons) {
             addonList.appendChild(li);
         });
     } else {
-        addonSelector.style.display = 'none';
+        addonSelector.classList.add('hidden');
     }
 }
 
@@ -300,7 +300,7 @@ function updateDrinks(drinks) {
     const drinkList = document.getElementById('drink-list');
     
     if (drinks && drinks.length > 0) {
-        drinkSelector.style.display = 'block';
+        drinkSelector.classList.remove('hidden');
         drinkList.innerHTML = '';
         
         drinks.forEach((drink, index) => {
@@ -317,7 +317,7 @@ function updateDrinks(drinks) {
             drinkList.appendChild(li);
         });
     } else {
-        drinkSelector.style.display = 'none';
+        drinkSelector.classList.add('hidden');
     }
 }
 
