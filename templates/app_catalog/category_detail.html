@@ -32,11 +32,13 @@
                     <!-- Карточка товара -->
                     {% for item in items %}
                         <div class="item-card">
-                            {% if item.image %}
+                            <a href="{% url 'app_catalog:item_detail' item.slug %}">
+                                {% if item.image %}
                                 <img src="{{ item.image.url }}" alt="{{ item.name }}">
-                            {% else %}
+                                {% else %}
                                 <img src="{% static 'img/No-Image-Placeholder.svg' %}" alt="{{ item.name }}">
-                            {% endif %}
+                                {% endif %}
+                            </a>
                             <h2>{{ item.name }}</h2>
                             <p>{{ item.description }}</p>
                             <div class="cart_price_section">
