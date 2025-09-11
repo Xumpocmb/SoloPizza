@@ -174,7 +174,8 @@
 }
 
 /* Класс для скрытия селекторов */
-.option-selector.hidden {
+.option-selector.hidden,
+.board-selector.hidden {
     display: none;
 }
 

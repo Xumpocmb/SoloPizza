@@ -74,10 +74,10 @@ def get_variant_data(request, variant_id):
         'unit': variant.get_unit_display() if variant.unit else None,
     }
     
-    # Проверяем, является ли товар пиццей или кальцоне
-    is_pizza_or_calzone = product.category.name in ["Пицца", "Кальцоне"]
+    # Проверяем, является ли товар пиццей или комбо
+    is_pizza_or_combo = product.category.name in ["Пицца", "Комбо"]
     
-    if is_pizza_or_calzone and variant.size:
+    if is_pizza_or_combo and variant.size:
         # Получаем соусы
         sauces = PizzaSauce.objects.filter(is_active=True)
         variant_data['sauces'] = [{

@@ -177,6 +177,9 @@
     </main>
 
 <script>
+// Категория товара для проверки доступности бортов
+const itemCategory = '{{ item.category.name }}';
+
 // Функция для динамического изменения размера товара
 function changeSizeVariant(variantId) {
     // Показываем индикатор загрузки
@@ -244,7 +247,10 @@ function updateBoards(boards) {
     const board1Select = document.getElementById('board1');
     const board2Select = document.getElementById('board2');
     
-    if (boards && boards.length > 0) {
+    // Проверяем категорию товара - борты доступны только для пиццы и комбо
+    const isPizzaOrCombo = itemCategory === 'Пицца' || itemCategory === 'Комбо';
+    
+    if (boards && boards.length > 0 && isPizzaOrCombo) {
         boardSelector.classList.remove('hidden');
         
         // Очищаем селекты
