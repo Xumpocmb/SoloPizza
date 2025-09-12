@@ -236,7 +236,10 @@ function updateSauces(sauces) {
     const sauceSelector = document.getElementById('sauce-selector');
     const sauceList = document.getElementById('sauce-list');
     
-    if (sauces && sauces.length > 0) {
+    // Проверяем категорию товара - соусы доступны только для пиццы и кальцоне
+    const isPizzaOrCalzone = itemCategory === 'Пицца' || itemCategory === 'Кальцоне';
+    
+    if (sauces && sauces.length > 0 && isPizzaOrCalzone) {
         sauceSelector.classList.remove('hidden');
         sauceList.innerHTML = '';
         
@@ -266,7 +269,7 @@ function updateBoards(boards) {
     const board2Select = document.getElementById('board2');
     
     // Проверяем категорию товара - борты доступны только для пиццы и комбо
-    const isPizzaOrCombo = itemCategory === 'Пицца' || itemCategory === 'Комбо' || itemCategory === 'Кальцоне';
+    const isPizzaOrCombo = itemCategory === 'Пицца' || itemCategory === 'Комбо';
     
     if (boards && boards.length > 0 && isPizzaOrCombo) {
         boardSelector.classList.remove('hidden');
@@ -299,7 +302,10 @@ function updateAddons(addons) {
     const addonSelector = document.getElementById('addon-selector');
     const addonList = document.getElementById('addon-list');
     
-    if (addons && addons.length > 0) {
+    // Проверяем категорию товара - добавки доступны только для пиццы
+    const isPizza = itemCategory === 'Пицца';
+    
+    if (addons && addons.length > 0 && isPizza) {
         addonSelector.classList.remove('hidden');
         addonList.innerHTML = '';
         
@@ -326,7 +332,10 @@ function updateDrinks(drinks) {
     const drinkSelector = document.getElementById('drink-selector');
     const drinkList = document.getElementById('drink-list');
     
-    if (drinks && drinks.length > 0) {
+    // Проверяем категорию товара - напитки доступны только для комбо
+    const isCombo = itemCategory === 'Комбо';
+    
+    if (drinks && drinks.length > 0 && isCombo) {
         drinkSelector.classList.remove('hidden');
         drinkList.innerHTML = '';
         
