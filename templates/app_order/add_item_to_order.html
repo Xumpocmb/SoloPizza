@@ -99,6 +99,9 @@
                 select.classList.add('styled-select');
             });
             
+            // Удален дублирующийся обработчик изменения варианта (перенесен в конец файла)
+            // (обработчик добавлен внизу файла)
+            
             // Устанавливаем атрибуты data-category для всех опций продуктов
             for (let i = 0; i < productSelect.options.length; i++) {
                 const option = productSelect.options[i];
@@ -137,9 +140,24 @@
                 // Очищаем текущие варианты
                 variantSelect.innerHTML = '<option value="">---------</option>';
                 
+                // Показываем индикатор загрузки
+                variantSelect.disabled = true;
+                
                 // Запрашиваем варианты для выбранного продукта
-                fetch(`/api/product/${productId}/variants/`)
-                    .then(response => response.json())
+                fetch(`/api/catalog/product-variants/${productId}/`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    credentials: 'same-origin'
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Ошибка сети: ' + response.status);
+                        }
+                        return response.json();
+                    })
                     .then(data => {
                         data.forEach(variant => {
                             const option = document.createElement('option');
@@ -150,65 +168,102 @@
                             }
                             variantSelect.appendChild(option);
                         });
+                        variantSelect.disabled = false;
+                        // При наличии выбранного варианта — обновим параметры пиццы
+                        updatePizzaParams();
                     })
-                    .catch(error => console.error('Ошибка при загрузке вариантов:', error));
+                    .catch(error => {
+                        console.error('Ошибка при загрузке вариантов:', error);
+                        variantSelect.disabled = false;
+                    });
             }
             
             // Функция для обновления параметров пиццы при выборе варианта
             function updatePizzaParams() {
-                const variantOption = variantSelect.options[variantSelect.selectedIndex];
-                if (!variantOption || !variantOption.dataset.size) return;
-                
-                const sizeId = variantOption.dataset.size;
-                const productId = productSelect.value;
-                
-                // Проверяем, является ли продукт пиццей или кальцоне
                 const selectedProductOption = productSelect.options[productSelect.selectedIndex];
-                if (!selectedProductOption || !(selectedProductOption.dataset.category === 'Пицца' || selectedProductOption.dataset.category === 'Кальцоне')) {
+                if (!selectedProductOption) return;
+                
+                // Обновляем параметры только для категорий Пицца/Кальцоне
+                const isPizza = selectedProductOption.dataset.category === 'Пицца' || selectedProductOption.dataset.category === 'Кальцоне';
+                if (!isPizza) {
                     return;
                 }
                 
-                // Загружаем борты для выбранного размера
-                fetch(`/api/size/${sizeId}/boards/`)
-                    .then(response => response.json())
+                const variantId = variantSelect.value;
+                if (!variantId) return;
+                
+                // Блокируем элементы на время загрузки
+                board1Select.disabled = true;
+                board2Select.disabled = true;
+                sauceSelect.disabled = true;
+                addonsSelect.disabled = true;
+                
+                fetch(`/api/catalog/variant-data/${variantId}/`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    credentials: 'same-origin'
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Ошибка сети: ' + response.status);
+                        }
+                        return response.json();
+                    })
                     .then(data => {
-                        // Обновляем борт 1
+                        // Борты
                         board1Select.innerHTML = '<option value="">---------</option>';
-                        data.forEach(board => {
-                            const option = document.createElement('option');
-                            option.value = board.id;
-                            option.textContent = `${board.name} (+${board.price} руб.)`;
-                            board1Select.appendChild(option);
+                        board2Select.innerHTML = '<option value="">---------</option>';
+                        (data.boards || []).forEach(board => {
+                            const option1 = document.createElement('option');
+                            option1.value = board.id;
+                            option1.textContent = `${board.name} (+${board.price} руб.)`;
+                            board1Select.appendChild(option1);
+                            
+                            const option2 = document.createElement('option');
+                            option2.value = board.id;
+                            option2.textContent = `${board.name} (+${board.price} руб.)`;
+                            board2Select.appendChild(option2);
                         });
                         
-                        // Обновляем борт 2
-                        board2Select.innerHTML = '<option value="">---------</option>';
-                        data.forEach(board => {
+                        // Соусы
+                        sauceSelect.innerHTML = '<option value="">---------</option>';
+                        (data.sauces || []).forEach(sauce => {
                             const option = document.createElement('option');
-                            option.value = board.id;
-                            option.textContent = `${board.name} (+${board.price} руб.)`;
-                            board2Select.appendChild(option);
+                            option.value = sauce.id;
+                            option.textContent = sauce.name;
+                            sauceSelect.appendChild(option);
                         });
-                    })
-                    .catch(error => console.error('Ошибка при загрузке бортов:', error));
-                
-                // Загружаем добавки для выбранного размера
-                fetch(`/api/size/${sizeId}/addons/`)
-                    .then(response => response.json())
-                    .then(data => {
+                        
+                        // Добавки
                         addonsSelect.innerHTML = '';
-                        data.forEach(addon => {
+                        (data.addons || []).forEach(addon => {
                             const option = document.createElement('option');
                             option.value = addon.id;
                             option.textContent = `${addon.name} (+${addon.price} руб.)`;
                             addonsSelect.appendChild(option);
                         });
+                        
+                        // Разблокируем элементы
+                        board1Select.disabled = false;
+                        board2Select.disabled = false;
+                        sauceSelect.disabled = false;
+                        addonsSelect.disabled = false;
                     })
-                    .catch(error => console.error('Ошибка при загрузке добавок:', error));
+                    .catch(error => {
+                        console.error('Ошибка при загрузке параметров варианта:', error);
+                        board1Select.disabled = false;
+                        board2Select.disabled = false;
+                        sauceSelect.disabled = false;
+                        addonsSelect.disabled = false;
+                    });
             }
             
-            // Вызываем функцию при загрузке страницы
+            // Вызываем функции при загрузке страницы
             updatePizzaOptions();
+            updateVariants();
             
             // Добавляем обработчики событий
             productSelect.addEventListener('change', function() {
