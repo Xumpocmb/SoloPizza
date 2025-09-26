@@ -51,16 +51,17 @@
                         <div class="categories">
                             {% for category in categories %}
                                 <div class="category-card" tabindex="0">
-                                    <div class="category-card__image">
-                                        {% if category.image %}
-                                            <img src="{{ category.image.url }}" alt="{{ category.name }}">
-                                        {% else %}
-                                            <img src="{% static 'img/test.jpg' %}" alt="{{ category.name }}">
-                                        {% endif %}
-                                    </div>
+                                    
                                     <a href="{% url 'app_catalog:category_detail' category.slug %}"
                                        class="category-card__link"
                                        aria-label="Перейти в категорию: Пицца">
+                                    <div class="category-card__image">
+                                        {% if category.image %}
+                                        <img src="{{ category.image.url }}" alt="{{ category.name }}">
+                                        {% else %}
+                                        <img src="{% static 'img/test.jpg' %}" alt="{{ category.name }}">
+                                        {% endif %}
+                                    </div>
                                         <p class="category_name">{{ category.name }}</p>
                                     </a>
                                 </div>
