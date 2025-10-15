@@ -82,7 +82,7 @@ class Vacancy(models.Model):
     title = models.CharField("Название", max_length=100)
     description = models.TextField("Описание", blank=True)
     image = models.ImageField("Фото профессии", upload_to="vacancies/", blank=True, null=True)
-    salary = models.CharField("Зарплата", max_length=50, blank=True)
+    salary = models.CharField("Зарплата", max_length=50, blank=True, null=True)
     benefits = models.TextField("Преимущества (через запятую)", blank=True, null=True)
     is_active = models.BooleanField("Активна", default=True)
     created_at = models.DateTimeField(auto_now_add=True)
