@@ -36,6 +36,7 @@ class Category(models.Model):
     def get_absolute_url(self):
         return reverse('app_catalog:category_detail', kwargs={'slug': self.slug})
 
+
 class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products')
     name = models.CharField('Название', max_length=255)

@@ -22,7 +22,6 @@ class Discount(models.Model):
         return f"{self.name} ({self.percent}%)"
 
 
-
 class Feedback(models.Model):
     name = models.CharField("Имя", max_length=100)
     phone_regex = RegexValidator(
