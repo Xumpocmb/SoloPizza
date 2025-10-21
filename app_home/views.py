@@ -3,8 +3,6 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_protect
-from django.db.models import Q
-from django.conf import settings
 
 from app_cart.models import CartItem
 from app_cart.utils import validate_cart_items_for_branch
@@ -33,22 +31,18 @@ def select_branch(request):
 
             # Проверяем, авторизован ли пользователь, прежде чем получать его корзину
             if request.user.is_authenticated:
-                cart_items = CartItem.objects.filter(user=request.user).select_related('item__category')
+                cart_items = CartItem.objects.filter(user=request.user).select_related("item__category")
                 unavailable_items = validate_cart_items_for_branch(cart_items, branch)
-                
-                if unavailable_items:
-                    messages.warning(
-                        request,
-                    f"Некоторые товары в корзине недоступны в филиале '{branch.name}'. "
-                    "Пожалуйста, удалите их перед оформлением заказа."
-                )
 
-            return redirect(request.META.get('HTTP_REFERER', '/'))
+                if unavailable_items:
+                    messages.warning(request, f"Некоторые товары в корзине недоступны в филиале '{branch.name}'. " "Пожалуйста, удалите их перед оформлением заказа.")
+
+            return redirect(request.META.get("HTTP_REFERER", "/"))
         else:
             messages.error(request, "Ошибка: филиал не выбран!", extra_tags="error")
     except CafeBranch.DoesNotExist:
         messages.error(request, "Выбранный филиал не найден", extra_tags="error")
-        return redirect('/')
+        return redirect("/")
     return redirect(request.META.get("HTTP_REFERER"))
 
 
@@ -61,37 +55,22 @@ def discounts_view(request):
 def vacancy_list(request):
     """Отображает список всех активных вакансий"""
     vacancies = Vacancy.objects.filter(is_active=True)
-    
+
     # Добавляем хлебные крошки
-    breadcrumbs = [
-        {'title': 'Главная', 'url': '/'},
-        {'title': 'Вакансии', 'url': '#'}
-    ]
-    
-    context = {
-        "vacancies": vacancies,
-        "title": "Вакансии",
-        "breadcrumbs": breadcrumbs
-    }
+    breadcrumbs = [{"title": "Главная", "url": "/"}, {"title": "Вакансии", "url": "#"}]
+
+    context = {"vacancies": vacancies, "title": "Вакансии", "breadcrumbs": breadcrumbs}
     return render(request, "app_home/vacancy_list.html", context=context)
 
 
 def vacancy_detail(request, vacancy_id):
     """Отображает детальную информацию о конкретной вакансии"""
     vacancy = get_object_or_404(Vacancy, id=vacancy_id, is_active=True)
-    
+
     # Добавляем хлебные крошки
-    breadcrumbs = [
-        {'title': 'Главная', 'url': '/'},
-        {'title': 'Вакансии', 'url': reverse('app_home:vacancy_list')},
-        {'title': vacancy.title, 'url': '#'}
-    ]
-    
-    context = {
-        "vacancy": vacancy,
-        "title": vacancy.title,
-        "breadcrumbs": breadcrumbs
-    }
+    breadcrumbs = [{"title": "Главная", "url": "/"}, {"title": "Вакансии", "url": reverse("app_home:vacancy_list")}, {"title": vacancy.title, "url": "#"}]
+
+    context = {"vacancy": vacancy, "title": vacancy.title, "breadcrumbs": breadcrumbs}
     return render(request, "app_home/vacancy_detail.html", context=context)
 
 
@@ -99,95 +78,71 @@ def vacancy_detail(request, vacancy_id):
 def vacancy_apply(request, vacancy_id):
     """Отображает форму для отклика на вакансию и обрабатывает её отправку"""
     vacancy = get_object_or_404(Vacancy, id=vacancy_id, is_active=True)
-    
-    if request.method == 'POST':
+
+    if request.method == "POST":
         form = VacancyApplicationForm(request.POST)
         if form.is_valid():
             application = form.save(commit=False)
             application.vacancy = vacancy
             application.save()
             messages.success(request, "Ваш отклик успешно отправлен! Мы свяжемся с вами в ближайшее время.", extra_tags="success")
-            return redirect(reverse('app_home:vacancy_detail', kwargs={'vacancy_id': vacancy_id}))
+            return redirect(reverse("app_home:vacancy_detail", kwargs={"vacancy_id": vacancy_id}))
         else:
             # Добавляем сообщение об ошибке, если форма не валидна
             messages.error(request, "Пожалуйста, исправьте ошибки в форме.", extra_tags="error")
     else:
         form = VacancyApplicationForm()
-    
+
     # Добавляем хлебные крошки
     breadcrumbs = [
-        {'title': 'Главная', 'url': '/'},
-        {'title': 'Вакансии', 'url': reverse('app_home:vacancy_list')},
-        {'title': vacancy.title, 'url': reverse('app_home:vacancy_detail', kwargs={'vacancy_id': vacancy_id})},
-        {'title': 'Отклик на вакансию', 'url': '#'}
+        {"title": "Главная", "url": "/"},
+        {"title": "Вакансии", "url": reverse("app_home:vacancy_list")},
+        {"title": vacancy.title, "url": reverse("app_home:vacancy_detail", kwargs={"vacancy_id": vacancy_id})},
+        {"title": "Отклик на вакансию", "url": "#"},
     ]
-    
-    context = {
-        "vacancy": vacancy,
-        "form": form,
-        "breadcrumbs": breadcrumbs,
-        "title": f"Отклик на вакансию: {vacancy.title}"
-    }
+
+    context = {"vacancy": vacancy, "form": form, "breadcrumbs": breadcrumbs, "title": f"Отклик на вакансию: {vacancy.title}"}
     return render(request, "app_home/vacancy_apply.html", context=context)
 
 
 def contacts_view(request):
     """Отображает страницу контактов с информацией о выбранном филиале"""
-   
-    breadcrumbs = [
-        {'title': 'Главная', 'url': '/'},
-        {'title': 'Контакты', 'url': reverse('app_home:contacts')}
-    ]
-    
-    context = {
-        "breadcrumbs": breadcrumbs,
-        "title": "Контакты"
-    }
-    
+
+    breadcrumbs = [{"title": "Главная", "url": "/"}, {"title": "Контакты", "url": reverse("app_home:contacts")}]
+
+    context = {"breadcrumbs": breadcrumbs, "title": "Контакты"}
+
     return render(request, "app_home/contacts.html", context=context)
 
 
 @csrf_protect
 def feedback_view(request):
     """Отображает форму вопросов и предложений и обрабатывает её отправку"""
-    
-    breadcrumbs = [
-        {'title': 'Главная', 'url': '/'},
-        {'title': 'Вопросы и предложения', 'url': reverse('app_home:feedback')}
-    ]
-    
-    if request.method == 'POST':
+
+    breadcrumbs = [{"title": "Главная", "url": "/"}, {"title": "Вопросы и предложения", "url": reverse("app_home:feedback")}]
+
+    if request.method == "POST":
         form = FeedbackForm(request.POST)
         if form.is_valid():
             form.save()
             messages.success(request, "Ваш вопрос/предложение успешно отправлено! Мы свяжемся с вами в ближайшее время.", extra_tags="success")
-            return redirect(reverse('app_home:feedback'))
+            return redirect(reverse("app_home:feedback"))
         else:
             # Добавляем сообщение об ошибке, если форма не валидна
             messages.error(request, "Пожалуйста, исправьте ошибки в форме.", extra_tags="error")
     else:
         form = FeedbackForm()
-    
-    context = {
-        "breadcrumbs": breadcrumbs,
-        "form": form,
-        "title": "Вопросы и предложения"
-    }
-    
+
+    context = {"breadcrumbs": breadcrumbs, "form": form, "title": "Вопросы и предложения"}
+
     return render(request, "app_home/feedback.html", context=context)
 
 
 def info_view(request):
     """Отображает страницу с информацией о компании"""
-    
-    breadcrumbs = [
-        {'title': 'Главная', 'url': '/'},
-        {'title': 'Информация', 'url': reverse('app_home:info')}
-    ]
-    
-    context = {
-        "breadcrumbs": breadcrumbs,
-        "title": "Информация о компании"
-    }
-    
+
+    breadcrumbs = [{"title": "Главная", "url": "/"}, {"title": "Информация", "url": reverse("app_home:info")}]
+
+    context = {"breadcrumbs": breadcrumbs, "title": "Информация о компании"}
+
     return render(request, "app_home/info.html", context=context)
