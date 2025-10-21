@@ -6,7 +6,7 @@ from .models import Category
 @shared_task
 def activate_combo_category():
     """
-    Активирует категорию "Комбо" в рабочие дни с 11:00.
+    Активирует категорию "Комбо"
     """
     # Проверяем, что сегодня рабочий день (понедельник-пятница)
     weekday = timezone.now().weekday()
@@ -24,7 +24,7 @@ def activate_combo_category():
 @shared_task
 def deactivate_combo_category():
     """
-    Деактивирует категорию "Комбо" в 17:00 или в выходные дни.
+    Деактивирует категорию "Комбо"
     """
     try:
         combo_category = Category.objects.get(name="Комбо")
@@ -33,3 +33,13 @@ def deactivate_combo_category():
         return f"Категория 'Комбо' деактивирована в {timezone.now()}"
     except Category.DoesNotExist:
         return "Категория 'Комбо' не найдена"
+
+
+@shared_task
+def disable_weekly_special_for_all_products():
+    """
+    Отключает акцию "Пицца недели" для всех товаров.
+    """
+    from .models import Product
+    updated_count = Product.objects.filter(is_weekly_special=True).update(is_weekly_special=False)
+    return f"Отключена акция 'Пицца недели' для {updated_count} товаров."

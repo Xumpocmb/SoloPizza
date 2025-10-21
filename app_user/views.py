@@ -14,8 +14,7 @@ def register_view(request):
             return redirect("app_user:login")
     else:
         form = UserCreationForm()
-    return render(request, 'app_user/register.html', {'form': form})
-
+    return render(request, "app_user/register.html", {"form": form})
 
 
 def login_view(request):
@@ -24,6 +23,7 @@ def login_view(request):
         if form.is_valid():
             username = form.cleaned_data.get("username")
             password = form.cleaned_data.get("password")
+
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
@@ -32,14 +32,13 @@ def login_view(request):
                 form.add_error(None, "Неверное имя пользователя или пароль.")
     else:
         form = AuthenticationForm()
-    return render(request, 'app_user/login.html', {'form': form})
+    return render(request, "app_user/login.html", {"form": form})
 
 
 def logout_view(request):
     try:
         logout(request)
-        messages.success(request, 'Вы успешно вышли из системы.', extra_tags='success')
+        messages.success(request, "Вы успешно вышли из системы.", extra_tags="success")
     except Exception as e:
-        messages.error(request, f'Произошла ошибка при выходе из системы: {e}', extra_tags='error')
-    return redirect('app_home:home')
-
+        messages.error(request, f"Произошла ошибка при выходе из системы: {e}", extra_tags="error")
+    return redirect("app_home:home")

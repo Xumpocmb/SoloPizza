@@ -3,9 +3,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
+from django.contrib.auth.decorators import permission_required
 from .models import Review
 from .forms import ReviewForm, ReviewModerationForm
-from django.contrib.auth.decorators import permission_required
 
 
 def review_list(request):
