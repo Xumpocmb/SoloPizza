@@ -200,7 +200,7 @@ function changeSizeVariant(variantId) {
     }
     
     // 3) Отправляем AJAX запрос
-    fetch(`/api/catalog/variant-data/${variantId}/`)
+    fetch(`/catalog/variant-data/${variantId}/`)
         .then(response => response.json())
         .then(data => {
             // Обновляем цену

@@ -1,5 +1,28 @@
 from django.contrib import admin
-from app_home.models import CafeBranch, CafeBranchPhone, Vacancy, VacancyApplication, Feedback, Discount
+from app_home.models import CafeBranch, CafeBranchPhone, Vacancy, VacancyApplication, Feedback, Discount, OrderAvailability
+
+
+@admin.register(OrderAvailability)
+class OrderAvailabilityAdmin(admin.ModelAdmin):
+    list_display = ('is_available', 'updated_at')
+    list_editable = ('is_available',)
+    list_display_links = None  # Remove the link from the display to avoid confusion
+    readonly_fields = ('updated_at',)
+    fieldsets = (
+        (None, {
+            'fields': ('is_available',)
+        }),
+        ('Информация', {
+            'fields': ('updated_at',),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def has_add_permission(self, request):
+        # Only allow one instance of OrderAvailability
+        if OrderAvailability.objects.exists():
+            return False
+        return True
 
 
 @admin.register(Discount)

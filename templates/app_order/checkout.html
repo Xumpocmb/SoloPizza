@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load order_availability %}
 
 {% block meta_description %}Оформление заказа в Solo Pizza - заполните контактные данные, выберите способ доставки и оплаты для завершения заказа.{% endblock %}
 {% block meta_keywords %}оформление заказа, доставка пиццы, оплата заказа, Solo Pizza заказ{% endblock %}
@@ -14,7 +15,14 @@
     <main class="checkout-page">
         <div class="checkout-container">
             <h1 class="checkout-title">Оформление заказа</h1>
-
+            
+            {% are_orders_available as orders_available %}
+            {% if not orders_available %}
+                <div class="alert alert-warning">
+                    <p>В настоящий момент оформление новых заказов недоступно. Приносим свои извинения за доставленные неудобства.</p>
+                    <a href="{% url 'app_cart:view_cart' %}" class="back-link">Вернуться в корзину</a>
+                </div>
+            {% else %}
             <div class="checkout-content">
                 <form method="POST" class="checkout-form">
                     {% csrf_token %}
@@ -186,7 +194,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            {% endif %}
         </div>
     </main>
 {% endblock %}

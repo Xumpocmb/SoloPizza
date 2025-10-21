@@ -126,3 +126,38 @@ class VacancyApplication(models.Model):
     
     def __str__(self):
         return f"Отклик на {self.vacancy.title} от {self.name}"
+
+
+class OrderAvailability(models.Model):
+    """Модель для управления доступностью оформления заказов"""
+    is_available = models.BooleanField(
+        default=True,
+        verbose_name="Доступность оформления заказов",
+        help_text="Если отключено, пользователи не смогут оформлять новые заказы"
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True,
+        verbose_name="Дата последнего изменения"
+    )
+    
+    class Meta:
+        verbose_name = "Доступность заказов"
+        verbose_name_plural = "Доступность заказов"
+    
+    def __str__(self):
+        status = "доступно" if self.is_available else "недоступно"
+        return f"Оформление заказов: {status}"
+    
+    @classmethod
+    def toggle_availability(cls):
+        """Переключить доступность заказов"""
+        obj, created = cls.objects.get_or_create(pk=1)
+        obj.is_available = not obj.is_available
+        obj.save()
+        return obj
+    
+    @classmethod
+    def is_orders_available(cls):
+        """Проверить, доступно ли оформление заказов"""
+        obj, created = cls.objects.get_or_create(pk=1)
+        return obj.is_available

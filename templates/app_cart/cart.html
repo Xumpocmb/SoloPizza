@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load cart_tags %}
+{% load order_availability %}
 
 {% block meta_description %}Корзина покупок Solo Pizza - просмотрите выбранные товары, измените количество и оформите заказ.{% endblock %}
 {% block meta_keywords %}корзина, заказ пиццы, доставка пиццы, Solo Pizza корзина{% endblock %}
@@ -157,7 +158,12 @@
                         <span class="summary-label">Итого к оплате:</span>
                         <span class="summary-value">{{ total_price|floatformat:2 }} руб.</span>
                     </div>
-                    <a href="{% url 'app_order:checkout' %}" class="checkout-btn">Оформить заказ</a>
+                    {% are_orders_available as orders_available %}
+                    {% if orders_available %}
+                        <a href="{% url 'app_order:checkout' %}" class="checkout-btn">Оформить заказ</a>
+                    {% else %}
+                        <button class="checkout-btn disabled" disabled>Оформление заказов временно недоступно</button>
+                    {% endif %}
                 </div>
                     
 

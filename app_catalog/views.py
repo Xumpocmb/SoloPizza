@@ -1,4 +1,5 @@
 from django.db.models import Min
+from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 
@@ -128,3 +129,59 @@ def catalog_view(request):
         "breadcrumbs": breadcrumbs,
     }
     return render(request, "app_catalog/catalog.html", context=context)
+
+
+def get_variant_data(request, variant_id):
+    """
+    API-представление для получения полных данных варианта товара
+    включая цену, соусы, доски и добавки
+    """
+    variant = get_object_or_404(ProductVariant, id=variant_id)
+    product = variant.product
+
+    # Базовые данные варианта
+    variant_data = {
+        "id": variant.id,
+        "price": float(variant.price),
+        "size_name": variant.size.name if variant.size else None,
+        "value": variant.value,
+        "unit": variant.get_unit_display() if variant.unit else None,
+    }
+
+    # Проверяем, является ли товар пиццей, кальцоне или комбо
+    is_pizza_or_combo = product.category.name in ["Пицца", "Кальцоне", "Комбо"]
+
+    if is_pizza_or_combo and variant.size:
+        # Получаем соусы
+        sauces = PizzaSauce.objects.filter(is_active=True)
+        variant_data["sauces"] = [{"id": sauce.id, "name": sauce.name, "price": 0.0} for sauce in sauces]
+
+        # Получаем доски для размера
+        boards = BoardParams.objects.filter(size=variant.size)
+        variant_data["boards"] = [
+            {"id": board.id, "name": board.board.name, "price": float(board.price)} for board in boards  # Возвращаем ID BoardParams, чтобы форма получала корректный идентификатор
+        ]
+
+        # Получаем добавки для размера
+        addons = AddonParams.objects.filter(size=variant.size)
+        variant_data["addons"] = [
+            {"id": addon.id, "name": addon.addon.name, "price": float(addon.price)} for addon in addons  # Возвращаем ID AddonParams, чтобы форма получала корректный идентификатор
+        ]
+    else:
+        variant_data["sauces"] = []
+        variant_data["boards"] = []
+        variant_data["addons"] = []
+
+    # Проверяем, является ли товар комбо
+    if product.category.name == "Комбо":
+        # Получаем напитки (предполагаем, что они в категории "Напитки")
+        try:
+            drinks_category = Category.objects.get(name="Напитки")
+            drinks = Product.objects.filter(category=drinks_category, is_active=True)
+            variant_data["drinks"] = [{"id": drink.id, "name": drink.name, "price": float(drink.price) if hasattr(drink, "price") else 0} for drink in drinks]
+        except Category.DoesNotExist:
+            variant_data["drinks"] = []
+    else:
+        variant_data["drinks"] = []
+
+    return JsonResponse(variant_data)

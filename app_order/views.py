@@ -14,6 +14,7 @@ from app_cart.utils import validate_cart_items_for_branch
 from app_home.models import CafeBranch
 from app_order.forms import CheckoutForm, OrderEditForm, OrderItemFormSet, AddToOrderForm
 from app_order.models import OrderItem, Order
+from app_home.models import OrderAvailability
 from decimal import Decimal, ROUND_HALF_UP
 from django.conf import settings
 import requests
@@ -45,6 +46,14 @@ def is_order_time_allowed(user):
 
 @login_required
 def checkout(request):
+    # Проверяем, доступно ли оформление заказов
+    if not OrderAvailability.is_orders_available():
+        messages.error(
+            request,
+            "В настоящий момент оформление новых заказов недоступно. Приносим свои извинения за доставленные неудобства."
+        )
+        return redirect("app_cart:view_cart")
+    
     cart_items = CartItem.objects.filter(user=request.user).select_related(
         'item', 'item__category'
     )

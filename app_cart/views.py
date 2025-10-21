@@ -12,6 +12,7 @@ from django.views.decorators.http import require_POST
 
 from app_cart.forms import AddToCartForm
 from app_catalog.models import Product, ProductVariant, BoardParams, AddonParams, PizzaSauce
+from app_home.models import OrderAvailability
 from .models import CartItem
 
 
@@ -87,6 +88,13 @@ def add_to_cart(request, slug):
 
 @login_required
 def view_cart(request):
+    # Проверяем, доступно ли оформление заказов
+    if not OrderAvailability.is_orders_available():
+        messages.warning(
+            request,
+            "В настоящий момент оформление новых заказов недоступно. Приносим свои извинения за доставленные неудобства."
+        )
+    
     cart_items = CartItem.objects.filter(user=request.user).select_related(
         'item', 'item_variant', 'sauce', 'board1', 'board2'
     ).prefetch_related('addons')
