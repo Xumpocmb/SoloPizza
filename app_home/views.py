@@ -127,7 +127,7 @@ def feedback_view(request):
         if form.is_valid():
             feedback = form.save()
             # Отправляем уведомление о новом вопросе/предложении
-            if not settings.DEBUG and not request.user.is_superuser and not request.user.is_staff:
+            if not settings.DEBUG:
                 from app_home.tasks import send_feedback_notification
                 send_feedback_notification.delay(feedback.id)
             messages.success(request, "Ваш вопрос/предложение успешно отправлено! Мы свяжемся с вами в ближайшее время.", extra_tags="success")
