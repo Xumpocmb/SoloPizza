@@ -17,8 +17,7 @@ def send_feedback_notification(feedback_id):
         chat_id = getattr(settings, 'CHAT_ID', None)
 
         if not bot_token or not chat_id:
-            print("Отсутствуют настройки для уведомлений в Telegram")
-            return
+            return "Отсутствуют настройки для уведомлений в Telegram"
 
         # Формируем сообщение
         feedback_text = (
@@ -36,10 +35,13 @@ def send_feedback_notification(feedback_id):
             'text': feedback_text
         }
 
-        response = requests.get(url=url, params=params)
+        try:
+            response = requests.get(url=url, params=params)
+        except requests.exceptions.RequestException as e:
+            return f"Ошибка при отправке запроса в Telegram: {str(e)}"
 
         if response.status_code != 200:
-            return f"Ошибка при отправке уведомления: {str(e)}"
+            return f"Ошибка при отправке уведомления: {response.status_code} - {response.text}"
 
         return f"Уведомление о вопросе/предложении #{feedback_id} отправлено"
 
