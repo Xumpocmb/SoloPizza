@@ -33,13 +33,13 @@ def is_order_time_allowed(user):
     # Администраторы и сотрудники могут делать заказы в любое время
     if user.is_superuser or user.is_staff:
         return True
-    
+
     # Получаем текущее время в часовом поясе проекта
     current_time = timezone.localtime().time()
-    
+
     start_time = time(11, 0)  # 11:00
-    end_time = time(22, 30)    # 22:30
-    
+    end_time = time(22, 30)  # 22:30
+
     # Проверяем, находится ли текущее время в разрешенном интервале
     return start_time <= current_time <= end_time
 
@@ -48,30 +48,22 @@ def is_order_time_allowed(user):
 def checkout(request):
     # Проверяем, доступно ли оформление заказов
     if not OrderAvailability.is_orders_available():
-        messages.error(
-            request,
-            "В настоящий момент оформление новых заказов недоступно. Приносим свои извинения за доставленные неудобства."
-        )
+        messages.error(request, "В настоящий момент оформление новых заказов недоступно. Приносим свои извинения за доставленные неудобства.")
         return redirect("app_cart:view_cart")
-    
-    cart_items = CartItem.objects.filter(user=request.user).select_related(
-        'item', 'item__category'
-    )
+
+    cart_items = CartItem.objects.filter(user=request.user).select_related("item", "item__category")
     cart_totals = CartItem.objects.get_cart_totals(request.user)
 
     if not cart_items.exists():
         return redirect("app_cart:view_cart")
-        
+
     # Проверяем, разрешено ли пользователю делать заказ в текущее время
     if not is_order_time_allowed(request.user):
-        messages.error(
-            request,
-            "Заказы принимаются только с 11:00 до 22:30."
-        )
+        messages.error(request, "Заказы принимаются только с 11:00 до 22:30.")
         return redirect("app_cart:view_cart")
 
     # Получаем выбранный филиал
-    selected_branch_id = request.session.get('selected_branch_id', DEFAULT_BRANCH_ID)
+    selected_branch_id = request.session.get("selected_branch_id", DEFAULT_BRANCH_ID)
     try:
         selected_branch = CafeBranch.objects.get(id=selected_branch_id)
     except CafeBranch.DoesNotExist:
@@ -84,11 +76,7 @@ def checkout(request):
             unavailable_items = validate_cart_items_for_branch(cart_items, selected_branch)
 
             if unavailable_items:
-                messages.error(
-                    request,
-                    f"Некоторые товары недоступны в филиале '{selected_branch.name}': "
-                    f"{', '.join(item.item.name for item in unavailable_items)}"
-                )
+                messages.error(request, f"Некоторые товары недоступны в филиале '{selected_branch.name}': " f"{', '.join(item.item.name for item in unavailable_items)}")
                 return redirect("app_cart:view_cart")
 
             order = form.save(user=request.user)
@@ -112,17 +100,15 @@ def checkout(request):
             order.recalculate_totals()
             cart_items.delete()
             if not settings.DEBUG and not request.user.is_superuser and not request.user.is_staff:
-                send_notify(order)
+                from .tasks import send_order_notification
+
+                send_order_notification.delay(order.id)
             return redirect("app_order:order_detail", order_id=order.id)
     else:
         # Проверяем товары при заходе на страницу оформления
         unavailable_items = validate_cart_items_for_branch(cart_items, selected_branch)
         if unavailable_items:
-            messages.error(
-                request,
-                f"Некоторые товары недоступны в филиале '{selected_branch.name}'. "
-                "Пожалуйста, измените состав корзины или выберите другой филиал."
-            )
+            messages.error(request, f"Некоторые товары недоступны в филиале '{selected_branch.name}'. " "Пожалуйста, измените состав корзины или выберите другой филиал.")
             return redirect("app_cart:view_cart")
 
         initial = {
@@ -143,16 +129,7 @@ def checkout(request):
     )
 
 
-def send_notify(order):
-    from SoloPizza.settings import BOT_TOKEN, CHAT_ID
-    order_text = (f'ФИЛИАЛ: {order.branch.name}\n\n'
-                  f'Заказ {order.id}\n'
-                  f'Способ доставки: {dict(Order.DELIVERY_CHOICES)[order.delivery_type]}\n'
-                  f'Телефон: {order.phone_number}\n'
-                  f'Создан: {order.created_at.strftime("%d.%m.%Y %H:%M:%S")}\n'
-                  f'\nПодробности: https://solo-pizza.by/order/order/{order.id}/')
-    url = f'https://api.telegram.org/bot{BOT_TOKEN}/sendMessage?chat_id={CHAT_ID}&text={order_text}'
-    requests.get(url=url)
+# Функция send_notify больше не используется, так как уведомления отправляются через Celery задачу send_order_notification
 
 
 @login_required
@@ -180,11 +157,7 @@ def order_detail(request, order_id):
     order_form = OrderEditForm(instance=order)
     items_formset = OrderItemFormSet(instance=order)
 
-    breadcrumbs = [
-        {'title': 'Главная', 'url': '/'},
-        {'title': 'Мои заказы', 'url': reverse('app_order:order_list')},
-        {'title': f'Заказ #{order.id}', 'url': '#'}
-    ]
+    breadcrumbs = [{"title": "Главная", "url": "/"}, {"title": "Мои заказы", "url": reverse("app_order:order_list")}, {"title": f"Заказ #{order.id}", "url": "#"}]
 
     return render(
         request,
@@ -210,7 +183,7 @@ def update_order(request, order_id):
         order = get_object_or_404(Order, id=order_id)
     else:
         order = get_object_or_404(Order, id=order_id, user=request.user)
-    
+
     if not order.is_editable():
         return HttpResponseForbidden("Заказ нельзя редактировать")
 
@@ -234,7 +207,7 @@ def update_order_items(request, order_id):
         order = get_object_or_404(Order, id=order_id)
     else:
         order = get_object_or_404(Order, id=order_id, user=request.user)
-    
+
     if not order.is_editable():
         return HttpResponseForbidden("Заказ нельзя редактировать")
 
@@ -253,8 +226,8 @@ def update_order_items(request, order_id):
 @login_required
 def order_list(request):
     # Получаем выбранный филиал из сессии
-    selected_branch_id = request.session.get('selected_branch_id', DEFAULT_BRANCH_ID)
-    
+    selected_branch_id = request.session.get("selected_branch_id", DEFAULT_BRANCH_ID)
+
     if request.user.is_staff:
         orders = Order.objects.filter(branch_id=selected_branch_id).order_by("-created_at")
     else:
@@ -273,20 +246,17 @@ def order_list(request):
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
-    breadcrumbs = [
-        {'title': 'Главная', 'url': '/'},
-        {'title': 'Мои заказы', 'url': reverse('app_order:order_list')}  # Текущая страница
-    ]
+    breadcrumbs = [{"title": "Главная", "url": "/"}, {"title": "Мои заказы", "url": reverse("app_order:order_list")}]  # Текущая страница
 
     # Получаем информацию о выбранном филиале
     try:
         selected_branch = CafeBranch.objects.get(id=selected_branch_id)
     except CafeBranch.DoesNotExist:
         selected_branch = CafeBranch.objects.get(id=DEFAULT_BRANCH_ID)
-    
+
     # Получаем список всех филиалов для возможности изменения филиала заказа
     branches = CafeBranch.objects.filter(is_active=True)
-    
+
     context = {
         "page_obj": page_obj,
         "status_choices": Order.STATUS_CHOICES,
@@ -323,10 +293,10 @@ def update_order_branch(request, order_id):
     """Изменение филиала для конкретного заказа"""
     if not request.user.is_staff:
         return HttpResponseForbidden("Доступ запрещен")
-        
+
     order = get_object_or_404(Order, id=order_id)
     new_branch_id = request.POST.get("branch_id")
-    
+
     try:
         new_branch = CafeBranch.objects.get(id=new_branch_id)
         order.branch = new_branch
@@ -334,7 +304,7 @@ def update_order_branch(request, order_id):
         messages.success(request, f"Филиал заказа #{order_id} изменен на «{new_branch.name}»")
     except CafeBranch.DoesNotExist:
         messages.error(request, "Выбранный филиал не найден")
-    
+
     return redirect(request.META.get("HTTP_REFERER", "app_order:order_list"))
 
 
@@ -346,16 +316,12 @@ def print_check_non_fastfood(request, order_id):
     """
     # Проверка прав доступа - только для администраторов и персонала
     if not (request.user.is_staff or request.user.is_superuser):
-        return redirect('app_order:order_list')
-        
+        return redirect("app_order:order_list")
+
     order = get_object_or_404(Order, id=order_id)
 
     # Получаем все позиции заказа
-    items = (
-        order.items.all()
-        .select_related("product__category", "variant__size", "board1__board", "board2__board", "sauce")
-        .prefetch_related("addons")
-    )
+    items = order.items.all().select_related("product__category", "variant__size", "board1__board", "board2__board", "sauce").prefetch_related("addons")
 
     # Пересчитываем итоги только для этой части
     subtotal_part = Decimal("0.00")
@@ -371,18 +337,16 @@ def print_check_non_fastfood(request, order_id):
 
         # Создаем полное описание с информацией о цене и количестве
         full_description = item.get_full_description(include_price_info=True, base_unit_price=base_item_price, final_line_total=calc["final_total"])
-        
-        items_data.append(
-            {"item": item, "calculation": calc, "base_unit_price": base_item_price, "final_line_total": calc["final_total"], "full_description": full_description}
-        )
+
+        items_data.append({"item": item, "calculation": calc, "base_unit_price": base_item_price, "final_line_total": calc["final_total"], "full_description": full_description})
         subtotal_part += calc["original_total"]
         discount_amount_part += calc["discount_amount"]
 
     # Итог для этой части
     part_total = subtotal_part - discount_amount_part
-    
+
     # Если это заказ с доставкой и стоимость доставки больше 0, добавляем её к итогу
-    if order.delivery_type == 'delivery' and order.delivery_cost > 0:
+    if order.delivery_type == "delivery" and order.delivery_cost > 0:
         part_total += order.delivery_cost
 
     context = {
@@ -403,49 +367,41 @@ def add_item_to_order(request, order_id):
     """Добавление товара в существующий заказ"""
     # Проверка прав доступа - только для администраторов и персонала
     if not request.user.is_staff:
-        return redirect('app_order:order_list')
-        
+        return redirect("app_order:order_list")
+
     order = get_object_or_404(Order, id=order_id)
-    
+
     # Проверяем, можно ли редактировать заказ
     if not order.is_editable():
         messages.error(request, "Этот заказ нельзя редактировать")
-        return redirect('app_order:order_detail', order_id=order.id)
-    
+        return redirect("app_order:order_detail", order_id=order.id)
+
     if request.method == "POST":
         form = AddToOrderForm(request.POST, order=order)
         if form.is_valid():
-            product = form.cleaned_data['product']
-            variant = form.cleaned_data['variant']
-            quantity = form.cleaned_data['quantity']
-            board1 = form.cleaned_data.get('board1')
-            board2 = form.cleaned_data.get('board2')
-            sauce = form.cleaned_data.get('sauce')
-            addons = form.cleaned_data.get('addons', [])
-            
+            product = form.cleaned_data["product"]
+            variant = form.cleaned_data["variant"]
+            quantity = form.cleaned_data["quantity"]
+            board1 = form.cleaned_data.get("board1")
+            board2 = form.cleaned_data.get("board2")
+            sauce = form.cleaned_data.get("sauce")
+            addons = form.cleaned_data.get("addons", [])
+
             # Создаем новый элемент заказа
-            order_item = OrderItem.objects.create(
-                order=order,
-                product=product,
-                variant=variant,
-                quantity=quantity,
-                board1=board1,
-                board2=board2,
-                sauce=sauce
-            )
-            
+            order_item = OrderItem.objects.create(order=order, product=product, variant=variant, quantity=quantity, board1=board1, board2=board2, sauce=sauce)
+
             # Добавляем добавки, если они есть
             if addons:
                 order_item.addons.set(addons)
-            
+
             # Пересчитываем итоги заказа
             order.recalculate_totals()
-            
+
             messages.success(request, f"Товар '{product.name}' добавлен в заказ")
-            return redirect('app_order:order_detail', order_id=order.id)
+            return redirect("app_order:order_detail", order_id=order.id)
     else:
         form = AddToOrderForm(order=order)
-    
+
     return render(
         request,
         "app_order/add_item_to_order.html",
@@ -464,8 +420,8 @@ def print_check_fastfood_only(request, order_id):
     """
     # Проверка прав доступа - только для администраторов и персонала
     if not (request.user.is_staff or request.user.is_superuser):
-        return redirect('app_order:order_list')
-        
+        return redirect("app_order:order_list")
+
     order = get_object_or_404(Order, id=order_id)
 
     # Получаем позиции фастфуда, соусов и бургеров
@@ -489,10 +445,8 @@ def print_check_fastfood_only(request, order_id):
 
         # Создаем полное описание с информацией о цене и количестве
         full_description = item.get_full_description(include_price_info=True, base_unit_price=base_item_price, final_line_total=calc["final_total"])
-        
-        items_data.append(
-            {"item": item, "calculation": calc, "base_unit_price": base_item_price, "final_line_total": calc["final_total"], "full_description": full_description}
-        )
+
+        items_data.append({"item": item, "calculation": calc, "base_unit_price": base_item_price, "final_line_total": calc["final_total"], "full_description": full_description})
         subtotal_part += calc["original_total"]
         discount_amount_part += calc["discount_amount"]
 
