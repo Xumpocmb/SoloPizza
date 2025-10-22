@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_protect
+from django.conf import settings
 
 from app_cart.models import CartItem
 from app_cart.utils import validate_cart_items_for_branch
@@ -124,7 +125,11 @@ def feedback_view(request):
     if request.method == "POST":
         form = FeedbackForm(request.POST)
         if form.is_valid():
-            form.save()
+            feedback = form.save()
+            # Отправляем уведомление о новом вопросе/предложении
+            if not settings.DEBUG and not request.user.is_superuser and not request.user.is_staff:
+                from app_home.tasks import send_feedback_notification
+                send_feedback_notification.delay(feedback.id)
             messages.success(request, "Ваш вопрос/предложение успешно отправлено! Мы свяжемся с вами в ближайшее время.", extra_tags="success")
             return redirect(reverse("app_home:feedback"))
         else:
