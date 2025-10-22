@@ -136,6 +136,7 @@ def get_variant_data(request, variant_id):
     API-представление для получения полных данных варианта товара
     включая цену, соусы, доски и добавки
     """
+    print("variant_data")
     variant = get_object_or_404(ProductVariant, id=variant_id)
     product = variant.product
 
