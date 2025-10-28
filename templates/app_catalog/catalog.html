@@ -1,10 +1,38 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block meta_description %}Каталог блюд Solo Pizza - пицца, роллы, суши, напитки и десерты. Широкий выбор и быстрая доставка.{% endblock %}
-{% block meta_keywords %}каталог пиццы, меню пиццерии, заказать еду, доставка еды, пицца, роллы, суши, напитки, десерты{% endblock %}
-{% block og_description %}Каталог блюд Solo Pizza - пицца, роллы, суши, напитки и десерты. Широкий выбор и быстрая доставка.{% endblock %}
-{% block twitter_description %}Каталог блюд Solo Pizza - пицца, роллы, суши, напитки и десерты. Широкий выбор и быстрая доставка.{% endblock %}
+{% block meta_description %}Каталог пиццы и других блюд Solo Pizza в Барановичах. Закажите вкусную еду с доставкой по городу!{% endblock %}
+{% block meta_keywords %}заказать пиццу барановичи, каталог пиццы барановичи, меню пиццерии барановичи, доставка пиццы барановичи, пицца, напитки, фастфуд, заказать еду онлайн, доставка еды барановичи{% endblock %}
+{% block og_description %}Каталог пиццы и других блюд Solo Pizza в Барановичах. Закажите вкусную еду с доставкой по городу!{% endblock %}
+{% block twitter_description %}Каталог пиццы, фастфуд и других блюд Solo Pizza в Барановичах. Закажите вкусную еду с доставкой по городу!{% endblock %}
+{% block schema_markup %}
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "WebPage",
+  "name": "Каталог - Solo Pizza",
+  "description": "Каталог пиццы, фастфуд и других блюд Solo Pizza в Барановичах. Закажите вкусную еду с доставкой по городу!",
+  "url": "{{ request.build_absolute_uri }}",
+  "breadcrumb": {
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Главная",
+        "item": "https://solopizza.by"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Каталог",
+        "item": "{{ request.build_absolute_uri }}"
+      }
+    ]
+  }
+}
+</script>
+{% endblock %}
 {% block styles %}
     <link rel="stylesheet" href="{% static 'css/home.css' %}">
     <link rel="stylesheet" href="{% static 'css/catalog.css' %}">
@@ -22,7 +50,7 @@
                 <section class="section_categories">
                     <div class="categories_container">
                         <div class="page_title">
-                            <h2 class="categories_title">Наше меню:</h2>
+                            <h1 class="categories_title">Каталог пиццы в Барановичах - Solo Pizza</h1>
                             <div class="divider"></div>
                         </div>
                         <div class="categories">

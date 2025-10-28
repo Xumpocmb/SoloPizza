@@ -1,10 +1,36 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block meta_description %}{{ item.name }} - {{ item.description|default:"Вкусное блюдо от Solo Pizza" }}. Заказывайте с доставкой!{% endblock %}
-{% block meta_keywords %}{{ item.name }}, заказать {{ item.name }}, доставка {{ item.name }}, {{ item.category.name }}, Solo Pizza{% endblock %}
-{% block og_description %}{{ item.name }} - {{ item.description|default:"Вкусное блюдо от Solo Pizza" }}. Заказывайте с доставкой!{% endblock %}
-{% block twitter_description %}{{ item.name }} - {{ item.description|default:"Вкусное блюдо от Solo Pizza" }}. Заказывайте с доставкой!{% endblock %}
+{% block meta_description %}{{ item.name }} в Барановичах - {{ item.description|default:"Вкусное блюдо от Solo Pizza" }}. Закажите онлайн с доставкой по городу!{% endblock %}
+{% block meta_keywords %}{{ item.name }} барановичи, заказать {{ item.name }} барановичи, доставка {{ item.name }} барановичи, {{ item.name }} с доставкой, {{ item.category.name }} барановичи, Solo Pizza, заказать еду онлайн{% endblock %}
+{% block og_description %}{{ item.name }} в Барановичах - {{ item.description|default:"Вкусное блюдо от Solo Pizza" }}. Закажите онлайн с доставкой по городу!{% endblock %}
+{% block twitter_description %}{{ item.name }} в Барановичах - {{ item.description|default:"Вкусное блюдо от Solo Pizza" }}. Закажите онлайн с доставкой по городу!{% endblock %}
+{% block schema_markup %}
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Product",
+  "name": "{{ item.name }}",
+ "description": "{{ item.description|default:"Вкусное блюдо от Solo Pizza" }}",
+  "image": "{{ item.image.url|default:"https://solopizza.by/static/img/No-Image-Placeholder.svg" }}",
+  "offers": {
+    "@type": "Offer",
+    "availability": "http://schema.org/InStock",
+    {% if min_price %}
+    "price": "{{ min_price }}",
+    {% else %}
+    "price": "0",
+    {% endif %}
+    "priceCurrency": "BYN",
+    "seller": {
+      "@type": "Organization",
+      "name": "Solo Pizza"
+    }
+  },
+  "category": "{{ item.category.name }}"
+}
+</script>
+{% endblock %}
 
 
 {% block styles %}
@@ -35,7 +61,7 @@
                 {% endif %}
 
                 <div class="item-info">
-                    <h1>{{ item.name }}</h1>
+                    <h1>{{ item.name }} в Барановичах - Закажите с доставкой от Solo Pizza</h1>
                     <p class="item-description">{{ item.description }}</p>
 
                     <!-- Цена -->

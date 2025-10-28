@@ -2,10 +2,10 @@
 {% load static %}
 
 {% block title %}Заказать пиццу в Барановичах с доставкой - Solo Pizza{% endblock %}
-{% block meta_description %}Закажите вкусную пиццу с доставкой в Барановичах! Solo Pizza предлагает свежие пиццы, роллы, суши и другие блюда. Быстрая доставка, отличное обслуживание.{% endblock %}
-{% block meta_keywords %}заказать пиццу барановичи, доставка пиццы барановичи, пицца в барановичах, заказать пиццу онлайн, вкусная пицца, итальянская пицца, пицца с доставкой, роллы, суши, доставка еды барановичи{% endblock %}
-{% block og_description %}Закажите вкусную пиццу с доставкой в Барановичах! Solo Pizza предлагает свежие пиццы, фастфуд, кальцоне, бургеры и другие блюда. Быстрая доставка, отличное обслуживание.{% endblock %}
-{% block twitter_description %}Закажите вкусную пиццу с доставкой в Барановичах! Solo Pizza предлагает свежие пиццы, фастфуд, кальцоне, бургеры и другие блюда. Быстрая доставка, отличное обслуживание.{% endblock %}
+{% block meta_description %}Закажите вкусную пиццу с доставкой в Барановичах! Solo Pizza предлагает свежие пиццы и другие блюда. Быстрая доставка, отличное обслуживание.{% endblock %}
+{% block meta_keywords %}заказать пиццу барановичи, доставка пиццы барановичи, пицца в барановичах, заказать пиццу онлайн, вкусная пицца, итальянская пицца, пицца с доставкой, доставка еды барановичи{% endblock %}
+{% block og_description %}Закажите вкусную пиццу с доставкой в Барановичах! Solo Pizza предлагает свежие пиццы и другие блюда. Быстрая доставка, отличное обслуживание.{% endblock %}
+{% block twitter_description %}Закажите вкусную пиццу с доставкой в Барановичах! Solo Pizza предлагает свежие пиццы и другие блюда. Быстрая доставка, отличное обслуживание.{% endblock %}
 {% block styles %}
     <link rel="stylesheet" href="{% static 'css/home.css' %}">
     <link rel="stylesheet" href="{% static 'css/vacancies.css' %}">
@@ -18,14 +18,24 @@
   "@context": "http://schema.org",
   "@type": "Restaurant",
   "name": "SoloPizza",
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "ул. Ленина, 10",
-    "addressLocality": "Барановичи",
-    "addressRegion": "Брестская область",
-    "postalCode": "225400",
-    "addressCountry": "BY"
-  },
+  "address": [
+    {
+      "@type": "PostalAddress",
+      "streetAddress": "ул. Ленина 9/1",
+      "addressLocality": "Барановичи",
+      "addressRegion": "Брестская область",
+      "postalCode": "225400",
+      "addressCountry": "BY"
+    },
+    {
+      "@type": "PostalAddress",
+      "streetAddress": "ул. Тексер, 4а",
+      "addressLocality": "Барановичи",
+      "addressRegion": "Брестская область",
+      "postalCode": "225400",
+      "addressCountry": "BY"
+    }
+  ],
   "geo": {
     "@type": "GeoCoordinates",
     "latitude": "53.1333",
@@ -49,11 +59,11 @@
       "closes": "23:00"
     }
   ],
-  "servesCuisine": "Пицца, Роллы, Суши",
+  "servesCuisine": "Пицца",
   "priceRange": "$$",
   "hasMenu": {
     "@type": "Menu",
-    "url": "https://solopizza.by/menu"
+    "url": "https://solopizza.by/catalog/"
   },
  "aggregateRating": {
     "@type": "AggregateRating",
@@ -122,6 +132,29 @@
                     </div>
                 </section>
             {% endif %}
+            <section class="section_delivery_info">
+                <div class="delivery_info_container">
+                    <div class="page_title">
+                        <h2 class="delivery_title">Доставка</h2>
+                        <div class="divider"></div>
+                    </div>
+                    <div class="delivery_info centered-text">
+                        <p>Доставка по городу - 3 руб. При заказе от 20 руб. - доставка бесплатная!</p>
+                        <a href="{% url 'app_home:delivery' %}">Подробнее о доставке</a>
+                    </div>
+                </div>
+            </section>
+            <section class="section_about_us">
+                <div class="about_us_container">
+                    <div class="page_title">
+                        <h2 class="about_title">О нас</h2>
+                        <div class="divider"></div>
+                    </div>
+                    <div class="about_info centered-text">
+                        <p>Solo Pizza - это сеть пиццерий в Барановичах по адресам: ул. Ленина 9/1 и ул. Тексер, 4а. Мы предлагаем свежую, вкусную пиццу и другие блюда с доставкой по городу.</p>
+                    </div>
+                </div>
+            </section>
         </div>
     </main>
 {% endblock %}

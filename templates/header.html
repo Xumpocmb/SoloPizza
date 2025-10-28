@@ -38,7 +38,7 @@
                             {% for branch in branches %}
                                 <option value="{{ branch.id }}"
                                         {% if branch.id|stringformat:"s" == selected_branch_id %}selected{% endif %}>
-                                    {{ branch.address }}
+                                    {{ branch.name }}
                                 </option>
                             {% endfor %}
                         </select>
@@ -67,6 +67,7 @@
         <div class="submenu" id="aboutSub">
             <a href="{% url 'app_home:info' %}">Информация</a>
             <a href="{% url 'app_home:contacts' %}">Контакты</a>
+            <a href="{% url 'app_home:delivery' %}">Доставка</a>
             <a href="{% url 'app_reviews:review_list' %}">Отзывы</a>
             <a href="{% url 'app_home:vacancy_list' %}">Вакансии</a>
             <a href="{% url 'app_reviews:moderation_list' %}">Модерация</a>

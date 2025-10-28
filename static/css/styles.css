@@ -269,6 +269,13 @@ a:hover {
     gap: 1.5rem;
 }
 
+@media (max-width: 400px) {
+    
+    .header-content {
+        gap: 0.5rem;
+    }
+}
+
 .header-phone {
     display: flex;
     flex-direction: row;
@@ -317,6 +324,12 @@ a:hover {
     display: flex;
     align-items: center;
     gap: 1.5rem;
+}
+
+@media (max-width: 400px) {
+    .right {
+        gap: 0.5rem;
+    }
 }
 
 .branch-select {
@@ -406,6 +419,12 @@ a:hover {
         font-size: 12px;
         padding: 3px 8px;
         min-width: 24px;
+    }
+}
+
+@media (max-width: 400px) {
+    .cart-icon {
+        display: none;
     }
 }
 

@@ -1,10 +1,22 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block meta_description %}{{ category.name }} в Solo Pizza - {{ category.description|default:"Вкусные блюда с доставкой" }}{% endblock %}
-{% block meta_keywords %}{{ category.name }}, заказать {{ category.name }}, доставка {{ category.name }}, Solo Pizza{% endblock %}
-{% block og_description %}{{ category.name }} в Solo Pizza - {{ category.description|default:"Вкусные блюда с доставкой" }}{% endblock %}
-{% block twitter_description %}{{ category.name }} в Solo Pizza - {{ category.description|default:"Вкусные блюда с доставкой" }}{% endblock %}
+{% block meta_description %}{{ category.name }} в Барановичах - {{ category.description|default:"Вкусные блюда с доставкой от Solo Pizza" }}. Закажите онлайн с доставкой по городу.{% endblock %}
+{% block meta_keywords %}{{ category.name }} барановичи, заказать {{ category.name }} барановичи, доставка {{ category.name }} барановичи, {{ category.name }} с доставкой, Solo Pizza, заказать еду онлайн{% endblock %}
+{% block og_description %}{{ category.name }} в Барановичах - {{ category.description|default:"Вкусные блюда с доставкой от Solo Pizza" }}. Закажите онлайн с доставкой по городу.{% endblock %}
+{% block twitter_description %}{{ category.name }} в Барановичах - {{ category.description|default:"Вкусные блюда с доставкой от Solo Pizza" }}. Закажите онлайн с доставкой по городу.{% endblock %}
+{% block schema_markup %}
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "ProductGroup",
+  "name": "{{ category.name }}",
+  "category": "{{ category.name }}",
+  "description": "{{ category.description|default:"Вкусные блюда с доставкой от Solo Pizza" }}",
+  "url": "{{ request.build_absolute_uri }}"
+}
+</script>
+{% endblock %}
 
 {% block styles %}
     <link rel="stylesheet" href="{% static 'css/catalog.css' %}">
@@ -23,7 +35,7 @@
         </div>
         <section class="site-greetings">
             <div class="page_title">
-                <h2>{{ category.name }}</h2>
+                <h1>{{ category.name }} в Барановичах - Закажите с доставкой от Solo Pizza</h1>
             </div>
         </section>
         <section class="section_catalog">

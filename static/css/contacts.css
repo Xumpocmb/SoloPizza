@@ -143,6 +143,16 @@
     outline: none;
 }
 
+.delivery-info {
+    margin-bottom: 20px;
+}
+
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
 /* Адаптивные стили */
 @media (max-width: 768px) {
     .branch-info {
