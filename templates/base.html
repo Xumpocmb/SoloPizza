@@ -20,12 +20,14 @@
     <link rel="canonical" href="{{ request.build_absolute_uri }}">
     <link rel="icon" href="{% static 'img/favicon.ico' %}" type="image/x-icon">
     <link rel="shortcut icon" href="{% static 'img/favicon.ico' %}" type="image/x-icon">
-    <title>{{ title|default:"Solo Pizza" }}</title>
+    <title>{% block title %}{{ title|default:"Solo Pizza" }}{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     <link rel="stylesheet" href="{% static 'css/alert.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     {% block styles %}
 
+    {% endblock %}
+    {% block schema_markup %}
     {% endblock %}
 </head>
 <body>

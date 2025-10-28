@@ -1,22 +1,74 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block meta_description %}Solo Pizza - вкусная пицца, роллы, суши и другие блюда с доставкой по городу. Заказывайте онлайн!{% endblock %}
-{% block meta_keywords %}пицца, доставка пиццы, итальянская кухня, заказать пиццу, роллы, суши, доставка еды{% endblock %}
-{% block og_description %}Solo Pizza - вкусная пицца, роллы, суши и другие блюда с доставкой по городу. Заказывайте онлайн!{% endblock %}
-{% block twitter_description %}Solo Pizza - вкусная пицца, роллы, суши и другие блюда с доставкой по городу. Заказывайте онлайн!{% endblock %}
+{% block title %}Заказать пиццу в Барановичах с доставкой - Solo Pizza{% endblock %}
+{% block meta_description %}Закажите вкусную пиццу с доставкой в Барановичах! Solo Pizza предлагает свежие пиццы, роллы, суши и другие блюда. Быстрая доставка, отличное обслуживание.{% endblock %}
+{% block meta_keywords %}заказать пиццу барановичи, доставка пиццы барановичи, пицца в барановичах, заказать пиццу онлайн, вкусная пицца, итальянская пицца, пицца с доставкой, роллы, суши, доставка еды барановичи{% endblock %}
+{% block og_description %}Закажите вкусную пиццу с доставкой в Барановичах! Solo Pizza предлагает свежие пиццы, фастфуд, кальцоне, бургеры и другие блюда. Быстрая доставка, отличное обслуживание.{% endblock %}
+{% block twitter_description %}Закажите вкусную пиццу с доставкой в Барановичах! Solo Pizza предлагает свежие пиццы, фастфуд, кальцоне, бургеры и другие блюда. Быстрая доставка, отличное обслуживание.{% endblock %}
 {% block styles %}
     <link rel="stylesheet" href="{% static 'css/home.css' %}">
     <link rel="stylesheet" href="{% static 'css/vacancies.css' %}">
     <link rel="stylesheet" href="{% static 'css/swiper-bundle.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/swiper.css' %}">
 {% endblock %}
+{% block schema_markup %}
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Restaurant",
+  "name": "SoloPizza",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "ул. Ленина, 10",
+    "addressLocality": "Барановичи",
+    "addressRegion": "Брестская область",
+    "postalCode": "225400",
+    "addressCountry": "BY"
+  },
+  "geo": {
+    "@type": "GeoCoordinates",
+    "latitude": "53.1333",
+    "longitude": "26.0167"
+  },
+  "url": "https://solopizza.by",
+  "telephone": "+37529XXXXXXX",
+  "openingHoursSpecification": [
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday"
+      ],
+      "opens": "10:00",
+      "closes": "23:00"
+    }
+  ],
+  "servesCuisine": "Пицца, Роллы, Суши",
+  "priceRange": "$$",
+  "hasMenu": {
+    "@type": "Menu",
+    "url": "https://solopizza.by/menu"
+  },
+ "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "4.8",
+    "reviewCount": "150"
+  }
+}
+</script>
+{% endblock %}
 {% block main %}
     <main>
         <div class="main-wrapper">
             <section class="site-greetings">
                 <div class="page_title">
-                    <h1>Добро пожаловать в Solo Pizza!</h1>
+                    <h1>Заказать пиццу в Барановичах с доставкой - Solo Pizza</h1>
                 </div>
             </section>
             <section class="slides">
@@ -24,15 +76,15 @@
                     <div class="swiper-wrapper">
                         <div class="swiper-slide">
                             <img src="{% static 'img/slider/kombo_ohota.gif' %}"
-                                 alt="Описание изображения 1">
+                                 alt="Комбо-набор Охота - вкусная пицца с доставкой в Барановичах">
                         </div>
                         <div class="swiper-slide">
                             <img src="{% static 'img/slider/kombo_shef.gif' %}"
-                                 alt="Описание изображения 1">
+                                 alt="Комбо-набор Шеф - изысканная пицца с доставкой в Барановичах">
                         </div>
                         <div class="swiper-slide">
                             <img src="{% static 'img/slider/kombo_sochnyj.gif' %}"
-                                 alt="Описание изображения 1">
+                                 alt="Комбо-набор Сочный - сочная пицца с доставкой в Барановичах">
                         </div>
                     </div>
                     <div class="swiper-button-next"></div>
@@ -54,7 +106,7 @@
                                     
                                     <a href="{% url 'app_catalog:category_detail' category.slug %}"
                                        class="category-card__link"
-                                       aria-label="Перейти в категорию: Пицца">
+                                       aria-label="Перейти в категорию: {{ category.name }}">
                                     <div class="category-card__image">
                                         {% if category.image %}
                                         <img src="{{ category.image.url }}" alt="{{ category.name }}">
