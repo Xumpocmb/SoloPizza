@@ -118,6 +118,36 @@ footer {
     text-decoration: underline;
 }
 
+.footer-contacts {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    margin-top: 20px;
+    padding: 15px 20px;
+    border-top: 1px solid var(--divider-color);
+    border-bottom: 1px solid var(--divider-color);
+    flex-wrap: wrap;
+}
+
+.footer-phone {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+}
+
+.phone-text {
+    color: var(--accent-color);
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.footer-address {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    text-align: center;
+}
+
 .company-info {
     text-align: center;
     margin-top: 30px;
@@ -140,6 +170,19 @@ footer {
 
     .company-info {
         padding: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .footer-contacts {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+    
+    .footer-phone {
+        flex-direction: column;
+        gap: 5px;
     }
 }
 

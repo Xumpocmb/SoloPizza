@@ -33,6 +33,17 @@
                 </li>
             </ul>
         </div>
+        <div class="footer-column">
+            <h3>Контакты</h3>
+            <ul>
+                    {% for phone in selected_branch.branch_phones.all %}
+                        <li><div class="phone-text">{{ phone.phone }}</div></li>
+                    {% empty %}
+                        <li><div class="phone-text">Нет телефонов</div></li>
+                    {% endfor %}
+                    <li>{{ selected_branch.address }}</li>
+            </ul>
+        </div>
     </div>
     <div class="company-info">
         <p>&copy; 2025 Solo Pizza. Все права защищены.</p>
