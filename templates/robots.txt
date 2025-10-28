@@ -3,7 +3,12 @@ Disallow: /admin/
 Disallow: /accounts/
 Disallow: /user/login/
 Disallow: /user/register/
-Disallow: /cart/
+Disallow: /cart/remove_item/
+Disallow: /cart/update_quantity/
 Disallow: /order/checkout/
+Disallow: /order/add_item_to_order/
+Disallow: /static/
+Disallow: /media/
 
-Sitemap: {{ request.scheme }}://{{ request.get_host }}/sitemap.xml
+
+Sitemap: https://solo-pizza.by/sitemap.xml
