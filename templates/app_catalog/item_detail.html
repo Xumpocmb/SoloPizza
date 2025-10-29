@@ -12,7 +12,7 @@
   "@type": "Product",
   "name": "{{ item.name }}",
  "description": "{{ item.description|default:"Вкусное блюдо от Solo Pizza" }}",
-  "image": "{{ item.image.url|default:"https://solopizza.by/static/img/No-Image-Placeholder.svg" }}",
+  "image": "{% if item.image %}{{ item.image.url }}{% else %}{% static 'img/No-Image-Placeholder.svg' %}{% endif %}",
   "offers": {
     "@type": "Offer",
     "availability": "http://schema.org/InStock",
