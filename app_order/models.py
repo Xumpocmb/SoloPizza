@@ -50,17 +50,25 @@ class OrderManager(models.Manager):
         # Сумма товаров без учета доставки
         subtotal = sum(item.calculate_item_total()["final_total"] for item in items)
 
-        # Проверяем, все ли товары в заказе относятся к фастфуду
+        # Проверяем, все ли товары в заказе относятся к фастфуду (за исключением "Напитки", "Соусы")
         is_all_fastfood = True
         for item in items:
-            if item.product.category.name != "Фастфуд":
+            if item.product.category.name not in ["Фастфуд", "Соусы", "Напитки"]:
                 is_all_fastfood = False
                 break
 
-        # Устанавливаем минимальную сумму для бесплатной доставки
-        free_delivery_threshold = Decimal("30.00") if is_all_fastfood else Decimal("20.00")
-
-        return Decimal("3.00") if subtotal < free_delivery_threshold else Decimal("0.00")
+        # Если все товары в заказе относятся к категории "Фастфуд" (за исключением "Напитки", "Соусы"),
+        # применяем специальные правила расчета доставки
+        print(is_all_fastfood)
+        if is_all_fastfood:
+            # Сумма заказа меньше 25 руб: доставка 3 руб.
+            # Сумма заказа больше или равна 25 руб: доставка бесплатная
+            print("--")
+            return Decimal("3.00") if subtotal < Decimal("25.00") else Decimal("0.00")
+        else:
+            # Для остальных случаев используем стандартную логику
+            print("+++")
+            return Decimal("3.00") if subtotal < Decimal("20.00") else Decimal("0.00")
 
 
 class Order(models.Model):
