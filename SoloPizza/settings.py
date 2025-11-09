@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     "app_cart.apps.AppCartConfig",
     "app_order.apps.AppOrderConfig",
     "app_reviews.apps.AppReviewsConfig",
+    "app_tracker.apps.AppTrackerConfig",
 ]
 
 MIDDLEWARE = [
