@@ -26,7 +26,7 @@ urlpatterns = [
     path("cart/", include("app_cart.urls")),
     path("order/", include("app_order.urls")),
     path("reviews/", include("app_reviews.urls")),
-    path("track/", include("app_tracker.urls")),
+    path("t/", include("app_tracker.urls")),
 
     # SEO URLs
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),

@@ -9,7 +9,6 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 DEBUG = os.getenv("DEBUG") == "True"
 
 ALLOWED_HOSTS = ["*"]
-DOMAIN = "solo-pizza.by"
 SITE_NAME = "Solo Pizza"
 if DEBUG:
     DOMAIN_NAME = "http://localhost:8000"
