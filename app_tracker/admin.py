@@ -9,6 +9,7 @@ class TrackedURLAdmin(admin.ModelAdmin):
     list_display = ('original_url', 'tracking_code', 'clicks', 'created_at', 'trackable_link')
     readonly_fields = ('clicks', 'created_at', 'trackable_link')
     search_fields = ('original_url', 'tracking_code')
+    actions = ['clear_clicks']
 
     def trackable_link(self, obj):
         if settings.DEBUG:
@@ -20,3 +21,8 @@ class TrackedURLAdmin(admin.ModelAdmin):
         return format_html("<a href='{}'>{}</a>", link, link)
 
     trackable_link.short_description = "Trackable Link"
+
+    def clear_clicks(self, request, queryset):
+        updated_count = queryset.update(clicks=0)
+        self.message_user(request, f"{updated_count} счетчик(ов) кликов был(и) обнулен(ы).")
+    clear_clicks.short_description = "Обнулить счетчик кликов"
