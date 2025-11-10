@@ -153,7 +153,15 @@
                                     {% endif %}
                                     <span class="item-quantity">×{{ item.quantity }}</span>
                                 </div>
-                                <span class="item-price">{{ item.calculate_cart_item_total.final_total|floatformat:2 }} руб.</span>
+                                <span class="item-price"
+                                      data-original-price="{{ item.calculate_cart_item_total.original_total|floatformat:2 }} руб."
+                                      data-discounted-price="{{ item.calculate_cart_item_total.final_total|floatformat:2 }} руб.">
+                                    {% if form.delivery_type.value == 'pickup' %}
+                                        {{ item.calculate_cart_item_total.final_total|floatformat:2 }} руб.
+                                    {% else %}
+                                        {{ item.calculate_cart_item_total.original_total|floatformat:2 }} руб.
+                                    {% endif %}
+                                </span>
 
                                 {% if item.board1 or item.board2 %}
                                     <div class="item-options">
@@ -178,20 +186,27 @@
                     </div>
 
                     <div class="summary-totals">
-                        <div class="summary-row">
-                            <span class="total-label">Сумма без скидки:</span>
-                            <span class="total-value">{{ cart_totals.total_original_price|floatformat:2 }} руб.</span>
-                        </div>
-                        {% if cart_totals.total_discount > 0 %}
-                            <div class="summary-row discount">
-                                <span class="total-label">Скидка:</span>
-                                <span class="total-value">-{{ cart_totals.total_discount|floatformat:2 }} руб.</span>
-                            </div>
-                        {% endif %}
-                        <div class="summary-row grand-total">
-                            <span class="total-label">Итого к оплате:</span>
-                            <span class="total-value">{{ cart_totals.total_price|floatformat:2 }} руб.</span>
-                        </div>
+                     <div class="summary-row">
+                         <span class="total-label">Сумма без скидки:</span>
+                         <span class="total-value"
+                               data-amount="{{ cart_totals.total_original_price|floatformat:2 }}">{{ cart_totals.total_original_price|floatformat:2 }} руб.</span>
+                     </div>
+                     {% if cart_totals.total_discount > 0 and form.delivery_type.value == 'pickup' %}
+                         <div class="summary-row discount">
+                             <span class="total-label">Скидка:</span>
+                             <span class="total-value"
+                                   data-amount="{{ cart_totals.total_discount|floatformat:2 }}">-{{ cart_totals.total_discount|floatformat:2 }} руб.</span>
+                         </div>
+                     {% endif %}
+                     <div class="summary-row grand-total">
+                         <span class="total-label">Итого к оплате:</span>
+                         <span class="total-value"
+                               data-original-total="{{ cart_totals.total_original_price }}"
+                               data-discounted-total="{{ cart_totals.total_price }}"
+                               data-discount-amount="{{ cart_totals.total_discount }}">
+                             {{ cart_totals.total_original_price|floatformat:2 }} руб.
+                         </span>
+                     </div>
                     </div>
                 </div>
             {% endif %}
@@ -204,31 +219,78 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             // Показываем/скрываем поле адреса
-            const deliveryOptions = document.querySelectorAll('input[name="delivery_type"]')
-            const addressField = document.getElementById('address-field')
+            const deliveryOptions = document.querySelectorAll('input[name="delivery_type"]');
+            const addressField = document.getElementById('address-field');
 
             function toggleAddressField() {
-                const selectedOption = document.querySelector('input[name="delivery_type"]:checked')
-                addressField.style.display = selectedOption && selectedOption.value === 'delivery' ? 'block' : 'none'
+                const selectedOption = document.querySelector('input[name="delivery_type"]:checked');
+                addressField.style.display = selectedOption && selectedOption.value === 'delivery' ? 'block' : 'none';
+                
+                // Обновляем итоги при изменении типа доставки
+                updateTotals();
             }
 
             deliveryOptions.forEach((option) => {
-                option.addEventListener('change', toggleAddressField)
-            })
+                option.addEventListener('change', toggleAddressField);
+            });
 
-            toggleAddressField()
+            toggleAddressField();
             
             // Показываем/скрываем поле процента скидки партнера
-            const partnerCheckbox = document.querySelector('input[name="is_partner"]')
-            const partnerDiscountInput = document.querySelector('.partner-discount-input')
+            const partnerCheckbox = document.querySelector('input[name="is_partner"]');
+            const partnerDiscountInput = document.querySelector('.partner-discount-input');
             
             function togglePartnerDiscountField() {
-                partnerDiscountInput.style.display = partnerCheckbox.checked ? 'block' : 'none'
+                partnerDiscountInput.style.display = partnerCheckbox.checked ? 'block' : 'none';
             }
             
-            partnerCheckbox.addEventListener('change', togglePartnerDiscountField)
+            partnerCheckbox.addEventListener('change', togglePartnerDiscountField);
             
-            togglePartnerDiscountField()
-        })
+            togglePartnerDiscountField();
+            
+            // Функция для обновления итогов при изменении типа доставки
+            function updateTotals() {
+                const selectedOption = document.querySelector('input[name="delivery_type"]:checked');
+                const isPickup = selectedOption && selectedOption.value === 'pickup';
+                
+                // Обновляем цены товаров
+                const itemPrices = document.querySelectorAll('.item-price');
+                itemPrices.forEach(priceElement => {
+                    const originalPrice = priceElement.getAttribute('data-original-price');
+                    const discountedPrice = priceElement.getAttribute('data-discounted-price');
+                    
+                    if (originalPrice && discountedPrice) {
+                        priceElement.textContent = isPickup ? discountedPrice : originalPrice;
+                    }
+                });
+                
+                // Обновляем отображение скидки
+                const discountRow = document.querySelector('.summary-row.discount');
+                if (discountRow) {
+                    discountRow.style.display = isPickup ? 'flex' : 'none';
+                }
+                
+                // Обновляем итоговую стоимость
+                const grandTotalElement = document.querySelector('.summary-row.grand-total .total-value');
+                const originalTotalElementText = document.querySelector('.summary-row:first-child .total-value').textContent;
+                const discountAmountElement = document.querySelector('.summary-row.discount .total-value');
+                const discountAmountText = discountAmountElement ? discountAmountElement.textContent : '0,00 руб.';
+
+                if (grandTotalElement) {
+                    const originalTotal = parseFloat(originalTotalElementText.replace(' руб.', '').replace(',', '.'));
+                    const discountAmount = parseFloat(discountAmountText.replace(' руб.', '').replace(',', '.').replace('-', ''));
+                    
+                    if (isPickup) {
+                        const discountedTotal = originalTotal - discountAmount;
+                        grandTotalElement.textContent = discountedTotal.toFixed(2) + ' руб.';
+                    } else {
+                        grandTotalElement.textContent = originalTotal.toFixed(2) + ' руб.';
+                    }
+                }
+            }
+            
+            // Инициализируем итоги при загрузке страницы
+            updateTotals();
+        });
     </script>
 {% endblock %}

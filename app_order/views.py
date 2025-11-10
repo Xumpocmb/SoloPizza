@@ -116,17 +116,15 @@ def checkout(request):
             "phone_number": getattr(request.user, "phone", ""),
         }
         form = CheckoutForm(initial=initial)
-
-    return render(
-        request,
-        "app_order/checkout.html",
-        {
-            "form": form,
-            "cart_items": cart_items,
-            "cart_totals": cart_totals,
-            "selected_branch": selected_branch,
-        },
-    )
+    
+    context = {
+        "form": form,
+        "cart_items": cart_items,
+        "cart_totals": cart_totals,
+        "selected_branch": selected_branch,
+    }
+    
+    return render(request, "app_order/checkout.html", context)
 
 
 # Функция send_notify больше не используется, так как уведомления отправляются через Celery задачу send_order_notification
