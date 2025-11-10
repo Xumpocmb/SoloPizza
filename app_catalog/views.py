@@ -28,10 +28,10 @@ def category_detail(request, slug):
     drinks = ["Кола 1л.", "Sprite 1л.", "Фанта 1л.", "Вода 0.5л."]
     
     # Получаем скидку для акции "Пицца недели"
-    try:
-        weekly_pizza_discount = Discount.objects.get(slug='picca-nedeli').percent
-    except Discount.DoesNotExist:
-        weekly_pizza_discount = 20  # Значение по умолчанию, если скидка не найдена
+    # try:
+    #     weekly_pizza_discount = Discount.objects.get(slug='picca-nedeli').percent
+    # except Discount.DoesNotExist:
+    #     weekly_pizza_discount = 20  # Значение по умолчанию, если скидка не найдена
 
     context = {
         'title': f'Solo Pizza | Категория: {category.name}',
@@ -42,7 +42,7 @@ def category_detail(request, slug):
         "boards": boards,
         "addons": addons,
         "drinks": drinks,
-        "weekly_pizza_discount": weekly_pizza_discount,
+        "weekly_pizza_discount": "Пицца недели",
     }
     
     return render(request, 'app_catalog/category_detail.html', context=context)
