@@ -81,7 +81,7 @@
                                         <h3 class="item-name">
                                             {{ form.instance.product.name }}
                                             {% if form.instance.product.is_weekly_special %}
-                                                <span class="discount-badge">Акция: -20%</span>
+                                                <span class="discount-badge">Пицца недели</span>
                                             {% endif %}
                                             {% if is_editable and request.user.is_staff %}
                                                 <button type="button" class="edit-item-btn"

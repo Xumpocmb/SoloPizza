@@ -101,24 +101,20 @@ def view_cart(request):
     
     enriched_items = []
     subtotal = Decimal('0')
-    discount = Decimal('0')
     
     for item in cart_items:
         calculation = item.calculate_cart_item_total()
         enriched_items.append({
             'object': item,
-            'item_total': calculation['final_total'],
+            'item_total': calculation['original_total'],
             'original_total': calculation['original_total'],
-            'has_discount': calculation['is_weekly_pizza']
+            'has_discount': False  # Не показываем информацию о скидке
         })
         subtotal += calculation['original_total']
-        discount += calculation['discount_amount']
     
     context = {
         'items': enriched_items,
         'subtotal': subtotal,
-        'discount_amount': discount,
-        'total_price': subtotal - discount,
     }
     
     return render(request, 'app_cart/cart.html', context)

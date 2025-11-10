@@ -69,10 +69,13 @@
 .discount-badge {
     background-color: #ef7700;
     color: white;
-    padding: 3px 8px;
+    padding: 3px;
     border-radius: var(--border-radius);
     font-size: 0.8rem;
-    font-weight: 600;
+    /* font-weight: 600; */
+    text-align: center;
+    width: 22%;
+
 }
 
 .cart_price_section .order-link {

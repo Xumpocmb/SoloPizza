@@ -36,7 +36,7 @@
                                 <div class="item-header">
                                     <h2 class="item-name">{{ item.item.name }}</h2>
                                     {% if item.item.is_weekly_special and item.item.category.name == "Пицца" %}
-                                        <span class="discount-badge">Акция: -20%</span>
+                                        <span class="discount-badge">Пицца недели</span>
                                     {% endif %}
                                 </div>
 
@@ -128,14 +128,9 @@
                                 </div>
                             </div>
 
-                            <!-- Цена с учетом скидки -->
+                            <!-- Базовая цена -->
                             <div class="item-total">
-                                <span class="total-price">{{ item_data.item_total|floatformat:2 }} руб.</span>
-                                {% if item_data.has_discount %}
-                                    <div class="original-price">
-                                        <s>{{ item_data.original_total|floatformat:2 }} руб.</s>
-                                    </div>
-                                {% endif %}
+                                <span class="total-price">{{ item_data.original_total|floatformat:2 }} руб.</span>
                             </div>
                         </div>
                         {% endwith %}
@@ -143,21 +138,15 @@
                 </div>
 
                 <!-- Итоговая сумма -->
-                <div class="cart-summary">
-                    <div class="summary-row">
-                        <span class="summary-label">Сумма без скидки:</span>
-                        <span class="summary-value">{{ subtotal|floatformat:2 }} руб.</span>
-                    </div>
-                    {% if discount_amount > 0 %}
-                        <div class="summary-row discount-row">
-                            <span class="summary-label">Скидка:</span>
-                            <span class="summary-value">-{{ discount_amount|floatformat:2 }} руб.</span>
-                        </div>
-                    {% endif %}
-                    <div class="summary-row total-row">
-                        <span class="summary-label">Итого к оплате:</span>
-                        <span class="summary-value">{{ total_price|floatformat:2 }} руб.</span>
-                    </div>
+                                 <div class="cart-summary">
+                                     <div class="summary-row">
+                                         <span class="summary-label">Сумма без скидки:</span>
+                                         <span class="summary-value">{{ subtotal|floatformat:2 }} руб.</span>
+                                     </div>
+                                     <div class="summary-row total-row">
+                                         <span class="summary-label">Итого к оплате:</span>
+                                         <span class="summary-value">{{ subtotal|floatformat:2 }} руб.</span>
+                                     </div>
                     {% are_orders_available as orders_available %}
                     {% if orders_available %}
                         <a href="{% url 'app_order:checkout' %}" class="checkout-btn">Оформить заказ</a>

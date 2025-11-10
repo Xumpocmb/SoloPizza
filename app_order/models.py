@@ -59,15 +59,12 @@ class OrderManager(models.Manager):
 
         # Если все товары в заказе относятся к категории "Фастфуд" (за исключением "Напитки", "Соусы"),
         # применяем специальные правила расчета доставки
-        print(is_all_fastfood)
         if is_all_fastfood:
             # Сумма заказа меньше 25 руб: доставка 3 руб.
             # Сумма заказа больше или равна 25 руб: доставка бесплатная
-            print("--")
             return Decimal("3.00") if subtotal < Decimal("25.00") else Decimal("0.00")
         else:
             # Для остальных случаев используем стандартную логику
-            print("+++")
             return Decimal("3.00") if subtotal < Decimal("20.00") else Decimal("0.00")
 
 
