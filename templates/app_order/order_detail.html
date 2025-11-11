@@ -170,12 +170,8 @@
                                             <span class="quantity">×{{ form.instance.quantity }}</span>
                                             <span class="item-total">
                                                 {% with item_total=form.instance.calculate_item_total %}
-                                                    {% if item_total.is_weekly_pizza %}
                                                         <span class="original-price">{{ item_total.original_total|floatformat:2 }} руб.</span>
                                                         <span class="discounted-price">{{ item_total.final_total|floatformat:2 }} руб.</span>
-                                                    {% else %}
-                                                        {{ item_total.final_total|floatformat:2 }} руб.
-                                                    {% endif %}
                                                 {% endwith %}
                                             </span>
                                         </div>

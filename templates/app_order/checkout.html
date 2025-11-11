@@ -277,13 +277,19 @@
                 const discountAmountText = discountAmountElement ? discountAmountElement.textContent : '0,00 руб.';
 
                 if (grandTotalElement) {
-                    const originalTotal = parseFloat(originalTotalElementText.replace(' руб.', '').replace(',', '.'));
-                    const discountAmount = parseFloat(discountAmountText.replace(' руб.', '').replace(',', '.').replace('-', ''));
+                    // Парсим значения и сразу переводим в копейки (умножаем на 100)
+                    const originalTotalKopecks = Math.round(parseFloat(originalTotalElementText.replace(' руб.', '').replace(',', '.')) * 100);
+                    const discountAmountKopecks = Math.round(parseFloat(discountAmountText.replace(' руб.', '').replace(',', '.').replace('-', '')) * 100);
                     
                     if (isPickup) {
-                        const discountedTotal = originalTotal - discountAmount;
+                        // Вычисляем итоговую сумму в копейках
+                        const discountedTotalKopecks = originalTotalKopecks - discountAmountKopecks;
+                        // Переводим обратно в рубли и форматируем
+                        const discountedTotal = discountedTotalKopecks / 100;
                         grandTotalElement.textContent = discountedTotal.toFixed(2) + ' руб.';
                     } else {
+                        // При доставке отображаем сумму без скидки (также форматируем)
+                        const originalTotal = originalTotalKopecks / 100;
                         grandTotalElement.textContent = originalTotal.toFixed(2) + ' руб.';
                     }
                 }
