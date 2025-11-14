@@ -162,3 +162,23 @@ def delivery_view(request):
     context = {"breadcrumbs": breadcrumbs, "title": "Доставка", "branches": branches}
 
     return render(request, "app_home/delivery.html", context=context)
+
+
+from django.contrib.admin.views.decorators import staff_member_required
+from django.db.models import Count
+from app_tracker.models import TrackedUTM
+
+@staff_member_required
+def utm_analytics_view(request):
+    # Aggregate UTM data
+    utm_data = TrackedUTM.objects.values('utm_source', 'utm_medium', 'utm_campaign').annotate(count=Count('id')).order_by('-count')
+
+    context = {
+        'utm_data': utm_data,
+        'title': 'UTM Analytics',
+        'breadcrumbs': [
+            {"title": "Главная", "url": "/"},
+            {"title": "UTM Analytics", "url": "#"}
+        ]
+    }
+    return render(request, 'app_home/utm_analytics.html', context)

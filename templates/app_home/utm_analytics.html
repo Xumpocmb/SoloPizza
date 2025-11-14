@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block main %}
+    <main>
+        <div class="main-wrapper">
+            <div class="container">
+                <h1>{{ title }}</h1>
+
+                <div class="breadcrumbs">
+                    {% for crumb in breadcrumbs %}
+                        <a href="{{ crumb.url }}" class="breadcrumb-link">{{ crumb.title }}</a>
+                        {% if not forloop.last %}<span class="breadcrumb-separator">&gt;</span>{% endif %}
+                    {% endfor %}
+                </div>
+
+                {% if utm_data %}
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>UTM Source</th>
+                                <th>UTM Medium</th>
+                                <th>UTM Campaign</th>
+                                <th>Count</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in utm_data %}
+                                <tr>
+                                    <td>{{ item.utm_source|default:"-" }}</td>
+                                    <td>{{ item.utm_medium|default:"-" }}</td>
+                                    <td>{{ item.utm_campaign|default:"-" }}</td>
+                                    <td>{{ item.count }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p>No UTM data available.</p>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+{% endblock %}
