@@ -1,28 +1,10 @@
 from django.contrib import admin
-from django.urls import reverse
-from django.utils.html import format_html
-from django.conf import settings
-from .models import TrackedURL
+from .models import TrackedUTM
 
-@admin.register(TrackedURL)
-class TrackedURLAdmin(admin.ModelAdmin):
-    list_display = ('original_url', 'tracking_code', 'clicks', 'created_at', 'trackable_link')
-    readonly_fields = ('clicks', 'created_at', 'trackable_link')
-    search_fields = ('original_url', 'tracking_code')
-    actions = ['clear_clicks']
 
-    def trackable_link(self, obj):
-        if settings.DEBUG:
-            domain = "http://localhost:8000"
-        else:
-            domain = settings.DOMAIN_NAME
-
-        link = f"{domain}{reverse('track_url')}?code={obj.tracking_code}"
-        return format_html("<a href='{}'>{}</a>", link, link)
-
-    trackable_link.short_description = "Trackable Link"
-
-    def clear_clicks(self, request, queryset):
-        updated_count = queryset.update(clicks=0)
-        self.message_user(request, f"{updated_count} счетчик(ов) кликов был(и) обнулен(ы).")
-    clear_clicks.short_description = "Обнулить счетчик кликов"
+@admin.register(TrackedUTM)
+class TrackedUTMAdmin(admin.ModelAdmin):
+    list_display = ('utm_source', 'utm_medium', 'utm_campaign', 'timestamp', 'ip_address')
+    readonly_fields = ('utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'timestamp', 'ip_address', 'user_agent')
+    search_fields = ('utm_source', 'utm_medium', 'utm_campaign', 'ip_address')
+    list_filter = ('utm_source', 'utm_medium', 'utm_campaign')
