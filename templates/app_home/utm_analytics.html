@@ -39,7 +39,29 @@
                 {% else %}
                     <p>No UTM data available.</p>
                 {% endif %}
+                <br><br><hr><br><br>
+                {% if tracked_url_data %}
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Tracking Code</th>
+                                <th>Original URL</th>
+                                <th>Clicks</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in tracked_url_data %}
+                                <tr>
+                                    <td>{{ item.tracking_code }}</td>
+                                    <td>{{ item.original_url }}</td>
+                                    <td>{{ item.clicks }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p>No Tracked URL data available.</p>
+                {% endif %}
             </div>
         </div>
-    </main>
 {% endblock %}

@@ -166,15 +166,19 @@ def delivery_view(request):
 
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Count
-from app_tracker.models import TrackedUTM
+from app_tracker.models import TrackedUTM, TrackedURL
 
 @staff_member_required
 def utm_analytics_view(request):
     # Aggregate UTM data
     utm_data = TrackedUTM.objects.values('utm_source', 'utm_medium', 'utm_campaign').annotate(count=Count('id')).order_by('-count')
 
+    # Get TrackedURL data
+    tracked_url_data = TrackedURL.objects.all().order_by('-clicks')
+
     context = {
         'utm_data': utm_data,
+        'tracked_url_data': tracked_url_data,
         'title': 'UTM Analytics',
         'breadcrumbs': [
             {"title": "Главная", "url": "/"},
