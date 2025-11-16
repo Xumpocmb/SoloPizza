@@ -47,7 +47,7 @@ def login_view(request):
                 if session_key:
                     Order.objects.filter(session_key=session_key, user__isnull=True).update(user=user)
 
-                # Clear guest_token cookie from response since user is now logged in
+                # Do not clear guest_token cookie to allow user to access unauthenticated orders after logout
                 next_url = request.GET.get('next')
                 print(next_url)
                 if next_url:
@@ -55,8 +55,6 @@ def login_view(request):
                 else:
                     response = redirect('app_home:home')
                 
-                if 'guest_token' in request.COOKIES:
-                    response.delete_cookie('guest_token')
                 return response
             else:
                 form.add_error(None, "Неверное имя пользователя или пароль.")

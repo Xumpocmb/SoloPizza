@@ -186,9 +186,8 @@ def order_detail(request, order_id):
         if request.user.is_authenticated:
             order_query_conditions &= Q(user=request.user)
         else:
-            # For unauthenticated users, also ensure the order has no user assigned (for security)
-            order_query_conditions &= Q(user__isnull=True)
-            
+            # For unauthenticated users, allow access via guest token 
+            # (secure because guest_token is UUID4 - cryptographically unique)
             guest_token = request.COOKIES.get('guest_token')
             session_key = request.session.session_key
 
@@ -197,9 +196,10 @@ def order_detail(request, order_id):
             if guest_token:
                 guest_or_session_query |= Q(guest_token=guest_token)
             if session_key:
-                guest_or_session_query |= Q(session_key=session_key)
+                # For session_key, still ensure no user is assigned for security
+                guest_or_session_query |= Q(session_key=session_key, user__isnull=True)
             
-            # Combine with order ID and user__isnull=True
+            # Combine with order ID
             if guest_or_session_query:
                 order_query_conditions &= guest_or_session_query
             else:
@@ -291,6 +291,10 @@ def order_list(request):
     # Получаем выбранный филиал из сессии
     selected_branch_id = request.session.get("selected_branch_id", DEFAULT_BRANCH_ID)
 
+    # Debug: Get the current guest token value
+    current_guest_token = request.COOKIES.get('guest_token')
+    current_session_key = request.session.session_key
+    
     if request.user.is_staff:
         orders = Order.objects.filter(branch_id=selected_branch_id).order_by("-created_at")
     else:
@@ -298,14 +302,34 @@ def order_list(request):
         if request.user.is_authenticated:
             orders = Order.objects.filter(user=request.user, branch_id=selected_branch_id).order_by("-created_at")
         else:
-            # For unauthenticated users, only show orders that have NO user assigned (anonymous orders)
+            # For unauthenticated users, show orders that match their tokens
+            # Since guest_token is a UUID4 (cryptographically secure), we can safely
+            # allow access to orders that were created with this token, regardless of user assignment
             guest_token = request.COOKIES.get('guest_token')
             if guest_token:
-                orders = Order.objects.filter(guest_token=guest_token, user__isnull=True, branch_id=selected_branch_id).order_by("-created_at")
+                orders = Order.objects.filter(guest_token=guest_token, branch_id=selected_branch_id).order_by("-created_at")
             else:
                 # Fallback to session_key if no guest_token
                 session_key = request.session.session_key or request.session.create()
                 orders = Order.objects.filter(session_key=session_key, user__isnull=True, branch_id=selected_branch_id).order_by("-created_at")
+    
+    # Additional debug info for unauthenticated users
+    debug_total_orders_for_guest_token = 0
+    debug_total_orders_for_guest_token_anon_only = 0  # Orders with no user assigned
+    debug_total_orders_for_guest_token_all = 0       # All orders with this guest token
+    debug_total_orders_for_session_key = 0
+    debug_total_orders_for_session_key_anon_only = 0
+    debug_total_orders_for_user = 0
+    
+    if not request.user.is_authenticated:
+        if current_guest_token:
+            debug_total_orders_for_guest_token_all = Order.objects.filter(guest_token=current_guest_token).count()
+            debug_total_orders_for_guest_token_anon_only = Order.objects.filter(guest_token=current_guest_token, user__isnull=True, branch_id=selected_branch_id).count()
+        if current_session_key:
+            debug_total_orders_for_session_key = Order.objects.filter(session_key=current_session_key).count()
+            debug_total_orders_for_session_key_anon_only = Order.objects.filter(session_key=current_session_key, user__isnull=True, branch_id=selected_branch_id).count()
+    elif request.user.is_authenticated:
+        debug_total_orders_for_user = Order.objects.filter(user=request.user).count()
 
     search_query = request.GET.get("search", "")
     status_filter = request.GET.get("status", "")
@@ -339,6 +363,13 @@ def order_list(request):
         "breadcrumbs": breadcrumbs,
         "selected_branch": selected_branch,
         "branches": branches,
+        "current_guest_token": current_guest_token,  # Debug information
+        "current_session_key": current_session_key,
+        "debug_total_orders_for_guest_token_all": debug_total_orders_for_guest_token_all,
+        "debug_total_orders_for_guest_token_anon_only": debug_total_orders_for_guest_token_anon_only,
+        "debug_total_orders_for_session_key": debug_total_orders_for_session_key,
+        "debug_total_orders_for_session_key_anon_only": debug_total_orders_for_session_key_anon_only,
+        "debug_total_orders_for_user": debug_total_orders_for_user,
     }
     return render(request, "app_order/order_list.html", context)
 

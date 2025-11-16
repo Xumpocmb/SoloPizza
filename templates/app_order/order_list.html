@@ -28,6 +28,14 @@
         {% endif %}
         <div class="order-list-container">
             <h1 class="page-title">Мои заказы</h1>
+            
+            <!-- Debug information for guest token -->
+            <div class="debug-info" style="display: none;">
+                <strong>DEBUG INFO:</strong><br>
+                Current Guest Token: {% if current_guest_token %}{{ current_guest_token }}{% else %}None{% endif %}<br>
+                User Authenticated: {% if user.is_authenticated %}Yes{% else %}No{% endif %}<br>
+                Number of Orders Found: {{ page_obj.paginator.count }}
+            </div>
 
             <!-- Панель фильтров и поиска -->
             <div class="order-controls">

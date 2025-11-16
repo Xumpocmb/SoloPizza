@@ -93,7 +93,7 @@
                         </div>
                     </div>
 
-                    <form method="POST" action="{% url 'app_cart:add_to_cart' item.slug %}" class="add-to-cart-form">
+                    <form method="POST" action="{% url 'app_cart:add_to_cart' item.slug %}" class="add-to-cart-form" id="add-to-cart-form">
                         {% csrf_token %}
 
                         <!-- Размер -->
@@ -194,7 +194,17 @@
                         </div>
 
                         <!-- Кнопка добавления в заказ -->
-                        <button type="submit" class="order-link" id="add-to-cart-btn">Добавить в заказ</button>
+                        <button type="submit" class="order-link" id="add-to-cart-btn" onclick="changeButtonText()">Добавить в заказ</button>
+                        <script>
+                            function changeButtonText() {
+                                const button = document.getElementById('add-to-cart-btn');
+                                button.textContent = 'Добавляю в заказ...';
+                                form = document.getElementById('add-to-cart-form');
+                                setTimeout(() => {
+                                    form.submit();
+                                }, 2000);
+                            }
+                        </script>
                     </form>
                 </div>
             </div>
