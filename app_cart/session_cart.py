@@ -101,7 +101,7 @@ class SessionCart:
             item['board2'] = board2
             item['sauce'] = sauce
             item['addons'] = item_addons
-            item['total_price'] = total_price.quantize(Decimal('0.01'))
+            item['total_price'] = str(total_price.quantize(Decimal('0.01'))) # Store as string
             item['item_key'] = item_key
             yield item
 
@@ -109,7 +109,7 @@ class SessionCart:
         return sum(item['quantity'] for item in self.cart.values())
 
     def get_total_price(self):
-        return sum(Decimal(item['total_price']) for item in self.cart.values()).quantize(Decimal('0.01'))
+        return sum(Decimal(str(item['total_price'])) for item in self.cart.values()).quantize(Decimal('0.01'))
 
     def clear(self):
         del self.session[CART_SESSION_ID]

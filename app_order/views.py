@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Q
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, Http404
 from django.shortcuts import redirect, render, get_object_or_404
 from django.urls import reverse
 from django.views.decorators.http import require_POST
@@ -81,7 +81,18 @@ def checkout(request):
                 return redirect("app_cart:view_cart")
 
             session_key = request.session.session_key or request.session.create()
-            order = form.save(session_key=session_key)
+            
+            # Ensure guest_token exists - get from cookie or create new one
+            guest_token = request.COOKIES.get('guest_token')
+            if not guest_token:
+                from uuid import uuid4
+                guest_token = str(uuid4())
+
+            order = form.save(commit=False)
+            order.session_key = session_key
+            order.user = request.user if request.user.is_authenticated else None
+            order.guest_token = guest_token
+
             # Default payment status to False for all orders
             order.payment_status = False
             order.status = "new" # Ensure status is 'new' for all new orders
@@ -124,7 +135,11 @@ def checkout(request):
 
                 send_order_notification.delay(order.id)
             messages.success(request, f"Ваш заказ №{order.id} успешно оформлен!")
-            return redirect("app_order:order_detail", order_id=order.id)
+            response = redirect("app_order:order_detail", order_id=order.id)
+            # Set guest_token cookie if it doesn't exist, using the same token as the order
+            if not request.COOKIES.get('guest_token'):
+                response.set_cookie('guest_token', guest_token, max_age=60*60*24*365*10) # 10 years
+            return response
     else:
         # Проверяем товары при заходе на страницу оформления
         unavailable_items = validate_cart_items_for_branch(cart_items, selected_branch)
@@ -158,19 +173,45 @@ def order_detail(request, order_id):
     # Иначе пользователь может видеть только свои заказы
     if request.user.is_staff or request.user.is_superuser:
         order = get_object_or_404(
-            Order.objects.select_related("branch").prefetch_related(
+            Order.objects.select_related("user", "branch").prefetch_related(
                 "items__product", "items__variant", "items__board1__board", "items__board2__board", "items__sauce", "items__addons__addon"
             ),
             id=order_id,
         )
     else:
-        session_key = request.session.session_key or request.session.create()
+        # For non-staff/superuser users, try to find the order by user, guest_token, or session_key
+        order_query_conditions = Q(id=order_id)
+        
+        # If user is authenticated, prioritize their orders
+        if request.user.is_authenticated:
+            order_query_conditions &= Q(user=request.user)
+        else:
+            # For unauthenticated users, also ensure the order has no user assigned (for security)
+            order_query_conditions &= Q(user__isnull=True)
+            
+            guest_token = request.COOKIES.get('guest_token')
+            session_key = request.session.session_key
+
+            # Build OR conditions for guest_token and session_key
+            guest_or_session_query = Q()
+            if guest_token:
+                guest_or_session_query |= Q(guest_token=guest_token)
+            if session_key:
+                guest_or_session_query |= Q(session_key=session_key)
+            
+            # Combine with order ID and user__isnull=True
+            if guest_or_session_query:
+                order_query_conditions &= guest_or_session_query
+            else:
+                # If no guest_token or session_key, it's an invalid request for unauthenticated user
+                raise Http404("Order not found with provided credentials.")
+
+
         order = get_object_or_404(
-            Order.objects.select_related("branch").prefetch_related(
+            Order.objects.select_related("user", "branch").prefetch_related(
                 "items__product", "items__variant", "items__board1__board", "items__board2__board", "items__sauce", "items__addons__addon"
             ),
-            id=order_id,
-            session_key=session_key,
+            order_query_conditions,
         )
     totals = Order.objects.get_order_totals(order.id)  # Добавляем расчет сумм
     is_editable = order.is_editable()
@@ -253,8 +294,18 @@ def order_list(request):
     if request.user.is_staff:
         orders = Order.objects.filter(branch_id=selected_branch_id).order_by("-created_at")
     else:
-        session_key = request.session.session_key or request.session.create()
-        orders = Order.objects.filter(session_key=session_key, branch_id=selected_branch_id).order_by("-created_at")
+        # Prioritize user's orders if authenticated
+        if request.user.is_authenticated:
+            orders = Order.objects.filter(user=request.user, branch_id=selected_branch_id).order_by("-created_at")
+        else:
+            # For unauthenticated users, only show orders that have NO user assigned (anonymous orders)
+            guest_token = request.COOKIES.get('guest_token')
+            if guest_token:
+                orders = Order.objects.filter(guest_token=guest_token, user__isnull=True, branch_id=selected_branch_id).order_by("-created_at")
+            else:
+                # Fallback to session_key if no guest_token
+                session_key = request.session.session_key or request.session.create()
+                orders = Order.objects.filter(session_key=session_key, user__isnull=True, branch_id=selected_branch_id).order_by("-created_at")
 
     search_query = request.GET.get("search", "")
     status_filter = request.GET.get("status", "")

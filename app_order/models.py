@@ -4,6 +4,9 @@ from django.conf import settings
 from django.db.models.signals import post_save, post_delete, m2m_changed
 from django.dispatch import receiver
 from app_catalog.models import AddonParams, ProductVariant, BoardParams, PizzaSauce
+from django.contrib.auth import get_user_model # Import get_user_model
+
+User = get_user_model() # Get the User model
 from app_home.models import CafeBranch, Discount
 
 
@@ -94,7 +97,9 @@ class Order(models.Model):
     
     PARTNER_DISCOUNT_PERCENT = 15  # Процент скидки для партнеров
 
-    session_key = models.CharField(max_length=40, verbose_name="Ключ сессии", db_index=True) # Added session_key field
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Пользователь")
+    session_key = models.CharField(max_length=40, verbose_name="Ключ сессии", db_index=True, null=True, blank=True)
+    guest_token = models.CharField(max_length=40, verbose_name="Гостевой токен", db_index=True, null=True, blank=True)
     branch = models.ForeignKey(CafeBranch, on_delete=models.SET_NULL, verbose_name="Филиал", null=True)
     customer_name = models.CharField(max_length=255, verbose_name="Имя заказчика")
     phone_number = models.CharField(max_length=20, verbose_name="Номер телефона", null=True, blank=True)

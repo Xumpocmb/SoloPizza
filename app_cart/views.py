@@ -64,7 +64,7 @@ def add_to_cart(request, slug):
                 board1_id=board1.id if board1 else None,
                 board2_id=board2.id if board2 else None,
                 sauce_id=sauce.id if sauce else None,
-                addons_ids=[addon.id for addon in addons],
+                addons_ids=[addon.id for addon in addons] if addons else [], # Ensure addons_ids is a list of IDs
                 drink=drink
             )
 
@@ -107,7 +107,7 @@ def view_cart(request):
             'drink': item['drink'],
             'item_key': item['item_key'],
         })
-        subtotal += item['total_price']
+        subtotal += Decimal(item['total_price'])
     
     context = {
         'items': enriched_items,

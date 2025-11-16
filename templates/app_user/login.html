@@ -21,8 +21,11 @@
                     <a href="{% url 'google_login' %}" class="google-login-btn"><i class="fab fa-google"></i>Войти через Google</a>
                     <p>или используйте логин и пароль от сайта:</p>
                 </div>
-                <form class="auth_form" action="{% url 'app_user:login' %}" method="post">
+                <form class="auth_form" action="{% url 'app_user:login' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}" method="post">
                     {% csrf_token %}
+                    {% if request.GET.next %}
+                        <input type="hidden" name="next" value="{{ request.GET.next }}">
+                    {% endif %}
                     <label for="{{ form.username.id_for_label }}">Имя пользователя:</label>
                     {{ form.username|add_class:"form-control" }}
                     {% if form.username.errors %}

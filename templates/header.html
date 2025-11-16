@@ -70,7 +70,9 @@
             <a href="{% url 'app_home:delivery' %}">Доставка</a>
             <a href="{% url 'app_reviews:review_list' %}">Отзывы</a>
             <a href="{% url 'app_home:vacancy_list' %}">Вакансии</a>
+            {% if user.is_superuser %}
             <a href="{% url 'app_reviews:moderation_list' %}">Модерация</a>
+            {% endif %}
         </div>
     </div>
     <div class="has-submenu">

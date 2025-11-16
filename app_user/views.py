@@ -30,40 +30,34 @@ def login_view(request):
 
             user = authenticate(username=username, password=password)
             if user is not None:
-                login(request, user)
-                # Cart merging logic
-                session_cart = SessionCart(request)
-                if session_cart.cart:
-                    for item_data in session_cart:
-                        product = item_data['product']
-                        variant = item_data['variant']
-                        board1 = item_data['board1']
-                        board2 = item_data['board2']
-                        sauce = item_data['sauce']
-                        addons = item_data['addons']
-                        drink = item_data['drink']
-                        quantity = item_data['quantity']
-
-                        cart_item, created = CartItem.objects.get_or_create(
-                            user=user,
-                            item=product,
-                            item_variant=variant,
-                            board1=board1,
-                            board2=board2,
-                            sauce=sauce,
-                            drink=drink,
-                            defaults={'quantity': quantity}
-                        )
-                        if not created:
-                            cart_item.quantity += quantity
-                            cart_item.save()
-                        
-                        if addons:
-                            cart_item.addons.set(addons)
-
-                    session_cart.clear()
+                # Get current guest_token and session_key before login
+                guest_token = request.COOKIES.get('guest_token')
+                session_key = request.session.session_key or request.session.create()
                 
-                return redirect("app_home:home")
+                login(request, user)
+                
+                # Order migration logic
+                from app_order.models import Order # Import Order model
+
+                # Migrate orders that match the guest_token (if exists) and have no user assigned
+                if guest_token:
+                    Order.objects.filter(guest_token=guest_token, user__isnull=True).update(user=user)
+                
+                # Migrate orders that match the session_key (if exists) and have no user assigned
+                if session_key:
+                    Order.objects.filter(session_key=session_key, user__isnull=True).update(user=user)
+
+                # Clear guest_token cookie from response since user is now logged in
+                next_url = request.GET.get('next')
+                print(next_url)
+                if next_url:
+                    response = redirect(next_url)
+                else:
+                    response = redirect('app_home:home')
+                
+                if 'guest_token' in request.COOKIES:
+                    response.delete_cookie('guest_token')
+                return response
             else:
                 form.add_error(None, "Неверное имя пользователя или пароль.")
     else:

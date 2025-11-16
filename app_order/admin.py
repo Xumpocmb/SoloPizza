@@ -18,6 +18,9 @@ class OrderItemInline(admin.TabularInline):
 class OrderAdmin(admin.ModelAdmin):
     list_display = [
         'id',
+        'user',
+        'session_key',
+        'guest_token',
         'customer_name',
         'phone_number',
         'get_status_display',
@@ -29,10 +32,14 @@ class OrderAdmin(admin.ModelAdmin):
         'status',
         'delivery_type',
         'payment_method',
-        'created_at'
+        'created_at',
+        'user',
     ]
     search_fields = [
         'id',
+        'user__username',
+        'session_key',
+        'guest_token',
         'customer_name',
         'phone_number'
     ]
@@ -46,6 +53,9 @@ class OrderAdmin(admin.ModelAdmin):
         ('Основная информация', {
             'fields': (
                 'status',
+                'user',
+                'session_key',
+                'guest_token',
                 'customer_name',
                 'phone_number',
                 'branch',
