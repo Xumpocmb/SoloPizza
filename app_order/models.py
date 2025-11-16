@@ -94,13 +94,7 @@ class Order(models.Model):
     
     PARTNER_DISCOUNT_PERCENT = 15  # Процент скидки для партнеров
 
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name="orders",
-        verbose_name="Пользователь",
-    )
+    session_key = models.CharField(max_length=40, verbose_name="Ключ сессии", db_index=True) # Added session_key field
     branch = models.ForeignKey(CafeBranch, on_delete=models.SET_NULL, verbose_name="Филиал", null=True)
     customer_name = models.CharField(max_length=255, verbose_name="Имя заказчика")
     phone_number = models.CharField(max_length=20, verbose_name="Номер телефона", null=True, blank=True)

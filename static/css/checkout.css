@@ -202,6 +202,7 @@
 
 .summary-item {
     display: flex;
+    flex-direction: column;
     justify-content: space-between;
     margin-bottom: 15px;
     padding-bottom: 15px;
@@ -210,7 +211,8 @@
 
 .item-info {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    gap: 5px;
 }
 
 .item-name {
@@ -229,6 +231,18 @@
     font-weight: 600;
     color: var(--text-color);
 }
+
+
+.item-options {
+    display: flex;
+    flex-direction: column;
+}
+
+.item-addons {
+    display: flex;
+    flex-direction: column;
+}
+
 
 .summary-total {
     display: flex;

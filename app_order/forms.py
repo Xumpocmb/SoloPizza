@@ -84,10 +84,11 @@ class CheckoutForm(forms.ModelForm):
 
         return cleaned_data
 
-    def save(self, commit=True, user=None):
+    def save(self, commit=True, user=None, session_key=None):
         order = super().save(commit=False)
+        if session_key:
+            order.session_key = session_key
         if user:
-            order.user = user
             order.payment_status = True if user.is_staff else False
             order.status = "new"
         

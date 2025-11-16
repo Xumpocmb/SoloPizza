@@ -144,41 +144,36 @@
                     <h2 class="section-title">Ваш заказ</h2>
 
                     <div class="summary-items">
-                        {% for item in cart_items %}
+                        {% for item_data in cart_items %}
                             <div class="summary-item">
                                 <div class="item-info">
-                                    <span class="item-name">{{ item.item.name }}</span>
-                                    {% if item.item_variant.size %}
-                                        <span class="item-size">{{ item.item_variant.size.name }}</span>
+                                    <span class="item-name">{{ item_data.product.name }}</span>
+                                    {% if item_data.variant.size %}
+                                        <span class="item-size">{{ item_data.variant.size.name }}</span>
                                     {% endif %}
-                                    <span class="item-quantity">×{{ item.quantity }}</span>
+                                    <span class="item-quantity">×{{ item_data.quantity }}</span>
                                 </div>
-                                <span class="item-price"
-                                      data-original-price="{{ item.calculate_cart_item_total.original_total|floatformat:2 }} руб."
-                                      data-discounted-price="{{ item.calculate_cart_item_total.final_total|floatformat:2 }} руб.">
-                                    {% if form.delivery_type.value == 'pickup' %}
-                                        {{ item.calculate_cart_item_total.final_total|floatformat:2 }} руб.
-                                    {% else %}
-                                        {{ item.calculate_cart_item_total.original_total|floatformat:2 }} руб.
-                                    {% endif %}
+                                <span class="item-price">
+                                    {{ item_data.total_price|floatformat:2 }} руб.
                                 </span>
 
-                                {% if item.board1 or item.board2 %}
+                                {% if item_data.board1 or item_data.board2 %}
                                     <div class="item-options">
-                                        {% if item.board1 %}
-                                            <span class="item-option">Борт 1: {{ item.board1.board.name }}</span>
+                                        {% if item_data.board1 %}
+                                            <span class="item-option">Борт 1: {{ item_data.board1.board.name }}</span>
                                         {% endif %}
-                                        {% if item.board2 %}
-                                            <span class="item-option">Борт 2: {{ item.board2.board.name }}</span>
+                                        {% if item_data.board2 %}
+                                            <span class="item-option">Борт 2: {{ item_data.board2.board.name }}</span>
                                         {% endif %}
                                     </div>
                                 {% endif %}
 
-                                {% if item.addons.exists %}
+                                {% if item_data.addons %}
+                                Добавки:
                                     <div class="item-addons">
-                                        Добавки:{% for addon in item.addons.all %}
-                                        {{ addon.addon.name }}{% if not forloop.last %}, {% endif %}
-                                    {% endfor %}
+                                        {% for addon in item_data.addons %}
+                                            <span class="item-option">{{ addon.addon.name }}</span>
+                                        {% endfor %}
                                     </div>
                                 {% endif %}
                             </div>
@@ -186,27 +181,12 @@
                     </div>
 
                     <div class="summary-totals">
-                     <div class="summary-row">
-                         <span class="total-label">Сумма без скидки:</span>
-                         <span class="total-value"
-                               data-amount="{{ cart_totals.total_original_price|floatformat:2 }}">{{ cart_totals.total_original_price|floatformat:2 }} руб.</span>
-                     </div>
-                     {% if cart_totals.total_discount > 0 and form.delivery_type.value == 'pickup' %}
-                         <div class="summary-row discount">
-                             <span class="total-label">Скидка:</span>
-                             <span class="total-value"
-                                   data-amount="{{ cart_totals.total_discount|floatformat:2 }}">-{{ cart_totals.total_discount|floatformat:2 }} руб.</span>
-                         </div>
-                     {% endif %}
-                     <div class="summary-row grand-total">
-                         <span class="total-label">Итого к оплате:</span>
-                         <span class="total-value"
-                               data-original-total="{{ cart_totals.total_original_price }}"
-                               data-discounted-total="{{ cart_totals.total_price }}"
-                               data-discount-amount="{{ cart_totals.total_discount }}">
-                             {{ cart_totals.total_original_price|floatformat:2 }} руб.
-                         </span>
-                     </div>
+                 <div class="summary-row grand-total">
+                     <span class="total-label">Итого к оплате:</span>
+                     <span class="total-value">
+                         {{ cart_totals|floatformat:2 }} руб.
+                     </span>
+                 </div>
                     </div>
                 </div>
             {% endif %}
@@ -254,45 +234,8 @@
                 const isPickup = selectedOption && selectedOption.value === 'pickup';
                 
                 // Обновляем цены товаров
-                const itemPrices = document.querySelectorAll('.item-price');
-                itemPrices.forEach(priceElement => {
-                    const originalPrice = priceElement.getAttribute('data-original-price');
-                    const discountedPrice = priceElement.getAttribute('data-discounted-price');
-                    
-                    if (originalPrice && discountedPrice) {
-                        priceElement.textContent = isPickup ? discountedPrice : originalPrice;
-                    }
-                });
-                
-                // Обновляем отображение скидки
-                const discountRow = document.querySelector('.summary-row.discount');
-                if (discountRow) {
-                    discountRow.style.display = isPickup ? 'flex' : 'none';
-                }
-                
-                // Обновляем итоговую стоимость
-                const grandTotalElement = document.querySelector('.summary-row.grand-total .total-value');
-                const originalTotalElementText = document.querySelector('.summary-row:first-child .total-value').textContent;
-                const discountAmountElement = document.querySelector('.summary-row.discount .total-value');
-                const discountAmountText = discountAmountElement ? discountAmountElement.textContent : '0,00 руб.';
-
-                if (grandTotalElement) {
-                    // Парсим значения и сразу переводим в копейки (умножаем на 100)
-                    const originalTotalKopecks = Math.round(parseFloat(originalTotalElementText.replace(' руб.', '').replace(',', '.')) * 100);
-                    const discountAmountKopecks = Math.round(parseFloat(discountAmountText.replace(' руб.', '').replace(',', '.').replace('-', '')) * 100);
-                    
-                    if (isPickup) {
-                        // Вычисляем итоговую сумму в копейках
-                        const discountedTotalKopecks = originalTotalKopecks - discountAmountKopecks;
-                        // Переводим обратно в рубли и форматируем
-                        const discountedTotal = discountedTotalKopecks / 100;
-                        grandTotalElement.textContent = discountedTotal.toFixed(2) + ' руб.';
-                    } else {
-                        // При доставке отображаем сумму без скидки (также форматируем)
-                        const originalTotal = originalTotalKopecks / 100;
-                        grandTotalElement.textContent = originalTotal.toFixed(2) + ' руб.';
-                    }
-                }
+                // No dynamic price updates needed for now, as cart_totals is already the final price.
+                // The discount logic will be handled in the backend during order creation.
             }
             
             // Инициализируем итоги при загрузке страницы

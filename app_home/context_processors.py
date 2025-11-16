@@ -2,6 +2,7 @@ from app_cart.models import CartItem
 from app_home.models import CafeBranch, Discount
 from app_catalog.models import Category
 from django.conf import settings
+from app_cart.session_cart import SessionCart # Import SessionCart
 
 DEFAULT_BRANCH_ID = 1
 
@@ -53,10 +54,8 @@ def site_context_processor(request):
 
 
 def cart_context(request):
-    if request.user.is_authenticated:
-        cart_total_quantity = CartItem.objects.total_quantity(request.user)
-    else:
-        cart_total_quantity = 0
+    session_cart = SessionCart(request)
+    cart_total_quantity = len(session_cart) # SessionCart has __len__ method
 
     return {
         "cart_total_quantity": cart_total_quantity,

@@ -3,6 +3,7 @@ import json
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from .session_cart import SessionCart
 from django.db.models import Sum
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect
@@ -16,7 +17,6 @@ from app_home.models import OrderAvailability
 from .models import CartItem
 
 
-@login_required
 def add_to_cart(request, slug):
     if request.method == 'POST':
         item = get_object_or_404(Product, slug=slug)
@@ -56,27 +56,19 @@ def add_to_cart(request, slug):
             # Получаем выбранный напиток для комбо
             drink = request.POST.get('drink') if item.category.name == "Комбо" else None
             
-            # Создание/обновление элемента корзины
-            cart_item, created = CartItem.objects.get_or_create(
-                user=request.user,
-                item=item,
-                item_variant=variant,
-                sauce=sauce,
-                board1=board1,
-                board2=board2,
-                drink=drink,
-                defaults={'quantity': quantity}
+            session_cart = SessionCart(request)
+            session_cart.add(
+                product_id=item.id,
+                variant_id=variant.id,
+                quantity=quantity,
+                board1_id=board1.id if board1 else None,
+                board2_id=board2.id if board2 else None,
+                sauce_id=sauce.id if sauce else None,
+                addons_ids=[addon.id for addon in addons],
+                drink=drink
             )
 
-            if not created:
-                cart_item.quantity += quantity
-                cart_item.save()
-
-            cart_item.addons.set(addons)
-
-            # Показываем уведомление только если пользователь не персонал и не суперпользователь
-            if not request.user.is_staff and not request.user.is_superuser:
-                messages.success(request, f'Товар "{item.name}" добавлен в корзину!')
+            messages.success(request, f'Товар "{item.name}" добавлен в корзину!')
             return redirect('app_catalog:item_detail', slug=slug)
         else:
             messages.error(request, 'Ошибка в форме. Пожалуйста, проверьте данные.')
@@ -86,7 +78,6 @@ def add_to_cart(request, slug):
 
 
 
-@login_required
 def view_cart(request):
     # Проверяем, доступно ли оформление заказов
     if not OrderAvailability.is_orders_available():
@@ -95,22 +86,28 @@ def view_cart(request):
             "В настоящий момент оформление новых заказов недоступно. Приносим свои извинения за доставленные неудобства."
         )
     
-    cart_items = CartItem.objects.filter(user=request.user).select_related(
-        'item', 'item_variant', 'sauce', 'board1', 'board2'
-    ).prefetch_related('addons')
-    
     enriched_items = []
     subtotal = Decimal('0')
-    
-    for item in cart_items:
-        calculation = item.calculate_cart_item_total()
+
+    session_cart = SessionCart(request)
+    for item in session_cart:
+        # For session cart, 'item' already contains product, variant, etc.
+        # and 'total_price' is pre-calculated.
         enriched_items.append({
-            'object': item,
-            'item_total': calculation['original_total'],
-            'original_total': calculation['original_total'],
-            'has_discount': False  # Не показываем информацию о скидке
+            'object': item['product'], # Using product for display, might need to adjust for variant details
+            'item_total': item['total_price'],
+            'original_total': item['total_price'], # Assuming no discounts in session cart for now
+            'has_discount': False,
+            'variant': item['variant'],
+            'quantity': item['quantity'],
+            'board1': item['board1'],
+            'board2': item['board2'],
+            'sauce': item['sauce'],
+            'addons': item['addons'],
+            'drink': item['drink'],
+            'item_key': item['item_key'],
         })
-        subtotal += calculation['original_total']
+        subtotal += item['total_price']
     
     context = {
         'items': enriched_items,
@@ -120,25 +117,26 @@ def view_cart(request):
     return render(request, 'app_cart/cart.html', context)
 
 
-@login_required
 def update_quantity(request, item_id):
     if request.method == 'POST':
-        cart_item = get_object_or_404(CartItem, id=item_id, user=request.user)
-        action = request.POST.get('action')
-
-        if action == 'increase':
-            cart_item.quantity += 1
-        elif action == 'decrease' and cart_item.quantity > 1:
-            cart_item.quantity -= 1
-
-        cart_item.save()
+        session_cart = SessionCart(request)
+        item_key = request.POST.get('item_key') # Need to pass item_key from template
+        if item_key:
+            current_item = session_cart.cart.get(item_key)
+            if current_item:
+                action = request.POST.get('action')
+                if action == 'increase':
+                    current_item['quantity'] += 1
+                elif action == 'decrease' and current_item['quantity'] > 1:
+                    current_item['quantity'] -= 1
+                session_cart.save()
 
     return redirect('app_cart:view_cart')
 
-@login_required
-def remove_item(request, item_id):
+def remove_item(request, item_id): # item_id here will be item_key for session cart
     if request.method == 'POST':
-        cart_item = get_object_or_404(CartItem, id=item_id, user=request.user)
-        cart_item.delete()
+        session_cart = SessionCart(request)
+        item_key = item_id # item_id is actually the item_key for session cart
+        session_cart.remove(item_key)
 
     return redirect('app_cart:view_cart')

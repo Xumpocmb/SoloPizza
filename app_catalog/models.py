@@ -68,6 +68,13 @@ class Product(models.Model):
     def get_absolute_url(self):
         return reverse('app_catalog:item_detail', kwargs={'slug': self.slug})
 
+    def is_available_in_branch(self, branch):
+        """Проверяет, доступен ли товар в указанном филиале"""
+        # Если у категории нет филиалов, товар доступен везде
+        if not self.category.branch.exists():
+            return True
+        return self.category.branch.filter(id=branch.id).exists()
+
 
 class PizzaSizes(models.Model):
     name = models.CharField(default='Размер', max_length=50, verbose_name='Размер')

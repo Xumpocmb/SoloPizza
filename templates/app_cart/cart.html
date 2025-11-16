@@ -21,21 +21,21 @@
                 <div class="cart-items-list">
                     {% for item_data in items %}
                         {% with item=item_data.object %}
-                        <div class="cart-item-card {% if not item|is_available_in_branch:selected_branch %}unavailable{% endif %}">
+                        <div class="cart-item-card {% if not item_data.object|is_available_in_branch:selected_branch %}unavailable{% endif %}">
                             <!-- Изображение товара -->
                             <div class="cart-item-image">
-                                {% if item.item.image %}
-                                    <img src="{{ item.item.image.url }}" alt="{{ item.item.name }}" class="item-img">
+                                {% if item_data.object.image %}
+                                    <img src="{{ item_data.object.image.url }}" alt="{{ item_data.object.name }}" class="item-img">
                                 {% else %}
-                                    <img src="{% static 'img/test.jpg' %}" alt="{{ item.item.name }}" class="item-img">
+                                    <img src="{% static 'img/test.jpg' %}" alt="{{ item_data.object.name }}" class="item-img">
                                 {% endif %}
                             </div>
 
                             <!-- Информация о товаре -->
                             <div class="cart-item-details">
                                 <div class="item-header">
-                                    <h2 class="item-name">{{ item.item.name }}</h2>
-                                    {% if item.item.is_weekly_special and item.item.category.name == "Пицца" %}
+                                    <h2 class="item-name">{{ item_data.object.name }}</h2>
+                                    {% if item_data.object.is_weekly_special and item_data.object.category.name == "Пицца" %}
                                         <span class="discount-badge">Пицца недели</span>
                                     {% endif %}
                                 </div>
@@ -45,27 +45,27 @@
                                     <div class="item-option">
                                         <span class="option-label">Размер:</span>
                                         <span class="option-value">
-                                            {% if item.item_variant.size %}
-                                                {{ item.item_variant.size.name }}
+                                            {% if item_data.variant.size %}
+                                                {{ item_data.variant.size.name }}
                                             {% else %}
-                                                {{ item.item_variant.value }} {{ item.item_variant.get_unit_display }}
+                                                {{ item_data.variant.value }} {{ item_data.variant.get_unit_display }}
                                             {% endif %}
-                                            ({{ item.item_variant.price }} руб.)
+                                            ({{ item_data.variant.price }} руб.)
                                         </span>
                                     </div>
 
                                     <!-- Борты -->
-                                    {% if item.board1 or item.board2 %}
+                                    {% if item_data.board1 or item_data.board2 %}
                                     <div class="item-option">
                                         <span class="option-label">Борты:</span>
                                         <ul class="board-list">
-                                            {% if item.board1 %}
-                                                <li>Борт 1: {{ item.board1.board.name }} (+{{ item.board1.price }} руб.)</li>
+                                            {% if item_data.board1 %}
+                                                <li>Борт 1: {{ item_data.board1.board.name }} (+{{ item_data.board1.price }} руб.)</li>
                                             {% else %}
                                                 <li>Борт 1: Не выбран</li>
                                             {% endif %}
-                                            {% if item.board2 %}
-                                                <li>Борт 2: {{ item.board2.board.name }} (+{{ item.board2.price }} руб.)</li>
+                                            {% if item_data.board2 %}
+                                                <li>Борт 2: {{ item_data.board2.board.name }} (+{{ item_data.board2.price }} руб.)</li>
                                             {% else %}
                                                 <li>Борт 2: Не выбран</li>
                                             {% endif %}
@@ -74,27 +74,27 @@
                                     {% endif %}
 
                                     <!-- Соус -->
-                                    {% if item.sauce %}
+                                    {% if item_data.sauce %}
                                         <div class="item-option">
                                             <span class="option-label">Соус:</span>
-                                            <span class="option-value">{{ item.sauce.name }}</span>
+                                            <span class="option-value">{{ item_data.sauce.name }}</span>
                                         </div>
                                     {% endif %}
                                     
                                     <!-- Напиток -->
-                                    {% if item.drink %}
+                                    {% if item_data.drink %}
                                         <div class="item-option">
                                             <span class="option-label">Напиток:</span>
-                                            <span class="option-value">{{ item.drink }}</span>
+                                            <span class="option-value">{{ item_data.drink }}</span>
                                         </div>
                                     {% endif %}
 
                                     <!-- Добавки -->
-                                    {% if item.addons.exists %}
+                                    {% if item_data.addons|length > 0 %}
                                         <div class="item-option">
                                             <span class="option-label">Добавки:</span>
                                             <ul class="addons-list">
-                                                {% for addon in item.addons.all %}
+                                                {% for addon in item_data.addons %}
                                                     <li>{{ addon.addon.name }} (+{{ addon.price }} руб.)</li>
                                                 {% endfor %}
                                             </ul>
@@ -104,21 +104,22 @@
 
                                 <!-- Управление количеством и удалением -->
                                 <div class="item-controls">
-                                    <form method="post" action="{% url 'app_cart:update_quantity' item.id %}"
+                                    <form method="post" action="{% url 'app_cart:update_quantity' item_data.item_key %}"
                                           class="quantity-form">
                                         {% csrf_token %}
+                                        <input type="hidden" name="item_key" value="{{ item_data.item_key }}">
                                         <div class="quantity-selector">
                                             <button type="submit" name="action" value="decrease"
                                                     class="quantity-btn minus">-
                                             </button>
-                                            <span class="quantity-value">{{ item.quantity }}</span>
+                                            <span class="quantity-value">{{ item_data.quantity }}</span>
                                             <button type="submit" name="action" value="increase"
                                                     class="quantity-btn plus">+
                                             </button>
                                         </div>
                                     </form>
 
-                                    <form method="POST" action="{% url 'app_cart:remove_item' item.id %}"
+                                    <form method="POST" action="{% url 'app_cart:remove_item' item_data.item_key %}"
                                           class="remove-form">
                                         {% csrf_token %}
                                         <button type="submit" class="remove-btn">

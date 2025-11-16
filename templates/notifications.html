@@ -1,10 +1,37 @@
 {% load static %}
 
 {% if messages %}
+<div id="notification-container">
     {% for message in messages %}
-        <div class="notification {{ message.tags }}" id="notification" role="alert">
-            {{ message }}
-            <span class="alert-close-btn">&times;</span>
-        </div>
+    <div class="notification {{ message.tags }}" role="alert" data-auto-dismiss="5000">
+        {{ message }}
+        <button type="button" class="close-btn" data-dismiss-target=".notification">&times;</button>
+    </div>
     {% endfor %}
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.notification').forEach(function(notification) {
+            // Auto-dismiss
+            const autoDismissTime = notification.getAttribute('data-auto-dismiss');
+            if (autoDismissTime) {
+                setTimeout(function() {
+                    notification.classList.add('hide');
+                    notification.addEventListener('transitionend', function() {
+                        notification.remove();
+                    });
+                }, parseInt(autoDismissTime));
+            }
+
+            // Manual dismiss
+            notification.querySelector('.close-btn').addEventListener('click', function() {
+                notification.classList.add('hide');
+                notification.addEventListener('transitionend', function() {
+                    notification.remove();
+                });
+            });
+        });
+    });
+</script>
 {% endif %}

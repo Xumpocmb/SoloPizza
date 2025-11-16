@@ -7,11 +7,11 @@ from app_catalog.models import Product, ProductVariant, BoardParams, AddonParams
 
 
 class CartItemManager(models.Manager):
-    def total_quantity(self, user):
-        return self.filter(user=user).aggregate(total=Sum("quantity"))["total"] or 0
+    def total_quantity(self, session_key):
+        return self.filter(session_key=session_key).aggregate(total=Sum("quantity"))["total"] or 0
 
-    def get_cart_totals(self, user):
-        cart_items = self.filter(user=user).select_related("item", "item_variant", "sauce", "board1", "board2").prefetch_related("addons")
+    def get_cart_totals(self, session_key):
+        cart_items = self.filter(session_key=session_key).select_related("item", "item_variant", "sauce", "board1", "board2").prefetch_related("addons")
 
         totals = {"total_price": Decimal("0.00"), "total_original_price": Decimal("0.00"), "total_discount": Decimal("0.00"), "items": []}
 
@@ -26,7 +26,7 @@ class CartItemManager(models.Manager):
 
 
 class CartItem(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name="Пользователь")
+    session_key = models.CharField(max_length=40, verbose_name="Ключ сессии", db_index=True)
     item = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name="Товар")
     item_variant = models.ForeignKey(
         ProductVariant, on_delete=models.CASCADE, verbose_name="Вариант товара", help_text="Выбранный размер/вариант товара", null=True, blank=True
@@ -52,7 +52,7 @@ class CartItem(models.Model):
         verbose_name_plural = "Товары в корзине"
         ordering = ["-created_at"]
         unique_together = [
-            ["user", "item", "item_variant", "board1", "board2", "sauce"],
+            ["session_key", "item", "item_variant", "board1", "board2", "sauce"],
         ]
 
     def __str__(self):
@@ -62,7 +62,7 @@ class CartItem(models.Model):
         elif self.item_variant.value:
             size_info = f" | {self.item_variant.value} {self.item_variant.get_unit_display()}"
 
-        return f"Корзина {self.user.username} | Товар: {self.item.name}{size_info}"
+        return f"Корзина {self.session_key} | Товар: {self.item.name}{size_info}"
 
     def get_size_display(self):
         """Возвращает отображаемое название размера/варианта"""

@@ -9,6 +9,7 @@ from app_cart.utils import validate_cart_items_for_branch
 from app_catalog.models import Product
 from app_home.models import CafeBranch, Vacancy
 from app_home.forms import VacancyApplicationForm, FeedbackForm
+from app_cart.session_cart import SessionCart # Import SessionCart
 
 
 def home_page(request):
@@ -30,12 +31,12 @@ def select_branch(request):
             messages.success(request, "Филиал изменен!", extra_tags="success")
 
             # Проверяем, авторизован ли пользователь, прежде чем получать его корзину
-            if request.user.is_authenticated:
-                cart_items = CartItem.objects.filter(user=request.user).select_related("item__category")
-                unavailable_items = validate_cart_items_for_branch(cart_items, branch)
+            session_cart = SessionCart(request)
+            cart_items_from_session = list(session_cart) # Get items from session cart
+            unavailable_items = validate_cart_items_for_branch(cart_items_from_session, branch)
 
-                if unavailable_items:
-                    messages.warning(request, f"Некоторые товары в корзине недоступны в филиале '{branch.name}'. " "Пожалуйста, удалите их перед оформлением заказа.")
+            if unavailable_items:
+                messages.warning(request, f"Некоторые товары в корзине недоступны в филиале '{branch.name}'. " "Пожалуйста, удалите их перед оформлением заказа.")
 
             return redirect(request.META.get("HTTP_REFERER", "/"))
         else:

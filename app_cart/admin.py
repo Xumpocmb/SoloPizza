@@ -12,15 +12,15 @@ class AddonInline(admin.TabularInline):
 
 @admin.register(CartItem)
 class CartItemAdmin(admin.ModelAdmin):
-    list_display = ('user', 'item_info', 'quantity', 'total_price', 'created_at')
-    list_filter = ('user', 'created_at')
-    search_fields = ('user__username', 'item__name')
+    list_display = ('session_key', 'item_info', 'quantity', 'total_price', 'created_at')
+    list_filter = ('session_key', 'created_at')
+    search_fields = ('session_key', 'item__name')
     readonly_fields = ('created_at', 'updated_at')
     inlines = [AddonInline]
 
     fieldsets = (
         (None, {
-            'fields': ('user', 'item', 'item_variant', 'quantity')
+            'fields': ('session_key', 'item', 'item_variant', 'quantity')
         }),
         ('Дополнительные опции', {
             'fields': ('board1', 'board2', 'sauce'),

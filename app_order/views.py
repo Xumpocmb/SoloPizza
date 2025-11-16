@@ -9,7 +9,8 @@ from django.urls import reverse
 from django.views.decorators.http import require_POST
 from django.utils import timezone
 from datetime import time
-from app_cart.models import CartItem
+from app_cart.models import CartItem # Still needed for `CartItem.objects.total_quantity` in some cases
+from app_cart.session_cart import SessionCart # Import SessionCart
 from app_cart.utils import validate_cart_items_for_branch
 from app_home.models import CafeBranch
 from app_order.forms import CheckoutForm, OrderEditForm, OrderItemFormSet, AddToOrderForm
@@ -37,24 +38,24 @@ def is_order_time_allowed(user):
     # Получаем текущее время в часовом поясе проекта
     current_time = timezone.localtime().time()
 
-    start_time = time(11, 0)  # 11:00
+    start_time = time(6, 0)  # 11:00
     end_time = time(22, 30)  # 22:30
 
     # Проверяем, находится ли текущее время в разрешенном интервале
     return start_time <= current_time <= end_time
 
 
-@login_required
 def checkout(request):
     # Проверяем, доступно ли оформление заказов
     if not OrderAvailability.is_orders_available():
         messages.error(request, "В настоящий момент оформление новых заказов недоступно. Приносим свои извинения за доставленные неудобства.")
         return redirect("app_cart:view_cart")
 
-    cart_items = CartItem.objects.filter(user=request.user).select_related("item", "item__category")
-    cart_totals = CartItem.objects.get_cart_totals(request.user)
+    session_cart = SessionCart(request)
+    cart_items = list(session_cart) # Get items from session cart
+    cart_totals = session_cart.get_total_price() # Get total price from session cart
 
-    if not cart_items.exists():
+    if not cart_items: # Check if session cart is empty
         return redirect("app_cart:view_cart")
 
     # Проверяем, разрешено ли пользователю делать заказ в текущее время
@@ -79,30 +80,50 @@ def checkout(request):
                 messages.error(request, f"Некоторые товары недоступны в филиале '{selected_branch.name}': " f"{', '.join(item.item.name for item in unavailable_items)}")
                 return redirect("app_cart:view_cart")
 
-            order = form.save(user=request.user)
+            session_key = request.session.session_key or request.session.create()
+            order = form.save(session_key=session_key)
+            # Default payment status to False for all orders
+            order.payment_status = False
+            order.status = "new" # Ensure status is 'new' for all new orders
+            
+            if request.user.is_authenticated:
+                # Only staff can create "paid" orders directly
+                order.payment_status = True if request.user.is_staff else False
+            
             order.branch = selected_branch
             order.save()
 
-            for cart_item in cart_items:
+            for item_data in cart_items:
+                # Retrieve actual model instances for product, variant, etc.
+                product = item_data['product']
+                variant = item_data['variant']
+                board1 = item_data['board1']
+                board2 = item_data['board2']
+                sauce = item_data['sauce']
+                addons = item_data['addons']
+                drink = item_data['drink']
+
                 order_item = OrderItem.objects.create(
                     order=order,
-                    product=cart_item.item,
-                    variant=cart_item.item_variant,
-                    quantity=cart_item.quantity,
-                    board1=cart_item.board1,
-                    board2=cart_item.board2,
-                    sauce=cart_item.sauce,
-                    drink=cart_item.drink,
+                    product=product,
+                    variant=variant,
+                    quantity=item_data['quantity'],
+                    board1=board1,
+                    board2=board2,
+                    sauce=sauce,
+                    drink=drink,
                 )
-                order_item.addons.set(cart_item.addons.all())
+                if addons:
+                    order_item.addons.set(addons)
 
             # Пересчитываем итоги заказа после добавления всех товаров
             order.recalculate_totals()
-            cart_items.delete()
+            session_cart.clear() # Clear the session cart after order is placed
             if not settings.DEBUG and not request.user.is_superuser and not request.user.is_staff:
                 from .tasks import send_order_notification
 
                 send_order_notification.delay(order.id)
+            messages.success(request, f"Ваш заказ №{order.id} успешно оформлен!")
             return redirect("app_order:order_detail", order_id=order.id)
     else:
         # Проверяем товары при заходе на страницу оформления
@@ -111,10 +132,12 @@ def checkout(request):
             messages.error(request, f"Некоторые товары недоступны в филиале '{selected_branch.name}'. " "Пожалуйста, измените состав корзины или выберите другой филиал.")
             return redirect("app_cart:view_cart")
 
-        initial = {
-            "customer_name": request.user.get_full_name(),
-            "phone_number": getattr(request.user, "phone", ""),
-        }
+        initial = {}
+        if request.user.is_authenticated:
+            initial = {
+                "customer_name": request.user.get_full_name(),
+                "phone_number": getattr(request.user, "phone", ""),
+            }
         form = CheckoutForm(initial=initial)
     
     context = {
@@ -130,24 +153,24 @@ def checkout(request):
 # Функция send_notify больше не используется, так как уведомления отправляются через Celery задачу send_order_notification
 
 
-@login_required
 def order_detail(request, order_id):
     # Если пользователь является персоналом, то он может видеть любой заказ
     # Иначе пользователь может видеть только свои заказы
     if request.user.is_staff or request.user.is_superuser:
         order = get_object_or_404(
-            Order.objects.select_related("user", "branch").prefetch_related(
+            Order.objects.select_related("branch").prefetch_related(
                 "items__product", "items__variant", "items__board1__board", "items__board2__board", "items__sauce", "items__addons__addon"
             ),
             id=order_id,
         )
     else:
+        session_key = request.session.session_key or request.session.create()
         order = get_object_or_404(
-            Order.objects.select_related("user", "branch").prefetch_related(
+            Order.objects.select_related("branch").prefetch_related(
                 "items__product", "items__variant", "items__board1__board", "items__board2__board", "items__sauce", "items__addons__addon"
             ),
             id=order_id,
-            user=request.user,
+            session_key=session_key,
         )
     totals = Order.objects.get_order_totals(order.id)  # Добавляем расчет сумм
     is_editable = order.is_editable()
@@ -180,7 +203,8 @@ def update_order(request, order_id):
     if request.user.is_staff:
         order = get_object_or_404(Order, id=order_id)
     else:
-        order = get_object_or_404(Order, id=order_id, user=request.user)
+        session_key = request.session.session_key or request.session.create()
+        order = get_object_or_404(Order, id=order_id, session_key=session_key)
 
     if not order.is_editable():
         return HttpResponseForbidden("Заказ нельзя редактировать")
@@ -204,7 +228,8 @@ def update_order_items(request, order_id):
     if request.user.is_staff:
         order = get_object_or_404(Order, id=order_id)
     else:
-        order = get_object_or_404(Order, id=order_id, user=request.user)
+        session_key = request.session.session_key or request.session.create()
+        order = get_object_or_404(Order, id=order_id, session_key=session_key)
 
     if not order.is_editable():
         return HttpResponseForbidden("Заказ нельзя редактировать")
@@ -221,7 +246,6 @@ def update_order_items(request, order_id):
     return redirect("app_order:order_detail", order_id=order.id)
 
 
-@login_required
 def order_list(request):
     # Получаем выбранный филиал из сессии
     selected_branch_id = request.session.get("selected_branch_id", DEFAULT_BRANCH_ID)
@@ -229,7 +253,8 @@ def order_list(request):
     if request.user.is_staff:
         orders = Order.objects.filter(branch_id=selected_branch_id).order_by("-created_at")
     else:
-        orders = Order.objects.filter(user=request.user, branch_id=selected_branch_id).order_by("-created_at")
+        session_key = request.session.session_key or request.session.create()
+        orders = Order.objects.filter(session_key=session_key, branch_id=selected_branch_id).order_by("-created_at")
 
     search_query = request.GET.get("search", "")
     status_filter = request.GET.get("status", "")
