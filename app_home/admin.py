@@ -1,5 +1,5 @@
 from django.contrib import admin
-from app_home.models import CafeBranch, CafeBranchPhone, Vacancy, VacancyApplication, Feedback, Discount, OrderAvailability
+from app_home.models import CafeBranch, CafeBranchPhone, Vacancy, VacancyApplication, Feedback, Discount, OrderAvailability, WorkingHours
 
 
 @admin.register(OrderAvailability)
@@ -92,3 +92,26 @@ class FeedbackAdmin(admin.ModelAdmin):
             "fields": ("message",)
         }),
     )
+
+
+@admin.register(WorkingHours)
+class WorkingHoursAdmin(admin.ModelAdmin):
+    list_display = ['branch', 'get_day_of_week_display', 'opening_time', 'closing_time', 'is_closed']
+    list_filter = ['branch', 'day_of_week', 'is_closed']
+    list_editable = ['opening_time', 'closing_time', 'is_closed']
+    search_fields = ['branch__name']
+    list_per_page = 50
+
+    fieldsets = (
+        (None, {
+            'fields': ('branch', 'day_of_week')
+        }),
+        ('Время работы', {
+            'fields': ('opening_time', 'closing_time', 'is_closed'),
+            'classes': ('collapse',) if False else ()
+        }),
+    )
+
+    def get_day_of_week_display(self, obj):
+        return obj.get_day_of_week_display()
+    get_day_of_week_display.short_description = 'День недели'

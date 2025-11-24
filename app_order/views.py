@@ -12,7 +12,7 @@ from datetime import time
 from app_cart.models import CartItem # Still needed for `CartItem.objects.total_quantity` in some cases
 from app_cart.session_cart import SessionCart # Import SessionCart
 from app_cart.utils import validate_cart_items_for_branch
-from app_home.models import CafeBranch
+from app_home.models import CafeBranch, WorkingHours
 from app_order.forms import CheckoutForm, OrderEditForm, OrderItemFormSet, AddToOrderForm
 from app_order.models import OrderItem, Order
 from app_home.models import OrderAvailability
@@ -29,20 +29,33 @@ def is_order_time_allowed(user):
     """
     Проверяет, разрешено ли пользователю делать заказ в текущее время.
     Администраторы и сотрудники могут делать заказы в любое время.
-    Обычные пользователи могут делать заказы только с 11:00 до 22:30.
+    Обычные пользователи могут делать заказы в соответствии с графиком работы филиала.
     """
     # Администраторы и сотрудники могут делать заказы в любое время
     if user.is_superuser or user.is_staff:
         return True
 
     # Получаем текущее время в часовом поясе проекта
-    current_time = timezone.localtime().time()
+    current_time = timezone.localtime()
+    current_day_of_week = current_time.isoweekday()  # 1 - понедельник, 7 - воскресенье
+    current_time_only = current_time.time()
 
-    start_time = time(11, 0)  # 11:00
-    end_time = time(22, 30)  # 22:30
+    # Получаем ID выбранного филиала из сессии
+    selected_branch_id = user.profile.selected_branch_id if hasattr(user, 'profile') and user.profile.selected_branch_id else DEFAULT_BRANCH_ID
 
-    # Проверяем, находится ли текущее время в разрешенном интервале
-    return start_time <= current_time <= end_time
+    # Получаем график работы для выбранного филиала в текущий день недели
+    try:
+        working_hours = WorkingHours.objects.get(branch_id=selected_branch_id, day_of_week=current_day_of_week)
+    except WorkingHours.DoesNotExist:
+        # Если для текущего дня не установлен график, считаем, что филиал закрыт
+        return False
+
+    # Если филиал закрыт в этот день, заказы не принимаются
+    if working_hours.is_closed:
+        return False
+
+    # Проверяем, находится ли текущее время в рабочем интервале филиала
+    return working_hours.opening_time <= current_time_only <= working_hours.closing_time
 
 
 def checkout(request):
@@ -58,9 +71,28 @@ def checkout(request):
     if not cart_items: # Check if session cart is empty
         return redirect("app_cart:view_cart")
 
+    # Получаем выбранный филиал
+    selected_branch_id = request.session.get("selected_branch_id", DEFAULT_BRANCH_ID)
+    try:
+        selected_branch = CafeBranch.objects.get(id=selected_branch_id)
+    except CafeBranch.DoesNotExist:
+        selected_branch = CafeBranch.objects.get(id=DEFAULT_BRANCH_ID)
+
     # Проверяем, разрешено ли пользователю делать заказ в текущее время
     if not is_order_time_allowed(request.user):
-        messages.error(request, "Заказы принимаются только с 11:00 до 22:30.")
+        # Получаем график работы для выбранного филиала в текущий день недели
+        from datetime import datetime
+        current_day_of_week = datetime.now().isoweekday()
+        try:
+            working_hours = WorkingHours.objects.get(branch=selected_branch, day_of_week=current_day_of_week)
+            if working_hours.is_closed:
+                time_info = "закрыто"
+            else:
+                time_info = f"с {working_hours.opening_time.strftime('%H:%M')} до {working_hours.closing_time.strftime('%H:%M')}"
+        except WorkingHours.DoesNotExist:
+            time_info = "график работы не установлен"
+        
+        messages.error(request, f"Заказы принимаются в соответствии с графиком работы филиала: {time_info}.")
         return redirect("app_cart:view_cart")
 
     # Получаем выбранный филиал

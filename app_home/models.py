@@ -161,3 +161,33 @@ class OrderAvailability(models.Model):
         """Проверить, доступно ли оформление заказов"""
         obj, created = cls.objects.get_or_create(pk=1)
         return obj.is_available
+
+
+class WorkingHours(models.Model):
+    """Модель для указания графика работы"""
+    branch = models.ForeignKey(
+        CafeBranch,
+        on_delete=models.CASCADE,
+        related_name='working_hours',
+        verbose_name="Филиал",
+        help_text="Филиал, для которого устанавливается график работы"
+    )
+    day_of_week = models.PositiveIntegerField(
+        choices=[(i, ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье'][i-1]) for i in range(1, 8)],
+        verbose_name="День недели",
+        help_text="День недели (1-7, где 1 - понедельник, 7 - воскресенье)"
+    )
+    opening_time = models.TimeField(verbose_name="Время открытия", help_text="Время открытия филиала")
+    closing_time = models.TimeField(verbose_name="Время закрытия", help_text="Время закрытия филиала")
+    is_closed = models.BooleanField(default=False, verbose_name="Закрыт", help_text="Отметьте, если филиал закрыт в этот день")
+    
+    class Meta:
+        verbose_name = "График работы"
+        verbose_name_plural = "Графики работы"
+        unique_together = ['branch', 'day_of_week']
+        ordering = ['branch', 'day_of_week']
+    
+    def __str__(self):
+        if self.is_closed:
+            return f"{self.branch.name} - {self.get_day_of_week_display()}: Закрыто"
+        return f"{self.branch.name} - {self.get_day_of_week_display()}: {self.opening_time} - {self.closing_time}"
