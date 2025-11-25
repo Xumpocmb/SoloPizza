@@ -54,7 +54,7 @@ def send_order_notification(order_id):
                       f'Заказ {order.id}\n'
                       f'Способ доставки: {dict(Order.DELIVERY_CHOICES)[order.delivery_type]}\n'
                       f'Телефон: {order.phone_number}\n'
-                      f'Создан: {order.created_at.strftime("%d.%m.%Y %H:%M:%S")}\n'
+                      f'Создан: {timezone.localtime(order.created_at).strftime("%d.%m.%Y %H:%M:%S")}\n'
                       f'\nПодробности: https://solo-pizza.by/order/order/{order.id}/')
         
         # Отправляем сообщение в Telegram
