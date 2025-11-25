@@ -12,7 +12,7 @@ from app_home.models import Discount
 def category_detail(request, slug):
     category = get_object_or_404(Category, slug=slug)
     items = (
-        Product.objects.filter(category=category)
+        Product.objects.filter(category=category, is_active=True)
         .annotate(min_price=Min('variants__price'))
     )
 
