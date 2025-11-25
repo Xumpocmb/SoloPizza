@@ -187,3 +187,23 @@ def utm_analytics_view(request):
         ]
     }
     return render(request, 'app_home/utm_analytics.html', context)
+
+
+def partners_view(request):
+   """Отображает страницу с информацией о партнерах"""
+   from app_home.models import Partner
+   
+   partners = Partner.objects.all()
+   
+   breadcrumbs = [
+       {"title": "Главная", "url": "/"},
+       {"title": "Партнеры", "url": reverse("app_home:partners")}
+   ]
+   
+   context = {
+       "partners": partners,
+       "title": "Наши партнеры",
+       "breadcrumbs": breadcrumbs
+   }
+   
+   return render(request, "app_home/partners.html", context=context)

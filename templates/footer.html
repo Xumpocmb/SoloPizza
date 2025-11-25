@@ -15,13 +15,16 @@
             <h3>Компания</h3>
             <ul>
                 <li>
-                    <a href="#">О нас</a>
+                    <a href="{% url 'app_home:info' %}">О нас</a>
                 </li>
                 <li>
                     <a href="{% url 'app_home:contacts' %}">Контакты</a>
                 </li>
                 <li>
                     <a href="{% url 'app_home:vacancy_list' %}">Вакансии</a>
+                </li>
+                <li>
+                    <a href="{% url 'app_home:partners' %}">Партнеры</a>
                 </li>
             </ul>
         </div>

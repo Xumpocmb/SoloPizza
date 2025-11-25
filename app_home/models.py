@@ -191,3 +191,16 @@ class WorkingHours(models.Model):
         if self.is_closed:
             return f"{self.branch.name} - {self.get_day_of_week_display()}: Закрыто"
         return f"{self.branch.name} - {self.get_day_of_week_display()}: {self.opening_time} - {self.closing_time}"
+
+
+class Partner(models.Model):
+    name = models.CharField(max_length=200, verbose_name="Название партнера")
+    link = models.URLField(verbose_name="Ссылка на партнера", blank=True, null=True)
+    
+    class Meta:
+        verbose_name = "Партнер"
+        verbose_name_plural = "Партнеры"
+        ordering = ["name"]
+    
+    def __str__(self):
+        return self.name

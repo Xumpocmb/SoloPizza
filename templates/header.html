@@ -61,20 +61,7 @@
 <!-- Sidebar -->
 <div class="sidebar" id="sidebar">
     <a href="{% url 'app_home:home' %}">Главная</a>
-    <a href="{% url 'app_home:discounts' %}">Акции</a>
-    <div class="has-submenu">
-        <button onclick="toggleSubmenu('aboutSub')">О нас ▾</button>
-        <div class="submenu" id="aboutSub">
-            <a href="{% url 'app_home:info' %}">Информация</a>
-            <a href="{% url 'app_home:contacts' %}">Контакты</a>
-            <a href="{% url 'app_home:delivery' %}">Доставка</a>
-            <a href="{% url 'app_reviews:review_list' %}">Отзывы</a>
-            <a href="{% url 'app_home:vacancy_list' %}">Вакансии</a>
-            {% if user.is_superuser %}
-            <a href="{% url 'app_reviews:moderation_list' %}">Модерация</a>
-            {% endif %}
-        </div>
-    </div>
+
     <div class="has-submenu">
         <button onclick="toggleSubmenu('catalogSub')">Каталог ▾</button>
         <div class="submenu" id="catalogSub">
@@ -83,6 +70,25 @@
             {% endfor %}
         </div>
     </div>
+
+    
+    <div class="has-submenu">
+        <button onclick="toggleSubmenu('aboutSub')">О нас ▾</button>
+        <div class="submenu" id="aboutSub">
+            <a href="{% url 'app_home:discounts' %}">Акции</a>
+            <a href="{% url 'app_home:info' %}">Информация</a>
+            <a href="{% url 'app_home:contacts' %}">Контакты</a>
+            <a href="{% url 'app_home:delivery' %}">Доставка</a>
+            <a href="{% url 'app_reviews:review_list' %}">Отзывы</a>
+            <a href="{% url 'app_home:vacancy_list' %}">Вакансии</a>
+            <a href="{% url 'app_home:partners' %}">Партнеры</a>
+            {% if user.is_superuser %}
+            <a href="{% url 'app_reviews:moderation_list' %}">Модерация</a>
+            {% endif %}
+        </div>
+    </div>
+
+
     <div class="has-submenu">
         <button onclick="toggleSubmenu('profileSub')">{% if user.is_authenticated %}{{ user.username }}{% else %}Профиль{% endif %} ▾</button>
         <div class="submenu" id="profileSub">

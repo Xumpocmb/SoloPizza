@@ -1,5 +1,5 @@
 from django.contrib import admin
-from app_home.models import CafeBranch, CafeBranchPhone, Vacancy, VacancyApplication, Feedback, Discount, OrderAvailability, WorkingHours
+from app_home.models import CafeBranch, CafeBranchPhone, Vacancy, VacancyApplication, Feedback, Discount, OrderAvailability, WorkingHours, Partner
 
 
 @admin.register(OrderAvailability)
@@ -115,3 +115,10 @@ class WorkingHoursAdmin(admin.ModelAdmin):
     def get_day_of_week_display(self, obj):
         return obj.get_day_of_week_display()
     get_day_of_week_display.short_description = 'День недели'
+
+
+@admin.register(Partner)
+class PartnerAdmin(admin.ModelAdmin):
+   list_display = ('name', 'link')
+   search_fields = ('name',)
+   list_per_page = 20

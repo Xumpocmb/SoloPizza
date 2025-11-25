@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block meta_description %}Наши партнеры - список организаций и компаний, с которыми мы сотрудничаем.{% endblock %}
+{% block meta_keywords %}партнеры, сотрудничество, организации, компании{% endblock %}
+{% block og_description %}Наши партнеры - список организаций и компаний, с которыми мы сотрудничаем.{% endblock %}
+{% block twitter_description %}Наши партнеры - список организаций и компаний, с которыми мы сотрудничаем.{% endblock %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'css/promo_page.css' %}">
+{% endblock %}
+
+{% block main %}
+<main>
+    <section class="promo-section">
+        <div class="container">
+            <div class="promo-header">
+                <h1 class="promo-title">{{ title }}</h1>
+                <div class="divider"></div>
+            </div>
+    
+            <div class="promo-description">
+                <p>Посетителям, которые проводят время у наших партнеров и заказывают пиццу в Solo Pizza, предоставляется скидка 10% на все виды пиццы!</p>
+            </div>
+    
+            {% if partners %}
+            <ul class="promo-list">
+                {% for partner in partners %}
+                <li class="promo-list-item">
+                    <h3 class="promo-list-title">{{ partner.name }}</h3>
+                    {% if partner.link %}
+                        <a href="{{ partner.link }}" target="_blank" rel="noopener noreferrer">Перейти к партнеру</a>
+                    {% else %}
+                        <span>Ссылка недоступна</span>
+                    {% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <div class="promo-card">
+                <div class="promo-card-content">
+                    <p>В настоящее время у нас нет активных партнеров.</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+</main>
+{% endblock %}
