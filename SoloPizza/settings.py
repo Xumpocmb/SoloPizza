@@ -81,6 +81,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "app_home.context_processors.site_context_processor",
                 "app_home.context_processors.cart_context",
+                "app_home.context_processors.snow_context_processor",
             ],
         },
     },
@@ -180,6 +181,9 @@ CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = TIME_ZONE
+
+# Snowflakes settings
+SNOW_ENABLED = os.getenv("SNOW_ENABLED", "False") == "True"
 
 EMAIL_HOST = "smtp.yandex.ru"
 EMAIL_PORT = 465

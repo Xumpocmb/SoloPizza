@@ -1,8 +1,8 @@
 from app_cart.models import CartItem
-from app_home.models import CafeBranch, Discount
+from app_home.models import CafeBranch, Discount, SnowSettings
 from app_catalog.models import Category
 from django.conf import settings
-from app_cart.session_cart import SessionCart # Import SessionCart
+from app_cart.session_cart import SessionCart  # Import SessionCart
 
 DEFAULT_BRANCH_ID = 1
 
@@ -43,8 +43,6 @@ def site_context_processor(request):
     except Exception:
         categories = []
 
-
-
     return {
         "branches": branches,
         "categories": categories,
@@ -55,8 +53,15 @@ def site_context_processor(request):
 
 def cart_context(request):
     session_cart = SessionCart(request)
-    cart_total_quantity = len(session_cart) # SessionCart has __len__ method
+    cart_total_quantity = len(session_cart)  # SessionCart has __len__ method
 
     return {
         "cart_total_quantity": cart_total_quantity,
+    }
+
+
+def snow_context_processor(request):
+    snow_settings, created = SnowSettings.objects.get_or_create(pk=1)
+    return {
+        "SNOW_ENABLED": snow_settings.is_enabled,
     }

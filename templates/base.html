@@ -24,8 +24,10 @@
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     <link rel="stylesheet" href="{% static 'css/alert.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    {% if SNOW_ENABLED %}
+        <link rel="stylesheet" href="{% static 'css/snow.css' %}">
+    {% endif %}
     {% block styles %}
-
     {% endblock %}
     {% block schema_markup %}
     {% endblock %}
@@ -55,9 +57,13 @@
 {% include 'footer.html' %}
 
 {% block scripts %}
+    
 {% endblock %}
 <script src="{% static 'js/jquery-3.6.0.min.js' %}"></script>
 <script src="{% static 'js/burger_menu.js' %}"></script>
 <script src="{% static 'js/hide_alert.js' %}"></script>
+{% if SNOW_ENABLED %}
+        <script src="{% static 'js/snow.js' %}"></script>
+    {% endif %}
 </body>
 </html>
