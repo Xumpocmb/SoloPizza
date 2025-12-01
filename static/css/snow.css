@@ -15,8 +15,8 @@
 
 /* Для светлой темы (по умолчанию) */
 :root .snowflake {
-    color: #cccccc;
-    text-shadow: 0 0 5px #4d4d4d, 0 0 10px #4d4d4d, 0 0 15px #555555, 0 0 20px #5e5e5e;
+    color: #dadada;
+    text-shadow: 0 0 5px #4b4b4b, 0 0 10px #535353, 0 15px #494949, 0 0 20px #5c5c5c;
 }
 
 /* Для темной темы */
@@ -29,11 +29,15 @@ body.dark .snowflake,
 @keyframes fall {
     0% {
         transform: translateY(-10vh) translateX(0) rotate(0deg);
-        opacity: var(--opacity, 1);
+        opacity: var(--opacity, 0.7);
+    }
+
+    85% {
+        opacity: var(--opacity, 0.7);
     }
 
     100% {
         transform: translateY(100vh) translateX(var(--drift, 0px)) rotate(var(--rotation, 0deg));
-        opacity: 0;
+        opacity: 0.2;
     }
 }
