@@ -9,8 +9,8 @@ from django.urls import reverse
 from django.views.decorators.http import require_POST
 from django.utils import timezone
 from datetime import time
-from app_cart.models import CartItem # Still needed for `CartItem.objects.total_quantity` in some cases
-from app_cart.session_cart import SessionCart # Import SessionCart
+from app_cart.models import CartItem  # Still needed for `CartItem.objects.total_quantity` in some cases
+from app_cart.session_cart import SessionCart  # Import SessionCart
 from app_cart.utils import validate_cart_items_for_branch
 from app_home.models import CafeBranch, WorkingHours
 from app_order.forms import CheckoutForm, OrderEditForm, OrderItemFormSet, AddToOrderForm
@@ -41,7 +41,7 @@ def is_order_time_allowed(user):
     current_time_only = current_time.time()
 
     # Получаем ID выбранного филиала из сессии
-    selected_branch_id = user.profile.selected_branch_id if hasattr(user, 'profile') and user.profile.selected_branch_id else DEFAULT_BRANCH_ID
+    selected_branch_id = user.profile.selected_branch_id if hasattr(user, "profile") and user.profile.selected_branch_id else DEFAULT_BRANCH_ID
 
     # Получаем график работы для выбранного филиала в текущий день недели
     try:
@@ -65,10 +65,10 @@ def checkout(request):
         return redirect("app_cart:view_cart")
 
     session_cart = SessionCart(request)
-    cart_items = list(session_cart) # Get items from session cart
-    cart_totals = session_cart.get_total_price() # Get total price from session cart
+    cart_items = list(session_cart)  # Get items from session cart
+    cart_totals = session_cart.get_total_price()  # Get total price from session cart
 
-    if not cart_items: # Check if session cart is empty
+    if not cart_items:  # Check if session cart is empty
         return redirect("app_cart:view_cart")
 
     # Получаем выбранный филиал
@@ -82,6 +82,7 @@ def checkout(request):
     if not is_order_time_allowed(request.user):
         # Получаем график работы для выбранного филиала в текущий день недели
         from datetime import datetime
+
         current_day_of_week = datetime.now().isoweekday()
         try:
             working_hours = WorkingHours.objects.get(branch=selected_branch, day_of_week=current_day_of_week)
@@ -91,7 +92,7 @@ def checkout(request):
                 time_info = f"с {working_hours.opening_time.strftime('%H:%M')} до {working_hours.closing_time.strftime('%H:%M')}"
         except WorkingHours.DoesNotExist:
             time_info = "график работы не установлен"
-        
+
         messages.error(request, f"Заказы принимаются в соответствии с графиком работы филиала: {time_info}.")
         return redirect("app_cart:view_cart")
 
@@ -113,11 +114,12 @@ def checkout(request):
                 return redirect("app_cart:view_cart")
 
             session_key = request.session.session_key or request.session.create()
-            
+
             # Ensure guest_token exists - get from cookie or create new one
-            guest_token = request.COOKIES.get('guest_token')
+            guest_token = request.COOKIES.get("guest_token")
             if not guest_token:
                 from uuid import uuid4
+
                 guest_token = str(uuid4())
 
             order = form.save(commit=False)
@@ -127,30 +129,30 @@ def checkout(request):
 
             # Default payment status to False for all orders
             order.payment_status = False
-            order.status = "new" # Ensure status is 'new' for all new orders
-            
+            order.status = "new"  # Ensure status is 'new' for all new orders
+
             if request.user.is_authenticated:
                 # Only staff can create "paid" orders directly
                 order.payment_status = True if request.user.is_staff else False
-            
+
             order.branch = selected_branch
             order.save()
 
             for item_data in cart_items:
                 # Retrieve actual model instances for product, variant, etc.
-                product = item_data['product']
-                variant = item_data['variant']
-                board1 = item_data['board1']
-                board2 = item_data['board2']
-                sauce = item_data['sauce']
-                addons = item_data['addons']
-                drink = item_data['drink']
+                product = item_data["product"]
+                variant = item_data["variant"]
+                board1 = item_data["board1"]
+                board2 = item_data["board2"]
+                sauce = item_data["sauce"]
+                addons = item_data["addons"]
+                drink = item_data["drink"]
 
                 order_item = OrderItem.objects.create(
                     order=order,
                     product=product,
                     variant=variant,
-                    quantity=item_data['quantity'],
+                    quantity=item_data["quantity"],
                     board1=board1,
                     board2=board2,
                     sauce=sauce,
@@ -161,7 +163,7 @@ def checkout(request):
 
             # Пересчитываем итоги заказа после добавления всех товаров
             order.recalculate_totals()
-            session_cart.clear() # Clear the session cart after order is placed
+            session_cart.clear()  # Clear the session cart after order is placed
             if not settings.DEBUG and not request.user.is_superuser and not request.user.is_staff:
                 from .tasks import send_order_notification
 
@@ -169,8 +171,8 @@ def checkout(request):
             messages.success(request, f"Ваш заказ №{order.id} успешно оформлен!")
             response = redirect("app_order:order_detail", order_id=order.id)
             # Set guest_token cookie if it doesn't exist, using the same token as the order
-            if not request.COOKIES.get('guest_token'):
-                response.set_cookie('guest_token', guest_token, max_age=60*60*24*365*10) # 10 years
+            if not request.COOKIES.get("guest_token"):
+                response.set_cookie("guest_token", guest_token, max_age=60 * 60 * 24 * 365 * 10)  # 10 years
             return response
     else:
         # Проверяем товары при заходе на страницу оформления
@@ -186,14 +188,14 @@ def checkout(request):
                 "phone_number": getattr(request.user, "phone", ""),
             }
         form = CheckoutForm(initial=initial)
-    
+
     context = {
         "form": form,
         "cart_items": cart_items,
         "cart_totals": cart_totals,
         "selected_branch": selected_branch,
     }
-    
+
     return render(request, "app_order/checkout.html", context)
 
 
@@ -213,14 +215,14 @@ def order_detail(request, order_id):
     else:
         # For non-staff/superuser users, try to find the order by user, guest_token, or session_key
         order_query_conditions = Q(id=order_id)
-        
+
         # If user is authenticated, prioritize their orders
         if request.user.is_authenticated:
             order_query_conditions &= Q(user=request.user)
         else:
-            # For unauthenticated users, allow access via guest token 
+            # For unauthenticated users, allow access via guest token
             # (secure because guest_token is UUID4 - cryptographically unique)
-            guest_token = request.COOKIES.get('guest_token')
+            guest_token = request.COOKIES.get("guest_token")
             session_key = request.session.session_key
 
             # Build OR conditions for guest_token and session_key
@@ -230,14 +232,13 @@ def order_detail(request, order_id):
             if session_key:
                 # For session_key, still ensure no user is assigned for security
                 guest_or_session_query |= Q(session_key=session_key, user__isnull=True)
-            
+
             # Combine with order ID
             if guest_or_session_query:
                 order_query_conditions &= guest_or_session_query
             else:
                 # If no guest_token or session_key, it's an invalid request for unauthenticated user
                 raise Http404("Order not found with provided credentials.")
-
 
         order = get_object_or_404(
             Order.objects.select_related("user", "branch").prefetch_related(
@@ -324,9 +325,9 @@ def order_list(request):
     selected_branch_id = request.session.get("selected_branch_id", DEFAULT_BRANCH_ID)
 
     # Debug: Get the current guest token value
-    current_guest_token = request.COOKIES.get('guest_token')
+    current_guest_token = request.COOKIES.get("guest_token")
     current_session_key = request.session.session_key
-    
+
     if request.user.is_staff:
         orders = Order.objects.filter(branch_id=selected_branch_id).order_by("-created_at")
     else:
@@ -337,22 +338,22 @@ def order_list(request):
             # For unauthenticated users, show orders that match their tokens
             # Since guest_token is a UUID4 (cryptographically secure), we can safely
             # allow access to orders that were created with this token, regardless of user assignment
-            guest_token = request.COOKIES.get('guest_token')
+            guest_token = request.COOKIES.get("guest_token")
             if guest_token:
                 orders = Order.objects.filter(guest_token=guest_token, branch_id=selected_branch_id).order_by("-created_at")
             else:
                 # Fallback to session_key if no guest_token
                 session_key = request.session.session_key or request.session.create()
                 orders = Order.objects.filter(session_key=session_key, user__isnull=True, branch_id=selected_branch_id).order_by("-created_at")
-    
+
     # Additional debug info for unauthenticated users
     debug_total_orders_for_guest_token = 0
     debug_total_orders_for_guest_token_anon_only = 0  # Orders with no user assigned
-    debug_total_orders_for_guest_token_all = 0       # All orders with this guest token
+    debug_total_orders_for_guest_token_all = 0  # All orders with this guest token
     debug_total_orders_for_session_key = 0
     debug_total_orders_for_session_key_anon_only = 0
     debug_total_orders_for_user = 0
-    
+
     if not request.user.is_authenticated:
         if current_guest_token:
             debug_total_orders_for_guest_token_all = Order.objects.filter(guest_token=current_guest_token).count()
@@ -563,7 +564,7 @@ def print_check_fastfood_only(request, order_id):
 
     # Получаем позиции фастфуда, соусов и бургеров
     items = (
-        order.items.filter(product__category__name__in=["Фастфуд", "Соусы", "Бургеры"])
+        order.items.filter(product__category__name__in=["Фастфуд", "Соусы", "Бургеры", "Сковородки"])
         .select_related("product__category", "variant__size", "board1__board", "board2__board", "sauce")
         .prefetch_related("addons")
     )
