@@ -1,5 +1,5 @@
 from django.contrib import admin
-from app_home.models import CafeBranch, CafeBranchPhone, Vacancy, VacancyApplication, Feedback, Discount, OrderAvailability, WorkingHours, Partner, SnowSettings
+from app_home.models import CafeBranch, CafeBranchPhone, Vacancy, VacancyApplication, Feedback, Discount, OrderAvailability, WorkingHours, Partner, SnowSettings, Marquee
 
 
 @admin.register(SnowSettings)
@@ -112,4 +112,12 @@ class WorkingHoursAdmin(admin.ModelAdmin):
 class PartnerAdmin(admin.ModelAdmin):
     list_display = ("name", "link")
     search_fields = ("name",)
+    list_per_page = 20
+
+
+@admin.register(Marquee)
+class MarqueeAdmin(admin.ModelAdmin):
+    list_display = ("text", "is_active")
+    list_editable = ("is_active",)
+    search_fields = ("text",)
     list_per_page = 20

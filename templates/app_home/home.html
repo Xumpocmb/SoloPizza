@@ -14,73 +14,87 @@
 {% endblock %}
 {% block schema_markup %}
 <script type="application/ld+json">
-{
-  "@context": "http://schema.org",
-  "@type": "Restaurant",
-  "name": "SoloPizza",
-  "address": [
     {
-      "@type": "PostalAddress",
-      "streetAddress": "ул. Ленина 9/1",
-      "addressLocality": "Барановичи",
-      "addressRegion": "Брестская область",
-      "postalCode": "225400",
-      "addressCountry": "BY"
+    "@context": "http://schema.org",
+    "@type": "Restaurant",
+    "name": "SoloPizza",
+    "address": [
+        {
+        "@type": "PostalAddress",
+        "streetAddress": "ул. Ленина 9/1",
+        "addressLocality": "Барановичи",
+        "addressRegion": "Брестская область",
+        "postalCode": "225400",
+        "addressCountry": "BY"
+        },
+        {
+        "@type": "PostalAddress",
+        "streetAddress": "ул. Тексер, 4а",
+        "addressLocality": "Барановичи",
+        "addressRegion": "Брестская область",
+        "postalCode": "225400",
+        "addressCountry": "BY"
+        }
+    ],
+    "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": "53.1333",
+        "longitude": "26.0167"
     },
-    {
-      "@type": "PostalAddress",
-      "streetAddress": "ул. Тексер, 4а",
-      "addressLocality": "Барановичи",
-      "addressRegion": "Брестская область",
-      "postalCode": "225400",
-      "addressCountry": "BY"
+    "url": "https://solopizza.by",
+    "telephone": "+37529XXXXXXX",
+    "openingHoursSpecification": [
+        {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+            "Sunday"
+        ],
+        "opens": "10:00",
+        "closes": "23:00"
+        }
+    ],
+    "servesCuisine": "Пицца",
+    "priceRange": "$$",
+    "hasMenu": {
+        "@type": "Menu",
+        "url": "https://solopizza.by/catalog/"
+    },
+    "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "reviewCount": "150"
     }
-  ],
-  "geo": {
-    "@type": "GeoCoordinates",
-    "latitude": "53.1333",
-    "longitude": "26.0167"
-  },
-  "url": "https://solopizza.by",
-  "telephone": "+37529XXXXXXX",
-  "openingHoursSpecification": [
-    {
-      "@type": "OpeningHoursSpecification",
-      "dayOfWeek": [
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-        "Sunday"
-      ],
-      "opens": "10:00",
-      "closes": "23:00"
     }
-  ],
-  "servesCuisine": "Пицца",
-  "priceRange": "$$",
-  "hasMenu": {
-    "@type": "Menu",
-    "url": "https://solopizza.by/catalog/"
-  },
- "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.8",
-    "reviewCount": "150"
-  }
-}
 </script>
 {% endblock %}
 {% block main %}
     <main>
         <div class="main-wrapper">
+            
             <section class="site-greetings">
                 <div class="page_title">
                     <h1>Заказать пиццу в Барановичах с доставкой - Solo Pizza</h1>
                 </div>
             </section>
+
+            {% if marquees %}
+            {% for marquee in marquees %}
+            <section class="ticker-section">
+                <div class="ticker-container">
+                    <div class="ticker">
+                        <h2>{{ marquee.text }}</h2>
+                    </div>
+                </div>
+            </section>
+            {% endfor %}
+            {% endif %}
+
             <section class="slides">
                 <div class="swiper-container">
                     <div class="swiper-wrapper">

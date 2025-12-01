@@ -7,15 +7,17 @@ from django.views.decorators.csrf import csrf_protect
 from app_cart.models import CartItem
 from app_cart.utils import validate_cart_items_for_branch
 from app_catalog.models import Product
-from app_home.models import CafeBranch, Vacancy
+from app_home.models import CafeBranch, Vacancy, Marquee
 from app_home.forms import VacancyApplicationForm, FeedbackForm
-from app_cart.session_cart import SessionCart # Import SessionCart
+from app_cart.session_cart import SessionCart  # Import SessionCart
 
 
 def home_page(request):
     active_vacancies = Vacancy.objects.filter(is_active=True)
+    active_marquees = Marquee.objects.filter(is_active=True)
     context = {
         "vacancies": active_vacancies,
+        "marquees": active_marquees,
     }
     return render(request, "app_home/home.html", context=context)
 
@@ -32,7 +34,7 @@ def select_branch(request):
 
             # Проверяем, авторизован ли пользователь, прежде чем получать его корзину
             session_cart = SessionCart(request)
-            cart_items_from_session = list(session_cart) # Get items from session cart
+            cart_items_from_session = list(session_cart)  # Get items from session cart
             unavailable_items = validate_cart_items_for_branch(cart_items_from_session, branch)
 
             if unavailable_items:
@@ -129,6 +131,7 @@ def feedback_view(request):
             # Отправляем уведомление о новом вопросе/предложении
             # if not settings.DEBUG:
             from app_home.tasks import send_feedback_notification
+
             send_feedback_notification.delay(feedback.id)
             messages.success(request, "Ваш вопрос/предложение успешно отправлено! Мы свяжемся с вами в ближайшее время.", extra_tags="success")
             return redirect(reverse("app_home:feedback"))
@@ -169,41 +172,32 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Count
 from app_tracker.models import TrackedUTM, TrackedURL
 
+
 @staff_member_required
 def utm_analytics_view(request):
     # Aggregate UTM data
-    utm_data = TrackedUTM.objects.values('utm_source', 'utm_medium', 'utm_campaign').annotate(count=Count('id')).order_by('-count')
+    utm_data = TrackedUTM.objects.values("utm_source", "utm_medium", "utm_campaign").annotate(count=Count("id")).order_by("-count")
 
     # Get TrackedURL data
-    tracked_url_data = TrackedURL.objects.all().order_by('-clicks')
+    tracked_url_data = TrackedURL.objects.all().order_by("-clicks")
 
     context = {
-        'utm_data': utm_data,
-        'tracked_url_data': tracked_url_data,
-        'title': 'UTM Analytics',
-        'breadcrumbs': [
-            {"title": "Главная", "url": "/"},
-            {"title": "UTM Analytics", "url": "#"}
-        ]
+        "utm_data": utm_data,
+        "tracked_url_data": tracked_url_data,
+        "title": "UTM Analytics",
+        "breadcrumbs": [{"title": "Главная", "url": "/"}, {"title": "UTM Analytics", "url": "#"}],
     }
-    return render(request, 'app_home/utm_analytics.html', context)
+    return render(request, "app_home/utm_analytics.html", context)
 
 
 def partners_view(request):
-   """Отображает страницу с информацией о партнерах"""
-   from app_home.models import Partner
-   
-   partners = Partner.objects.all()
-   
-   breadcrumbs = [
-       {"title": "Главная", "url": "/"},
-       {"title": "Партнеры", "url": reverse("app_home:partners")}
-   ]
-   
-   context = {
-       "partners": partners,
-       "title": "Наши партнеры",
-       "breadcrumbs": breadcrumbs
-   }
-   
-   return render(request, "app_home/partners.html", context=context)
+    """Отображает страницу с информацией о партнерах"""
+    from app_home.models import Partner
+
+    partners = Partner.objects.all()
+
+    breadcrumbs = [{"title": "Главная", "url": "/"}, {"title": "Партнеры", "url": reverse("app_home:partners")}]
+
+    context = {"partners": partners, "title": "Наши партнеры", "breadcrumbs": breadcrumbs}
+
+    return render(request, "app_home/partners.html", context=context)

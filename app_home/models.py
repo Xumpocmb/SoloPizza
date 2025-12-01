@@ -188,3 +188,15 @@ class SnowSettings(models.Model):
 
     def __str__(self):
         return "Снег включен" if self.is_enabled else "Снег выключен"
+
+
+class Marquee(models.Model):
+    text = models.CharField(max_length=500, verbose_name="Текст бегущей строки")
+    is_active = models.BooleanField(default=True, verbose_name="Активна")
+
+    class Meta:
+        verbose_name = "Бегущая строка"
+        verbose_name_plural = "Бегущие строки"
+
+    def __str__(self):
+        return self.text

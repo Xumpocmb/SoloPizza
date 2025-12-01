@@ -93,6 +93,7 @@
     font-size: 1.1rem;
     margin: 0;
 }
+
 .centered-text {
     text-align: center;
     display: flex;
@@ -108,4 +109,106 @@
 
 .section_about_us {
     margin-bottom: 20px;
+}
+
+/* Стили для бегущей строки */
+.ticker-section {
+    background: linear-gradient(90deg, #ff6b6b, #ffa500, #ff6b6b);
+    background-size: 200% 200%;
+    animation: gradientShift 3s ease infinite;
+    padding: 12px 0;
+    position: relative;
+    overflow: hidden;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0, 0, 0.1);
+}
+
+.ticker-container {
+    width: 100%;
+    overflow: hidden;
+    background: transparent;
+    white-space: nowrap;
+    position: relative;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+}
+
+.ticker {
+    display: inline-block;
+    position: relative;
+    transform: translateX(100vw);
+    animation: ticker 20s linear infinite;
+    font-size: 1.1rem;
+    line-height: 40px;
+    color: white;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    padding: 0 20px;
+}
+
+@keyframes ticker {
+    0% {
+        transform: translateX(100vw);
+    }
+
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
+.marquee-item {
+    color: white;
+    font-weight: bold;
+    font-size: 1.1rem;
+    margin: 0 20px;
+    padding: 0 10px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.marquee-separator {
+    color: rgba(25, 255, 255, 0.7);
+    font-size: 1.2rem;
+    margin: 0 10px;
+    display: inline-block;
+    animation: pulse 1.5s infinite;
+}
+
+/* Основная анимация будет задаваться через JavaScript */
+@keyframes marqueeScroll {
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 0.7;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.2);
+    }
 }
