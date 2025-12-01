@@ -56,7 +56,7 @@ class OrderManager(models.Manager):
         # Проверяем, все ли товары в заказе относятся к фастфуду (за исключением "Напитки", "Соусы")
         is_all_fastfood = True
         for item in items:
-            if item.product.category.name not in ["Фастфуд", "Соусы", "Напитки"]:
+            if item.product.category.name not in ["Фастфуд", "Бургеры", "Соусы", "Напитки"]:
                 is_all_fastfood = False
                 break
 
