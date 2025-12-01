@@ -2,15 +2,28 @@
 .snowflake {
     position: fixed;
     top: -10px;
-    z-index: 999;
+    z-index: 9999;
     pointer-events: none;
     color: #fff;
     font-size: 20px;
     animation: fall linear infinite;
-    text-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+    text-shadow: 0 5px #fff, 0 0 10px #fff, 0 0 15px #fff, 0 0 20px #fff;
     user-select: none;
     will-change: transform;
-    filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.5));
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.9));
+}
+
+/* Для светлой темы (по умолчанию) */
+:root .snowflake {
+    color: #cccccc;
+    text-shadow: 0 0 5px #4d4d4d, 0 0 10px #4d4d4d, 0 0 15px #555555, 0 0 20px #5e5e5e;
+}
+
+/* Для темной темы */
+body.dark .snowflake,
+.dark .snowflake {
+    color: #fff;
+    text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #fff, 0 0 20px #fff;
 }
 
 @keyframes fall {
