@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
@@ -90,6 +91,13 @@ def vacancy_apply(request, vacancy_id):
             application = form.save(commit=False)
             application.vacancy = vacancy
             application.save()
+
+            # Отправляем уведомление о новом отклике на вакансию
+            if not settings.DEBUG:
+                from app_home.tasks import send_vacancy_application_notification
+
+                send_vacancy_application_notification.delay(application.id)
+
             messages.success(request, "Ваш отклик успешно отправлен! Мы свяжемся с вами в ближайшее время.", extra_tags="success")
             return redirect(reverse("app_home:vacancy_detail", kwargs={"vacancy_id": vacancy_id}))
         else:
