@@ -3,7 +3,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_protect
-
+from django.contrib.admin.views.decorators import staff_member_required
+from django.db.models import Count
+from app_tracker.models import TrackedUTM, TrackedURL
 from app_cart.models import CartItem
 from app_cart.utils import validate_cart_items_for_branch
 from app_catalog.models import Product
@@ -166,11 +168,6 @@ def delivery_view(request):
     context = {"breadcrumbs": breadcrumbs, "title": "Доставка", "branches": branches}
 
     return render(request, "app_home/delivery.html", context=context)
-
-
-from django.contrib.admin.views.decorators import staff_member_required
-from django.db.models import Count
-from app_tracker.models import TrackedUTM, TrackedURL
 
 
 @staff_member_required
