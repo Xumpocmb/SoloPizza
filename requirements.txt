@@ -1,25 +1,41 @@
-# Django и основные компоненты
-Django>=4.2,<5.0
-django-allauth>=0.57.0
-cryptography
-django-redis>=5.4.0
-
-# Celery для асинхронных задач
-celery>=5.3.0
-django-celery-beat>=2.5.0
-django-celery-results>=2.5.0
-redis>=5.0.0
-
-
-# Работа с изображениями
-Pillow>=10.0.0
-
-# Переменные окружения
-python-dotenv>=1.0.0
-
-# Веб-сервер для продакшена
-gunicorn>=21.2.0
-
-# Дополнительные утилиты
-requests>=2.31.0
-
+amqp==5.3.1
+asgiref==3.11.0
+billiard==4.2.4
+celery==5.6.0
+certifi==2025.11.12
+cffi==2.0.0
+charset-normalizer==3.4.4
+click==8.3.1
+click-didyoumean==0.3.1
+click-plugins==1.1.1.2
+click-repl==0.3.0
+cron_descriptor==2.0.6
+cryptography==46.0.3
+Django==4.2.27
+django-allauth==65.13.1
+django-celery-beat==2.8.1
+django-debug-toolbar==6.1.0
+django-redis==6.0.0
+django-timezone-field==7.2.1
+django_celery_results==2.6.0
+exceptiongroup==1.3.1
+gunicorn==23.0.0
+idna==3.11
+kombu==5.6.1
+packaging==25.0
+pillow==12.0.0
+prompt_toolkit==3.0.52
+pycparser==2.23
+python-crontab==3.3.0
+python-dateutil==2.9.0.post0
+python-dotenv==1.2.1
+redis==7.1.0
+requests==2.32.5
+six==1.17.0
+sqlparse==0.5.4
+typing_extensions==4.15.0
+tzdata==2025.2
+tzlocal==5.3.1
+urllib3==2.6.0
+vine==5.1.0
+wcwidth==0.2.14
