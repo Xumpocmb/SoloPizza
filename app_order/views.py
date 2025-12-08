@@ -32,7 +32,7 @@ def is_order_time_allowed(user):
     Обычные пользователи могут делать заказы в соответствии с графиком работы филиала.
     """
     # Администраторы и сотрудники могут делать заказы в любое время
-    if user.is_superuser or user.is_staff:
+    if user.is_superuser or user.is_staff or settings.DEBUG:
         return True
 
     # Получаем текущее время в часовом поясе проекта
