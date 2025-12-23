@@ -7,14 +7,13 @@ from django.conf import settings
 from django.conf.urls.static import static
 from debug_toolbar.toolbar import debug_toolbar_urls
 
-from .sitemap import StaticViewSitemap, CategorySitemap, ProductSitemap, VacancySitemap, ReviewSitemap
+from .sitemap import StaticViewSitemap, CategorySitemap, ProductSitemap, VacancySitemap
 
 sitemaps = {
     "static": StaticViewSitemap,
     "categories": CategorySitemap,
     "products": ProductSitemap,
     "vacancies": VacancySitemap,
-    "reviews": ReviewSitemap,
 }
 
 urlpatterns = [
