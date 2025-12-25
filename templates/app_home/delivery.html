@@ -9,48 +9,53 @@
 {% block twitter_description %}Узнайте о доставке пиццы и других блюд Solo Pizza по Барановичам. Стоимость доставки 3 руб., при заказе от 20 руб. - доставка бесплатно!{% endblock %}
 
 {% block styles %}
-    <link rel="stylesheet" href="{% static 'css/contacts.css' %}">
+    <link rel="stylesheet" href="{% static 'css/promo_page.css' %}">
 {% endblock %}
 
 {% block main %}
     <main>
-        <div class="main-wrapper">
+        <section class="promo-section">
+        <div class="container">
             <div class="breadcrumbs">
                 <a href="{% url "app_home:home" %}" class="breadcrumb-link">Главная</a>
                 <span class="breadcrumb-separator"></span>
                 <span class="breadcrumb-item active">Доставка</span>
             </div>
 
-            <div class="delivery-page">
-                <h1 class="page-title">Доставка</h1>
+            <div class="promo-header">
+                <h1 class="promo-title">Доставка</h1>
                 <div class="divider"></div>
-
+            </div>
+            <div class="text-content">
                 <div class="delivery-info">
-                    <h2>Доставка по городу</h2>
+                    <h2 class="text-title">Доставка по городу</h2>
                     <p>Мы осуществляем доставку пиццы и других блюд по всему городу Барановичи.</p>
 
-                    <h3>Стоимость доставки</h3>
+                    <h2 class="text-title">Стоимость доставки</h2>
                     <ul>
                         <li>Доставка по городу - <strong>3 руб.</strong></li>
                         <li>При стоимости заказа <strong>более 20 руб.</strong> - доставка <strong>бесплатная</strong>!</li>
+                        <li>При стоимости заказа <strong>менее 25 руб.</strong> если в заказе блюда из категории "Фастфуд", "Бургеры", "Сковородки", "Напитки", "Соусы"- доставка <strong>платная</strong>!</li>
                     </ul>
 
-                    <h3>Адреса заведений</h3>
+                    <h2 class="text-title">Адреса заведений</h2>
                     <ul>
                         {% for branch in branches %}
                         <li>{{ branch.address }}</li>
                         {% endfor %}
                     </ul>
 
-                    <h3>Время доставки</h3>
+                    <h2 class="text-title">Время доставки</h2>
                     <p>Обычно доставка занимает от 30 до 45 минут в зависимости от адреса и загруженности.</p>
                 </div>
                 <div class="action-buttons">
                         <a href="{% url "app_home:home" %}">Заказать пиццу</a>
                         <a href="{% url 'app_home:contacts' %}">Наши контакты</a>
-                    </div>
+                </div>
             </div>
         </div>
+    </section>
+            
     </main>
 {% endblock %}
 

@@ -33,15 +33,11 @@ def select_branch(request):
         if branch_id:
             branch = CafeBranch.objects.get(id=branch_id)
             request.session["selected_branch_id"] = branch_id
-            messages.success(request, "Филиал изменен!", extra_tags="success")
+            messages.success(request, "Филиал изменен. Корзина очищена!", extra_tags="success")
 
-            # Проверяем, авторизован ли пользователь, прежде чем получать его корзину
+            # Очищаем корзину при смене филиала
             session_cart = SessionCart(request)
-            cart_items_from_session = list(session_cart)  # Get items from session cart
-            unavailable_items = validate_cart_items_for_branch(cart_items_from_session, branch)
-
-            if unavailable_items:
-                messages.warning(request, f"Некоторые товары в корзине недоступны в филиале '{branch.name}'. " "Пожалуйста, удалите их перед оформлением заказа.")
+            session_cart.clear()
 
             return redirect(request.META.get("HTTP_REFERER", "/"))
         else:
