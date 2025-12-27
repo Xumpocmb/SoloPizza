@@ -4,6 +4,8 @@ from datetime import timedelta
 from django.db import connection
 from .models import Order, OrderStatistic
 from django.db import models
+from django.db.models import Sum, Q, F, DecimalField
+from django.db.models.functions import Coalesce
 from decimal import Decimal
 import requests
 from django.conf import settings
@@ -89,20 +91,27 @@ def collect_order_statistics():
     Запускается ежедневно.
     """
     today = timezone.now().date()
-    
+
     # Фильтруем заказы за сегодняшний день со статусом, не равным 'Отменен'
     orders_today = Order.objects.filter(created_at__date=today).exclude(status='canceled')
-    
+
     # Считаем количество заказов
     orders_count = orders_today.count()
-    
-    # Считаем суммы по типам оплаты
-    total_cash = orders_today.filter(payment_method='cash').aggregate(total=models.Sum('total_price'))['total'] or Decimal('0.00')
-    total_card = orders_today.filter(payment_method='card').aggregate(total=models.Sum('total_price'))['total'] or Decimal('0.00')
-    
+
+    # Одним запросом считаем суммы по всем типам оплаты
+    aggregates = orders_today.aggregate(
+        total_cash=Coalesce(Sum('total_price', filter=Q(payment_method='cash')), Decimal('0.00'), output_field=DecimalField()),
+        total_card=Coalesce(Sum('total_price', filter=Q(payment_method='card')), Decimal('0.00'), output_field=DecimalField()),
+        total_noname=Coalesce(Sum('total_price', filter=Q(payment_method='noname')), Decimal('0.00'), output_field=DecimalField())
+    )
+
+    total_cash = aggregates['total_cash']
+    total_card = aggregates['total_card']
+    total_noname = aggregates['total_noname']
+
     # Общая сумма
-    total_amount = total_cash + total_card
-    
+    total_amount = total_cash + total_card + total_noname
+
     # Создаем или обновляем запись в статистике
     statistic, created = OrderStatistic.objects.update_or_create(
         date=today,
@@ -110,10 +119,11 @@ def collect_order_statistics():
             'orders_count': orders_count,
             'total_cash': total_cash,
             'total_card': total_card,
+            'total_noname': total_noname,
             'total_amount': total_amount,
         }
     )
-    
+
     if created:
         return f"Статистика за {today} создана. Заказов: {orders_count}, общая сумма: {total_amount}."
     else:

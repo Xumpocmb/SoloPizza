@@ -32,7 +32,7 @@
 .statistics-table .table-header,
 .statistics-table .table-row {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr; /* 5 колонок с динамической шириной */
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr; /* 6 колонок с динамической шириной */
     padding: 12px 15px;
     align-items: center;
 }

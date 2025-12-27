@@ -375,6 +375,7 @@ class OrderStatistic(models.Model):
     orders_count = models.PositiveIntegerField(verbose_name="Количество заказов")
     total_cash = models.DecimalField(max_digits=12, decimal_places=2, default=0, verbose_name="Сумма (наличные)")
     total_card = models.DecimalField(max_digits=12, decimal_places=2, default=0, verbose_name="Сумма (карта)")
+    total_noname = models.DecimalField(max_digits=12, decimal_places=2, default=0, verbose_name="Сумма (безнал)")
     total_amount = models.DecimalField(max_digits=12, decimal_places=2, verbose_name="Итоговая сумма")
 
     class Meta:

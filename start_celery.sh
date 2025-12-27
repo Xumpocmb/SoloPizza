@@ -13,14 +13,21 @@ if [ ! -f "celery_app.py" ]; then
     exit 1
 fi
 
-# Проверяем, существует ли виртуальное окружение
-if [ ! -d "venv" ]; then
-    echo "❌ Виртуальное окружение 'venv' не найдено"
+# Ищем виртуальное окружение
+VENV_DIR=""
+if [ -d "venv" ]; then
+    VENV_DIR="venv"
+elif [ -d ".venv" ]; then
+    VENV_DIR=".venv"
+else
+    echo "❌ Виртуальное окружение 'venv' или '.venv' не найдено"
     exit 1
 fi
 
+echo "✅ Найдено виртуальное окружение: $VENV_DIR"
+
 # Активировать виртуальное окружение
-source venv/bin/activate || { echo "❌ Не удалось активировать виртуальное окружение"; exit 1; }
+source "$VENV_DIR/bin/activate" || { echo "❌ Не удалось активировать виртуальное окружение"; exit 1; }
 
 # Создать папку для логов (если её нет)
 mkdir -p logs
