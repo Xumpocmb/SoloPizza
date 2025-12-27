@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Order, OrderItem
+from .models import Order, OrderItem, OrderStatistic
 
 
 class OrderItemInline(admin.TabularInline):
@@ -88,3 +88,13 @@ class OrderAdmin(admin.ModelAdmin):
         return "\n".join(summary)
 
     display_order_summary.short_description = 'Состав заказа'
+
+
+@admin.register(OrderStatistic)
+class OrderStatisticAdmin(admin.ModelAdmin):
+    list_display = ('date', 'orders_count', 'total_cash', 'total_card', 'total_amount')
+    list_filter = ('date',)
+    search_fields = ('date',)
+    date_hierarchy = 'date'
+    ordering = ('-date',)
+

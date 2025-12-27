@@ -1,0 +1,108 @@
+/* Стили для страницы статистики заказов */
+
+/* Стили для кнопки сброса фильтра */
+.filter-button.reset-button {
+    background-color: var(--text-muted);
+    color: white;
+    margin-left: 10px;
+}
+
+.filter-button.reset-button:hover {
+    background-color: #868e96; /* Немного темнее */
+}
+
+/* Дополнительные стили для группы фильтров на странице статистики */
+.order-controls .filter-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.order-controls .filter-group label {
+    font-weight: 500;
+}
+
+/* Стили для таблицы статистики */
+.statistics-table {
+    margin-bottom: 30px;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+}
+
+.statistics-table .table-header,
+.statistics-table .table-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr; /* 5 колонок с динамической шириной */
+    padding: 12px 15px;
+    align-items: center;
+}
+
+.statistics-table .table-header {
+    background-color: var(--accent-color);
+    color: white;
+    font-weight: 600;
+}
+
+.statistics-table .table-row {
+    border-bottom: 1px solid var(--hover-bg);
+    transition: background-color 0.2s;
+}
+
+.statistics-table .table-row:hover {
+    background-color: var(--hover-bg);
+}
+
+.statistics-table .header-cell,
+.statistics-table .table-cell {
+    padding: 5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.statistics-table .header-cell a {
+    color: white;
+    text-decoration: none;
+}
+
+.statistics-table .header-cell a:hover {
+    text-decoration: underline;
+}
+
+/* Адаптивность для таблицы статистики */
+@media screen and (max-width: 992px) {
+    .statistics-table .table-header {
+        display: none; /* Скрываем заголовки на мобильных */
+    }
+
+    .statistics-table .table-row {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        padding: 15px;
+        margin-bottom: 15px;
+        border-radius: var(--border-radius);
+        background-color: var(--card-bg);
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    .statistics-table .table-cell {
+        padding: 10px 5px;
+        display: flex;
+        align-items: center;
+        border-bottom: 1px solid var(--hover-bg);
+        width: 100%;
+    }
+
+    .statistics-table .table-cell:last-child {
+        border-bottom: none;
+    }
+
+    .statistics-table .table-cell::before {
+        content: attr(data-label);
+        font-weight: bold;
+        width: 40%;
+        margin-right: 10px;
+        flex-shrink: 0;
+        color: var(--text-muted);
+    }
+}

@@ -79,19 +79,21 @@
                         <h2 class="section-title">Способ оплаты</h2>
 
                         <div class="options-group">
-                            {% for choice in form.payment_method %}
-                                <div class="option-item">
-                                    {{ choice.tag }}
-                                    <label for="{{ choice.id_for_label }}" class="option-label">
-                                        <span class="option-title">{{ choice.choice_label }}</span>
-                                        {% if choice.data.value == 'cash' %}
-                                            <span class="option-description">Оплата наличными при получении</span>
-                                        {% else %}
-                                            <span class="option-description">Оплата картой при получении</span>
-                                        {% endif %}
-                                    </label>
-                                </div>
-                            {% endfor %}
+                        {% for choice in form.payment_method %}
+                            <div class="option-item">
+                                {{ choice.tag }}
+                                <label for="{{ choice.id_for_label }}" class="option-label">
+                                    <span class="option-title">{{ choice.choice_label }}</span>
+                                    {% if choice.data.value == 'cash' %}
+                                        <span class="option-description">Оплата наличными при получении</span>
+                                    {% elif choice.data.value == 'card' %}
+                                        <span class="option-description">Оплата картой при получении</span>
+                                    {% elif choice.data.value == 'noname' %}
+                                        <span class="option-description">Безналичный расчет</span>
+                                    {% endif %}
+                                </label>
+                            </div>
+                        {% endfor %}
                             {{ form.payment_method.errors }}
                         </div>
                     </div>

@@ -70,7 +70,6 @@
             {% endfor %}
         </div>
     </div>
-
     
     <div class="has-submenu">
         <button onclick="toggleSubmenu('aboutSub')">О нас ▾</button>
@@ -81,13 +80,8 @@
             <a href="{% url 'app_home:delivery' %}">Доставка</a>
             <a href="{% url 'app_reviews:review_list' %}">Отзывы</a>
             <a href="{% url 'app_home:vacancy_list' %}">Вакансии</a>
-            <a href="{% url 'app_home:partners' %}">Партнеры</a>
-            {% if user.is_superuser %}
-            <a href="{% url 'app_reviews:moderation_list' %}">Модерация</a>
-            {% endif %}
         </div>
     </div>
-
 
     <div class="has-submenu">
         <button onclick="toggleSubmenu('profileSub')">{% if user.is_authenticated %}{{ user.username }}{% else %}Профиль{% endif %} ▾</button>
@@ -97,6 +91,8 @@
                     <a href="{% url 'admin:index' %}" target="_blank">Админ-панель</a>
                     <a href="{% url 'app_home:utm_analytics' %}">UTM Аналитика</a>
                     <a href="{% url 'socialaccount_connections' %}">Управление социальными аккаунтами</a>
+                    <a href="{% url 'app_reviews:moderation_list' %}">Модерация</a>
+                    <a href="{% url 'app_order:order_statistics' %}">Статистика</a>
                 {% endif %}
                 <a href="{% url 'app_cart:view_cart' %}">Корзина</a>
                 <a href="{% url 'app_order:order_list' %}">Заказы</a>

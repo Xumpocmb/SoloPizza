@@ -14,7 +14,7 @@ from app_cart.session_cart import SessionCart  # Import SessionCart
 from app_cart.utils import validate_cart_items_for_branch
 from app_home.models import CafeBranch, WorkingHours
 from app_order.forms import CheckoutForm, OrderEditForm, OrderItemFormSet, AddToOrderForm
-from app_order.models import OrderItem, Order
+from app_order.models import OrderItem, Order, OrderStatistic
 from app_home.models import OrderAvailability
 from decimal import Decimal, ROUND_HALF_UP
 from django.conf import settings
@@ -602,3 +602,46 @@ def print_check_fastfood_only(request, order_id):
         "branch": order.branch,  # Передаем филиал для доступа к настройкам печати
     }
     return render(request, "app_order/print_check.html", context)
+
+
+@login_required
+def order_statistics_view(request):
+    if not request.user.is_staff:
+        return HttpResponseForbidden("Доступ запрещен")
+
+    statistics_list = OrderStatistic.objects.all()
+
+    # Filtering
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
+    if start_date:
+        statistics_list = statistics_list.filter(date__gte=start_date)
+    if end_date:
+        statistics_list = statistics_list.filter(date__lte=end_date)
+
+    # Sorting
+    sort_by = request.GET.get('sort', 'date')
+    sort_dir = request.GET.get('dir', 'desc')
+
+    if sort_dir == 'asc':
+        statistics_list = statistics_list.order_by(sort_by)
+    else:
+        statistics_list = statistics_list.order_by(f'-{sort_by}')
+        
+    paginator = Paginator(statistics_list, 30)  # 30 записей на страницу
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'page_obj': page_obj,
+        'sort_by': sort_by,
+        'sort_dir': sort_dir,
+        'start_date': start_date,
+        'end_date': end_date,
+        'breadcrumbs': [
+            {"title": "Главная", "url": "/"},
+            {"title": "Статистика заказов", "url": "#"}
+        ]
+    }
+    return render(request, 'app_order/order_statistics.html', context)

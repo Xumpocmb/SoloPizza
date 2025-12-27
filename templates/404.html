@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Страница не найдена (404){% endblock %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/404.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-404">
+    <div class="content-404">
+        <h1 class="title-404">404</h1>
+        <p class="subtitle-404">Упс! Страница не найдена.</p>
+        <p class="description-404">
+            Похоже, мы не можем найти то, что вы ищете.
+            Возможно, страница была перемещена или удалена.
+        </p>
+        <a href="{% url 'app_home:home' %}" class="btn btn-primary btn-404">Вернуться на главную</a>
+    </div>
+</div>
+{% endblock %}

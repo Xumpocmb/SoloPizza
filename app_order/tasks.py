@@ -2,7 +2,9 @@ from celery import shared_task
 from django.utils import timezone
 from datetime import timedelta
 from django.db import connection
-from .models import Order
+from .models import Order, OrderStatistic
+from django.db import models
+from decimal import Decimal
 import requests
 from django.conf import settings
 
@@ -78,3 +80,41 @@ def send_order_notification(order_id):
         return f"Объект Order с id {order_id} не найден"
     except Exception as e:
         return f"Ошибка при отправке уведомления: {str(e)}"
+
+
+@shared_task
+def collect_order_statistics():
+    """
+    Собирает статистику по заказам за текущий день и сохраняет ее в БД.
+    Запускается ежедневно.
+    """
+    today = timezone.now().date()
+    
+    # Фильтруем заказы за сегодняшний день со статусом, не равным 'Отменен'
+    orders_today = Order.objects.filter(created_at__date=today).exclude(status='canceled')
+    
+    # Считаем количество заказов
+    orders_count = orders_today.count()
+    
+    # Считаем суммы по типам оплаты
+    total_cash = orders_today.filter(payment_method='cash').aggregate(total=models.Sum('total_price'))['total'] or Decimal('0.00')
+    total_card = orders_today.filter(payment_method='card').aggregate(total=models.Sum('total_price'))['total'] or Decimal('0.00')
+    
+    # Общая сумма
+    total_amount = total_cash + total_card
+    
+    # Создаем или обновляем запись в статистике
+    statistic, created = OrderStatistic.objects.update_or_create(
+        date=today,
+        defaults={
+            'orders_count': orders_count,
+            'total_cash': total_cash,
+            'total_card': total_card,
+            'total_amount': total_amount,
+        }
+    )
+    
+    if created:
+        return f"Статистика за {today} создана. Заказов: {orders_count}, общая сумма: {total_amount}."
+    else:
+        return f"Статистика за {today} обновлена. Заказов: {orders_count}, общая сумма: {total_amount}."

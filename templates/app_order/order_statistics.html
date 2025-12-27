@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}Статистика заказов - Solo Pizza{% endblock %}
+
+{% block meta_description %}Статистика заказов Solo Pizza - просмотрите данные о количестве и суммах заказов по дням.{% endblock %}
+{% block meta_keywords %}статистика заказов, аналитика заказов, Solo Pizza статистика{% endblock %}
+{% block og_description %}Статистика заказов Solo Pizza - просмотрите данные о количестве и суммах заказов по дням.{% endblock %}
+{% block twitter_description %}Статистика заказов Solo Pizza - просмотрите данные о количестве и суммах заказов по дням.{% endblock %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'css/order_list.css' %}">
+    <link rel="stylesheet" href="{% static 'css/order_statistics.css' %}">
+{% endblock %}
+
+{% block main %}
+<main class="order-list-page">
+    {% if breadcrumbs %}
+        <div class="breadcrumbs">
+            {% for crumb in breadcrumbs %}
+                {% if crumb.url != '#' %}
+                    <a href="{{ crumb.url }}" class="breadcrumb-link">{{ crumb.title }}</a>
+                {% else %}
+                    <span class="breadcrumb-current">{{ crumb.title }}</span>
+                {% endif %}
+                {% if not forloop.last %}
+                    <span class="breadcrumb-separator">›</span>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="order-list-container">
+        <h1 class="page-title">Статистика заказов</h1>
+
+        <div class="order-controls">
+            <form method="get" class="search-form">
+                <div class="filter-group">
+                    <label for="start_date">С:</label>
+                    <input type="date" name="start_date" id="start_date" class="status-filter" value="{{ start_date|default:'' }}">
+                </div>
+                <div class="filter-group">
+                    <label for="end_date">По:</label>
+                    <input type="date" name="end_date" id="end_date" class="status-filter" value="{{ end_date|default:'' }}">
+                </div>
+                <div class="filter-group">
+                    <button type="submit" class="filter-button">Применить</button>
+                    <a href="{% url 'app_order:order_statistics' %}" class="filter-button reset-button">Сбросить</a>
+                </div>
+            </form>
+        </div>
+
+        <div class="statistics-table">
+            <div class="table-header">
+                <div class="header-cell">
+                    <a href="?sort=date&dir={% if sort_by == 'date' and sort_dir == 'asc' %}desc{% else %}asc{% endif %}&start_date={{ start_date|default:'' }}&end_date={{ end_date|default:'' }}">
+                        Дата
+                        {% if sort_by == 'date' %}{% if sort_dir == 'asc' %}▲{% else %}▼{% endif %}{% endif %}
+                    </a>
+                </div>
+                <div class="header-cell">
+                    <a href="?sort=orders_count&dir={% if sort_by == 'orders_count' and sort_dir == 'asc' %}desc{% else %}asc{% endif %}&start_date={{ start_date|default:'' }}&end_date={{ end_date|default:'' }}">
+                        Кол-во заказов
+                        {% if sort_by == 'orders_count' %}{% if sort_dir == 'asc' %}▲{% else %}▼{% endif %}{% endif %}
+                    </a>
+                </div>
+                <div class="header-cell">
+                    <a href="?sort=total_cash&dir={% if sort_by == 'total_cash' and sort_dir == 'asc' %}desc{% else %}asc{% endif %}&start_date={{ start_date|default:'' }}&end_date={{ end_date|default:'' }}">
+                        Сумма (наличные)
+                        {% if sort_by == 'total_cash' %}{% if sort_dir == 'asc' %}▲{% else %}▼{% endif %}{% endif %}
+                    </a>
+                </div>
+                <div class="header-cell">
+                    <a href="?sort=total_card&dir={% if sort_by == 'total_card' and sort_dir == 'asc' %}desc{% else %}asc{% endif %}&start_date={{ start_date|default:'' }}&end_date={{ end_date|default:'' }}">
+                        Сумма (карта)
+                        {% if sort_by == 'total_card' %}{% if sort_dir == 'asc' %}▲{% else %}▼{% endif %}{% endif %}
+                    </a>
+                </div>
+                <div class="header-cell">
+                    <a href="?sort=total_amount&dir={% if sort_by == 'total_amount' and sort_dir == 'asc' %}desc{% else %}asc{% endif %}&start_date={{ start_date|default:'' }}&end_date={{ end_date|default:'' }}">
+                        Итоговая сумма
+                        {% if sort_by == 'total_amount' %}{% if sort_dir == 'asc' %}▲{% else %}▼{% endif %}{% endif %}
+                    </a>
+                </div>
+            </div>
+
+            {% for stat in page_obj %}
+            <div class="table-row">
+                <div class="table-cell" data-label="Дата">{{ stat.date|date:"d.m.Y" }}</div>
+                <div class="table-cell" data-label="Кол-во заказов">{{ stat.orders_count }}</div>
+                <div class="table-cell" data-label="Сумма (наличные)">{{ stat.total_cash|format_price }}</div>
+                <div class="table-cell" data-label="Сумма (карта)">{{ stat.total_card|format_price }}</div>
+                <div class="table-cell" data-label="Итоговая сумма">{{ stat.total_amount|format_price }}</div>
+            </div>
+            {% empty %}
+                <div class="no-orders">
+                    <p>Нет данных для отображения.</p>
+                </div>
+            {% endfor %}
+        </div>
+
+        {% if page_obj.has_other_pages %}
+            <div class="pagination">
+                {% if page_obj.has_previous %}
+                    <a href="?page=1&sort={{ sort_by }}&dir={{ sort_dir }}&start_date={{ start_date|default:'' }}&end_date={{ end_date|default:'' }}" class="page-link first-page">
+                        <i class="fas fa-angle-double-left"></i>
+                    </a>
+                    <a href="?page={{ page_obj.previous_page_number }}&sort={{ sort_by }}&dir={{ sort_dir }}&start_date={{ start_date|default:'' }}&end_date={{ end_date|default:'' }}" class="page-link">
+                        <i class="fas fa-angle-left"></i>
+                    </a>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                        <span class="page-link current-page">{{ num }}</span>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <a href="?page={{ num }}&sort={{ sort_by }}&dir={{ sort_dir }}&start_date={{ start_date|default:'' }}&end_date={{ end_date|default:'' }}" class="page-link">{{ num }}</a>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}&sort={{ sort_by }}&dir={{ sort_dir }}&start_date={{ start_date|default:'' }}&end_date={{ end_date|default:'' }}" class="page-link">
+                        <i class="fas fa-angle-right"></i>
+                    </a>
+                    <a href="?page={{ page_obj.paginator.num_pages }}&sort={{ sort_by }}&dir={{ sort_dir }}&start_date={{ start_date|default:'' }}&end_date={{ end_date|default:'' }}" class="page-link last-page">
+                        <i class="fas fa-angle-double-right"></i>
+                    </a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</main>
+{% endblock %}
+
+{% block scripts %}
+{% endblock %}

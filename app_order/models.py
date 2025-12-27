@@ -84,7 +84,7 @@ class Order(models.Model):
     PAYMENT_CHOICES = [
         ("cash", "Наличные"),
         ("card", "Карта"),
-        # ('card_online', 'Карта онлайн'),
+        ('noname', 'Безналичный расчет'),
     ]
 
     DELIVERY_CHOICES = [
@@ -367,3 +367,20 @@ def update_order_on_addons_change(sender, instance, action, **kwargs):
     """Обновляет итоги заказа при изменении добавок в позиции заказа"""
     if action in ['post_add', 'post_remove', 'post_clear']:
         instance.order.update_order_items()
+
+
+class OrderStatistic(models.Model):
+    """Модель для хранения статистики по заказам за день."""
+    date = models.DateField(unique=True, verbose_name="Дата")
+    orders_count = models.PositiveIntegerField(verbose_name="Количество заказов")
+    total_cash = models.DecimalField(max_digits=12, decimal_places=2, default=0, verbose_name="Сумма (наличные)")
+    total_card = models.DecimalField(max_digits=12, decimal_places=2, default=0, verbose_name="Сумма (карта)")
+    total_amount = models.DecimalField(max_digits=12, decimal_places=2, verbose_name="Итоговая сумма")
+
+    class Meta:
+        verbose_name = "Статистика по заказам"
+        verbose_name_plural = "Статистика по заказам"
+        ordering = ['-date']
+
+    def __str__(self):
+        return f"Статистика за {self.date.strftime('%d.%m.%Y')}"
