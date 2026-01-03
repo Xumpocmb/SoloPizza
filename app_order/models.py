@@ -1,4 +1,5 @@
 from decimal import Decimal
+import json
 from django.db import models
 from django.conf import settings
 from django.db.models.signals import post_save, post_delete, m2m_changed
@@ -8,6 +9,13 @@ from django.contrib.auth import get_user_model # Import get_user_model
 
 User = get_user_model() # Get the User model
 from app_home.models import CafeBranch, Discount
+
+
+class DecimalEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, Decimal):
+            return str(o)
+        return super().default(o)
 
 
 class OrderManager(models.Manager):
@@ -377,6 +385,7 @@ class OrderStatistic(models.Model):
     total_card = models.DecimalField(max_digits=12, decimal_places=2, default=0, verbose_name="Сумма (карта)")
     total_noname = models.DecimalField(max_digits=12, decimal_places=2, default=0, verbose_name="Сумма (безнал)")
     total_amount = models.DecimalField(max_digits=12, decimal_places=2, verbose_name="Итоговая сумма")
+    sold_items = models.JSONField(default=dict, verbose_name="Проданные товары", encoder=DecimalEncoder)
 
     class Meta:
         verbose_name = "Статистика по заказам"

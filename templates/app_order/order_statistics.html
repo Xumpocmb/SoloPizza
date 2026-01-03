@@ -89,6 +89,7 @@
                         {% if sort_by == 'total_amount' %}{% if sort_dir == 'asc' %}▲{% else %}▼{% endif %}{% endif %}
                     </a>
                 </div>
+                <div class="header-cell">Проданные товары</div>
             </div>
 
             {% for stat in page_obj %}
@@ -99,6 +100,27 @@
                 <div class="table-cell" data-label="Сумма (карта)">{{ stat.total_card|format_price }}</div>
                 <div class="table-cell" data-label="Сумма (безнал)">{{ stat.total_noname|format_price }}</div>
                 <div class="table-cell" data-label="Итоговая сумма">{{ stat.total_amount|format_price }}</div>
+                <div class="table-cell" data-label="Проданные товары">
+                    {% if stat.sold_items %}
+                        <button class="toggle-details-button" onclick="toggleDetails(this)">Показать товары</button>
+                        <div class="sold-items-details" style="display: none;">
+                            <ul>
+                                {% for item_name, item_data in stat.sold_items.items %}
+                                    <li>
+                                        <strong>{{ item_name }}</strong> ({{ item_data.quantity }} шт.)
+                                        <ul>
+                                            {% for method, qty in item_data.payment_methods.items %}
+                                                <li>{{ method }}: {{ qty }} р.</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% else %}
+                        Нет проданных товаров.
+                    {% endif %}
+                </div>
             </div>
             {% empty %}
                 <div class="no-orders">
@@ -141,4 +163,16 @@
 {% endblock %}
 
 {% block scripts %}
+<script>
+    function toggleDetails(button) {
+        const detailsDiv = button.nextElementSibling;
+        if (detailsDiv.style.display === "none") {
+            detailsDiv.style.display = "block";
+            button.textContent = "Скрыть товары";
+        } else {
+            detailsDiv.style.display = "none";
+            button.textContent = "Показать товары";
+        }
+    }
+</script>
 {% endblock %}

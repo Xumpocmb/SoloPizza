@@ -2,7 +2,7 @@ from celery import shared_task
 from django.utils import timezone
 from datetime import timedelta
 from django.db import connection
-from .models import Order, OrderStatistic
+from .models import Order, OrderStatistic, OrderItem
 from django.db import models
 from django.db.models import Sum, Q, F, DecimalField
 from django.db.models.functions import Coalesce
@@ -112,6 +112,25 @@ def collect_order_statistics():
     # Общая сумма
     total_amount = total_cash + total_card + total_noname
 
+    # Сбор статистики по проданным товарам
+    sold_items_stats = {}
+    order_items = OrderItem.objects.filter(order__in=orders_today).select_related('product', 'variant', 'order')
+
+    for item in order_items:
+        item_name = f"{item.product.name} ({item.get_size_display()})"
+        if item_name not in sold_items_stats:
+            sold_items_stats[item_name] = {'quantity': 0, 'payment_methods': {}}
+        
+        sold_items_stats[item_name]['quantity'] += item.quantity
+        payment_method = item.order.get_payment_method_display()
+        
+        # Get the final total for the item
+        item_final_total = item.calculate_item_total()['final_total']
+
+        if payment_method not in sold_items_stats[item_name]['payment_methods']:
+            sold_items_stats[item_name]['payment_methods'][payment_method] = Decimal('0.00')
+        sold_items_stats[item_name]['payment_methods'][payment_method] += item_final_total
+
     # Создаем или обновляем запись в статистике
     statistic, created = OrderStatistic.objects.update_or_create(
         date=today,
@@ -121,6 +140,7 @@ def collect_order_statistics():
             'total_card': total_card,
             'total_noname': total_noname,
             'total_amount': total_amount,
+            'sold_items': sold_items_stats,
         }
     )
 
