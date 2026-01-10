@@ -107,7 +107,7 @@
                             <ul>
                                 {% for item_name, item_data in stat.sold_items.items %}
                                     <li>
-                                        <strong>{{ item_name }}</strong> ({{ item_data.quantity }} р.)
+                                        <strong>{{ item_name }}</strong> ({{ item_data.quantity }} шт.)
                                         <ul>
                                             {% for method, qty in item_data.payment_methods.items %}
                                                 <li>{{ method }}: {{ qty }} р.</li>
