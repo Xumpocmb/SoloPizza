@@ -22,19 +22,19 @@ def clear_orders():
     all_orders = Order.objects.all()
     count = all_orders.count()
     all_orders.delete()
-    
+
     # Сбрасываем счетчик ID для таблицы заказов
     with connection.cursor() as cursor:
         # Определяем имя таблицы заказов
         table_name = Order._meta.db_table
-        
+
         # Для SQLite
-        if connection.vendor == 'sqlite':
+        if connection.vendor == "sqlite":
             cursor.execute(f"DELETE FROM sqlite_sequence WHERE name='{table_name}';")
         # Для PostgreSQL (закомментировано, но оставлено для будущего использования)
         # elif connection.vendor == 'postgresql':
         #     cursor.execute(f"ALTER SEQUENCE {table_name}_id_seq RESTART WITH 1;")
-    
+
     return f"Удалено {count} заказов. Счетчик ID сброшен."
 
 
@@ -44,30 +44,29 @@ def send_order_notification(order_id):
     Отправляет уведомление о новом заказе в Telegram
     """
     try:
-        order = Order.objects.select_related('branch').get(id=order_id)
-        
+        order = Order.objects.select_related("branch").get(id=order_id)
+
         # Получаем токен и ID чата из настроек
-        bot_token = getattr(settings, 'BOT_TOKEN', None)
-        chat_id = getattr(settings, 'CHAT_ID', None)
-        
+        bot_token = getattr(settings, "BOT_TOKEN", None)
+        chat_id = getattr(settings, "CHAT_ID", None)
+
         if not bot_token or not chat_id:
             return "Отсутствуют настройки для уведомлений в Telegram"
-        
+
         # Формируем сообщение
-        order_text = (f'ФИЛИАЛ: {order.branch.name}\n\n'
-                      f'Заказ {order.id}\n'
-                      f'Способ доставки: {dict(Order.DELIVERY_CHOICES)[order.delivery_type]}\n'
-                      f'Телефон: {order.phone_number}\n'
-                      f'Создан: {timezone.localtime(order.created_at).strftime("%d.%m.%Y %H:%M:%S")}\n'
-                      f'\nПодробности: https://solo-pizza.by/order/order/{order.id}/')
-        
+        order_text = (
+            f"ФИЛИАЛ: {order.branch.name}\n\n"
+            f"Заказ {order.id}\n"
+            f"Способ доставки: {dict(Order.DELIVERY_CHOICES)[order.delivery_type]}\n"
+            f"Телефон: {order.phone_number}\n"
+            f'Создан: {timezone.localtime(order.created_at).strftime("%d.%m.%Y %H:%M:%S")}\n'
+            f"\nПодробности: https://solo-pizza.by/order/order/{order.id}/"
+        )
+
         # Отправляем сообщение в Telegram
-        url = f'https://api.telegram.org/bot{bot_token}/sendMessage'
-        params = {
-            'chat_id': chat_id,
-            'text': order_text
-        }
-        
+        url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+        params = {"chat_id": chat_id, "text": order_text}
+
         try:
             response = requests.get(url=url, params=params)
         except requests.exceptions.RequestException as e:
@@ -77,7 +76,7 @@ def send_order_notification(order_id):
             return f"Ошибка при отправке уведомления: {response.status_code} - {response.text}"
 
         return f"Уведомление о заказе #{order_id} отправлено"
-    
+
     except Order.DoesNotExist:
         return f"Объект Order с id {order_id} не найден"
     except Exception as e:
@@ -93,58 +92,78 @@ def collect_order_statistics():
     today = timezone.now().date()
 
     # Фильтруем заказы за сегодняшний день со статусом, не равным 'Отменен'
-    orders_today = Order.objects.filter(created_at__date=today).exclude(status='canceled')
+    orders_today = Order.objects.filter(created_at__date=today).exclude(status="canceled")
 
-    # Считаем количество заказов
-    orders_count = orders_today.count()
+    # Сбор статистики по филиалам
+    branch_stats = {}
 
-    # Одним запросом считаем суммы по всем типам оплаты
-    aggregates = orders_today.aggregate(
-        total_cash=Coalesce(Sum('total_price', filter=Q(payment_method='cash')), Decimal('0.00'), output_field=DecimalField()),
-        total_card=Coalesce(Sum('total_price', filter=Q(payment_method='card')), Decimal('0.00'), output_field=DecimalField()),
-        total_noname=Coalesce(Sum('total_price', filter=Q(payment_method='noname')), Decimal('0.00'), output_field=DecimalField())
-    )
+    for order in orders_today.select_related("branch"):
+        branch_id = order.branch.id
+        branch_name = order.branch.name
 
-    total_cash = aggregates['total_cash']
-    total_card = aggregates['total_card']
-    total_noname = aggregates['total_noname']
+        if branch_id not in branch_stats:
+            branch_stats[branch_id] = {
+                "name": branch_name,
+                "orders_count": 0,
+                "total_cash": Decimal("0.00"),
+                "total_card": Decimal("0.00"),
+                "total_noname": Decimal("0.00"),
+                "sold_items": {},
+            }
 
-    # Общая сумма
-    total_amount = total_cash + total_card + total_noname
+        # Увеличиваем количество заказов для филиала
+        branch_stats[branch_id]["orders_count"] += 1
 
-    # Сбор статистики по проданным товарам
-    sold_items_stats = {}
-    order_items = OrderItem.objects.filter(order__in=orders_today).select_related('product', 'variant', 'order')
+        # Добавляем сумму заказа к соответствующему методу оплаты
+        order_total = order.total_price
+        if order.payment_method == "cash":
+            branch_stats[branch_id]["total_cash"] += order_total
+        elif order.payment_method == "card":
+            branch_stats[branch_id]["total_card"] += order_total
+        elif order.payment_method == "noname":
+            branch_stats[branch_id]["total_noname"] += order_total
+
+    # Обработка позиций заказов для статистики по товарам
+    order_items = OrderItem.objects.filter(order__in=orders_today).select_related("product", "variant", "order__branch")
 
     for item in order_items:
+        branch_id = item.order.branch.id
         item_name = f"{item.product.name} ({item.get_size_display()})"
-        if item_name not in sold_items_stats:
-            sold_items_stats[item_name] = {'quantity': 0, 'payment_methods': {}}
-        
-        sold_items_stats[item_name]['quantity'] += item.quantity
-        payment_method = item.order.get_payment_method_display()
-        
-        # Get the final total for the item
-        item_final_total = item.calculate_item_total()['final_total']
 
-        if payment_method not in sold_items_stats[item_name]['payment_methods']:
-            sold_items_stats[item_name]['payment_methods'][payment_method] = Decimal('0.00')
-        sold_items_stats[item_name]['payment_methods'][payment_method] += item_final_total
+        if item_name not in branch_stats[branch_id]["sold_items"]:
+            branch_stats[branch_id]["sold_items"][item_name] = {"quantity": 0, "payment_methods": {}}
+
+        branch_stats[branch_id]["sold_items"][item_name]["quantity"] += item.quantity
+        payment_method = item.order.get_payment_method_display()
+
+        # Get the final total for the item
+        item_final_total = item.calculate_item_total()["final_total"]
+
+        if payment_method not in branch_stats[branch_id]["sold_items"][item_name]["payment_methods"]:
+            branch_stats[branch_id]["sold_items"][item_name]["payment_methods"][payment_method] = Decimal("0.00")
+        branch_stats[branch_id]["sold_items"][item_name]["payment_methods"][payment_method] += item_final_total
+
+    # Подсчет общих сумм для всех филиалов
+    total_orders_count = sum(branch["orders_count"] for branch in branch_stats.values())
+    total_cash = sum(branch["total_cash"] for branch in branch_stats.values())
+    total_card = sum(branch["total_card"] for branch in branch_stats.values())
+    total_noname = sum(branch["total_noname"] for branch in branch_stats.values())
+    total_amount = total_cash + total_card + total_noname
 
     # Создаем или обновляем запись в статистике
     statistic, created = OrderStatistic.objects.update_or_create(
         date=today,
         defaults={
-            'orders_count': orders_count,
-            'total_cash': total_cash,
-            'total_card': total_card,
-            'total_noname': total_noname,
-            'total_amount': total_amount,
-            'sold_items': sold_items_stats,
-        }
+            "orders_count": total_orders_count,
+            "total_cash": total_cash,
+            "total_card": total_card,
+            "total_noname": total_noname,
+            "total_amount": total_amount,
+            "sold_items": branch_stats,  # Теперь содержит статистику по филиалам
+        },
     )
 
     if created:
-        return f"Статистика за {today} создана. Заказов: {orders_count}, общая сумма: {total_amount}."
+        return f"Статистика за {today} создана. Заказов: {total_orders_count}, общая сумма: {total_amount}."
     else:
-        return f"Статистика за {today} обновлена. Заказов: {orders_count}, общая сумма: {total_amount}."
+        return f"Статистика за {today} обновлена. Заказов: {total_orders_count}, общая сумма: {total_amount}."

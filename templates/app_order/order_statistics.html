@@ -12,6 +12,67 @@
 {% block styles %}
     <link rel="stylesheet" href="{% static 'css/order_list.css' %}">
     <link rel="stylesheet" href="{% static 'css/order_statistics.css' %}">
+    <style>
+        .branch-section {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
+        .branch-name {
+            margin-top: 0;
+            color: #333;
+            font-size: 1.2em;
+        }
+
+        .branch-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .branch-stats p {
+            margin: 5px 0;
+            font-weight: bold;
+        }
+
+        .sold-items-list {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .item-entry {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .item-entry:last-child {
+            border-bottom: none;
+        }
+
+        .item-info {
+            font-weight: bold;
+        }
+
+        .payment-methods {
+            margin-top: 5px;
+        }
+
+        .method-item {
+            display: inline-block;
+            margin-right: 15px;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .no-items {
+            color: #999;
+            font-style: italic;
+        }
+    </style>
 {% endblock %}
 
 {% block main %}
@@ -104,18 +165,56 @@
                     {% if stat.sold_items %}
                         <button class="toggle-details-button" onclick="toggleDetails(this)">Показать товары</button>
                         <div class="sold-items-details" style="display: none;">
-                            <ul>
-                                {% for item_name, item_data in stat.sold_items.items %}
-                                    <li>
-                                        <strong>{{ item_name }}</strong> ({{ item_data.quantity }} шт.)
-                                        <ul>
-                                            {% for method, qty in item_data.payment_methods.items %}
-                                                <li>{{ method }}: {{ qty }} р.</li>
-                                            {% endfor %}
-                                        </ul>
-                                    </li>
+                            <!-- Проверяем, является ли структура статистики по филиалам -->
+                            {% if stat.sold_items|get_first_value|get_dict_value:"name" %}
+                                <!-- Структура по филиалам -->
+                                {% for branch_id, branch_data in stat.sold_items.items %}
+                                    <div class="branch-section">
+                                        <h4 class="branch-name">{{ branch_data.name }}</h4>
+                                        <div class="branch-stats">
+                                            <p><strong>Заказов:</strong> {{ branch_data.orders_count }}</p>
+                                            <p><strong>Наличные:</strong> {{ branch_data.total_cash|format_price }}</p>
+                                            <p><strong>Карта:</strong> {{ branch_data.total_card|format_price }}</p>
+                                            <p><strong>Безнал:</strong> {{ branch_data.total_noname|format_price }}</p>
+                                        </div>
+                                        {% if branch_data.sold_items %}
+                                            <h5>Проданные товары:</h5>
+                                            <ul class="sold-items-list">
+                                                {% for item_name, item_data in branch_data.sold_items.items %}
+                                                    <li class="item-entry">
+                                                        <div class="item-info">
+                                                            <strong>{{ item_name }}</strong> ({{ item_data.quantity }} шт.)
+                                                        </div>
+                                                        <div class="payment-methods">
+                                                            {% for method, amount in item_data.payment_methods.items %}
+                                                                <span class="method-item">{{ method }}: {{ amount|format_price }}</span>
+                                                            {% endfor %}
+                                                        </div>
+                                                    </li>
+                                                {% endfor %}
+                                            </ul>
+                                        {% else %}
+                                            <p class="no-items">Нет проданных товаров.</p>
+                                        {% endif %}
+                                    </div>
                                 {% endfor %}
-                            </ul>
+                            {% else %}
+                                <!-- Старая структура (до разделения по филиалам) -->
+                                <ul class="sold-items-list">
+                                    {% for item_name, item_data in stat.sold_items.items %}
+                                        <li class="item-entry">
+                                            <div class="item-info">
+                                                <strong>{{ item_name }}</strong> ({{ item_data.quantity }} шт.)
+                                            </div>
+                                            <div class="payment-methods">
+                                                {% for method, amount in item_data.payment_methods.items %}
+                                                    <span class="method-item">{{ method }}: {{ amount|format_price }}</span>
+                                                {% endfor %}
+                                            </div>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
                         </div>
                     {% else %}
                         Нет проданных товаров.
