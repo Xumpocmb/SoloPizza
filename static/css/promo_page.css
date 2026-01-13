@@ -1,260 +1,773 @@
-/* Основные стили */
+/* Общие стили для страниц с промо-информацией */
+
+/* Структура страницы */
 .promo-section {
-    padding: 2rem 0;
     background-color: var(--bg-color);
-    color: var(--text-color);
+    padding: 40px 0;
 }
 
 .container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 1rem;
+    padding: 0 15px;
 }
 
 .promo-header {
-    text-align: center;
-    margin-bottom: 2rem;
+    margin-bottom: 30px;
 }
 
 .promo-title {
-    font-size: 2.5rem;
     color: var(--accent-color);
-    margin-bottom: 1rem;
+    text-align: center;
+    margin-bottom: 15px;
+    font-size: 2.2rem;
+    font-weight: 700;
+    text-align: center;
 }
 
 .divider {
     height: 3px;
     background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
-    margin: 0 auto;
+    margin: 0 auto 30px;
     width: 80%;
 }
 
-/* Карточки акций */
-.promo-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
-    margin-top: 2rem;
+.promo-description {
+    margin-bottom: 30px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 1.1rem;
 }
 
+.text-content {
+    margin-bottom: 30px;
+}
+
+.text-title {
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    color: var(--accent-color);
+    border-bottom: 2px solid var(--hover-bg);
+    padding-bottom: 10px;
+}
+
+/* Хлебные крошки */
+.breadcrumbs {
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+}
+
+.breadcrumb-link {
+    color: var(--text-muted);
+    text-decoration: none;
+}
+
+.breadcrumb-link:hover {
+    color: var(--accent-color);
+    text-decoration: underline;
+}
+
+.breadcrumb-separator {
+    margin: 0 8px;
+    color: var(--text-muted);
+}
+
+.current-page {
+    color: var(--accent-color);
+    font-weight: 500;
+}
+
+/* Стили для карточек */
 .promo-card {
-    background-color: var(--card-bg);
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease;
+    background: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 25px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 2px solid transparent;
+    position: relative;
 }
 
 .promo-card:hover {
     transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+    border: 2px solid var(--accent-color);
 }
 
 .promo-card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1.5rem;
-    background-color: var(--accent-color);
-    color: white;
+    margin-bottom: 15px;
 }
 
 .promo-card-title {
     margin: 0;
-    font-size: 1.5rem;
+    color: var(--accent-color);
+    font-size: 1.4rem;
+}
+
+.promo-card-content {
+    padding-top: 15px;
+}
+
+.promo-description {
+    margin-bottom: 15px;
+    line-height: 1.6;
+    color: var(--text-muted);
 }
 
 .promo-badge {
-    background-color: white;
+    background: var(--accent-color-rgba);
     color: var(--accent-color);
-    padding: 0.3rem 0.8rem;
+    padding: 5px 10px;
     border-radius: 20px;
     font-weight: bold;
     font-size: 0.9rem;
 }
 
-.promo-card-content {
-    padding: 1.5rem;
-}
-
-.promo-description {
-    margin-bottom: 1.5rem;
-    line-height: 1.6;
-}
-
-.promo-description i {
-    margin-right: 0.5rem;
-    color: var(--accent-color);
-}
-
-/* Стили для списка */
+/* Стили для списка промо-элементов */
 .promo-list {
     list-style: none;
     padding: 0;
-    margin: 2rem 0;
 }
 
 .promo-list-item {
-    background-color: var(--card-bg);
-    border-radius: 10px;
-    padding: 1.5rem;
-    margin-bottom: 1rem;
-    box-shadow: 0 2px 8px rgba(0, 0, 0.1);
+    background: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 20px;
+    margin-bottom: 15px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
 }
 
 .promo-list-item:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateX(5px);
 }
 
 .promo-list-title {
-    margin: 0;
-    font-size: 1.3rem;
-    color: var(--text-color);
-}
-
-.promo-list-item a {
+    margin-top: 0;
     color: var(--accent-color);
-    text-decoration: none;
-    font-weight: 500;
-    padding: 0.5rem 1rem;
-    border: 2px solid var(--accent-color);
-    border-radius: 5px;
-    transition: all 0.3s ease;
+    font-size: 1.3rem;
 }
 
-.promo-list-item a:hover {
-    background-color: var(--accent-color);
-    color: white;
+/* Стили для сетки */
+.promo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 25px;
+    align-items: stretch;
 }
 
-/* Изображения */
-.promo-image-container {
-    position: relative;
-    border-radius: 8px;
+/* Стили для вакансий */
+.vacancies-section {
+    background-color: var(--bg-color);
+    padding: 40px 0;
+}
+
+.vacancies-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.vacancies-title {
+    color: var(--accent-color);
+    text-align: center;
+    margin-bottom: 15px;
+    font-size: 2.5rem;
+}
+
+.vacancies-subtitle {
+    color: var(--text-muted);
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto 30px;
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+.vacancies-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 25px;
+    align-items: stretch;
+}
+
+/* Стили для карточки вакансии */
+.vacancy-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: var(--card-bg);
+    border-radius: var(--border-radius);
     overflow: hidden;
-    margin-top: 1rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s, border 0.3s;
+    border: 2px solid transparent;
+    position: relative;
 }
 
-.promo-image {
+.vacancy-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    border: 2px solid var(--accent-color);
+}
+
+.vacancy-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
-    height: auto;
-    display: block;
+    height: 5px;
+    background: var(--accent-color);
+    transform: scaleX(0);
+    transform-origin: left;
     transition: transform 0.3s ease;
 }
 
-.promo-image:hover {
-    transform: scale(1.03);
+.vacancy-card:hover::before {
+    transform: scaleX(1);
 }
 
-.promo-overlay {
+.vacancy-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.vacancy-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.vacancy-title {
+    color: var(--accent-color);
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.4rem;
+    font-weight: 600;
+    position: relative;
+    padding-bottom: 8px;
+}
+
+.vacancy-title::after {
+    content: '';
     position: absolute;
     bottom: 0;
     left: 0;
-    right: 0;
-    background: rgba(0, 0, 0, 0.7);
-    color: white;
-    padding: 0.8rem;
-    display: flex;
-    justify-content: space-between;
+    width: 40px;
+    height: 2px;
+    background: var(--accent-color);
 }
 
-.promo-price {
-    font-size: 1.2rem;
-    font-weight: bold;
+.vacancy-description {
+    color: var(--text-muted);
+    margin-bottom: 15px;
+    line-height: 1.5;
+    font-size: 0.95rem;
+}
+
+.vacancy-salary {
+    background: var(--accent-color-rgba);
     color: var(--accent-color);
+    padding: 8px 12px;
+    border-radius: 6px;
+    display: inline-block;
+    margin-bottom: 15px;
+    font-weight: bold;
+    font-size: 1.1rem;
+    box-shadow: 0 2px 5px rgba(7, 155, 89, 0.2);
 }
 
-.promo-old-price {
-    text-decoration: line-through;
-    opacity: 0.8;
+/* Блок с преимуществами */
+.vacancy-benefits {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
 }
 
-/* Сетка комбо */
-.combo-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 1rem;
-    margin-top: 1rem;
+.benefit-tag {
+    background: var(--hover-bg);
+    color: var(--text-color);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    border: 1px solid var(--divider-color);
+    transition: all 0.3s ease;
 }
 
-.combo-item {
-    border-radius: 8px;
+.benefit-tag:hover {
+    background: var(--accent-color-rgba);
+    color: var(--accent-color);
+    border-color: var(--accent-color);
+    transform: translateY(-2px);
+}
+
+/* Кнопка отклика */
+.vacancy-apply-btn {
+    margin-top: auto;
+    display: block;
+    text-align: center;
+    background: var(--accent-color);
+    color: white;
+    padding: 12px 15px;
+    border-radius: var(--border-radius);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 10px rgba(7, 155, 89, 0.3);
+    border: none;
+    position: relative;
     overflow: hidden;
 }
 
-.combo-image {
+.vacancy-apply-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
     width: 100%;
-    height: auto;
-    transition: transform 0.3s ease;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.7s ease;
 }
 
-.combo-image:hover {
-    transform: scale(1.05);
+.vacancy-apply-btn:hover {
+    background: #068a50;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(7, 155, 89, 0.4);
+    border-radius: var(--border-radius);
 }
 
-/* Баннер ограничений */
-.restriction-banner {
-    background-color: #ffebee;
-    color: #c62828;
-    padding: 0.8rem;
-    border-radius: 5px;
+.vacancy-apply-btn:hover::before {
+    left: 100%;
+}
+
+/* Сообщение об отсутствии вакансий */
+.no-vacancies {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 40px;
+    color: var(--text-muted);
+}
+
+/* Стили для детальной страницы вакансии */
+.vacancy-detail {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 30px;
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    border-top: 5px solid var(--accent-color);
+}
+
+.vacancy-header {
     display: flex;
     align-items: center;
-    margin: 1rem 0;
+    margin-bottom: 30px;
 }
 
-.restriction-banner i {
-    margin-right: 0.5rem;
+.vacancy-header-image {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: var(--border-radius);
+    margin-right: 30px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border: 3px solid var(--accent-color-rgba);
 }
 
-/* Темная тема */
-.dark .promo-card {
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+.vacancy-header-content h1 {
+    margin-top: 0;
+    color: var(--accent-color);
+    font-size: 2rem;
+    margin-bottom: 15px;
 }
 
-.dark .restriction-banner {
-    background-color: rgba(198, 40, 40, 0.2);
-    color: #ff8a80;
+.vacancy-salary {
+    font-size: 1.3rem;
+    font-weight: bold;
+    margin: 15px 0;
+    color: var(--accent-color);
+    display: inline-block;
+    padding: 8px 15px;
+    background: var(--accent-color-rgba);
+    border-radius: var(--border-radius);
 }
 
-.dark .promo-overlay {
-    background: rgba(0, 0, 0, 0.8);
+.vacancy-description {
+    margin: 25px 0;
+    line-height: 1.7;
+    white-space: pre-line;
+    color: var(--text-color);
+    font-size: 1.05rem;
 }
 
-/* Адаптивность */
+.vacancy-benefits-section {
+    margin: 30px 0;
+    padding: 20px;
+    background: var(--bg-color);
+    border-radius: var(--border-radius);
+    border-left: 4px solid var(--accent-color);
+}
+
+.vacancy-benefits-section h2 {
+    font-size: 1.4rem;
+    margin-bottom: 15px;
+    color: var(--accent-color);
+}
+
+.vacancy-apply {
+    margin-top: 40px;
+    text-align: center;
+}
+
+.back-link {
+    display: inline-block;
+    margin-top: 25px;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.back-link:hover {
+    color: var(--accent-color);
+    transform: translateX(-5px);
+}
+
+/* Стили для страницы отклика на вакансию */
+.vacancy-application-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 30px;
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    border-top: 5px solid var(--accent-color);
+}
+
+.vacancy-application-title {
+    color: var(--accent-color);
+    margin-bottom: 30px;
+    font-size: 1.8rem;
+    position: relative;
+    padding-bottom: 10px;
+}
+
+.vacancy-application-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background: var(--accent-color);
+}
+
+/* Стили для формы обратной связи и отклика на вакансию */
+.feedback-form-container {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 25px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.feedback-form-container:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+}
+
+.feedback-form {
+    margin-top: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid var(--divider-color);
+    border-radius: var(--border-radius);
+    background-color: var(--input-bg);
+    color: var(--text-color);
+    font-size: 1rem;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px var(--accent-color-rgba);
+    outline: none;
+}
+
+.form-group textarea {
+    min-height: 150px;
+    resize: vertical;
+}
+
+.form-error {
+    color: #e74c3c;
+    font-size: 0.9rem;
+    margin-top: 5px;
+}
+
+.form-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.feedback-submit-btn {
+    display: block;
+    text-align: center;
+    background: var(--accent-color);
+    color: white;
+    padding: 12px 15px;
+    border-radius: var(--border-radius);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    margin-top: auto;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 10px rgba(7, 155, 89, 0.3);
+    border: none;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.feedback-submit-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.7s ease;
+}
+
+.feedback-submit-btn:hover {
+    background: #068a50;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(7, 155, 89, 0.4);
+    border-radius: var(--border-radius);
+}
+
+.feedback-submit-btn:hover::before {
+    left: 100%;
+}
+
+/* Стили для уведомлений */
+.alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: var(--border-radius);
+    font-weight: 500;
+}
+
+.alert-success {
+    background-color: rgba(46, 204, 113, 0.2);
+    border-left: 4px solid #2ecc71;
+    color: #27ae60;
+}
+
+.alert-error {
+    background-color: rgba(231, 76, 60, 0.2);
+    border-left: 4px solid #e74c3c;
+    color: #c0392b;
+}
+
+/* Стили для страницы контактов */
+.branch-info {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 25px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.branch-info:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+}
+
+.branch-info h2 {
+    font-size: 1.6rem;
+    margin-bottom: 20px;
+    color: var(--accent-color);
+    border-bottom: 2px solid var(--hover-bg);
+    padding-bottom: 10px;
+}
+
+.contact-section {
+    margin-bottom: 25px;
+}
+
+.contact-section h3 {
+    font-size: 1.3rem;
+    margin-bottom: 12px;
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+}
+
+.contact-section h3:before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background-color: var(--accent-color);
+    margin-right: 10px;
+    border-radius: 50%;
+}
+
+.phone-list {
+    list-style: none;
+    padding: 0;
+}
+
+.phone-list li {
+    padding: 8px 0;
+    font-size: 1.1rem;
+    border-bottom: 1px solid var(--hover-bg);
+    transition: all 0.2s ease;
+}
+
+.phone-list li:hover {
+    padding-left: 5px;
+    color: var(--accent-color);
+}
+
+.branch-selection {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 2px solid var(--hover-bg);
+}
+
+.branch-selection h3 {
+    font-size: 1.4rem;
+    margin-bottom: 15px;
+    color: var(--accent-color);
+}
+
+.branch-form select {
+    width: 100%;
+    padding: 12px 15px;
+    border-radius: var(--border-radius);
+    border: 2px solid var(--hover-bg);
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-size: 1rem;
+    margin-top: 10px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23079b59' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: calc(100% - 15px) center;
+    padding-right: 40px;
+}
+
+.branch-form select:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px var(--accent-color-rgba);
+    outline: none;
+}
+
+.delivery-info {
+    margin-bottom: 20px;
+}
+
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Адаптивные стили */
 @media (max-width: 768px) {
     .promo-title {
-        font-size: 2rem;
+        font-size: 1.8rem;
+        text-align: center;
     }
 
-    .promo-card-title {
-        font-size: 1.3rem;
+    .branch-info {
+        padding: 20px;
     }
 
-    .combo-grid {
+    .branch-info h2 {
+        font-size: 1.4rem;
+    }
+
+    .contact-section h3 {
+        font-size: 1.2rem;
+    }
+
+    .promo-list-item {
+        padding: 15px;
+    }
+
+    .promo-card {
+        padding: 20px;
+    }
+
+    .vacancies-grid {
         grid-template-columns: 1fr;
     }
-}
 
-/* Стили для текстового контента */
-.text-content {
-    margin-top: 2rem;
-}
+    .vacancies-title {
+        font-size: 1.5rem;
+    }
 
-.text-content h2.text-title {
-    color: var(--accent-color);
-    margin: 1.5rem 0 1rem 0;
-    font-size: 1.8rem;
-    border-bottom: 2px solid var(--accent-color);
-    padding-bottom: 0.5rem;
-}
+    .vacancy-header {
+        flex-direction: column;
+        text-align: center;
+    }
 
-.text-content p {
-    margin-bottom: 1rem;
-    line-height: 1.6;
-    font-size: 1.1rem;
+    .vacancy-header-image {
+        margin-right: 0;
+        margin-bottom: 20px;
+    }
+
+    .vacancy-header-content h1::after {
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .vacancy-detail {
+        padding: 20px;
+    }
+
+    .feedback-form-container {
+        padding: 20px;
+    }
+
+    .form-group label {
+        font-size: 0.95rem;
+    }
 }

@@ -9,30 +9,36 @@
 {% block twitter_description %}Обратная связь Solo Pizza - оставьте ваш вопрос или предложение, и мы свяжемся с вами в ближайшее время.{% endblock %}
 
 {% block styles %}
-    <link rel="stylesheet" href="{% static 'css/feedback.css' %}">
+    <link rel="stylesheet" href="{% static 'css/promo_page.css' %}">
 {% endblock %}
 
 {% block main %}
-    <main>
-        <div class="main-wrapper">
-            <div class="breadcrumbs">
-                {% for crumb in breadcrumbs %}
-                    {% if forloop.last %}
-                        <span class="breadcrumb-item active">{{ crumb.title }}</span>
-                    {% else %}
-                        <a href="{{ crumb.url }}" class="breadcrumb-item">{{ crumb.title }}</a>
-                        <span class="breadcrumb-separator">&gt;</span>
-                    {% endif %}
-                {% endfor %}
+<main>
+    <section class="promo-section">
+        <div class="container">
+            <div class="promo-header">
+                <div class="breadcrumbs">
+                    {% for crumb in breadcrumbs %}
+                        {% if crumb.url != "#" %}
+                            <a href="{{ crumb.url }}" class="breadcrumb-link">{{ crumb.title }}</a>
+                        {% else %}
+                            <span class="current-page">{{ crumb.title }}</span>
+                        {% endif %}
+                        {% if not forloop.last %}<span class="breadcrumb-separator">></span>{% endif %}
+                    {% endfor %}
+                </div>
+                <h1 class="promo-title">{{ title }}</h1>
+                <div class="divider"></div>
             </div>
 
-            <div class="feedback-page">
-                <h1 class="page-title">{{ title }}</h1>
-                <div class="divider"></div>
+            <div class="promo-description">
+                <p>Оставьте ваш вопрос или предложение, и мы свяжемся с вами в ближайшее время.</p>
+            </div>
 
+            <div class="text-content">
+                <h2 class="text-title">Форма обратной связи</h2>
+                
                 <div class="feedback-form-container">
-                    <p class="feedback-intro">Оставьте ваш вопрос или предложение, и мы свяжемся с вами в ближайшее время.</p>
-                    
                     <form method="post" action="{% url 'app_home:feedback' %}" class="feedback-form">
                         {% csrf_token %}
                         
@@ -67,5 +73,6 @@
                 </div>
             </div>
         </div>
-    </main>
+    </section>
+</main>
 {% endblock %}

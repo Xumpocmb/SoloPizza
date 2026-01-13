@@ -26,7 +26,7 @@ urlpatterns = [
     path("cart/", include("app_cart.urls")),
     path("order/", include("app_order.urls")),
     path("reviews/", include("app_reviews.urls")),
-    path("t/", include("app_tracker.urls")),
+    path("t/", include(("app_tracker.urls", "app_tracker"), namespace="app_tracker")),
     # SEO URLs
     path("sitemap.xml", sitemap, {"sitemaps": sitemaps}, name="django.contrib.sitemaps.views.sitemap"),
     path("robots.txt", TemplateView.as_view(template_name="robots.txt", content_type="text/plain")),
@@ -36,4 +36,4 @@ if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += debug_toolbar_urls()
 
-handler404 = 'app_home.views.handler404'
+handler404 = "app_home.views.handler404"

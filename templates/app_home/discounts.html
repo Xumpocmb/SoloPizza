@@ -15,6 +15,16 @@
     <section class="promo-section">
         <div class="container">
             <div class="promo-header">
+                <div class="breadcrumbs">
+                    {% for crumb in breadcrumbs %}
+                        {% if crumb.url != "#" %}
+                            <a href="{{ crumb.url }}" class="breadcrumb-link">{{ crumb.title }}</a>
+                        {% else %}
+                            <span class="current-page">{{ crumb.title }}</span>
+                        {% endif %}
+                        {% if not forloop.last %}<span class="breadcrumb-separator">></span>{% endif %}
+                    {% endfor %}
+                </div>
                 <h1 class="promo-title">Наши акции</h1>
                 <div class="divider"></div>
             </div>

@@ -174,21 +174,7 @@ def delivery_view(request):
     return render(request, "app_home/delivery.html", context=context)
 
 
-@staff_member_required
-def utm_analytics_view(request):
-    # Aggregate UTM data
-    utm_data = TrackedUTM.objects.values("utm_source", "utm_medium", "utm_campaign").annotate(count=Count("id")).order_by("-count")
-
-    # Get TrackedURL data
-    tracked_url_data = TrackedURL.objects.all().order_by("-clicks")
-
-    context = {
-        "utm_data": utm_data,
-        "tracked_url_data": tracked_url_data,
-        "title": "UTM Analytics",
-        "breadcrumbs": [{"title": "Главная", "url": "/"}, {"title": "UTM Analytics", "url": "#"}],
-    }
-    return render(request, "app_home/utm_analytics.html", context)
+# Удалено: представление utm_analytics_view перемещено в app_tracker/views.py
 
 
 def partners_view(request):
@@ -208,4 +194,4 @@ def handler404(request, exception):
     """
     Custom 404 handler to serve a styled 404 page.
     """
-    return render(request, '404.html', status=404)
+    return render(request, "404.html", status=404)

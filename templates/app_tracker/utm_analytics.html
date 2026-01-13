@@ -1,20 +1,28 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}{{ title }}{% endblock %}
 
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'css/promo_page.css' %}">
+{% endblock %}
+
 {% block main %}
-    <main>
-        <div class="main-wrapper">
-            <div class="container">
-                <h1>{{ title }}</h1>
+<main>
+    <section class="promo-section">
+        <div class="container">
+            <div class="promo-header">
+                <h1 class="promo-title">{{ title }}</h1>
+                <div class="divider"></div>
+            </div>
 
-                <div class="breadcrumbs">
-                    {% for crumb in breadcrumbs %}
-                        <a href="{{ crumb.url }}" class="breadcrumb-link">{{ crumb.title }}</a>
-                        {% if not forloop.last %}<span class="breadcrumb-separator">&gt;</span>{% endif %}
-                    {% endfor %}
-                </div>
+            <div class="promo-description">
+                <p>Аналитика переходов по UTM-меткам. Здесь вы можете посмотреть источники трафика и эффективность рекламных кампаний.</p>
+            </div>
 
+            <div class="text-content">
+                <h2 class="text-title">UTM Статистика</h2>
+                
                 {% if utm_data %}
                     <table class="table table-striped">
                         <thead>
@@ -31,7 +39,7 @@
                                     <td>{{ item.utm_source|default:"-" }}</td>
                                     <td>{{ item.utm_medium|default:"-" }}</td>
                                     <td>{{ item.utm_campaign|default:"-" }}</td>
-                                    <td>{{ item.count }}</td>
+                                    <td>{{ item.counter }}</td>
                                 </tr>
                             {% endfor %}
                         </tbody>
@@ -39,7 +47,11 @@
                 {% else %}
                     <p>No UTM data available.</p>
                 {% endif %}
+                
                 <br><br><hr><br><br>
+                
+                <h2 class="text-title">Статистика по URL</h2>
+                
                 {% if tracked_url_data %}
                     <table class="table table-striped">
                         <thead>
@@ -64,4 +76,6 @@
                 {% endif %}
             </div>
         </div>
+    </section>
+</main>
 {% endblock %}

@@ -10,24 +10,28 @@
 {% block twitter_description %}Вакансии в Solo Pizza - присоединяйтесь к нашей команде! Мы ищем классных людей, которые любят пиццу, еду и хорошую атмосферу.{% endblock %}
 
 {% block styles %}
-    <link rel="stylesheet" href="{% static 'css/vacancies.css' %}">
+    <link rel="stylesheet" href="{% static 'css/promo_page.css' %}">
 {% endblock %}
 
 {% block main %}
-    <main>
-        <div class="main-wrapper">
-            {% if breadcrumbs %}
+<main>
+    <section class="promo-section">
+        <div class="container">
             <div class="breadcrumbs">
-                {% for crumb in breadcrumbs %}
-                    {% if not forloop.last %}
-                        <a href="{{ crumb.url }}">{{ crumb.title }}</a> <span class="breadcrumb-separator">></span>
-                    {% else %}
-                        <span class="breadcrumb-current">{{ crumb.title }}</span>
-                    {% endif %}
-                {% endfor %}
+                    {% for crumb in breadcrumbs %}
+                        {% if crumb.url != "#" %}
+                            <a href="{{ crumb.url }}" class="breadcrumb-link">{{ crumb.title }}</a>
+                        {% else %}
+                            <span class="current-page">{{ crumb.title }}</span>
+                        {% endif %}
+                        {% if not forloop.last %}<span class="breadcrumb-separator">></span>{% endif %}
+                    {% endfor %}
+                </div>
+
+            <div class="text-content">
+                {% include "app_home/includes/vacancy.html" %}
             </div>
-            {% endif %}
-            {% include "app_home/includes/vacancy.html" %}
         </div>
-    </main>
+    </section>
+</main>
 {% endblock %}

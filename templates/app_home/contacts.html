@@ -8,53 +8,60 @@
 {% block og_description %}Контакты Solo Pizza - адреса, телефоны и время работы наших пиццерий. Свяжитесь с нами для заказа или с вопросами.{% endblock %}
 {% block twitter_description %}Контакты Solo Pizza - адреса, телефоны и время работы наших пиццерий. Свяжитесь с нами для заказа или с вопросами.{% endblock %}
 
-{% block main %}
-<main>
-    <div class="main-wrapper">
-    <div class="breadcrumbs">
-        {% for crumb in breadcrumbs %}
-            {% if forloop.last %}
-                <span class="breadcrumb-item active">{{ crumb.title }}</span>
-            {% else %}
-                <a href="{{ crumb.url }}" class="breadcrumb-item">{{ crumb.title }}</a>
-                <span class="breadcrumb-separator">&gt;</span>
-            {% endif %}
-        {% endfor %}
-    </div>
-
-    <div class="contacts-page">
-        <h1 class="page-title">Контакты</h1>
-        <div class="divider"></div>
-
-        <div class="branch-info">
-            <h2>{{ selected_branch.name }}</h2>
-            
-            <div class="contact-section">
-                <h3>Адрес</h3>
-                <p>{{ selected_branch.address }}</p>
-            </div>
-
-            <div class="contact-section">
-                <h3>Телефоны</h3>
-                <ul class="phone-list">
-                    {% for phone in selected_branch.branch_phones.all %}
-                        <li>{{ phone.phone }}</li>
-                    {% empty %}
-                        <li>Телефоны не указаны</li>
-                    {% endfor %}
-                </ul>
-            </div>
-
-
-        </div>
-        <div class="delivery-link-section">
-            <p>Узнайте подробнее о нашей доставке:</p>
-            <a href="{% url 'app_home:delivery' %}">Доставка</a>
-        </div>
-    </div>
-</main>
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'css/promo_page.css' %}">
 {% endblock %}
 
-{% block styles %}
-<link rel="stylesheet" href="{% static 'css/contacts.css' %}">
+{% block main %}
+<main>
+    <section class="promo-section">
+        <div class="container">
+            <div class="promo-header">
+                <div class="breadcrumbs">
+                    {% for crumb in breadcrumbs %}
+                        {% if crumb.url != "#" %}
+                            <a href="{{ crumb.url }}" class="breadcrumb-link">{{ crumb.title }}</a>
+                        {% else %}
+                            <span class="current-page">{{ crumb.title }}</span>
+                        {% endif %}
+                        {% if not forloop.last %}<span class="breadcrumb-separator">></span>{% endif %}
+                    {% endfor %}
+                </div>
+                <h1 class="promo-title">{{ title }}</h1>
+                <div class="divider"></div>
+            </div>
+
+            <div class="promo-description">
+                <p>Адреса, телефоны и время работы наших пиццерий. Свяжитесь с нами для заказа или с вопросами.</p>
+            </div>
+
+            <div class="text-content">
+                <h2 class="text-title">{{ selected_branch.name }}</h2>
+                
+                <div class="branch-info">
+                    <div class="contact-section">
+                        <h3>Адрес</h3>
+                        <p>{{ selected_branch.address }}</p>
+                    </div>
+
+                    <div class="contact-section">
+                        <h3>Телефоны</h3>
+                        <ul class="phone-list">
+                            {% for phone in selected_branch.branch_phones.all %}
+                                <li>{{ phone.phone }}</li>
+                            {% empty %}
+                                <li>Телефоны не указаны</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="delivery-link-section">
+                    <p>Узнайте подробнее о нашей доставке:</p>
+                    <a href="{% url 'app_home:delivery' %}">Доставка</a>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
 {% endblock %}
