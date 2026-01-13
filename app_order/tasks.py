@@ -9,6 +9,8 @@ from django.db.models.functions import Coalesce
 from decimal import Decimal
 import requests
 from django.conf import settings
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
 
 
 @shared_task
@@ -169,7 +171,32 @@ def collect_order_statistics():
         },
     )
 
+    # Отправка email отчета
+    email_status = ""
+    try:
+        recipient_email = getattr(settings, "EMAIL_RECIPIENT", None)
+        if recipient_email:
+            email_context = {
+                "branch_statistics": branch_stats,
+                "selected_date": today,
+            }
+            html_message = render_to_string("app_order/email/branch_statistics_email.html", email_context)
+
+            send_mail(
+                f'Дневной отчет по филиалам за {today.strftime("%d.%m.%Y")}',
+                '',  # Plain text message (can be empty)
+                settings.EMAIL_HOST_USER,
+                [recipient_email],
+                html_message=html_message,
+                fail_silently=False,
+            )
+            email_status = f"Отчет успешно отправлен на {recipient_email}."
+        else:
+            email_status = "Адрес получателя (EMAIL_RECIPIENT) не настроен в settings.py."
+    except Exception as e:
+        email_status = f"Ошибка при отправке email: {e}"
+
     if created:
-        return f"Статистика за {today} создана. Заказов: {total_orders_count}, общая сумма: {total_amount}."
+        return f"Статистика за {today} создана. Заказов: {total_orders_count}, общая сумма: {total_amount}. {email_status}"
     else:
-        return f"Статистика за {today} обновлена. Заказов: {total_orders_count}, общая сумма: {total_amount}."
+        return f"Статистика за {today} обновлена. Заказов: {total_orders_count}, общая сумма: {total_amount}. {email_status}"

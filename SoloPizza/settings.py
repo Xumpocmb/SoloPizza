@@ -182,11 +182,9 @@ CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = TIME_ZONE
 
-# Snowflakes settings
-SNOW_ENABLED = os.getenv("SNOW_ENABLED", "False") == "True"
-
-EMAIL_HOST = "smtp.yandex.ru"
-EMAIL_PORT = 465
+EMAIL_HOST = os.getenv("EMAIL_HOST")
+EMAIL_PORT = os.getenv("EMAIL_PORT")
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
-EMAIL_USE_SSL = True
+EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL")
+EMAIL_RECIPIENT = "youarenear26@gmail.com"
