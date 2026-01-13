@@ -1,4 +1,25 @@
 /* Стили для страницы статистики заказов */
+.order-list-page {
+    width: 100%;
+    max-width: 1200px;
+    padding: 20px;
+    margin: 60px auto;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+
+.order-list-container {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 25px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.page-title {
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    color: var(--text-color);
+}
 
 /* Стили для кнопки сброса фильтра */
 .filter-button.reset-button {

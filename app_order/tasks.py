@@ -143,6 +143,12 @@ def collect_order_statistics():
             branch_stats[branch_id]["sold_items"][item_name]["payment_methods"][payment_method] = Decimal("0.00")
         branch_stats[branch_id]["sold_items"][item_name]["payment_methods"][payment_method] += item_final_total
 
+    # Добавляем итоговую сумму для каждого филиала
+    for branch_id in branch_stats:
+        branch_stats[branch_id]["total_amount"] = (
+            branch_stats[branch_id]["total_cash"] + branch_stats[branch_id]["total_card"] + branch_stats[branch_id]["total_noname"]
+        )
+
     # Подсчет общих сумм для всех филиалов
     total_orders_count = sum(branch["orders_count"] for branch in branch_stats.values())
     total_cash = sum(branch["total_cash"] for branch in branch_stats.values())
