@@ -93,8 +93,8 @@ def collect_order_statistics():
     """
     today = timezone.now().date()
 
-    # Фильтруем заказы за сегодняшний день со статусом, не равным 'Отменен'
-    orders_today = Order.objects.filter(created_at__date=today).exclude(status="canceled")
+    # Фильтруем заказы за сегодняшний день со статусом, не равным 'Отменен', и только оплаченные
+    orders_today = Order.objects.filter(created_at__date=today, payment_status=True).exclude(status="canceled")
 
     # Сбор статистики по филиалам
     branch_stats = {}
