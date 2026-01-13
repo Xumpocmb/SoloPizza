@@ -186,3 +186,20 @@ def get_variant_data(request, variant_id):
         variant_data["drinks"] = []
 
     return JsonResponse(variant_data)
+
+
+def get_product_variants(request, product_id):
+    """
+    API-представление для получения вариантов продукта.
+    """
+    product = get_object_or_404(Product, id=product_id)
+    variants = ProductVariant.objects.filter(product=product)
+    variants_data = [
+        {
+            "id": variant.id,
+            "name": str(variant),
+            "size": {"id": variant.size.id, "name": variant.size.name} if variant.size else None,
+        }
+        for variant in variants
+    ]
+    return JsonResponse(variants_data, safe=False)

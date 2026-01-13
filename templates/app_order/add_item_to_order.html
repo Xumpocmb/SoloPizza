@@ -144,7 +144,7 @@
                 variantSelect.disabled = true;
                 
                 // Запрашиваем варианты для выбранного продукта
-                fetch(`/api/catalog/product-variants/${productId}/`, {
+                fetch(`/catalog/product-variants/${productId}/`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -198,7 +198,7 @@
                 sauceSelect.disabled = true;
                 addonsSelect.disabled = true;
                 
-                fetch(`/api/catalog/variant-data/${variantId}/`, {
+                fetch(`/catalog/variant-data/${variantId}/`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
