@@ -21,6 +21,75 @@
     color: var(--text-color);
 }
 
+/* Панель управления */
+.order-controls {
+    margin-bottom: 25px;
+}
+
+.search-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: center;
+}
+
+.search-group {
+    display: flex;
+    flex: 1;
+    min-width: 250px;
+}
+
+.search-input {
+    flex: 1;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: var(--border-radius);
+    background-color: var(--card-bg);
+    color: var(--text-color);
+}
+
+.search-button {
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 0 15px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.search-button:hover {
+    background-color: #068a50;
+}
+
+.filter-group {
+    display: flex;
+    min-width: 300px;
+}
+
+.status-filter {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: var(--border-radius);
+    background-color: var(--card-bg);
+    color: var(--text-color);
+}
+
+.filter-button {
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.filter-button:hover {
+    background-color: #068a50;
+}
+
 /* Стили для кнопки сброса фильтра */
 .filter-button.reset-button {
     background-color: var(--text-muted);
