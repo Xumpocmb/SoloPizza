@@ -27,25 +27,24 @@
     margin-bottom: 30px;
     border-radius: var(--border-radius);
     overflow: hidden;
+    border-collapse: collapse;
+    width: 100%;
 }
 
 .statistics-table .table-header,
 .statistics-table .table-row {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr; /* 6 колонок с динамической шириной */
+    /* 7 колонок для новой структуры */
+    grid-template-columns: 10% 10% 12% 12% 12% 14% 30%;
     padding: 12px 15px;
     align-items: center;
+    border-bottom: 1px solid var(--hover-bg);
 }
 
 .statistics-table .table-header {
     background-color: var(--accent-color);
     color: white;
     font-weight: 600;
-}
-
-.statistics-table .table-row {
-    border-bottom: 1px solid var(--hover-bg);
-    transition: background-color 0.2s;
 }
 
 .statistics-table .table-row:hover {
@@ -67,6 +66,47 @@
 .statistics-table .header-cell a:hover {
     text-decoration: underline;
 }
+
+/* Выравнивание для колонок */
+.header-cell.date-col, .header-cell.orders-count-col, .header-cell.branch-stats-col {
+    text-align: center;
+}
+.header-cell.cash-col, .header-cell.card-col, .header-cell.noname-col, .header-cell.total-col {
+    text-align: right;
+}
+
+/* Стили для ячеек с данными */
+.table-cell.date-col, .table-cell.orders-count-col {
+    text-align: center;
+}
+.table-cell.cash-col,
+.table-cell.card-col,
+.table-cell.noname-col,
+.table-cell.total-col {
+    font-family: monospace; /* Моноширинный шрифт для цифр */
+    text-align: right;
+}
+
+.table-cell.branch-stats-cell {
+    text-align: center;
+}
+
+/* Стили для кнопки-ссылки */
+.button-link {
+    display: inline-block;
+    padding: 5px 10px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 0.9em;
+    transition: background-color 0.2s;
+}
+
+.button-link:hover {
+    background-color: #0056b3;
+}
+
 
 /* Адаптивность для таблицы статистики */
 @media screen and (max-width: 992px) {
@@ -91,6 +131,7 @@
         align-items: center;
         border-bottom: 1px solid var(--hover-bg);
         width: 100%;
+        text-align: right; /* Выравниваем значение справа */
     }
 
     .statistics-table .table-cell:last-child {
@@ -100,9 +141,14 @@
     .statistics-table .table-cell::before {
         content: attr(data-label);
         font-weight: bold;
-        width: 40%;
+        width: 50%; /* Увеличим место для заголовка */
         margin-right: 10px;
         flex-shrink: 0;
         color: var(--text-muted);
+        text-align: left; /* Заголовок слева */
+    }
+    
+    .table-cell.branch-stats-cell {
+        justify-content: space-between;
     }
 }

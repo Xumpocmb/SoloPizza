@@ -12,67 +12,6 @@
 {% block styles %}
     <link rel="stylesheet" href="{% static 'css/order_list.css' %}">
     <link rel="stylesheet" href="{% static 'css/order_statistics.css' %}">
-    <style>
-        .branch-section {
-            margin-bottom: 20px;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            background-color: #f9f9f9;
-        }
-
-        .branch-name {
-            margin-top: 0;
-            color: #333;
-            font-size: 1.2em;
-        }
-
-        .branch-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 10px;
-            margin: 10px 0;
-        }
-
-        .branch-stats p {
-            margin: 5px 0;
-            font-weight: bold;
-        }
-
-        .sold-items-list {
-            list-style-type: none;
-            padding: 0;
-        }
-
-        .item-entry {
-            padding: 8px;
-            border-bottom: 1px solid #eee;
-        }
-
-        .item-entry:last-child {
-            border-bottom: none;
-        }
-
-        .item-info {
-            font-weight: bold;
-        }
-
-        .payment-methods {
-            margin-top: 5px;
-        }
-
-        .method-item {
-            display: inline-block;
-            margin-right: 15px;
-            font-size: 0.9em;
-            color: #666;
-        }
-
-        .no-items {
-            color: #999;
-            font-style: italic;
-        }
-    </style>
 {% endblock %}
 
 {% block main %}
@@ -114,43 +53,43 @@
 
         <div class="statistics-table">
             <div class="table-header">
-                <div class="header-cell">
+                <div class="header-cell date-col">
                     <a href="?sort=date&dir={% if sort_by == 'date' and sort_dir == 'asc' %}desc{% else %}asc{% endif %}&start_date={{ start_date|default:'' }}&end_date={{ end_date|default:'' }}">
                         Дата
                         {% if sort_by == 'date' %}{% if sort_dir == 'asc' %}▲{% else %}▼{% endif %}{% endif %}
                     </a>
                 </div>
-                <div class="header-cell">
+                <div class="header-cell orders-count-col">
                     <a href="?sort=orders_count&dir={% if sort_by == 'orders_count' and sort_dir == 'asc' %}desc{% else %}asc{% endif %}&start_date={{ start_date|default:'' }}&end_date={{ end_date|default:'' }}">
                         Кол-во заказов
                         {% if sort_by == 'orders_count' %}{% if sort_dir == 'asc' %}▲{% else %}▼{% endif %}{% endif %}
                     </a>
                 </div>
-                <div class="header-cell">
+                <div class="header-cell cash-col">
                     <a href="?sort=total_cash&dir={% if sort_by == 'total_cash' and sort_dir == 'asc' %}desc{% else %}asc{% endif %}&start_date={{ start_date|default:'' }}&end_date={{ end_date|default:'' }}">
                         Сумма (наличные)
                         {% if sort_by == 'total_cash' %}{% if sort_dir == 'asc' %}▲{% else %}▼{% endif %}{% endif %}
                     </a>
                 </div>
-                <div class="header-cell">
+                <div class="header-cell card-col">
                     <a href="?sort=total_card&dir={% if sort_by == 'total_card' and sort_dir == 'asc' %}desc{% else %}asc{% endif %}&start_date={{ start_date|default:'' }}&end_date={{ end_date|default:'' }}">
                         Сумма (карта)
                         {% if sort_by == 'total_card' %}{% if sort_dir == 'asc' %}▲{% else %}▼{% endif %}{% endif %}
                     </a>
                 </div>
-                <div class="header-cell">
+                <div class="header-cell noname-col">
                     <a href="?sort=total_noname&dir={% if sort_by == 'total_noname' and sort_dir == 'asc' %}desc{% else %}asc{% endif %}&start_date={{ start_date|default:'' }}&end_date={{ end_date|default:'' }}">
                         Сумма (безнал)
                         {% if sort_by == 'total_noname' %}{% if sort_dir == 'asc' %}▲{% else %}▼{% endif %}{% endif %}
                     </a>
                 </div>
-                <div class="header-cell">
+                <div class="header-cell actions-col">
                     <a href="?sort=total_amount&dir={% if sort_by == 'total_amount' and sort_dir == 'asc' %}desc{% else %}asc{% endif %}&start_date={{ start_date|default:'' }}&end_date={{ end_date|default:'' }}">
                         Итоговая сумма
                         {% if sort_by == 'total_amount' %}{% if sort_dir == 'asc' %}▲{% else %}▼{% endif %}{% endif %}
                     </a>
                 </div>
-                <div class="header-cell">Проданные товары</div>
+                <div class="header-cell branch-stats-col">Статистика по филиалам</div>
             </div>
 
             {% for stat in page_obj %}
@@ -161,63 +100,11 @@
                 <div class="table-cell" data-label="Сумма (карта)">{{ stat.total_card|format_price }}</div>
                 <div class="table-cell" data-label="Сумма (безнал)">{{ stat.total_noname|format_price }}</div>
                 <div class="table-cell" data-label="Итоговая сумма">{{ stat.total_amount|format_price }}</div>
-                <div class="table-cell" data-label="Проданные товары">
+                <div class="table-cell branch-stats-cell" data-label="Статистика по филиалам">
                     {% if stat.sold_items %}
-                        <button class="toggle-details-button" onclick="toggleDetails(this)">Показать товары</button>
-                        <div class="sold-items-details" style="display: none;">
-                            <!-- Проверяем, является ли структура статистики по филиалам -->
-                            {% if stat.sold_items|get_first_value|get_dict_value:"name" %}
-                                <!-- Структура по филиалам -->
-                                {% for branch_id, branch_data in stat.sold_items.items %}
-                                    <div class="branch-section">
-                                        <h4 class="branch-name">{{ branch_data.name }}</h4>
-                                        <div class="branch-stats">
-                                            <p><strong>Заказов:</strong> {{ branch_data.orders_count }}</p>
-                                            <p><strong>Наличные:</strong> {{ branch_data.total_cash|format_price }}</p>
-                                            <p><strong>Карта:</strong> {{ branch_data.total_card|format_price }}</p>
-                                            <p><strong>Безнал:</strong> {{ branch_data.total_noname|format_price }}</p>
-                                        </div>
-                                        {% if branch_data.sold_items %}
-                                            <h5>Проданные товары:</h5>
-                                            <ul class="sold-items-list">
-                                                {% for item_name, item_data in branch_data.sold_items.items %}
-                                                    <li class="item-entry">
-                                                        <div class="item-info">
-                                                            <strong>{{ item_name }}</strong> ({{ item_data.quantity }} шт.)
-                                                        </div>
-                                                        <div class="payment-methods">
-                                                            {% for method, amount in item_data.payment_methods.items %}
-                                                                <span class="method-item">{{ method }}: {{ amount|format_price }}</span>
-                                                            {% endfor %}
-                                                        </div>
-                                                    </li>
-                                                {% endfor %}
-                                            </ul>
-                                        {% else %}
-                                            <p class="no-items">Нет проданных товаров.</p>
-                                        {% endif %}
-                                    </div>
-                                {% endfor %}
-                            {% else %}
-                                <!-- Старая структура (до разделения по филиалам) -->
-                                <ul class="sold-items-list">
-                                    {% for item_name, item_data in stat.sold_items.items %}
-                                        <li class="item-entry">
-                                            <div class="item-info">
-                                                <strong>{{ item_name }}</strong> ({{ item_data.quantity }} шт.)
-                                            </div>
-                                            <div class="payment-methods">
-                                                {% for method, amount in item_data.payment_methods.items %}
-                                                    <span class="method-item">{{ method }}: {{ amount|format_price }}</span>
-                                                {% endfor %}
-                                            </div>
-                                        </li>
-                                    {% endfor %}
-                                </ul>
-                            {% endif %}
-                        </div>
+                        <a href="{% url 'app_order:branch_statistics' stat.date|date:'Y-m-d' %}" class="button-link">Подробнее</a>
                     {% else %}
-                        Нет проданных товаров.
+                        Нет данных
                     {% endif %}
                 </div>
             </div>
@@ -262,16 +149,4 @@
 {% endblock %}
 
 {% block scripts %}
-<script>
-    function toggleDetails(button) {
-        const detailsDiv = button.nextElementSibling;
-        if (detailsDiv.style.display === "none") {
-            detailsDiv.style.display = "block";
-            button.textContent = "Скрыть товары";
-        } else {
-            detailsDiv.style.display = "none";
-            button.textContent = "Показать товары";
-        }
-    }
-</script>
 {% endblock %}

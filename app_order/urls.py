@@ -1,7 +1,20 @@
 from django.urls import path
-from app_order.views import checkout, order_detail, order_list, update_order, update_order_items, update_order_status, update_order_branch, print_check_non_fastfood, print_check_fastfood_only, add_item_to_order, order_statistics_view
+from app_order.views import (
+    checkout,
+    order_detail,
+    order_list,
+    update_order,
+    update_order_items,
+    update_order_status,
+    update_order_branch,
+    print_check_non_fastfood,
+    print_check_fastfood_only,
+    add_item_to_order,
+    order_statistics_view,
+    branch_statistics_view,
+)
 
-app_name = 'app_order'
+app_name = "app_order"
 
 urlpatterns = [
     path("checkout/", checkout, name="checkout"),
@@ -15,4 +28,5 @@ urlpatterns = [
     path("print-non-fastfood/<int:order_id>/", print_check_non_fastfood, name="print_non_fastfood_check"),
     path("print-fastfood/<int:order_id>/", print_check_fastfood_only, name="print_fastfood_check"),
     path("statistics/", order_statistics_view, name="order_statistics"),
+    path("statistics/branch/<str:date>/", branch_statistics_view, name="branch_statistics"),
 ]

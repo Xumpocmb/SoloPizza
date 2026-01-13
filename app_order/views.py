@@ -612,8 +612,8 @@ def order_statistics_view(request):
     statistics_list = OrderStatistic.objects.all()
 
     # Filtering
-    start_date = request.GET.get('start_date')
-    end_date = request.GET.get('end_date')
+    start_date = request.GET.get("start_date")
+    end_date = request.GET.get("end_date")
 
     if start_date:
         statistics_list = statistics_list.filter(date__gte=start_date)
@@ -621,27 +621,59 @@ def order_statistics_view(request):
         statistics_list = statistics_list.filter(date__lte=end_date)
 
     # Sorting
-    sort_by = request.GET.get('sort', 'date')
-    sort_dir = request.GET.get('dir', 'desc')
+    sort_by = request.GET.get("sort", "date")
+    sort_dir = request.GET.get("dir", "desc")
 
-    if sort_dir == 'asc':
+    if sort_dir == "asc":
         statistics_list = statistics_list.order_by(sort_by)
     else:
-        statistics_list = statistics_list.order_by(f'-{sort_by}')
-        
+        statistics_list = statistics_list.order_by(f"-{sort_by}")
+
     paginator = Paginator(statistics_list, 30)  # 30 записей на страницу
-    page_number = request.GET.get('page')
+    page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
     context = {
-        'page_obj': page_obj,
-        'sort_by': sort_by,
-        'sort_dir': sort_dir,
-        'start_date': start_date,
-        'end_date': end_date,
-        'breadcrumbs': [
-            {"title": "Главная", "url": "/"},
-            {"title": "Статистика заказов", "url": "#"}
-        ]
+        "page_obj": page_obj,
+        "sort_by": sort_by,
+        "sort_dir": sort_dir,
+        "start_date": start_date,
+        "end_date": end_date,
+        "breadcrumbs": [{"title": "Главная", "url": "/"}, {"title": "Статистика заказов", "url": "#"}],
     }
-    return render(request, 'app_order/order_statistics.html', context)
+    return render(request, "app_order/order_statistics.html", context)
+
+
+@login_required
+def branch_statistics_view(request, date):
+    if not request.user.is_staff:
+        return HttpResponseForbidden("Доступ запрещен")
+
+    # Конвертируем строку даты в объект даты
+    from datetime import datetime
+
+    try:
+        selected_date = datetime.strptime(date, "%Y-%m-%d").date()
+    except ValueError:
+        # Если формат даты неверный, возвращаем ошибку
+        raise Http404("Неверный формат даты")
+
+    # Получаем статистику для выбранной даты
+    try:
+        statistic = OrderStatistic.objects.get(date=selected_date)
+    except OrderStatistic.DoesNotExist:
+        raise Http404("Статистика для указанной даты не найдена")
+
+    # Получаем структуру данных по филиалам
+    branch_statistics = statistic.sold_items
+
+    context = {
+        "branch_statistics": branch_statistics,
+        "selected_date": selected_date,
+        "breadcrumbs": [
+            {"title": "Главная", "url": "/"},
+            {"title": "Статистика заказов", "url": reverse("app_order:order_statistics")},
+            {"title": f"Статистика по филиалам за {selected_date.strftime('%d.%m.%Y')}", "url": "#"},
+        ],
+    }
+    return render(request, "app_order/branch_statistics.html", context)
