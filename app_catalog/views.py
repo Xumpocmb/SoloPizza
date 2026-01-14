@@ -169,11 +169,14 @@ def get_variant_data(request, variant_id):
         size_32 = PizzaSizes.objects.filter(name="32").first()
         if size_32:
             boards = list(BoardParams.objects.filter(size=size_32))
+        else:
+            boards = BoardParams.objects.filter(size=variant.size)
     else:
         boards = BoardParams.objects.filter(size=variant.size)
-        variant_data["boards"] = [
-            {"id": board.id, "name": board.board.name, "price": float(board.price)} for board in boards  # Возвращаем ID BoardParams, чтобы форма получала корректный идентификатор
-        ]
+
+    variant_data["boards"] = [
+        {"id": board.id, "name": board.board.name, "price": float(board.price)} for board in boards  # Возвращаем ID BoardParams, чтобы форма получала корректный идентификатор
+    ]
 
     if product.has_addons:
         addons = AddonParams.objects.filter(size=variant.size)

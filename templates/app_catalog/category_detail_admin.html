@@ -83,7 +83,7 @@
                                                     data-variant-id="{{ variant.id }}"
                                                     data-item-slug="{{ item.slug }}"
                                                     data-item-category="{{ item.category.name }}">
-                                                {% if item.category.name == 'Пицца' or item.category.name == 'Кальцоне' and variant.size %}
+                                                {% if variant.size %}
                                                     {{ variant.size.name }}
                                                 {% elif variant.value %}
                                                     {{ variant.value }} {{ variant.get_unit_display }}
