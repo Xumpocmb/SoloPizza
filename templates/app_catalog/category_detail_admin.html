@@ -60,11 +60,11 @@
                                 </div>
                                 <button class="toggle-form-btn" onclick="toggleForm('{{ item.slug }}')">В корзину</button>
                             </div>
-                            
+
                             <!-- Форма добавления в корзину -->
                             <form method="POST" action="{% url 'app_cart:add_to_cart' item.slug %}" class="add-to-cart-form-admin" id="add-to-cart-form-{{ item.slug }}">
                                 {% csrf_token %}
-                                
+
                                 <!-- Размер -->
                                 <div class="form-group-admin size-selector-admin">
                                     <h3>Выберите размер:</h3>
@@ -95,14 +95,17 @@
                                 </div>
                                 
                                 <!-- Соус -->
+                                {% if item.has_base_sauce or item.has_additional_sauces %}
                                 <div class="form-group-admin option-selector-admin hidden" id="sauce-selector-{{ item.slug }}">
                                     <h3>Выберите соус:</h3>
                                     <ul class="custom-radio-list-admin" id="sauce-list-{{ item.slug }}">
                                         <!-- Будет заполнено динамически -->
                                     </ul>
                                 </div>
-                                
+                                {% endif %}
+
                                 <!-- Борты -->
+                                {% if item.has_border %}
                                 <div class="form-group-admin hidden" id="board-selector-{{ item.slug }}">
                                     <h3>Выберите борт:</h3>
                                     <div class="board-pair-admin">
@@ -120,22 +123,27 @@
                                         </select>
                                     </div>
                                 </div>
-                                
+                                {% endif %}
+
                                 <!-- Добавки -->
+                                {% if item.has_addons %}
                                 <div class="form-group-admin option-selector-admin hidden" id="addon-selector-{{ item.slug }}">
                                     <h3>Добавки:</h3>
                                     <ul class="custom-checkbox-list-admin" id="addon-list-{{ item.slug }}">
                                         <!-- Будет заполнено динамически -->
                                     </ul>
                                 </div>
-                                
+                                {% endif %}
+
                                 <!-- Напитки для комбо -->
+                                {% if item.has_drink %}
                                 <div class="form-group-admin option-selector-admin hidden" id="drink-selector-{{ item.slug }}">
                                     <h3>Напиток:</h3>
                                     <ul class="custom-radio-list-admin" id="drink-list-{{ item.slug }}">
                                         <!-- Будет заполнено динамически -->
                                     </ul>
                                 </div>
+                                {% endif %}
                                 
                                 <button type="submit" class="add-to-cart-btn-admin">Добавить в заказ</button>
                             </form>
@@ -184,19 +192,22 @@
                                 console.error('Ошибка при загрузке данных варианта:', error);
                             });
                     }
-                    
+
                     // Функция обновления соусов
                     function updateSauces(itemSlug, sauces, itemCategory) {
                         const sauceSelector = document.getElementById(`sauce-selector-${itemSlug}`);
+                        // Проверяем, существует ли элемент (т.е. был ли показан в шаблоне)
+                        if (!sauceSelector) return;
+
                         const sauceList = document.getElementById(`sauce-list-${itemSlug}`);
-                        
+
                         // Проверяем, является ли товар пиццей или кальцоне
                         const isPizzaOrCalzone = itemCategory === 'Пицца' || itemCategory === 'Кальцоне';
-                        
+
                         if (sauces && sauces.length > 0 && isPizzaOrCalzone) {
                             sauceSelector.classList.remove('hidden');
                             sauceList.innerHTML = '';
-                            
+
                             sauces.forEach((sauce, index) => {
                                 const li = document.createElement('li');
                                 li.innerHTML = `
@@ -215,30 +226,33 @@
                             sauceList.innerHTML = '';
                         }
                     }
-                    
+
                     // Функция обновления бортов
                     function updateBoards(itemSlug, boards, itemCategory) {
                         const boardSelector = document.getElementById(`board-selector-${itemSlug}`);
+                        // Проверяем, существует ли элемент (т.е. был ли показан в шаблоне)
+                        if (!boardSelector) return;
+
                         const board1Select = document.getElementById(`board1_${itemSlug}`);
                         const board2Select = document.getElementById(`board2_${itemSlug}`);
-                        
+
                         // Проверяем, является ли товар пиццей или комбо
                         const isPizzaOrCombo = itemCategory === 'Пицца' || itemCategory === 'Комбо';
-                        
+
                         if (boards && boards.length > 0 && isPizzaOrCombo) {
                             boardSelector.classList.remove('hidden');
-                            
+
                             // Очищаем селекты
                             board1Select.innerHTML = '<option value="">Не выбран</option>';
                             board2Select.innerHTML = '<option value="">Не выбран</option>';
-                            
+
                             // Добавляем опции
                             boards.forEach(board => {
                                 const option1 = document.createElement('option');
                                 option1.value = board.id;
                                 option1.textContent = `${board.name} (+${board.price} руб.)`;
                                 board1Select.appendChild(option1);
-                                
+
                                 const option2 = document.createElement('option');
                                 option2.value = board.id;
                                 option2.textContent = `${board.name} (+${board.price} руб.)`;
@@ -250,19 +264,22 @@
                             board2Select.innerHTML = '<option value="">Не выбран</option>';
                         }
                     }
-                    
+
                     // Функция обновления добавок
                     function updateAddons(itemSlug, addons, itemCategory) {
                         const addonSelector = document.getElementById(`addon-selector-${itemSlug}`);
+                        // Проверяем, существует ли элемент (т.е. был ли показан в шаблоне)
+                        if (!addonSelector) return;
+
                         const addonList = document.getElementById(`addon-list-${itemSlug}`);
-                        
+
                         // Проверяем, является ли товар пиццей
                         const isPizza = itemCategory === 'Пицца';
-                        
+
                         if (addons && addons.length > 0 && isPizza) {
                             addonSelector.classList.remove('hidden');
                             addonList.innerHTML = '';
-                            
+
                             addons.forEach(addon => {
                                 const li = document.createElement('li');
                                 li.innerHTML = `
@@ -280,19 +297,22 @@
                             addonList.innerHTML = '';
                         }
                     }
-                    
+
                     // Функция обновления напитков
                     function updateDrinks(itemSlug, drinks, itemCategory) {
                         const drinkSelector = document.getElementById(`drink-selector-${itemSlug}`);
+                        // Проверяем, существует ли элемент (т.е. был ли показан в шаблоне)
+                        if (!drinkSelector) return;
+
                         const drinkList = document.getElementById(`drink-list-${itemSlug}`);
-                        
+
                         // Проверяем, является ли товар комбо
                         const isCombo = itemCategory === 'Комбо';
-                        
+
                         if (drinks && drinks.length > 0 && isCombo) {
                             drinkSelector.classList.remove('hidden');
                             drinkList.innerHTML = '';
-                            
+
                             drinks.forEach((drink, index) => {
                                 const li = document.createElement('li');
                                 li.innerHTML = `
@@ -311,7 +331,7 @@
                             drinkList.innerHTML = '';
                         }
                     }
-                    
+
                     // Инициализируем параметры для первого варианта каждого товара при загрузке страницы
                     document.addEventListener('DOMContentLoaded', function() {
                         document.querySelectorAll('.size-option-admin.selected').forEach(button => {

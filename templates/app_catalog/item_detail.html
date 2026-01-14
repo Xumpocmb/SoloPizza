@@ -81,7 +81,7 @@
                                 <button type="button" 
                                         class="size-option {% if selected_variant and selected_variant.id == variant.id %}selected{% endif %}"
                                         data-variant-id="{{ variant.id }}">
-                                    {% if is_pizza_or_calzone and variant.size %}
+                                    {% if item.category.name == 'Пицца' or item.category.name == 'Кальцоне' and variant.size %}
                                         {{ variant.size.name }}
                                     {% elif variant.value %}
                                         {{ variant.value }} {{ variant.get_unit_display }}
@@ -174,17 +174,18 @@
                         </div>
 
                         <!-- Напитки для комбо -->
+                        {% if item.has_drink %}
                         <div class="form-group option-selector{% if not drinks %} hidden{% endif %}" id="drink-selector">
                             <h3>Выберите напиток (один вариант):</h3>
                             <ul class="custom-radio-list" id="drink-list">
                                 {% for drink in drinks %}
                                     <li>
                                         <label class="custom-radio">
-                                            <input type="radio" name="drink" value="{{ drink }}"
+                                            <input type="radio" name="drink" value="{{ drink.name }}"
                                                    {% if forloop.first %}checked{% endif %}
                                                    style="display: none;">
                                             <span class="radio-button"></span>
-                                            {{ drink }}
+                                            {{ drink.name }}
                                         </label>
                                     </li>
                                 {% empty %}
@@ -192,6 +193,7 @@
                                 {% endfor %}
                             </ul>
                         </div>
+                        {% endif %}
 
                         <!-- Кнопка добавления в заказ -->
                         <button type="submit" class="order-link" id="add-to-cart-btn" onclick="changeButtonText()">Добавить в заказ</button>
@@ -270,15 +272,18 @@ function changeSizeVariant(variantId) {
 // Функция обновления соусов
 function updateSauces(sauces) {
     const sauceSelector = document.getElementById('sauce-selector');
+    // Проверяем, существует ли элемент (т.е. был ли показан в шаблоне)
+    if (!sauceSelector) return;
+
     const sauceList = document.getElementById('sauce-list');
-    
+
     // Проверяем категорию товара - соусы доступны только для пиццы и кальцоне
     const isPizzaOrCalzone = itemCategory === 'Пицца' || itemCategory === 'Кальцоне';
-    
+
     if (sauces && sauces.length > 0 && isPizzaOrCalzone) {
         sauceSelector.classList.remove('hidden');
         sauceList.innerHTML = '';
-        
+
         sauces.forEach((sauce, index) => {
             const li = document.createElement('li');
             li.innerHTML = `
@@ -301,26 +306,29 @@ function updateSauces(sauces) {
 // Функция обновления бортов
 function updateBoards(boards) {
     const boardSelector = document.getElementById('board-selector');
+    // Проверяем, существует ли элемент (т.е. был ли показан в шаблоне)
+    if (!boardSelector) return;
+
     const board1Select = document.getElementById('board1');
     const board2Select = document.getElementById('board2');
-    
+
     // Проверяем категорию товара - борты доступны только для пиццы и комбо
     const isPizzaOrCombo = itemCategory === 'Пицца' || itemCategory === 'Комбо';
-    
+
     if (boards && boards.length > 0 && isPizzaOrCombo) {
         boardSelector.classList.remove('hidden');
-        
+
         // Очищаем селекты
         board1Select.innerHTML = '<option value="">Не выбран</option>';
         board2Select.innerHTML = '<option value="">Не выбран</option>';
-        
+
         // Добавляем опции
         boards.forEach(board => {
             const option1 = document.createElement('option');
             option1.value = board.id;
             option1.textContent = `${board.name} (+${board.price} руб.)`;
             board1Select.appendChild(option1);
-            
+
             const option2 = document.createElement('option');
             option2.value = board.id;
             option2.textContent = `${board.name} (+${board.price} руб.)`;
@@ -336,15 +344,18 @@ function updateBoards(boards) {
 // Функция обновления добавок
 function updateAddons(addons) {
     const addonSelector = document.getElementById('addon-selector');
+    // Проверяем, существует ли элемент (т.е. был ли показан в шаблоне)
+    if (!addonSelector) return;
+
     const addonList = document.getElementById('addon-list');
-    
+
     // Проверяем категорию товара - добавки доступны только для пиццы
     const isPizza = itemCategory === 'Пицца';
-    
+
     if (addons && addons.length > 0 && isPizza) {
         addonSelector.classList.remove('hidden');
         addonList.innerHTML = '';
-        
+
         addons.forEach(addon => {
             const li = document.createElement('li');
             li.innerHTML = `
@@ -366,24 +377,27 @@ function updateAddons(addons) {
 // Функция обновления напитков
 function updateDrinks(drinks) {
     const drinkSelector = document.getElementById('drink-selector');
+    // Проверяем, существует ли элемент (т.е. был ли показан в шаблоне)
+    if (!drinkSelector) return;
+
     const drinkList = document.getElementById('drink-list');
-    
+
     // Проверяем категорию товара - напитки доступны только для комбо
     const isCombo = itemCategory === 'Комбо';
-    
+
     if (drinks && drinks.length > 0 && isCombo) {
         drinkSelector.classList.remove('hidden');
         drinkList.innerHTML = '';
-        
+
         drinks.forEach((drink, index) => {
             const li = document.createElement('li');
             li.innerHTML = `
                 <label class="custom-radio">
-                    <input type="radio" name="drink" value="${drink}"
+                    <input type="radio" name="drink" value="${drink.name}"
                            ${index === 0 ? 'checked' : ''}
                            style="display: none;">
                     <span class="radio-button"></span>
-                    ${drink}
+                    ${drink.name}
                 </label>
             `;
             drinkList.appendChild(li);

@@ -51,12 +51,13 @@ def item_detail(request, slug):
     variants = ProductVariant.objects.filter(product=item)
 
     selected_variant_id = request.GET.get("size")
+    selected_variant = None
 
     if selected_variant_id and selected_variant_id.isdigit():
         try:
             selected_variant = variants.get(id=selected_variant_id)
         except ProductVariant.DoesNotExist:
-            selected_variant = None
+            selected_variant = variants.first()
     else:
         selected_variant = variants.first()
 
@@ -66,26 +67,35 @@ def item_detail(request, slug):
     addons = []
     drinks = []
     min_price = None
-    is_pizza_or_calzone = False
 
+    # Определяем параметры на основе выбранных опций товара
     if selected_variant:
-        is_pizza_or_calzone = item.category.name in ["Пицца", "Кальцоне"]
-
         min_price = selected_variant.price
 
-        # Получаем размеры в зависимости от типа товара
-        if is_pizza_or_calzone:
-            sauces = PizzaSauce.objects.all()
-            boards = BoardParams.objects.filter(size=selected_variant.size) if selected_variant.size else []
-            addons = AddonParams.objects.filter(size=selected_variant.size) if selected_variant.size else []
+        # Проверяем параметры товара
+        if item.has_base_sauce:
+            sauces = list(PizzaSauce.objects.filter(is_active=True))
 
-        if item.category.name in ["Комбо"]:
-            size_32 = PizzaSizes.objects.filter(name="32").first()
-            if size_32:
-                boards = BoardParams.objects.filter(size=size_32)
-            else:
-                boards = []
-            drinks = ["Кола 1л.", "Sprite 1л.", "Фанта 1л."]
+        if item.has_border and selected_variant.size:
+            boards = list(BoardParams.objects.filter(size=selected_variant.size))
+
+        if item.has_addons and selected_variant.size:
+            addons = list(AddonParams.objects.filter(size=selected_variant.size))
+
+    # Обработка напитков
+    if item.has_drink:
+        drinks = list(ComboDrinks.objects.filter(is_active=True))
+
+    # Обработка дополнительных соусов
+    if item.has_additional_sauces:
+        additional_sauces = list(PizzaSauce.objects.filter(is_active=True))
+        sauces.extend(additional_sauces)
+
+    # Обработка комбо-наборов
+    if item.is_combo:
+        size_32 = PizzaSizes.objects.filter(name="32").first()
+        if size_32:
+            boards = list(BoardParams.objects.filter(size=size_32))
 
     category = item.category
     breadcrumbs = [
@@ -95,6 +105,7 @@ def item_detail(request, slug):
         {"title": item.name, "url": "#"},
     ]
 
+    # Формируем контекст
     context = {
         "item": item,
         "variants": variants,
@@ -104,24 +115,11 @@ def item_detail(request, slug):
         "addons": addons,
         "drinks": drinks,
         "min_price": min_price,
-        "is_pizza_or_calzone": is_pizza_or_calzone,
-        "has_base_sauce": item.has_base_sauce,
-        "has_border": item.has_border,
-        "has_addons": item.has_addons,
-        "has_drink": item.has_drink,
-        "is_carbonated": item.is_carbonated,
-        "has_additional_sauces": item.has_additional_sauces,
         "breadcrumbs": breadcrumbs,
         "category": category,
     }
 
-    # Выбираем шаблон в зависимости от типа пользователя
-    if request.user.is_staff:
-        template_name = "app_catalog/item_detail_admin.html"
-    else:
-        template_name = "app_catalog/item_detail.html"
-
-    return render(request, template_name, context)
+    return render(request, "app_catalog/item_detail.html", context)
 
 
 def catalog_view(request):
@@ -187,13 +185,9 @@ def get_variant_data(request, variant_id):
 
     # Проверяем, является ли товар комбо
     if product.category.name == "Комбо":
-        # Получаем напитки (предполагаем, что они в категории "Напитки")
-        try:
-            drinks_category = Category.objects.get(name="Напитки")
-            drinks = Product.objects.filter(category=drinks_category, is_active=True)
-            variant_data["drinks"] = [{"id": drink.id, "name": drink.name, "price": float(drink.price) if hasattr(drink, "price") else 0} for drink in drinks]
-        except Category.DoesNotExist:
-            variant_data["drinks"] = []
+        # Получаем напитки из модели ComboDrinks
+        combo_drinks = ComboDrinks.objects.filter(is_active=True)
+        variant_data["drinks"] = [{"id": drink.id, "name": drink.name, "price": 0.0} for drink in combo_drinks]
     else:
         variant_data["drinks"] = []
 

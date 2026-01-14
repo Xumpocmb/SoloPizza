@@ -33,6 +33,7 @@ class ProductAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('name',)}
     inlines = [ProductVariantInline]
     readonly_fields = ['created_at']
+    list_editable = ['is_active', 'is_weekly_special', 'has_base_sauce', 'has_border', 'has_addons', 'has_drink', 'has_additional_sauces']
 
 
 class PizzaSizesAdmin(admin.ModelAdmin):
