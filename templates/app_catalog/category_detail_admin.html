@@ -45,13 +45,13 @@
                     {% for item in items %}
                         <div class="item-card-admin">
                             <div class="item-info-admin">
-                                <a href="{% url 'app_catalog:item_detail' item.slug %}">
+                                <a href="#" onclick="toggleForm('{{ item.slug }}'); return false;">
                                     <h2>{{ item.name }}</h2>
                                 </a>
                                 <p>{{ item.description }}</p>
                             </div>
                             <div class="cart_price_section-admin">
-                                <div class="item-price-admin">
+                                <div class="item-price-admin" id="item-price-{{ item.slug }}">
                                     {% if item.min_price %}
                                         {{ item.min_price|floatformat:2 }} руб.
                                     {% else %}
@@ -95,13 +95,13 @@
                                     </div>
                                     <input type="hidden" name="variant_id" id="variant_id_{{ item.slug }}" value="{% if item.variants.all %}{{ item.variants.first.id }}{% endif %}">
                                 </div>
-                                
+
                                 <!-- Количество -->
                                 <div class="form-group-admin">
                                     <label for="quantity_{{ item.slug }}">Количество:</label>
                                     <input type="number" id="quantity_{{ item.slug }}" name="quantity" value="1" min="1" max="10" class="quantity-input-admin">
                                 </div>
-                                
+
                                 <!-- Соус -->
                                 {% if item.has_base_sauce or item.has_additional_sauces %}
                                 <div class="form-group-admin option-selector-admin hidden" id="sauce-selector-{{ item.slug }}">
@@ -152,7 +152,7 @@
                                     </ul>
                                 </div>
                                 {% endif %}
-                                
+
                                 <button type="submit" class="add-to-cart-btn-admin">Добавить в заказ</button>
                             </form>
                         </div>
@@ -171,20 +171,38 @@
                             const itemSlug = this.getAttribute('data-item-slug');
                             const itemCategory = this.getAttribute('data-item-category');
                             const variantId = this.getAttribute('data-variant-id');
-                            
+
                             // Обновляем скрытое поле с ID варианта
                             document.getElementById(`variant_id_${itemSlug}`).value = variantId;
-                            
+
                             // Обновляем выбранный размер
                             this.parentElement.querySelectorAll('.size-option-admin').forEach(btn => {
                                 btn.classList.remove('selected');
                             });
                             this.classList.add('selected');
-                            
+
+                            // Обновляем цену товара
+                            updatePrice(itemSlug, variantId);
+
                             // Загружаем параметры для выбранного варианта
                             loadVariantData(itemSlug, variantId, itemCategory);
                         });
                     });
+
+                    // Функция обновления цены товара
+                    function updatePrice(itemSlug, variantId) {
+                        fetch(`/catalog/variant-data/${variantId}/`)
+                            .then(response => response.json())
+                            .then(data => {
+                                const priceElement = document.getElementById(`item-price-${itemSlug}`);
+                                if (priceElement) {
+                                    priceElement.innerHTML = `${data.price.toFixed(2)} руб.`;
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Ошибка при загрузке данных варианта:', error);
+                            });
+                    }
                     
                     // Функция загрузки данных варианта
                     function loadVariantData(itemSlug, variantId, itemCategory) {

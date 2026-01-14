@@ -69,11 +69,23 @@ def add_to_cart(request, slug):
             )
 
             messages.success(request, f'Товар "{item.name}" добавлен в корзину!')
+            # Redirect back to the referring page if available, otherwise to item detail
+            referer = request.META.get('HTTP_REFERER')
+            if referer:
+                return HttpResponseRedirect(referer)
             return redirect("app_catalog:item_detail", slug=slug)
         else:
             messages.error(request, "Ошибка в форме. Пожалуйста, проверьте данные.")
+            # Redirect back to the referring page if available, otherwise to item detail
+            referer = request.META.get('HTTP_REFERER')
+            if referer:
+                return HttpResponseRedirect(referer)
             return redirect("app_catalog:item_detail", slug=slug)
 
+    # Redirect back to the referring page if available, otherwise to item detail
+    referer = request.META.get('HTTP_REFERER')
+    if referer:
+        return HttpResponseRedirect(referer)
     return redirect("app_catalog:item_detail", slug=slug)
 
 
