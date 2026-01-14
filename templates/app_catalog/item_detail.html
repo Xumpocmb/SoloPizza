@@ -106,6 +106,7 @@
                         </div>
 
                         <!-- Соус -->
+                        {% if item.has_base_sauce or item.has_additional_sauces %}
                         <div class="form-group option-selector{% if not sauces %} hidden{% endif %}" id="sauce-selector">
                             <h3>Выберите соус (один вариант):</h3>
                             <ul class="custom-radio-list" id="sauce-list">
@@ -124,6 +125,7 @@
                                 {% endfor %}
                             </ul>
                         </div>
+                        {% endif %}
 
                         <!-- Борты -->
                         <div class="form-group board-selector{% if not boards %} hidden{% endif %}" id="board-selector">

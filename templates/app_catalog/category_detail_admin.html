@@ -204,7 +204,7 @@
                                 const hasDrink = paramsInput.dataset.hasDrink === 'true';
                                 const hasAdditionalSauces = paramsInput.dataset.hasAdditionalSauces === 'true';
 
-                                updateSauces(itemSlug, data.sauces, hasBaseSauce || hasAdditionalSauces);
+                                updateSauces(itemSlug, data.sauces, hasBaseSauce);
                                 updateBoards(itemSlug, data.boards, hasBorder);
                                 updateAddons(itemSlug, data.addons, hasAddons);
                                 updateDrinks(itemSlug, data.drinks, hasDrink);
