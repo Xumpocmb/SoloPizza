@@ -93,6 +93,7 @@ class Order(models.Model):
         ("cash", "Наличные"),
         ("card", "Карта"),
         ('noname', 'Безналичный расчет'),
+        ('split', 'Раздельная оплата'),
     ]
 
     DELIVERY_CHOICES = [
@@ -119,6 +120,11 @@ class Order(models.Model):
     delivery_type = models.CharField(max_length=20, choices=DELIVERY_CHOICES, verbose_name="Способ получения")
     payment_method = models.CharField(max_length=20, choices=PAYMENT_CHOICES, verbose_name="Способ оплаты")
     payment_status = models.BooleanField(default=True, verbose_name="Оплачено")
+
+    # Fields for split payment
+    cash_amount = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal("0.00"), verbose_name="Сумма наличными", blank=True)
+    card_amount = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal("0.00"), verbose_name="Сумма картой", blank=True)
+    noname_amount = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal("0.00"), verbose_name="Сумма безналично", blank=True)
     
     ready_by = models.DateTimeField(verbose_name="Готов к", null=True, blank=True)
     delivery_by = models.DateTimeField(verbose_name="Доставка к", null=True, blank=True)
@@ -156,6 +162,21 @@ class Order(models.Model):
     def is_editable(self):
         """Проверяет, можно ли редактировать заказ"""
         return self.status in self.EDITABLE_STATUSES
+
+    def get_split_payment_total(self):
+        """Возвращает общую сумму раздельной оплаты"""
+        return self.cash_amount + self.card_amount + self.noname_amount
+
+    def is_split_payment_valid(self):
+        """Проверяет, совпадает ли сумма раздельной оплаты с итоговой суммой заказа"""
+        if self.payment_method == 'split':
+            return abs(self.get_split_payment_total() - self.total_price) < Decimal('0.01')
+        return True
+
+    def get_payment_method_display(self):
+        """Возвращает отображаемое имя способа оплаты"""
+        payment_method_dict = dict(self.PAYMENT_CHOICES)
+        return payment_method_dict.get(self.payment_method, self.payment_method)
 
     def update_order_items(self):
         """Вызывается после изменения состава заказа"""

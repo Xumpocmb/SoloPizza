@@ -1,5 +1,33 @@
+from django import forms
 from django.contrib import admin
 from .models import Order, OrderItem, OrderStatistic
+
+
+class OrderAdminForm(forms.ModelForm):
+    class Meta:
+        model = Order
+        fields = '__all__'
+
+    def clean(self):
+        cleaned_data = super().clean()
+        payment_method = cleaned_data.get('payment_method')
+        total_price = cleaned_data.get('total_price', 0)
+
+        if payment_method == 'split':
+            cash_amount = cleaned_data.get('cash_amount', 0)
+            card_amount = cleaned_data.get('card_amount', 0)
+            noname_amount = cleaned_data.get('noname_amount', 0)
+
+            split_total = cash_amount + card_amount + noname_amount
+
+            # Check if the split payment total matches the order total
+            if abs(split_total - total_price) >= 0.01:
+                raise forms.ValidationError(
+                    f'Сумма раздельной оплаты ({split_total:.2f} руб.) '
+                    f'не совпадает с итоговой суммой заказа ({total_price:.2f} руб.).'
+                )
+
+        return cleaned_data
 
 
 class OrderItemInline(admin.TabularInline):
@@ -16,6 +44,7 @@ class OrderItemInline(admin.TabularInline):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
+    form = OrderAdminForm
     list_display = [
         'id',
         'user',
@@ -70,6 +99,12 @@ class OrderAdmin(admin.ModelAdmin):
                 ('subtotal', 'discount_amount'),
                 ('delivery_cost', 'total_price'),
             )
+        }),
+        ('Раздельная оплата', {
+            'fields': (
+                ('cash_amount', 'card_amount', 'noname_amount'),
+            ),
+            'classes': ('collapse',)  # Makes this section collapsible
         }),
         ('Дополнительно', {
             'fields': (

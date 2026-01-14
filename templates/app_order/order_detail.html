@@ -287,6 +287,25 @@
                                     </div>
                                 </div>
 
+                                <!-- Split Payment Fields -->
+                                <div id="split-payment-fields" style="display: none;">
+                                    <div class="form-group">
+                                        <label for="{{ form.cash_amount.id_for_label }}">Наличные:</label>
+                                        {{ form.cash_amount }}
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="{{ form.card_amount.id_for_label }}">Карта:</label>
+                                        {{ form.card_amount }}
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="{{ form.noname_amount.id_for_label }}">Безналичные:</label>
+                                        {{ form.noname_amount }}
+                                    </div>
+                                    <div class="form-group">
+                                        <small class="text-muted">Общая сумма раздельной оплаты должна совпадать с итоговой суммой заказа ({{ order.total_price|floatformat:2 }} руб.)</small>
+                                    </div>
+                                </div>
+
                                 <div class="form-group checkbox-group">
                                     {{ form.payment_status }}
                                     <label for="{{ form.payment_status.id_for_label }}">Заказ оплачен</label>
@@ -351,6 +370,22 @@
                                 <span class="summary-label">Способ оплаты:</span>
                                 <span class="summary-value">{{ order.get_payment_method_display }}</span>
                             </div>
+
+                            <!-- Display split payment details if payment method is split -->
+                            {% if order.payment_method == 'split' %}
+                                <div class="summary-row">
+                                    <span class="summary-label">Раздельная оплата:</span>
+                                    <span class="summary-value">
+                                        Наличные: {{ order.cash_amount|floatformat:2 }} руб.<br>
+                                        Карта: {{ order.card_amount|floatformat:2 }} руб.<br>
+                                        Безналичные: {{ order.noname_amount|floatformat:2 }} руб.
+                                    </span>
+                                </div>
+                                <div class="summary-row">
+                                    <span class="summary-label">Общая сумма:</span>
+                                    <span class="summary-value">{{ order.get_split_payment_total|floatformat:2 }} руб.</span>
+                                </div>
+                            {% endif %}
 
                             <div class="summary-row">
                                 <span class="summary-label">Статус оплаты:</span>
@@ -474,7 +509,7 @@
                 function togglePartnerDiscountField() {
                     const isPartnerCheckbox = document.querySelector('input[name="is_partner"]')
                     const partnerDiscountField = document.querySelector('.partner-discount').closest('.form-group')
-                    
+
                     if (isPartnerCheckbox && partnerDiscountField) {
                         if (isPartnerCheckbox.checked) {
                             partnerDiscountField.style.display = 'block'
@@ -484,14 +519,27 @@
                     }
                 }
 
+                function toggleSplitPaymentFields() {
+                    const selectedPaymentMethod = document.querySelector('input[name="payment_method"]:checked');
+                    const splitPaymentFields = document.getElementById('split-payment-fields');
+
+                    if (selectedPaymentMethod && selectedPaymentMethod.value === 'split') {
+                        splitPaymentFields.style.display = 'block';
+                    } else {
+                        splitPaymentFields.style.display = 'none';
+                    }
+                }
+
                 if (editBtn && editForm && viewDetails) {
                     toggleAddressField()
                     togglePartnerDiscountField()
+                    toggleSplitPaymentFields()
 
                     editBtn.addEventListener('click', function () {
                         viewDetails.style.display = 'none'
                         editForm.style.display = 'block'
                         editBtn.style.display = 'none'
+                        toggleSplitPaymentFields(); // Show/hide split payment fields after form is displayed
                     })
 
                     if (cancelBtn) {
@@ -507,10 +555,18 @@
                             option.addEventListener('change', toggleAddressField)
                         })
                     }
-                    
+
                     const isPartnerCheckbox = document.querySelector('input[name="is_partner"]')
                     if (isPartnerCheckbox) {
                         isPartnerCheckbox.addEventListener('change', togglePartnerDiscountField)
+                    }
+
+                    // Add event listeners for payment method radio buttons
+                    const paymentMethods = document.querySelectorAll('input[name="payment_method"]');
+                    if (paymentMethods.length) {
+                        paymentMethods.forEach((method) => {
+                            method.addEventListener('change', toggleSplitPaymentFields);
+                        });
                     }
                 }
 

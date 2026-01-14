@@ -105,10 +105,34 @@ class CheckoutForm(forms.ModelForm):
 
 
 class OrderEditForm(forms.ModelForm):
+    # Split payment fields
+    cash_amount = forms.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        required=False,
+        widget=forms.NumberInput(attrs={"class": "form-input", "step": "0.01"}),
+        label="Сумма наличными"
+    )
+    card_amount = forms.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        required=False,
+        widget=forms.NumberInput(attrs={"class": "form-input", "step": "0.01"}),
+        label="Сумма картой"
+    )
+    noname_amount = forms.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        required=False,
+        widget=forms.NumberInput(attrs={"class": "form-input", "step": "0.01"}),
+        label="Сумма безналично"
+    )
+
     class Meta:
         model = Order
         fields = ["delivery_type", "payment_method", "payment_status", "customer_name", "phone_number", "address",
-                  "ready_by", "delivery_by", "comment", "is_partner", "partner_discount_percent"]
+                  "ready_by", "delivery_by", "comment", "is_partner", "partner_discount_percent",
+                  "cash_amount", "card_amount", "noname_amount"]
         widgets = {
             "delivery_type": forms.RadioSelect(attrs={"class": "custom-radio-list"}),  # Просто указываете класс списка
             "payment_method": forms.RadioSelect(attrs={"class": "custom-radio-list"}),
@@ -134,21 +158,53 @@ class OrderEditForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["payment_status"].label = "Заказ оплачен"
-        
+
         # Устанавливаем начальное значение для адреса при самовывозе
         if self.instance and self.instance.delivery_type == "pickup" and not self.instance.address:
             self.instance.address = "Самовывоз"
-        
+
+        # Устанавливаем начальные значения для полей раздельной оплаты
+        if self.instance:
+            self.fields['cash_amount'].initial = self.instance.cash_amount
+            self.fields['card_amount'].initial = self.instance.card_amount
+            self.fields['noname_amount'].initial = self.instance.noname_amount
+
+    def clean(self):
+        cleaned_data = super().clean()
+        payment_method = cleaned_data.get("payment_method")
+        total_price = self.instance.total_price if self.instance else 0
+
+        if payment_method == 'split':
+            cash_amount = cleaned_data.get('cash_amount', 0) or 0
+            card_amount = cleaned_data.get('card_amount', 0) or 0
+            noname_amount = cleaned_data.get('noname_amount', 0) or 0
+
+            split_total = cash_amount + card_amount + noname_amount
+
+            # Check if the split payment total matches the order total
+            if abs(split_total - total_price) >= 0.01:
+                raise forms.ValidationError(
+                    f'Сумма раздельной оплаты ({split_total:.2f} руб.) '
+                    f'не совпадает с итоговой суммой заказа ({total_price:.2f} руб.).'
+                )
+
+        return cleaned_data
+
     def save(self, commit=True):
         order = super().save(commit=False)
-        
+
+        # Save split payment amounts
+        order.cash_amount = self.cleaned_data.get('cash_amount', 0) or 0
+        order.card_amount = self.cleaned_data.get('card_amount', 0) or 0
+        order.noname_amount = self.cleaned_data.get('noname_amount', 0) or 0
+
         # Автозаполнение поля delivery_by на основе ready_by
         ready_by = order.ready_by
         delivery_by = order.delivery_by
         if ready_by and not delivery_by:
             order.ready_by = ready_by
             order.delivery_by = ready_by + timezone.timedelta(minutes=30)
-            
+
         if commit:
             order.save()
         return order
