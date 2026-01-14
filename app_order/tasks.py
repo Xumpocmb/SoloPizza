@@ -117,13 +117,17 @@ def collect_order_statistics():
         branch_stats[branch_id]["orders_count"] += 1
 
         # Добавляем сумму заказа к соответствующему методу оплаты
-        order_total = order.total_price
-        if order.payment_method == "cash":
-            branch_stats[branch_id]["total_cash"] += order_total
+        if order.payment_method == "split":
+            # Для раздельной оплаты используем сохраненные суммы
+            branch_stats[branch_id]["total_cash"] += order.cash_amount
+            branch_stats[branch_id]["total_card"] += order.card_amount
+            branch_stats[branch_id]["total_noname"] += order.noname_amount
+        elif order.payment_method == "cash":
+            branch_stats[branch_id]["total_cash"] += order.total_price
         elif order.payment_method == "card":
-            branch_stats[branch_id]["total_card"] += order_total
+            branch_stats[branch_id]["total_card"] += order.total_price
         elif order.payment_method == "noname":
-            branch_stats[branch_id]["total_noname"] += order_total
+            branch_stats[branch_id]["total_noname"] += order.total_price
 
     # Обработка позиций заказов для статистики по товарам
     order_items = OrderItem.objects.filter(order__in=orders_today).select_related("product", "variant", "order__branch")
@@ -136,14 +140,47 @@ def collect_order_statistics():
             branch_stats[branch_id]["sold_items"][item_name] = {"quantity": 0, "payment_methods": {}}
 
         branch_stats[branch_id]["sold_items"][item_name]["quantity"] += item.quantity
-        payment_method = item.order.get_payment_method_display()
+        order_payment_method = item.order.payment_method
 
         # Get the final total for the item
-        item_final_total = item.calculate_item_total()["final_total"]
+        item_calculation = item.calculate_item_total()
+        item_final_total = item_calculation["final_total"]
 
-        if payment_method not in branch_stats[branch_id]["sold_items"][item_name]["payment_methods"]:
-            branch_stats[branch_id]["sold_items"][item_name]["payment_methods"][payment_method] = Decimal("0.00")
-        branch_stats[branch_id]["sold_items"][item_name]["payment_methods"][payment_method] += item_final_total
+        # Handle payment method distribution for split payments
+        if order_payment_method == "split":
+            # Calculate proportional amounts based on the split payment
+            total_order = item.order.total_price
+            if total_order > 0:
+                cash_ratio = item.order.cash_amount / total_order
+                card_ratio = item.order.card_amount / total_order
+                noname_ratio = item.order.noname_amount / total_order
+
+                cash_amount = item_final_total * cash_ratio
+                card_amount = item_final_total * card_ratio
+                noname_amount = item_final_total * noname_ratio
+
+                # Add to respective payment methods
+                cash_payment_method = "Наличные (раздельно)"
+                card_payment_method = "Карта (раздельно)"
+                noname_payment_method = "Безналичный (раздельно)"
+
+                if cash_payment_method not in branch_stats[branch_id]["sold_items"][item_name]["payment_methods"]:
+                    branch_stats[branch_id]["sold_items"][item_name]["payment_methods"][cash_payment_method] = Decimal("0.00")
+                branch_stats[branch_id]["sold_items"][item_name]["payment_methods"][cash_payment_method] += cash_amount
+
+                if card_payment_method not in branch_stats[branch_id]["sold_items"][item_name]["payment_methods"]:
+                    branch_stats[branch_id]["sold_items"][item_name]["payment_methods"][card_payment_method] = Decimal("0.00")
+                branch_stats[branch_id]["sold_items"][item_name]["payment_methods"][card_payment_method] += card_amount
+
+                if noname_payment_method not in branch_stats[branch_id]["sold_items"][item_name]["payment_methods"]:
+                    branch_stats[branch_id]["sold_items"][item_name]["payment_methods"][noname_payment_method] = Decimal("0.00")
+                branch_stats[branch_id]["sold_items"][item_name]["payment_methods"][noname_payment_method] += noname_amount
+        else:
+            payment_method = item.order.get_payment_method_display()
+
+            if payment_method not in branch_stats[branch_id]["sold_items"][item_name]["payment_methods"]:
+                branch_stats[branch_id]["sold_items"][item_name]["payment_methods"][payment_method] = Decimal("0.00")
+            branch_stats[branch_id]["sold_items"][item_name]["payment_methods"][payment_method] += item_final_total
 
     # Добавляем итоговую сумму для каждого филиала
     for branch_id in branch_stats:

@@ -184,7 +184,17 @@
                             </div>
                             <div class="payment-methods">
                                 {% for method, amount in item_data.payment_methods.items %}
-                                    <span class="method-item">{{ method }}: {{ amount|format_price }}</span>
+                                    <span class="method-item">
+                                        {% if method == "Наличные (раздельно)" %}
+                                            Наличные (разд.): {{ amount|format_price }}
+                                        {% elif method == "Карта (раздельно)" %}
+                                            Карта (разд.): {{ amount|format_price }}
+                                        {% elif method == "Безналичный (раздельно)" %}
+                                            Безнал (разд.): {{ amount|format_price }}
+                                        {% else %}
+                                            {{ method }}: {{ amount|format_price }}
+                                        {% endif %}
+                                    </span>
                                 {% endfor %}
                             </div>
                         </div>
