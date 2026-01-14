@@ -3,8 +3,7 @@ from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 
-from app_catalog.models import Category, Product, AddonParams, BoardParams, ProductVariant, PizzaSauce, PizzaAddon, PizzaBoard, PizzaSizes
-from app_home.models import Discount
+from app_catalog.models import Category, Product, AddonParams, BoardParams, ProductVariant, PizzaSauce, PizzaAddon, PizzaBoard, PizzaSizes, ComboDrinks
 
 
 def category_detail(request, slug):
@@ -16,32 +15,29 @@ def category_detail(request, slug):
         {"title": "Каталог", "url": reverse("app_catalog:catalog")},
         {"title": category.name, "url": category.get_absolute_url()},
     ]
-
-    sauces = PizzaSauce.objects.all()
-    boards = BoardParams.objects.all()
-    addons = AddonParams.objects.all()
-    drinks = ["Кола 1л.", "Sprite 1л.", "Фанта 1л.", "Вода 0.5л."]
-
-    # Получаем скидку для акции "Пицца недели"
-    # try:
-    #     weekly_pizza_discount = Discount.objects.get(slug='picca-nedeli').percent
-    # except Discount.DoesNotExist:
-    #     weekly_pizza_discount = 20  # Значение по умолчанию, если скидка не найдена
-
     context = {
         "title": f"Solo Pizza | Категория: {category.name}",
         "category": category,
         "items": items,
         "breadcrumbs": breadcrumbs,
-        "sauces": sauces,
-        "boards": boards,
-        "addons": addons,
-        "drinks": drinks,
         "weekly_pizza_discount": "Пицца недели",
     }
 
-    # Выбираем шаблон в зависимости от типа пользователя
     if request.user.is_staff:
+        sauces = PizzaSauce.objects.filter(is_active=True)
+        boards = BoardParams.objects.all()
+        addons = AddonParams.objects.all()
+        drinks = ComboDrinks.objects.filter(is_active=True)
+
+        context.update(
+            {
+                "sauces": sauces,
+                "boards": boards,
+                "addons": addons,
+                "drinks": drinks,
+            }
+        )
+
         template_name = "app_catalog/category_detail_admin.html"
     else:
         template_name = "app_catalog/category_detail.html"
@@ -109,6 +105,12 @@ def item_detail(request, slug):
         "drinks": drinks,
         "min_price": min_price,
         "is_pizza_or_calzone": is_pizza_or_calzone,
+        "has_base_sauce": item.has_base_sauce,
+        "has_border": item.has_border,
+        "has_addons": item.has_addons,
+        "has_drink": item.has_drink,
+        "is_carbonated": item.is_carbonated,
+        "has_additional_sauces": item.has_additional_sauces,
         "breadcrumbs": breadcrumbs,
         "category": category,
     }
@@ -131,8 +133,12 @@ def catalog_view(request):
         {"title": "Каталог", "url": reverse("app_catalog:catalog")},
     ]
 
+    # Добавляем общие параметры каталога
     context = {
         "breadcrumbs": breadcrumbs,
+        "has_base_sauce_options": PizzaSauce.objects.filter(is_active=True).exists(),
+        "has_border_options": PizzaBoard.objects.filter(is_active=True).exists(),
+        "has_addon_options": PizzaAddon.objects.filter(is_active=True).exists(),
     }
     return render(request, "app_catalog/catalog.html", context=context)
 

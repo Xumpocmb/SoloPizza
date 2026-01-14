@@ -50,6 +50,14 @@ class Product(models.Model):
     is_alcoholic = models.BooleanField('Алкогольный', default=False)
     is_combo = models.BooleanField('Комбо-набор', default=False)
     is_sweet = models.BooleanField('Сладкий', default=False)
+    is_carbonated = models.BooleanField('Газированный', default=None, null=True, blank=True, help_text='Применимо к напиткам')
+
+    # Fields for product parameters
+    has_base_sauce = models.BooleanField('Наличие соуса основы', default=False)
+    has_border = models.BooleanField('Наличие борта', default=False)
+    has_addons = models.BooleanField('Наличие добавок', default=False)
+    has_drink = models.BooleanField('Наличие напитка', default=False)
+    has_additional_sauces = models.BooleanField('Наличие дополнительных соусов', default=False)
 
     class Meta:
         db_table = 'products'
@@ -202,7 +210,6 @@ class RollTopping(models.Model):
 class IceCreamTopping(models.Model):
     name = models.CharField(max_length=50)
     price = models.DecimalField(max_digits=10, decimal_places=2)
-
     slug = models.SlugField(max_length=100, unique=True, blank=True, null=True, verbose_name='URL')
     is_active = models.BooleanField(default=True, verbose_name='Активен')
 
@@ -217,6 +224,19 @@ class IceCreamTopping(models.Model):
     def save(self, *args, **kwargs):
         self.slug = slugify(f"topping-{self.name}")
         super().save(*args, **kwargs)
+
+
+class ComboDrinks(models.Model):
+    name = models.CharField(max_length=100, verbose_name='Название напитка')
+    is_active = models.BooleanField(default=True, verbose_name="Активен")
+
+    class Meta:
+        db_table = 'combo_drinks'
+        verbose_name = 'Напиток для комбо'
+        verbose_name_plural = 'Напитки для комбо'
+
+    def __str__(self):
+        return f'Напиток для комбо: {self.name}'
 
 
 @receiver(pre_save, sender=Category)

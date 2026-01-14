@@ -1,11 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 
-from .models import (
-    Category, Product, ProductVariant,
-    PizzaSizes, PizzaBoard, PizzaSauce,
-    BoardParams, PizzaAddon, AddonParams, RollTopping, IceCreamTopping
-)
+from .models import Category, Product, ProductVariant, PizzaSizes, PizzaBoard, PizzaSauce, BoardParams, PizzaAddon, AddonParams, RollTopping, IceCreamTopping, ComboDrinks
 
 
 class CategoryAdmin(admin.ModelAdmin):
@@ -31,8 +27,8 @@ class ProductVariantInline(admin.TabularInline):
 
 
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['name', 'category', 'is_active', 'is_weekly_special', 'created_at']
-    list_filter = ['category', 'is_active', 'is_weekly_special']
+    list_display = ['name', 'category', 'is_active', 'is_weekly_special', 'has_base_sauce', 'has_border', 'has_addons', 'has_drink', 'has_additional_sauces', 'created_at']
+    list_filter = ['category', 'is_active', 'is_weekly_special', 'has_base_sauce', 'has_border', 'has_addons', 'has_drink', 'has_additional_sauces']
     search_fields = ['name', 'description']
     prepopulated_fields = {'slug': ('name',)}
     inlines = [ProductVariantInline]
@@ -94,4 +90,10 @@ class IceCreamToppingAdmin(admin.ModelAdmin):
 class ToppingAdmin(admin.ModelAdmin):
     list_display = ['name']
     prepopulated_fields = {"slug": ("name",)}
+    search_fields = ['name']
+
+
+@admin.register(ComboDrinks)
+class ComboDrinksAdmin(admin.ModelAdmin):
+    list_display = ['name']
     search_fields = ['name']
