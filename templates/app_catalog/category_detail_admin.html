@@ -65,6 +65,14 @@
                             <form method="POST" action="{% url 'app_cart:add_to_cart' item.slug %}" class="add-to-cart-form-admin" id="add-to-cart-form-{{ item.slug }}">
                                 {% csrf_token %}
 
+                                <!-- Скрытое поле для хранения информации о параметрах товара -->
+                                <input type="hidden" id="item-params-{{ item.slug }}"
+                                       data-has-base-sauce="{{ item.has_base_sauce|yesno:'true,false' }}"
+                                       data-has-border="{{ item.has_border|yesno:'true,false' }}"
+                                       data-has-addons="{{ item.has_addons|yesno:'true,false' }}"
+                                       data-has-drink="{{ item.has_drink|yesno:'true,false' }}"
+                                       data-has-additional-sauces="{{ item.has_additional_sauces|yesno:'true,false' }}">
+
                                 <!-- Размер -->
                                 <div class="form-group-admin size-selector-admin">
                                     <h3>Выберите размер:</h3>
@@ -183,10 +191,23 @@
                         fetch(`/catalog/variant-data/${variantId}/`)
                             .then(response => response.json())
                             .then(data => {
-                                updateSauces(itemSlug, data.sauces, itemCategory);
-                                updateBoards(itemSlug, data.boards, itemCategory);
-                                updateAddons(itemSlug, data.addons, itemCategory);
-                                updateDrinks(itemSlug, data.drinks, itemCategory);
+                                // Получаем информацию о параметрах товара из скрытого поля
+                                const paramsInput = document.getElementById(`item-params-${itemSlug}`);
+                                if (!paramsInput) {
+                                    console.error(`Параметры для товара ${itemSlug} не найдены`);
+                                    return;
+                                }
+
+                                const hasBaseSauce = paramsInput.dataset.hasBaseSauce === 'true';
+                                const hasBorder = paramsInput.dataset.hasBorder === 'true';
+                                const hasAddons = paramsInput.dataset.hasAddons === 'true';
+                                const hasDrink = paramsInput.dataset.hasDrink === 'true';
+                                const hasAdditionalSauces = paramsInput.dataset.hasAdditionalSauces === 'true';
+
+                                updateSauces(itemSlug, data.sauces, hasBaseSauce || hasAdditionalSauces);
+                                updateBoards(itemSlug, data.boards, hasBorder);
+                                updateAddons(itemSlug, data.addons, hasAddons);
+                                updateDrinks(itemSlug, data.drinks, hasDrink);
                             })
                             .catch(error => {
                                 console.error('Ошибка при загрузке данных варианта:', error);
@@ -194,17 +215,14 @@
                     }
 
                     // Функция обновления соусов
-                    function updateSauces(itemSlug, sauces, itemCategory) {
+                    function updateSauces(itemSlug, sauces, hasSauceOption) {
                         const sauceSelector = document.getElementById(`sauce-selector-${itemSlug}`);
                         // Проверяем, существует ли элемент (т.е. был ли показан в шаблоне)
                         if (!sauceSelector) return;
 
                         const sauceList = document.getElementById(`sauce-list-${itemSlug}`);
 
-                        // Проверяем, является ли товар пиццей или кальцоне
-                        const isPizzaOrCalzone = itemCategory === 'Пицца' || itemCategory === 'Кальцоне';
-
-                        if (sauces && sauces.length > 0 && isPizzaOrCalzone) {
+                        if (sauces && sauces.length > 0 && hasSauceOption) {
                             sauceSelector.classList.remove('hidden');
                             sauceList.innerHTML = '';
 
@@ -228,7 +246,7 @@
                     }
 
                     // Функция обновления бортов
-                    function updateBoards(itemSlug, boards, itemCategory) {
+                    function updateBoards(itemSlug, boards, hasBorderOption) {
                         const boardSelector = document.getElementById(`board-selector-${itemSlug}`);
                         // Проверяем, существует ли элемент (т.е. был ли показан в шаблоне)
                         if (!boardSelector) return;
@@ -236,10 +254,7 @@
                         const board1Select = document.getElementById(`board1_${itemSlug}`);
                         const board2Select = document.getElementById(`board2_${itemSlug}`);
 
-                        // Проверяем, является ли товар пиццей или комбо
-                        const isPizzaOrCombo = itemCategory === 'Пицца' || itemCategory === 'Комбо';
-
-                        if (boards && boards.length > 0 && isPizzaOrCombo) {
+                        if (boards && boards.length > 0 && hasBorderOption) {
                             boardSelector.classList.remove('hidden');
 
                             // Очищаем селекты
@@ -266,17 +281,14 @@
                     }
 
                     // Функция обновления добавок
-                    function updateAddons(itemSlug, addons, itemCategory) {
+                    function updateAddons(itemSlug, addons, hasAddonsOption) {
                         const addonSelector = document.getElementById(`addon-selector-${itemSlug}`);
                         // Проверяем, существует ли элемент (т.е. был ли показан в шаблоне)
                         if (!addonSelector) return;
 
                         const addonList = document.getElementById(`addon-list-${itemSlug}`);
 
-                        // Проверяем, является ли товар пиццей
-                        const isPizza = itemCategory === 'Пицца';
-
-                        if (addons && addons.length > 0 && isPizza) {
+                        if (addons && addons.length > 0 && hasAddonsOption) {
                             addonSelector.classList.remove('hidden');
                             addonList.innerHTML = '';
 
@@ -299,17 +311,14 @@
                     }
 
                     // Функция обновления напитков
-                    function updateDrinks(itemSlug, drinks, itemCategory) {
+                    function updateDrinks(itemSlug, drinks, hasDrinkOption) {
                         const drinkSelector = document.getElementById(`drink-selector-${itemSlug}`);
                         // Проверяем, существует ли элемент (т.е. был ли показан в шаблоне)
                         if (!drinkSelector) return;
 
                         const drinkList = document.getElementById(`drink-list-${itemSlug}`);
 
-                        // Проверяем, является ли товар комбо
-                        const isCombo = itemCategory === 'Комбо';
-
-                        if (drinks && drinks.length > 0 && isCombo) {
+                        if (drinks && drinks.length > 0 && hasDrinkOption) {
                             drinkSelector.classList.remove('hidden');
                             drinkList.innerHTML = '';
 
