@@ -1,0 +1,284 @@
+/* Компактный стиль для страницы каталога администратора */
+.items-catalog-admin {
+    margin-top: 20px;
+    width: auto;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding: 10px;
+}
+
+.item-card-admin {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 10px;
+    min-height: 80px;
+}
+
+.item-card-admin:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.item-info-admin {
+    flex-grow: 1;
+    padding-right: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.item-info-admin h2 {
+    font-size: 18px;
+    margin: 0 0 5px 0;
+    color: var(--text-color);
+}
+
+.item-info-admin p {
+    font-size: 14px;
+    margin: 0 0 5px 0;
+    color: var(--text-muted);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.item-price-admin {
+    font-size: 16px;
+    color: var(--accent-color);
+    font-weight: bold;
+    margin: 0;
+    min-width: 80px;
+    text-align: right;
+}
+
+.cart_price_section-admin {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 0;
+    flex-shrink: 0;
+}
+
+.admin-controls {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.admin-controls .btn {
+    padding: 5px 10px;
+    font-size: 0.8rem;
+    border-radius: 4px;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.admin-controls .btn-outline-primary {
+    color: #079b59;
+    border: 1px solid #079b59;
+}
+
+.admin-controls .btn-outline-primary:hover {
+    background-color: #079b59;
+    color: white;
+}
+
+.admin-controls .btn-outline-danger {
+    color: #dc3545;
+    border: 1px solid #dc3545;
+}
+
+.admin-controls .btn-outline-danger:hover {
+    background-color: #dc3545;
+    color: white;
+}
+
+/* Стили для формы добавления в корзину */
+.add-to-cart-form-admin {
+    display: none;
+    background-color: var(--hover-bg);
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--divider-color);
+}
+
+.add-to-cart-form-admin.open {
+    display: block;
+}
+
+.size-selector-admin {
+    margin-bottom: 10px;
+}
+
+.size-selector-admin h3 {
+    font-size: 14px;
+    margin: 0 0 5px 0;
+    color: var(--text-color);
+}
+
+.size-options-admin {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.size-option-admin {
+    padding: 5px 10px;
+    background-color: var(--bg-color);
+    border: 1px solid var(--divider-color);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.2s;
+}
+
+.size-option-admin:hover {
+    background-color: var(--accent-color-rgba);
+    border-color: var(--accent-color);
+}
+
+.size-option-admin.selected {
+    background-color: var(--accent-color);
+    color: white;
+    border-color: var(--accent-color);
+}
+
+.form-group-admin {
+    margin-bottom: 10px;
+}
+
+.form-group-admin label {
+    /* display: block; */
+    font-size: 13px;
+    margin-bottom: 3px;
+    color: var(--text-color);
+}
+
+.quantity-input-admin {
+    width: 60px;
+    padding: 5px;
+    border: 1px solid var(--divider-color);
+    border-radius: var(--border-radius);
+    font-size: 14px;
+}
+
+.option-selector-admin {
+    margin-bottom: 10px;
+}
+
+.custom-radio-list-admin,
+.custom-checkbox-list-admin {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.custom-radio-list-admin li,
+.custom-checkbox-list-admin li {
+    margin-bottom: 5px;
+}
+
+.custom-select-admin {
+    width: 100%;
+    padding: 5px;
+    border: 1px solid var(--divider-color);
+    border-radius: var(--border-radius);
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-size: 14px;
+}
+
+.board-pair-admin {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+
+.board-pair-admin label {
+    font-size: 12px;
+    flex: 1;
+}
+
+.board-pair-admin select {
+    flex: 2;
+    margin-left: 5px;
+}
+
+.add-to-cart-btn-admin {
+    background-color: var(--accent-color);
+    color: white;
+    padding: 8px 15px;
+    border-radius: var(--border-radius);
+    text-align: center;
+    text-decoration: none;
+    transition: background-color 0.3s;
+    display: inline-block;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+}
+
+.add-to-cart-btn-admin:hover {
+    background-color: #068a50;
+}
+
+.toggle-form-btn {
+    background-color: var(--accent-color);
+    color: white;
+    padding: 5px 10px;
+    border-radius: var(--border-radius);
+    text-decoration: none;
+    transition: background-color 0.3s;
+    display: inline-block;
+    font-size: 12px;
+    border: none;
+    cursor: pointer;
+    margin-left: 5px;
+}
+
+.toggle-form-btn:hover {
+    background-color: #068a50;
+}
+
+@media (max-width: 768px) {
+    .item-card-admin {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .item-price-admin {
+        text-align: center;
+        margin-top: 5px;
+    }
+
+    .cart_price_section-admin {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .admin-controls {
+        width: 100%;
+        justify-content: space-around;
+    }
+
+    .board-pair-admin {
+        flex-direction: column;
+    }
+
+    .board-pair-admin select {
+        margin-left: 0;
+        margin-top: 5px;
+    }
+}

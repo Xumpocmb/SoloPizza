@@ -3,30 +3,25 @@ from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 
-from app_catalog.models import (Category, Product, AddonParams, BoardParams, 
-                               ProductVariant, PizzaSauce, PizzaAddon, PizzaBoard, 
-                               PizzaSizes)
+from app_catalog.models import Category, Product, AddonParams, BoardParams, ProductVariant, PizzaSauce, PizzaAddon, PizzaBoard, PizzaSizes
 from app_home.models import Discount
 
 
 def category_detail(request, slug):
     category = get_object_or_404(Category, slug=slug)
-    items = (
-        Product.objects.filter(category=category, is_active=True)
-        .annotate(min_price=Min('variants__price'))
-    )
+    items = Product.objects.filter(category=category, is_active=True).prefetch_related("variants").annotate(min_price=Min("variants__price"))
 
     breadcrumbs = [
-        {'title': 'Главная', 'url': '/'},
-        {'title': 'Каталог', 'url': reverse('app_catalog:catalog')},
-        {'title': category.name, 'url': category.get_absolute_url()},
+        {"title": "Главная", "url": "/"},
+        {"title": "Каталог", "url": reverse("app_catalog:catalog")},
+        {"title": category.name, "url": category.get_absolute_url()},
     ]
 
     sauces = PizzaSauce.objects.all()
     boards = BoardParams.objects.all()
     addons = AddonParams.objects.all()
     drinks = ["Кола 1л.", "Sprite 1л.", "Фанта 1л.", "Вода 0.5л."]
-    
+
     # Получаем скидку для акции "Пицца недели"
     # try:
     #     weekly_pizza_discount = Discount.objects.get(slug='picca-nedeli').percent
@@ -34,9 +29,9 @@ def category_detail(request, slug):
     #     weekly_pizza_discount = 20  # Значение по умолчанию, если скидка не найдена
 
     context = {
-        'title': f'Solo Pizza | Категория: {category.name}',
-        'category': category,
-        'items': items,
+        "title": f"Solo Pizza | Категория: {category.name}",
+        "category": category,
+        "items": items,
         "breadcrumbs": breadcrumbs,
         "sauces": sauces,
         "boards": boards,
@@ -44,8 +39,14 @@ def category_detail(request, slug):
         "drinks": drinks,
         "weekly_pizza_discount": "Пицца недели",
     }
-    
-    return render(request, 'app_catalog/category_detail.html', context=context)
+
+    # Выбираем шаблон в зависимости от типа пользователя
+    if request.user.is_staff:
+        template_name = "app_catalog/category_detail_admin.html"
+    else:
+        template_name = "app_catalog/category_detail.html"
+
+    return render(request, template_name, context=context)
 
 
 def item_detail(request, slug):
@@ -81,7 +82,6 @@ def item_detail(request, slug):
             sauces = PizzaSauce.objects.all()
             boards = BoardParams.objects.filter(size=selected_variant.size) if selected_variant.size else []
             addons = AddonParams.objects.filter(size=selected_variant.size) if selected_variant.size else []
-            
 
         if item.category.name in ["Комбо"]:
             size_32 = PizzaSizes.objects.filter(name="32").first()
@@ -93,10 +93,10 @@ def item_detail(request, slug):
 
     category = item.category
     breadcrumbs = [
-        {'title': 'Главная', 'url': '/'},
-        {'title': 'Каталог', 'url': reverse('app_catalog:catalog')},
-        {'title': category.name, 'url': category.get_absolute_url()},
-        {'title': item.name, 'url': '#'}
+        {"title": "Главная", "url": "/"},
+        {"title": "Каталог", "url": reverse("app_catalog:catalog")},
+        {"title": category.name, "url": category.get_absolute_url()},
+        {"title": item.name, "url": "#"},
     ]
 
     context = {
@@ -113,7 +113,13 @@ def item_detail(request, slug):
         "category": category,
     }
 
-    return render(request, "app_catalog/item_detail.html", context)
+    # Выбираем шаблон в зависимости от типа пользователя
+    if request.user.is_staff:
+        template_name = "app_catalog/item_detail_admin.html"
+    else:
+        template_name = "app_catalog/item_detail.html"
+
+    return render(request, template_name, context)
 
 
 def catalog_view(request):
@@ -121,8 +127,8 @@ def catalog_view(request):
     context = {}
 
     breadcrumbs = [
-        {'title': 'Главная', 'url': '/'},
-        {'title': 'Каталог', 'url': reverse('app_catalog:catalog')},
+        {"title": "Главная", "url": "/"},
+        {"title": "Каталог", "url": reverse("app_catalog:catalog")},
     ]
 
     context = {
