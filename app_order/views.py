@@ -677,3 +677,132 @@ def branch_statistics_view(request, date):
         ],
     }
     return render(request, "app_order/branch_statistics.html", context)
+
+
+@login_required
+def reports_view(request):
+    """
+    Отображает статистику по заказам на текущий момент
+    """
+    # Проверка прав доступа - только для администраторов и персонала
+    if not (request.user.is_staff or request.user.is_superuser):
+        return redirect("app_order:order_list")
+
+    # Получаем дату за сегодня
+    today = timezone.now().date()
+
+    # Фильтруем заказы за сегодняшний день со статусом, не равным 'Отменен', и только оплаченные
+    orders_today = Order.objects.filter(created_at__date=today, payment_status=True).exclude(status="canceled")
+
+    # Сбор статистики по филиалам
+    branch_stats = {}
+
+    for order in orders_today.select_related("branch"):
+        branch_id = order.branch.id
+        branch_name = order.branch.name
+
+        if branch_id not in branch_stats:
+            branch_stats[branch_id] = {
+                "name": branch_name,
+                "orders_count": 0,
+                "total_cash": Decimal("0.00"),
+                "total_card": Decimal("0.00"),
+                "total_noname": Decimal("0.00"),
+                "sold_items": {},
+            }
+
+        # Увеличиваем количество заказов для филиала
+        branch_stats[branch_id]["orders_count"] += 1
+
+        # Добавляем сумму заказа к соответствующему методу оплаты
+        if order.payment_method == "split":
+            # Для раздельной оплаты используем сохраненные суммы
+            branch_stats[branch_id]["total_cash"] += order.cash_amount
+            branch_stats[branch_id]["total_card"] += order.card_amount
+            branch_stats[branch_id]["total_noname"] += order.noname_amount
+        elif order.payment_method == "cash":
+            branch_stats[branch_id]["total_cash"] += order.total_price
+        elif order.payment_method == "card":
+            branch_stats[branch_id]["total_card"] += order.total_price
+        elif order.payment_method == "noname":
+            branch_stats[branch_id]["total_noname"] += order.total_price
+
+    # Обработка позиций заказов для статистики по товарам
+    order_items = OrderItem.objects.filter(order__in=orders_today).select_related("product", "variant", "order__branch")
+
+    for item in order_items:
+        branch_id = item.order.branch.id
+        item_name = f"{item.product.name} ({item.get_size_display()})"
+
+        if item_name not in branch_stats[branch_id]["sold_items"]:
+            branch_stats[branch_id]["sold_items"][item_name] = {"quantity": 0, "payment_methods": {}}
+
+        branch_stats[branch_id]["sold_items"][item_name]["quantity"] += item.quantity
+        order_payment_method = item.order.payment_method
+
+        # Get the final total for the item
+        item_calculation = item.calculate_item_total()
+        item_final_total = item_calculation["final_total"]
+
+        # Handle payment method distribution for split payments
+        if order_payment_method == "split":
+            # Calculate proportional amounts based on the split payment
+            total_order = item.order.total_price
+            if total_order > 0:
+                cash_ratio = item.order.cash_amount / total_order
+                card_ratio = item.order.card_amount / total_order
+                noname_ratio = item.order.noname_amount / total_order
+
+                cash_amount = item_final_total * cash_ratio
+                card_amount = item_final_total * card_ratio
+                noname_amount = item_final_total * noname_ratio
+
+                # Add to respective payment methods
+                cash_payment_method = "Наличные (раздельно)"
+                card_payment_method = "Карта (раздельно)"
+                noname_payment_method = "Безналичный (раздельно)"
+
+                if cash_payment_method not in branch_stats[branch_id]["sold_items"][item_name]["payment_methods"]:
+                    branch_stats[branch_id]["sold_items"][item_name]["payment_methods"][cash_payment_method] = Decimal("0.00")
+                branch_stats[branch_id]["sold_items"][item_name]["payment_methods"][cash_payment_method] += cash_amount
+
+                if card_payment_method not in branch_stats[branch_id]["sold_items"][item_name]["payment_methods"]:
+                    branch_stats[branch_id]["sold_items"][item_name]["payment_methods"][card_payment_method] = Decimal("0.00")
+                branch_stats[branch_id]["sold_items"][item_name]["payment_methods"][card_payment_method] += card_amount
+
+                if noname_payment_method not in branch_stats[branch_id]["sold_items"][item_name]["payment_methods"]:
+                    branch_stats[branch_id]["sold_items"][item_name]["payment_methods"][noname_payment_method] = Decimal("0.00")
+                branch_stats[branch_id]["sold_items"][item_name]["payment_methods"][noname_payment_method] += noname_amount
+        else:
+            payment_method = item.order.get_payment_method_display()
+
+            if payment_method not in branch_stats[branch_id]["sold_items"][item_name]["payment_methods"]:
+                branch_stats[branch_id]["sold_items"][item_name]["payment_methods"][payment_method] = Decimal("0.00")
+            branch_stats[branch_id]["sold_items"][item_name]["payment_methods"][payment_method] += item_final_total
+
+    # Добавляем итоговую сумму для каждого филиала
+    for branch_id in branch_stats:
+        branch_stats[branch_id]["total_amount"] = (
+            branch_stats[branch_id]["total_cash"] + branch_stats[branch_id]["total_card"] + branch_stats[branch_id]["total_noname"]
+        )
+
+    # Подсчет общих сумм для всех филиалов
+    total_orders_count = sum(branch["orders_count"] for branch in branch_stats.values())
+    total_cash = sum(branch["total_cash"] for branch in branch_stats.values())
+    total_card = sum(branch["total_card"] for branch in branch_stats.values())
+    total_noname = sum(branch["total_noname"] for branch in branch_stats.values())
+    total_amount = total_cash + total_card + total_noname
+
+    # Формируем контекст
+    context = {
+        "branch_statistics": branch_stats,
+        "selected_date": today,
+        "total_orders_count": total_orders_count,
+        "total_cash": total_cash,
+        "total_card": total_card,
+        "total_noname": total_noname,
+        "total_amount": total_amount,
+        "breadcrumbs": [{"title": "Главная", "url": "/"}, {"title": "Отчеты", "url": "#"}],
+    }
+
+    return render(request, "app_order/reports.html", context)

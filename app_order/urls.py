@@ -12,6 +12,7 @@ from app_order.views import (
     add_item_to_order,
     order_statistics_view,
     branch_statistics_view,
+    reports_view,
 )
 
 app_name = "app_order"
@@ -29,4 +30,5 @@ urlpatterns = [
     path("print-fastfood/<int:order_id>/", print_check_fastfood_only, name="print_fastfood_check"),
     path("statistics/", order_statistics_view, name="order_statistics"),
     path("statistics/branch/<str:date>/", branch_statistics_view, name="branch_statistics"),
+    path("reports/", reports_view, name="reports"),
 ]

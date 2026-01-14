@@ -93,6 +93,9 @@
                     <a href="{% url 'socialaccount_connections' %}">Управление социальными аккаунтами</a>
                     <a href="{% url 'app_reviews:moderation_list' %}">Модерация</a>
                     <a href="{% url 'app_order:order_statistics' %}">Статистика</a>
+                    <a href="{% url 'app_order:reports' %}">Отчеты</a>
+                {% elif user.is_staff %}
+                    <a href="{% url 'app_order:reports' %}">Отчеты</a>
                 {% endif %}
                 <a href="{% url 'app_cart:view_cart' %}">Корзина</a>
                 <a href="{% url 'app_order:order_list' %}">Заказы</a>
