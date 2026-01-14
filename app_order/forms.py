@@ -139,8 +139,8 @@ class OrderEditForm(forms.ModelForm):
             "payment_status": forms.CheckboxInput(attrs={"class": "custom-checkbox-list"}),
             "customer_name": forms.TextInput(attrs={"class": "form-input"}),
             "phone_number": forms.TextInput(attrs={"class": "form-input"}),
-            "ready_by": forms.DateTimeInput(attrs={"class": "form-input", "type": "datetime-local", "format": "%Y-%m-%dT%H:%M"}),
-            "delivery_by": forms.DateTimeInput(attrs={"class": "form-input", "type": "datetime-local", "format": "%Y-%m-%dT%H:%M"}),
+            "ready_by": forms.DateTimeInput(attrs={"class": "form-input", "type": "datetime-local"}, format='%Y-%m-%dT%H:%M'),
+            "delivery_by": forms.DateTimeInput(attrs={"class": "form-input", "type": "datetime-local"}, format='%Y-%m-%dT%H:%M'),
             "comment": forms.Textarea(attrs={"class": "form-textarea", "rows": 3, "placeholder": "Ваши пожелания..."}),
             "address": forms.TextInput(
                 attrs={"class": "form-input", "placeholder": "ул. Ленина, д. 1, кв. 1", "id": "id_address"}),
@@ -168,6 +168,8 @@ class OrderEditForm(forms.ModelForm):
             self.fields['cash_amount'].initial = self.instance.cash_amount
             self.fields['card_amount'].initial = self.instance.card_amount
             self.fields['noname_amount'].initial = self.instance.noname_amount
+
+
 
     def clean(self):
         cleaned_data = super().clean()

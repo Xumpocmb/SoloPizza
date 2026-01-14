@@ -192,7 +192,7 @@
                                         {{ form.quantity }}
                                     </div>
 
-                                    {% if form.instance.product.category.name == 'Пицца' %}
+                                    {% if form.instance.product.has_border %}
                                         <div class="form-group">
                                             <label>Борт 1:</label>
                                             {{ form.board1 }}
@@ -207,7 +207,7 @@
                                             {{ form.sauce }}
                                         </div>
 
-                                        {% if form.instance.product.category.name == 'Комбо' %}
+                                        {% if form.instance.product.has_drink %}
                                         <div class="form-group">
                                             <label>Напиток:</label>
                                             {{ form.drink }}
