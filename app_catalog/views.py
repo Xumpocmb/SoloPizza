@@ -146,7 +146,6 @@ def get_variant_data(request, variant_id):
     API-представление для получения полных данных варианта товара
     включая цену, соусы, доски и добавки
     """
-    print("variant_data")
     variant = get_object_or_404(ProductVariant, id=variant_id)
     product = variant.product
 
@@ -159,32 +158,33 @@ def get_variant_data(request, variant_id):
         "unit": variant.get_unit_display() if variant.unit else None,
     }
 
-    # Проверяем, является ли товар пиццей, кальцоне или комбо
-    is_pizza_or_combo = product.category.name in ["Пицца", "Кальцоне", "Комбо"]
-
-    if is_pizza_or_combo and variant.size:
+    if product.has_base_sauce:
         # Получаем соусы
         sauces = PizzaSauce.objects.filter(is_active=True)
         variant_data["sauces"] = [{"id": sauce.id, "name": sauce.name, "price": 0.0} for sauce in sauces]
+    else:
+        variant_data["sauces"] = []
 
-        # Получаем доски для размера
+    if product.is_combo:
+        size_32 = PizzaSizes.objects.filter(name="32").first()
+        if size_32:
+            boards = list(BoardParams.objects.filter(size=size_32))
+    else:
         boards = BoardParams.objects.filter(size=variant.size)
         variant_data["boards"] = [
             {"id": board.id, "name": board.board.name, "price": float(board.price)} for board in boards  # Возвращаем ID BoardParams, чтобы форма получала корректный идентификатор
         ]
 
-        # Получаем добавки для размера
+    if product.has_addons:
         addons = AddonParams.objects.filter(size=variant.size)
         variant_data["addons"] = [
             {"id": addon.id, "name": addon.addon.name, "price": float(addon.price)} for addon in addons  # Возвращаем ID AddonParams, чтобы форма получала корректный идентификатор
         ]
     else:
-        variant_data["sauces"] = []
-        variant_data["boards"] = []
+
         variant_data["addons"] = []
 
-    # Проверяем, является ли товар комбо
-    if product.category.name == "Комбо":
+    if product.has_drink:
         # Получаем напитки из модели ComboDrinks
         combo_drinks = ComboDrinks.objects.filter(is_active=True)
         variant_data["drinks"] = [{"id": drink.id, "name": drink.name, "price": 0.0} for drink in combo_drinks]
