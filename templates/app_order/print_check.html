@@ -160,6 +160,11 @@
     <div class="order-details">
         <div><strong>Тип:</strong> {{ order.get_delivery_type_display }}</div>
         <div><strong>Оплата:</strong> {{ order.get_payment_method_display }}</div>
+        {% if order.payment_method == 'split' %}
+        <div><strong>Наличные:</strong> {{ order.cash_amount|floatformat:2 }} руб.</div>
+        <div><strong>Карта:</strong> {{ order.card_amount|floatformat:2 }} руб.</div>
+        <div><strong>Безналичный:</strong> {{ order.noname_amount|floatformat:2 }} руб.</div>
+        {% endif %}
         {% if order.ready_by %}
         <div><strong>Готов к:</strong> <span class="underlined_text">{{ order.ready_by|date:"d.m.Y H:i" }}</span></div>
         {% endif %}
@@ -174,6 +179,12 @@
     <!-- Для чека "Только Фастфуд" показываем минимум -->
     <div class="order-details">
         <div><strong>Тип:</strong> {{ order.get_delivery_type_display }}</div>
+        <div><strong>Оплата:</strong> {{ order.get_payment_method_display }}</div>
+        {% if order.payment_method == 'split' %}
+        <div><strong>Наличные:</strong> {{ order.cash_amount|floatformat:2 }} руб.</div>
+        <div><strong>Карта:</strong> {{ order.card_amount|floatformat:2 }} руб.</div>
+        <div><strong>Безналичный:</strong> {{ order.noname_amount|floatformat:2 }} руб.</div>
+        {% endif %}
         {% if order.ready_by %}
         <div><strong>Готов к:</strong> {{ order.ready_by|date:"d.m.Y H:i" }}</div>
         {% endif %}
