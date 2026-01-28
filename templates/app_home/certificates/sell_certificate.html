@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Продажа сертификатов{% endblock %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'css/promo_page.css' %}">
+    <style>
+        .certificate-form-container {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+        
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--divider-color);
+            border-radius: 4px;
+            font-size: 1rem;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+        }
+        
+        .certificate-display {
+            background-color: var(--bg-color);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+            text-align: center;
+            border: 2px dashed var(--divider-color);
+        }
+        
+        .certificate-code {
+            font-size: 1.5rem;
+            font-weight: bold;
+            letter-spacing: 3px;
+            color: var(--success-color);
+            margin: 0.5rem 0;
+        }
+        
+        .certificate-date {
+            color: var(--text-color);
+            font-size: 0.9rem;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background-color: var(--accent-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #068a50;
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+        }
+
+        .btn-success:hover {
+            opacity: 0.9;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-color);
+        }
+
+        .btn-primary:hover {
+            background-color: #068a50;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1.5rem;
+        }
+        
+        .search-section {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--divider-color);
+        }
+        
+        .search-result {
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: var(--bg-color);
+            border-radius: 4px;
+            color: var(--text-color);
+        }
+        
+        .valid-certificate {
+            border-left: 4px solid var(--success-color);
+        }
+
+        .invalid-certificate {
+            border-left: 4px solid var(--error-color);
+        }
+
+        .used-certificate {
+            border-left: 4px solid #ffc107;
+        }
+    </style>
+{% endblock %}
+
+{% block main %}
+<main>
+    <section class="promo-section">
+        <div class="container">
+            <div class="promo-header">
+                <div class="breadcrumbs">
+                    <a href="{% url 'app_home:home' %}" class="breadcrumb-link">Главная</a>
+                    <span class="breadcrumb-separator">></span>
+                    <span class="current-page">Продажа сертификатов</span>
+                </div>
+                <h1 class="promo-title">Продажа сертификатов</h1>
+                <div class="divider"></div>
+            </div>
+
+            <div class="certificate-form-container">
+                <h2 class="text-title">Создание нового сертификата</h2>
+                
+                <form method="post" id="certificateForm">
+                    {% csrf_token %}
+                    <input type="hidden" name="certificate_code" value="{{ certificate_code }}">
+
+                    <div class="certificate-display">
+                        <p>Уникальный код сертификата:</p>
+                        <div class="certificate-code">{{ certificate_code }}</div>
+                        <p class="certificate-date">Срок действия: {{ expiration_date|date:"d.m.Y H:i" }}</p>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button type="submit" class="btn btn-success">Сохранить сертификат</button>
+                        <a href="{% url 'app_home:certificate_sell' %}" class="btn btn-primary">Сгенерировать новый</a>
+                    </div>
+                </form>
+
+                <div class="search-section">
+                    <h2 class="text-title">Поиск сертификата</h2>
+                    <form method="post" action="{% url 'app_home:certificate_check' %}">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="certificate_code">Введите код сертификата:</label>
+                            <input type="text" name="certificate_code" placeholder="Введите 8-значный код" maxlength="8">
+                            <button type="submit" class="btn btn-primary">Найти</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+{% endblock %}

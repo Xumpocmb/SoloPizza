@@ -11,6 +11,10 @@ from app_home.views import (
     info_view,
     delivery_view,
     partners_view,
+    certificate_sell,
+    certificate_check,
+    certificate_use,
+    certificate_search,
 )
 
 app_name = "app_home"
@@ -27,4 +31,8 @@ urlpatterns = [
     path("vacancies/<int:vacancy_id>/apply/", vacancy_apply, name="vacancy_apply"),
     path("delivery/", delivery_view, name="delivery"),
     path("partners/", partners_view, name="partners"),
+    path("certificates/sell/", certificate_sell, name="certificate_sell"),
+    path("certificates/check/", certificate_check, name="certificate_check"),
+    path("certificates/<int:certificate_id>/use/", certificate_use, name="certificate_use"),
+    path("certificates/search/", certificate_search, name="certificate_search"),
 ]

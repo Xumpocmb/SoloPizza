@@ -6,6 +6,9 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Count
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from django.utils import timezone
 from app_tracker.models import TrackedUTM, TrackedURL
 from app_cart.models import CartItem
 from app_cart.utils import validate_cart_items_for_branch
@@ -188,6 +191,127 @@ def partners_view(request):
     context = {"partners": partners, "title": "Наши партнеры", "breadcrumbs": breadcrumbs}
 
     return render(request, "app_home/partners.html", context=context)
+
+
+from .models import Certificate
+
+
+@login_required
+def certificate_sell(request):
+    """View for selling certificates - generates unique code and allows staff to save it"""
+    if not (request.user.is_staff or request.user.is_superuser):
+        messages.error(request, "У вас нет прав для доступа к этой странице.")
+        return redirect('app_home:home')
+
+    # Generate a new unique certificate code
+    import random
+    import string
+    from datetime import timedelta
+
+    def generate_unique_code():
+        """Generate a unique certificate code"""
+        while True:
+            code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+            if not Certificate.objects.filter(code=code).exists():
+                return code
+
+    certificate_code = generate_unique_code()
+
+    # Calculate expiration date (3 months from now)
+    expiration_date = timezone.now() + timedelta(days=90)
+
+    if request.method == 'POST':
+        # Create and save the certificate with the code that was displayed
+        certificate = Certificate.objects.create(
+            code=request.POST.get('certificate_code', certificate_code),
+            expires_at=expiration_date
+        )
+        messages.success(request, f"Сертификат {certificate.code} успешно создан!")
+        # Regenerate code for next use
+        certificate_code = generate_unique_code()
+        expiration_date = timezone.now() + timedelta(days=90)
+
+    context = {
+        'certificate_code': certificate_code,
+        'expiration_date': expiration_date,
+    }
+    return render(request, 'app_home/certificates/sell_certificate.html', context)
+
+
+@login_required
+def certificate_check(request):
+    """View for checking certificate validity"""
+    if not (request.user.is_staff or request.user.is_superuser):
+        messages.error(request, "У вас нет прав для доступа к этой странице.")
+        return redirect('app_home:home')
+
+    certificate = None
+    searched = False
+    now = timezone.now()
+
+    if request.method == 'POST':
+        certificate_code = request.POST.get('certificate_code', '').strip()
+        if certificate_code:
+            certificate = Certificate.objects.filter(code=certificate_code).first()
+            searched = True
+
+    context = {
+        'certificate': certificate,
+        'searched': searched,
+        'now': now,
+    }
+    return render(request, 'app_home/certificates/check_certificate.html', context)
+
+
+@login_required
+def certificate_use(request, certificate_id):
+    """Mark a certificate as used"""
+    if not (request.user.is_staff or request.user.is_superuser):
+        messages.error(request, "У вас нет прав для доступа к этой странице.")
+        return redirect('app_home:home')
+
+    certificate = get_object_or_404(Certificate, id=certificate_id)
+
+    # Check if certificate is still valid
+    if certificate.is_used:
+        messages.error(request, "Сертификат уже использован.")
+    elif certificate.expires_at < timezone.now():
+        messages.error(request, "Сертификат просрочен.")
+    else:
+        certificate.is_used = True
+        certificate.used_at = timezone.now()
+        certificate.save()
+        messages.success(request, f"Сертификат {certificate.code} успешно отмечен как использованный.")
+
+    return redirect('app_home:certificate_check')
+
+
+@login_required
+def certificate_search(request):
+    """API endpoint to search for certificate by code - not used in current implementation"""
+    # This view is not used since we switched to standard Django forms
+    # Keeping it for potential future use
+    if request.method == 'POST' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        import json
+        data = json.loads(request.body)
+        code = data.get('code', '')
+
+        try:
+            certificate = Certificate.objects.get(code=code)
+            return JsonResponse({
+                'success': True,
+                'certificate': {
+                    'code': certificate.code,
+                    'is_used': certificate.is_used,
+                    'created_at': certificate.created_at.isoformat(),
+                    'expires_at': certificate.expires_at.isoformat(),
+                    'used_at': certificate.used_at.isoformat() if certificate.used_at else None
+                }
+            })
+        except Certificate.DoesNotExist:
+            return JsonResponse({'success': False})
+
+    return JsonResponse({'success': False})
 
 
 def handler404(request, exception):

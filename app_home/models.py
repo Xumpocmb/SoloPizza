@@ -1,3 +1,6 @@
+import random
+import string
+from datetime import timedelta
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
 
@@ -200,3 +203,35 @@ class Marquee(models.Model):
 
     def __str__(self):
         return self.text
+
+
+def generate_unique_code():
+    """Generate a unique certificate code"""
+    while True:
+        code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+        if not Certificate.objects.filter(code=code).exists():
+            return code
+
+
+class Certificate(models.Model):
+    code = models.CharField(max_length=8, unique=True, verbose_name="Уникальный код сертификата", default=generate_unique_code)
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
+    expires_at = models.DateTimeField(verbose_name="Срок действия")
+    is_used = models.BooleanField(default=False, verbose_name="Использован")
+    used_at = models.DateTimeField(null=True, blank=True, verbose_name="Дата использования")
+
+    class Meta:
+        verbose_name = "Сертификат"
+        verbose_name_plural = "Сертификаты"
+        ordering = ["-created_at"]
+
+    def save(self, *args, **kwargs):
+        # Set expiration date to 3 months from creation if not already set
+        if not self.expires_at:
+            from django.utils import timezone
+            self.expires_at = timezone.now() + timedelta(days=90)  # 3 months ~ 90 days
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        status = "использован" if self.is_used else "действителен"
+        return f"Сертификат {self.code} ({status})"

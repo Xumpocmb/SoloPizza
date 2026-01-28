@@ -1,5 +1,5 @@
 from django.contrib import admin
-from app_home.models import CafeBranch, CafeBranchPhone, Vacancy, VacancyApplication, Feedback, Discount, OrderAvailability, WorkingHours, Partner, SnowSettings, Marquee
+from app_home.models import CafeBranch, CafeBranchPhone, Vacancy, VacancyApplication, Feedback, Discount, OrderAvailability, WorkingHours, Partner, SnowSettings, Marquee, Certificate
 
 
 @admin.register(SnowSettings)
@@ -121,3 +121,28 @@ class MarqueeAdmin(admin.ModelAdmin):
     list_editable = ("is_active",)
     search_fields = ("text",)
     list_per_page = 20
+
+
+@admin.register(Certificate)
+class CertificateAdmin(admin.ModelAdmin):
+    list_display = ("code", "created_at", "expires_at", "is_used", "used_at")
+    list_filter = ("is_used", "created_at", "expires_at")
+    search_fields = ("code",)
+    readonly_fields = ("code", "created_at", "expires_at")
+    list_per_page = 20
+
+    def has_view_permission(self, request, obj=None):
+        # Only allow staff and superusers to view certificates
+        return request.user.is_staff or request.user.is_superuser
+
+    def has_change_permission(self, request, obj=None):
+        # Only allow staff and superusers to change certificates
+        return request.user.is_staff or request.user.is_superuser
+
+    def has_add_permission(self, request):
+        # Only allow staff and superusers to add certificates
+        return request.user.is_staff or request.user.is_superuser
+
+    def has_delete_permission(self, request, obj=None):
+        # Only allow staff and superusers to delete certificates
+        return request.user.is_staff or request.user.is_superuser
