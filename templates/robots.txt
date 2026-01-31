@@ -9,6 +9,10 @@ Disallow: /order/checkout/
 Disallow: /order/add_item_to_order/
 Disallow: /static/
 Disallow: /media/
-
+Disallow: /catalog/category/napitki-v-zal/
+Disallow: /reviews/moderation/
+Disallow: /order/statistics/
+Disallow: /order/reports/
+Disallow: /certificates/sell/
 
 Sitemap: https://solo-pizza.by/sitemap.xml
