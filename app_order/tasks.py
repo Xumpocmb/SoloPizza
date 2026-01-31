@@ -184,9 +184,7 @@ def collect_order_statistics():
 
     # Добавляем итоговую сумму для каждого филиала
     for branch_id in branch_stats:
-        branch_stats[branch_id]["total_amount"] = (
-            branch_stats[branch_id]["total_cash"] + branch_stats[branch_id]["total_card"] + branch_stats[branch_id]["total_noname"]
-        )
+        branch_stats[branch_id]["total_amount"] = branch_stats[branch_id]["total_cash"] + branch_stats[branch_id]["total_card"] + branch_stats[branch_id]["total_noname"]
 
     # Подсчет общих сумм для всех филиалов
     total_orders_count = sum(branch["orders_count"] for branch in branch_stats.values())
@@ -209,31 +207,170 @@ def collect_order_statistics():
     )
 
     # Отправка email отчета
+    # email_status = ""
+    # try:
+    #     recipient_email = getattr(settings, "EMAIL_RECIPIENT", None)
+    #     if recipient_email:
+    #         email_context = {
+    #             "branch_statistics": branch_stats,
+    #             "selected_date": today,
+    #         }
+    #         html_message = render_to_string("app_order/email/branch_statistics_email.html", email_context)
+
+    #         send_mail(
+    #             f'Дневной отчет по филиалам за {today.strftime("%d.%m.%Y")}',
+    #             "",  # Plain text message (can be empty)
+    #             settings.EMAIL_HOST_USER,
+    #             [recipient_email],
+    #             html_message=html_message,
+    #             fail_silently=False,
+    #         )
+    #         email_status = f"Отчет успешно отправлен на {recipient_email}."
+    #     else:
+    #         email_status = "Адрес получателя (EMAIL_RECIPIENT) не настроен в settings.py."
+    # except Exception as e:
+    #     email_status = f"Ошибка при отправке email: {e}"
+
+    if created:
+        return f"Статистика за {today} создана. Заказов: {total_orders_count}, общая сумма: {total_amount}. {email_status}"
+    else:
+        return f"Статистика за {today} обновлена. Заказов: {total_orders_count}, общая сумма: {total_amount}. {email_status}"
+
+
+@shared_task
+def collect_weekly_order_statistics():
+    """
+    Собирает статистику по заказам за последнюю неделю (понедельник-воскресенье) и сохраняет ее в БД.
+    Запускается еженедельно.
+    """
+    # Находим понедельник текущей недели
+    today = timezone.now().date()
+    week_start = today - timedelta(days=today.weekday())  # Понедельник недели
+    week_end = week_start + timedelta(days=6)  # Воскресенье недели
+
+    # Фильтруем заказы за неделю (с понедельника по воскресенье) со статусом, не равным 'Отменен', и только оплаченные
+    orders_week = Order.objects.filter(created_at__date__gte=week_start, created_at__date__lte=week_end, payment_status=True).exclude(status="canceled")
+
+    # Сбор статистики по филиалам
+    branch_stats = {}
+
+    for order in orders_week.select_related("branch"):
+        branch_id = order.branch.id
+        branch_name = order.branch.name
+
+        if branch_id not in branch_stats:
+            branch_stats[branch_id] = {
+                "name": branch_name,
+                "orders_count": 0,
+                "total_cash": Decimal("0.00"),
+                "total_card": Decimal("0.00"),
+                "total_noname": Decimal("0.00"),
+                "sold_items": {},
+            }
+
+        # Увеличиваем количество заказов для филиала
+        branch_stats[branch_id]["orders_count"] += 1
+
+        # Добавляем сумму заказа к соответствующему методу оплаты
+        if order.payment_method == "split":
+            # Для раздельной оплаты используем сохраненные суммы
+            branch_stats[branch_id]["total_cash"] += order.cash_amount
+            branch_stats[branch_id]["total_card"] += order.card_amount
+            branch_stats[branch_id]["total_noname"] += order.noname_amount
+        elif order.payment_method == "cash":
+            branch_stats[branch_id]["total_cash"] += order.total_price
+        elif order.payment_method == "card":
+            branch_stats[branch_id]["total_card"] += order.total_price
+        elif order.payment_method == "noname":
+            branch_stats[branch_id]["total_noname"] += order.total_price
+
+    # Обработка позиций заказов для статистики по товарам
+    order_items = OrderItem.objects.filter(order__in=orders_week).select_related("product", "variant", "order__branch")
+
+    for item in order_items:
+        branch_id = item.order.branch.id
+        item_name = f"{item.product.name} ({item.get_size_display()})"
+
+        if item_name not in branch_stats[branch_id]["sold_items"]:
+            branch_stats[branch_id]["sold_items"][item_name] = {"quantity": 0, "payment_methods": {}}
+
+        branch_stats[branch_id]["sold_items"][item_name]["quantity"] += item.quantity
+        order_payment_method = item.order.payment_method
+
+        # Get the final total for the item
+        item_calculation = item.calculate_item_total()
+        item_final_total = item_calculation["final_total"]
+
+        # Handle payment method distribution for split payments
+        if order_payment_method == "split":
+            # Calculate proportional amounts based on the split payment
+            total_order = item.order.total_price
+            if total_order > 0:
+                cash_ratio = item.order.cash_amount / total_order
+                card_ratio = item.order.card_amount / total_order
+                noname_ratio = item.order.noname_amount / total_order
+
+                cash_amount = item_final_total * cash_ratio
+                card_amount = item_final_total * card_ratio
+                noname_amount = item_final_total * noname_ratio
+
+                # Add to respective payment methods
+                cash_payment_method = "Наличные (раздельно)"
+                card_payment_method = "Карта (раздельно)"
+                noname_payment_method = "Безналичный (раздельно)"
+
+                if cash_payment_method not in branch_stats[branch_id]["sold_items"][item_name]["payment_methods"]:
+                    branch_stats[branch_id]["sold_items"][item_name]["payment_methods"][cash_payment_method] = Decimal("0.00")
+                branch_stats[branch_id]["sold_items"][item_name]["payment_methods"][cash_payment_method] += cash_amount
+
+                if card_payment_method not in branch_stats[branch_id]["sold_items"][item_name]["payment_methods"]:
+                    branch_stats[branch_id]["sold_items"][item_name]["payment_methods"][card_payment_method] = Decimal("0.00")
+                branch_stats[branch_id]["sold_items"][item_name]["payment_methods"][card_payment_method] += card_amount
+
+                if noname_payment_method not in branch_stats[branch_id]["sold_items"][item_name]["payment_methods"]:
+                    branch_stats[branch_id]["sold_items"][item_name]["payment_methods"][noname_payment_method] = Decimal("0.00")
+                branch_stats[branch_id]["sold_items"][item_name]["payment_methods"][noname_payment_method] += noname_amount
+        else:
+            payment_method = item.order.get_payment_method_display()
+
+            if payment_method not in branch_stats[branch_id]["sold_items"][item_name]["payment_methods"]:
+                branch_stats[branch_id]["sold_items"][item_name]["payment_methods"][payment_method] = Decimal("0.00")
+            branch_stats[branch_id]["sold_items"][item_name]["payment_methods"][payment_method] += item_final_total
+
+    # Добавляем итоговую сумму для каждого филиала
+    for branch_id in branch_stats:
+        branch_stats[branch_id]["total_amount"] = branch_stats[branch_id]["total_cash"] + branch_stats[branch_id]["total_card"] + branch_stats[branch_id]["total_noname"]
+
+    # Подсчет общих сумм для всех филиалов
+    total_orders_count = sum(branch["orders_count"] for branch in branch_stats.values())
+    total_cash = sum(branch["total_cash"] for branch in branch_stats.values())
+    total_card = sum(branch["total_card"] for branch in branch_stats.values())
+    total_noname = sum(branch["total_noname"] for branch in branch_stats.values())
+    total_amount = total_cash + total_card + total_noname
+
+    # Отправка email отчета
     email_status = ""
     try:
         recipient_email = getattr(settings, "EMAIL_RECIPIENT", None)
         if recipient_email:
             email_context = {
                 "branch_statistics": branch_stats,
-                "selected_date": today,
+                "selected_date": f"{week_start.strftime('%d.%m.%Y')} - {week_end.strftime('%d.%m.%Y')}",
             }
             html_message = render_to_string("app_order/email/branch_statistics_email.html", email_context)
 
             send_mail(
-                f'Дневной отчет по филиалам за {today.strftime("%d.%m.%Y")}',
-                '',  # Plain text message (can be empty)
+                f'Недельный отчет по филиалам за период {week_start.strftime("%d.%m.%Y")} - {week_end.strftime("%d.%m.%Y")}',
+                "",  # Plain text message (can be empty)
                 settings.EMAIL_HOST_USER,
                 [recipient_email],
                 html_message=html_message,
                 fail_silently=False,
             )
-            email_status = f"Отчет успешно отправлен на {recipient_email}."
+            email_status = f"Недельный отчет успешно отправлен на {recipient_email}."
         else:
             email_status = "Адрес получателя (EMAIL_RECIPIENT) не настроен в settings.py."
     except Exception as e:
         email_status = f"Ошибка при отправке email: {e}"
 
-    if created:
-        return f"Статистика за {today} создана. Заказов: {total_orders_count}, общая сумма: {total_amount}. {email_status}"
-    else:
-        return f"Статистика за {today} обновлена. Заказов: {total_orders_count}, общая сумма: {total_amount}. {email_status}"
+    return f"Недельная статистика за период {week_start.strftime('%d.%m.%Y')} - {week_end.strftime('%d.%m.%Y')} собрана. Заказов: {total_orders_count}, общая сумма: {total_amount}. {email_status}"

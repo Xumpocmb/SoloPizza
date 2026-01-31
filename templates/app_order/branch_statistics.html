@@ -116,6 +116,23 @@
         .back-to-statistics:hover {
             background-color: #5a6268;
         }
+        
+        .send-email-btn {
+            display: inline-block;
+            margin: 20px;
+            padding: 8px 16px;
+            background-color: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 0.9em;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .send-email-btn:hover {
+            background-color: #218838;
+        }
     </style>
 {% endblock %}
 
@@ -140,6 +157,15 @@
         <a href="{% url 'app_order:order_statistics' %}" class="back-to-statistics">← Назад к общей статистике</a>
         
         <h1 class="page-title">Статистика по филиалам за {{ selected_date|date:"d.m.Y" }}</h1>
+        
+        {% if user.is_superuser %}
+        <!-- Кнопка отправки отчета по email -->
+        <form method="post" action="{% url 'app_order:send_branch_statistics_email' %}" style="display:inline; margin-left: 20px;">
+            {% csrf_token %}
+            <input type="hidden" name="date" value="{{ selected_date|date:"Y-m-d" }}">
+            <button type="submit" class="send-email-btn" onclick="return confirm('Вы уверены, что хотите отправить отчет по email?')">Отправить отчет по email</button>
+        </form>
+        {% endif %}
         
         {% for branch_id, branch_data in branch_statistics.items %}
             <div class="branch-header">

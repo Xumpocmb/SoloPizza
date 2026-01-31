@@ -13,6 +13,7 @@ from app_order.views import (
     order_statistics_view,
     branch_statistics_view,
     reports_view,
+    send_branch_statistics_email,
 )
 
 app_name = "app_order"
@@ -31,4 +32,5 @@ urlpatterns = [
     path("statistics/", order_statistics_view, name="order_statistics"),
     path("statistics/branch/<str:date>/", branch_statistics_view, name="branch_statistics"),
     path("reports/", reports_view, name="reports"),
+    path("send-branch-statistics-email/", send_branch_statistics_email, name="send_branch_statistics_email"),
 ]

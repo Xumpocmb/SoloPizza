@@ -782,9 +782,7 @@ def reports_view(request):
 
     # Добавляем итоговую сумму для каждого филиала
     for branch_id in branch_stats:
-        branch_stats[branch_id]["total_amount"] = (
-            branch_stats[branch_id]["total_cash"] + branch_stats[branch_id]["total_card"] + branch_stats[branch_id]["total_noname"]
-        )
+        branch_stats[branch_id]["total_amount"] = branch_stats[branch_id]["total_cash"] + branch_stats[branch_id]["total_card"] + branch_stats[branch_id]["total_noname"]
 
     # Подсчет общих сумм для всех филиалов
     total_orders_count = sum(branch["orders_count"] for branch in branch_stats.values())
@@ -806,3 +804,64 @@ def reports_view(request):
     }
 
     return render(request, "app_order/reports.html", context)
+
+
+@login_required
+@require_POST
+def send_branch_statistics_email(request):
+    """
+    Отправляет статистику по филиалам за выбранный день на email
+    """
+    if not request.user.is_staff:
+        return HttpResponseForbidden("Доступ запрещен")
+
+    from django.core.mail import send_mail
+    from django.template.loader import render_to_string
+    from django.conf import settings
+    from datetime import datetime
+    from .models import OrderStatistic
+
+    # Получаем дату из POST-запроса
+    date_str = request.POST.get("date")
+    try:
+        selected_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+    except ValueError:
+        messages.error(request, "Неверный формат даты")
+        return redirect(request.META.get("HTTP_REFERER", "app_order:order_list"))
+
+    # Получаем статистику для выбранной даты
+    try:
+        statistic = OrderStatistic.objects.get(date=selected_date)
+    except OrderStatistic.DoesNotExist:
+        messages.error(request, "Статистика для указанной даты не найдена")
+        return redirect(request.META.get("HTTP_REFERER", "app_order:order_list"))
+
+    # Получаем структуру данных по филиалам
+    branch_statistics = statistic.sold_items
+
+    # Отправка email отчета
+    email_status = ""
+    try:
+        recipient_email = getattr(settings, "EMAIL_RECIPIENT", None)
+        if recipient_email:
+            email_context = {
+                "branch_statistics": branch_statistics,
+                "selected_date": selected_date,
+            }
+            html_message = render_to_string("app_order/email/branch_statistics_email.html", email_context)
+
+            send_mail(
+                f'Дневной отчет по филиалам за {selected_date.strftime("%d.%m.%Y")}',
+                "",  # Plain text message (can be empty)
+                settings.EMAIL_HOST_USER,
+                [recipient_email],
+                html_message=html_message,
+                fail_silently=False,
+            )
+            messages.success(request, f"Отчет за {selected_date.strftime('%d.%m.%Y')} успешно отправлен на {recipient_email}")
+        else:
+            messages.error(request, "Адрес получателя (EMAIL_RECIPIENT) не настроен в settings.py.")
+    except Exception as e:
+        messages.error(request, f"Ошибка при отправке email: {e}")
+
+    return redirect(request.META.get("HTTP_REFERER", "app_order:order_list"))
