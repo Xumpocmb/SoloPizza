@@ -176,9 +176,6 @@ def delivery_view(request):
     return render(request, "app_home/delivery.html", context=context)
 
 
-# Удалено: представление utm_analytics_view перемещено в app_tracker/views.py
-
-
 def partners_view(request):
     """Отображает страницу с информацией о партнерах"""
     from app_home.models import Partner
