@@ -50,13 +50,11 @@ INSTALLED_APPS = [
     "app_cart.apps.AppCartConfig",
     "app_order.apps.AppOrderConfig",
     "app_reviews.apps.AppReviewsConfig",
-    "app_tracker.apps.AppTrackerConfig",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-    "app_tracker.middleware.UTMTrackingMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
