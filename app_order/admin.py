@@ -10,6 +10,9 @@ class OrderAdminForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
+        if cleaned_data is None:
+            return cleaned_data
+        
         payment_method = cleaned_data.get('payment_method')
         total_price = cleaned_data.get('total_price', 0)
 
@@ -127,9 +130,30 @@ class OrderAdmin(admin.ModelAdmin):
 
 @admin.register(OrderStatistic)
 class OrderStatisticAdmin(admin.ModelAdmin):
-    list_display = ('date', 'orders_count', 'total_cash', 'total_card', 'total_amount')
+    list_display = ('date', 'orders_count', 'total_cash', 'total_card', 'total_noname', 'total_amount')
     list_filter = ('date',)
     search_fields = ('date',)
     date_hierarchy = 'date'
     ordering = ('-date',)
+    readonly_fields = ('sold_items_display',)
+    fieldsets = (
+        ('Основная информация', {
+            'fields': ('date', 'orders_count', 'total_cash', 'total_card', 'total_noname', 'total_amount')
+        }),
+        ('Проданные товары', {
+            'fields': ('sold_items_display',),
+            'classes': ('collapse',)
+        }),
+    )
+
+    def sold_items_display(self, obj):
+        import json
+        from decimal import Decimal
+        class DecimalEncoder(json.JSONEncoder):
+            def default(self, o):
+                if isinstance(o, Decimal):
+                    return str(o)
+                return super().default(o)
+        return json.dumps(obj.sold_items, cls=DecimalEncoder, ensure_ascii=False, indent=2)
+    sold_items_display.short_description = 'Проданные товары'
 

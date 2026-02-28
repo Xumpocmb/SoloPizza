@@ -1,0 +1,217 @@
+{% load custom_filters %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Отчет по филиалам за период</title>
+    <style>
+        .order-statistics-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            font-family: sans-serif;
+        }
+        .report-header {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .report-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #333;
+            margin: 0 10px 0;
+        }
+        .report-period {
+            color: #6c757d;
+            margin-top: 10px;
+        }
+        .branch-statistics-container {
+            margin-top: 20px;
+        }
+        .branch-header {
+            background-color: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .branch-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #333;
+            margin: 0 10px 10px;
+        }
+        .branch-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .summary-card {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 12px;
+        }
+        .summary-title {
+            font-weight: bold;
+            color: #6c757d;
+            margin-bottom: 5px;
+            font-size: 0.85em;
+        }
+        .summary-value {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #495057;
+        }
+        .items-list {
+            margin-top: 15px;
+        }
+        .items-title {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .item-entry {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .item-entry:last-child {
+            border-bottom: none;
+        }
+        .item-info {
+            flex: 1;
+        }
+        .item-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        .item-quantity {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+        .payment-methods {
+            flex: 1;
+            text-align: right;
+        }
+        .method-item {
+            display: block;
+            margin-bottom: 3px;
+            font-size: 0.9em;
+            color: #495057;
+        }
+        hr {
+            margin: 30px 0;
+            border: 0;
+            border-top: 1px solid #eee;
+        }
+        .no-orders {
+            text-align: center;
+            padding: 20px;
+            color: #777;
+        }
+        .total-summary {
+            background-color: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .total-summary-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="order-statistics-container">
+        <div class="report-header">
+            <h1 class="report-title">Статистика по филиалам</h1>
+            <p class="report-period">Период: с {{ start_date|date:"d.m.Y" }} по {{ end_date|date:"d.m.Y" }}</p>
+        </div>
+
+        {% for branch_id, branch_data in branch_statistics.items %}
+            <div class="branch-statistics-container">
+                <div class="branch-header">
+                    <h2 class="branch-name">{{ branch_data.name }}</h2>
+
+                    <div class="branch-summary">
+                        <div class="summary-card">
+                            <div class="summary-title">Количество заказов</div>
+                            <div class="summary-value">{{ branch_data.orders_count }}</div>
+                        </div>
+
+                        <div class="summary-card">
+                            <div class="summary-title">Наличные</div>
+                            <div class="summary-value">{{ branch_data.total_cash|format_price }}</div>
+                        </div>
+
+                        <div class="summary-card">
+                            <div class="summary-title">Карта</div>
+                            <div class="summary-value">{{ branch_data.total_card|format_price }}</div>
+                        </div>
+
+                        <div class="summary-card">
+                            <div class="summary-title">Безнал</div>
+                            <div class="summary-value">{{ branch_data.total_noname|format_price }}</div>
+                        </div>
+
+                        <div class="summary-card">
+                            <div class="summary-title">Итого</div>
+                            <div class="summary-value">{{ branch_data.total_amount|format_price }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                {% if branch_data.sold_items %}
+                    <div class="items-list">
+                        <h3 class="items-title">Проданные товары</h3>
+                        {% for item_name, item_data in branch_data.sold_items.items %}
+                            <div class="item-entry">
+                                <div class="item-info">
+                                    <div class="item-name">{{ item_name }}</div>
+                                    <div class="item-quantity">Продано: {{ item_data.quantity }} шт.</div>
+                                </div>
+                                <div class="payment-methods">
+                                    {% for method, amount in item_data.payment_methods.items %}
+                                        <span class="method-item">
+                                            {% if method == "Наличные (раздельно)" %}
+                                                Наличные (разд.): {{ amount|format_price }}
+                                            {% elif method == "Карта (раздельно)" %}
+                                                Карта (разд.): {{ amount|format_price }}
+                                            {% elif method == "Безналичный (раздельно)" %}
+                                                Безнал (разд.): {{ amount|format_price }}
+                                            {% else %}
+                                                {{ method }}: {{ amount|format_price }}
+                                            {% endif %}
+                                        </span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p>Нет данных о проданных товарах.</p>
+                {% endif %}
+            </div>
+
+            <hr>
+        {% endfor %}
+
+        {% if not branch_statistics %}
+            <div class="no-orders">
+                <p>Нет данных для отображения за указанный период.</p>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>

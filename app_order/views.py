@@ -9,8 +9,8 @@ from django.urls import reverse
 from django.views.decorators.http import require_POST
 from django.utils import timezone
 from datetime import time
-from app_cart.models import CartItem  # Still needed for `CartItem.objects.total_quantity` in some cases
-from app_cart.session_cart import SessionCart  # Import SessionCart
+from app_cart.models import CartItem
+from app_cart.session_cart import SessionCart
 from app_cart.utils import validate_cart_items_for_branch
 from app_home.models import CafeBranch, WorkingHours
 from app_order.forms import CheckoutForm, OrderEditForm, OrderItemFormSet, AddToOrderForm
@@ -23,6 +23,11 @@ import os
 
 
 DEFAULT_BRANCH_ID = 1
+
+
+def get_recipient_emails():
+    """Возвращает список email-адресов получателей из настроек."""
+    return [email.strip() for email in settings.EMAIL_RECIPIENTS_LIST if email.strip()]
 
 
 def is_order_time_allowed(user):
@@ -197,9 +202,6 @@ def checkout(request):
     }
 
     return render(request, "app_order/checkout.html", context)
-
-
-# Функция send_notify больше не используется, так как уведомления отправляются через Celery задачу send_order_notification
 
 
 def order_detail(request, order_id):
@@ -645,7 +647,7 @@ def order_statistics_view(request):
 
 
 @login_required
-def branch_statistics_view(request, date):
+def detail_statistics_view(request, date):
     if not request.user.is_staff:
         return HttpResponseForbidden("Доступ запрещен")
 
@@ -673,10 +675,10 @@ def branch_statistics_view(request, date):
         "breadcrumbs": [
             {"title": "Главная", "url": "/"},
             {"title": "Статистика заказов", "url": reverse("app_order:order_statistics")},
-            {"title": f"Статистика по филиалам за {selected_date.strftime('%d.%m.%Y')}", "url": "#"},
+            {"title": f"Детальная статистика за {selected_date.strftime('%d.%m.%Y')}", "url": "#"},
         ],
     }
-    return render(request, "app_order/branch_statistics.html", context)
+    return render(request, "app_order/detail_statistics.html", context)
 
 
 @login_required
@@ -808,9 +810,9 @@ def reports_view(request):
 
 @login_required
 @require_POST
-def send_branch_statistics_email(request):
+def send_detail_statistics_email(request):
     """
-    Отправляет статистику по филиалам за выбранный день на email
+    Отправляет детальную статистику по филиалам за выбранный день на email
     """
     if not request.user.is_staff:
         return HttpResponseForbidden("Доступ запрещен")
@@ -842,8 +844,9 @@ def send_branch_statistics_email(request):
     # Отправка email отчета
     email_status = ""
     try:
-        recipient_email = getattr(settings, "EMAIL_RECIPIENT", None)
-        if recipient_email:
+        recipient_emails = get_recipient_emails()
+
+        if recipient_emails:
             email_context = {
                 "branch_statistics": branch_statistics,
                 "selected_date": selected_date,
@@ -854,14 +857,128 @@ def send_branch_statistics_email(request):
                 f'Дневной отчет по филиалам за {selected_date.strftime("%d.%m.%Y")}',
                 "",  # Plain text message (can be empty)
                 settings.EMAIL_HOST_USER,
-                [recipient_email],
+                recipient_emails,  # Отправляем на все email-адреса
                 html_message=html_message,
                 fail_silently=False,
             )
-            messages.success(request, f"Отчет за {selected_date.strftime('%d.%m.%Y')} успешно отправлен на {recipient_email}")
+            messages.success(request, f"Отчет за {selected_date.strftime('%d.%m.%Y')} успешно отправлен на {', '.join(recipient_emails)}")
         else:
             messages.error(request, "Адрес получателя (EMAIL_RECIPIENT) не настроен в settings.py.")
     except Exception as e:
         messages.error(request, f"Ошибка при отправке email: {e}")
 
     return redirect(request.META.get("HTTP_REFERER", "app_order:order_list"))
+
+@login_required
+def send_order_statistics_email(request):
+    """
+    Отправляет статистику заказов за выбранный период на email.
+    Агрегирует готовые данные из модели OrderStatistic.
+    """
+    if not request.user.is_staff:
+        return HttpResponseForbidden("Доступ запрещен")
+
+    from django.core.mail import send_mail
+    from django.template.loader import render_to_string
+    from django.conf import settings
+    from datetime import datetime
+    from decimal import Decimal
+    from .models import OrderStatistic
+
+    # Получаем даты из POST-запроса
+    start_date_str = request.POST.get("start_date")
+    end_date_str = request.POST.get("end_date")
+
+    try:
+        start_date = datetime.strptime(start_date_str, "%Y-%m-%d").date()
+        end_date = datetime.strptime(end_date_str, "%Y-%m-%d").date()
+    except (ValueError, TypeError):
+        messages.error(request, "Неверный формат даты")
+        return redirect(request.META.get("HTTP_REFERER", "app_order:order_statistics"))
+
+    # Получаем статистику за указанный период
+    statistics = OrderStatistic.objects.filter(
+        date__gte=start_date,
+        date__lte=end_date
+    ).order_by('date')
+
+    if not statistics:
+        messages.warning(request, f"Нет данных статистики за период с {start_date.strftime('%d.%m.%Y')} по {end_date.strftime('%d.%m.%Y')}")
+        return redirect(request.META.get("HTTP_REFERER", "app_order:order_statistics"))
+
+    # Агрегируем данные по филиалам за весь период
+    branch_stats = {}
+
+    for stat in statistics:
+        # sold_items имеет структуру: {branch_id: {name, orders_count, total_cash, total_card, total_noname, sold_items}}
+        for branch_id, branch_data in stat.sold_items.items():
+            branch_id = str(branch_id)  # JSON ключи всегда строки
+            
+            if branch_id not in branch_stats:
+                branch_stats[branch_id] = {
+                    "name": branch_data.get("name", "Неизвестно"),
+                    "orders_count": 0,
+                    "total_cash": Decimal("0.00"),
+                    "total_card": Decimal("0.00"),
+                    "total_noname": Decimal("0.00"),
+                    "sold_items": {},
+                }
+
+            # Суммируем показатели филиала
+            branch_stats[branch_id]["orders_count"] += branch_data.get("orders_count", 0)
+            branch_stats[branch_id]["total_cash"] += Decimal(str(branch_data.get("total_cash", 0)))
+            branch_stats[branch_id]["total_card"] += Decimal(str(branch_data.get("total_card", 0)))
+            branch_stats[branch_id]["total_noname"] += Decimal(str(branch_data.get("total_noname", 0)))
+
+            # Агрегируем проданные товары
+            for item_name, item_data in branch_data.get("sold_items", {}).items():
+                if item_name not in branch_stats[branch_id]["sold_items"]:
+                    branch_stats[branch_id]["sold_items"][item_name] = {
+                        "quantity": 0,
+                        "payment_methods": {}
+                    }
+                
+                # Суммируем количество
+                branch_stats[branch_id]["sold_items"][item_name]["quantity"] += item_data.get("quantity", 0)
+                
+                # Суммируем суммы по методам оплаты
+                for method, amount in item_data.get("payment_methods", {}).items():
+                    if method not in branch_stats[branch_id]["sold_items"][item_name]["payment_methods"]:
+                        branch_stats[branch_id]["sold_items"][item_name]["payment_methods"][method] = Decimal("0.00")
+                    branch_stats[branch_id]["sold_items"][item_name]["payment_methods"][method] += Decimal(str(amount))
+
+    # Добавляем итоговую сумму для каждого филиала
+    for branch_id in branch_stats:
+        branch_stats[branch_id]["total_amount"] = (
+            branch_stats[branch_id]["total_cash"] + 
+            branch_stats[branch_id]["total_card"] + 
+            branch_stats[branch_id]["total_noname"]
+        )
+
+    # Отправка email отчета
+    try:
+        recipient_emails = get_recipient_emails()
+
+        if recipient_emails:
+            email_context = {
+                "branch_statistics": branch_stats,
+                "start_date": start_date,
+                "end_date": end_date,
+            }
+            html_message = render_to_string("app_order/email/order_statistics_email.html", email_context)
+
+            send_mail(
+                f'Отчет по филиалам за период с {start_date.strftime("%d.%m.%Y")} по {end_date.strftime("%d.%m.%Y")}',
+                "",
+                settings.EMAIL_HOST_USER,
+                recipient_emails,
+                html_message=html_message,
+                fail_silently=False,
+            )
+            messages.success(request, f"Отчет за период с {start_date.strftime('%d.%m.%Y')} по {end_date.strftime('%d.%m.%Y')} успешно отправлен на {', '.join(recipient_emails)}")
+        else:
+            messages.error(request, "Адрес получателя (EMAIL_RECIPIENT) не настроен в settings.py.")
+    except Exception as e:
+        messages.error(request, f"Ошибка при отправке email: {e}")
+
+    return redirect(request.META.get("HTTP_REFERER", "app_order:order_statistics"))

@@ -51,6 +51,32 @@
             </form>
         </div>
 
+        <div class="order-controls" style="justify-content: flex-end; margin-bottom: 20px;">
+            <button type="button" class="filter-button" id="openEmailModalBtn" style="background-color: #28a745; color: white;">
+                📧 Отправить по email
+            </button>
+        </div>
+
+        <!-- Modal for email sending -->
+        <div id="emailModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
+            <div class="modal-content" style="background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 400px; max-width: 90%; border-radius: 8px;">
+                <span class="close" id="closeModalBtn" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+                <h2 style="margin-top: 0;">Отправить статистику по email</h2>
+                <form method="post" action="{% url 'app_order:send_order_statistics_email' %}">
+                    {% csrf_token %}
+                    <div style="margin-bottom: 15px;">
+                        <label for="modal_start_date" style="display: block; margin-bottom: 5px; font-weight: bold;">Дата начала:</label>
+                        <input type="date" name="start_date" id="modal_start_date" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <label for="modal_end_date" style="display: block; margin-bottom: 5px; font-weight: bold;">Дата окончания:</label>
+                        <input type="date" name="end_date" id="modal_end_date" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                    </div>
+                    <button type="submit" class="filter-button" style="background-color: #28a745; color: white; width: 100%;">Отправить</button>
+                </form>
+            </div>
+        </div>
+
         <div class="statistics-table">
             <div class="table-header">
                 <div class="header-cell date-col">
@@ -102,7 +128,7 @@
                 <div class="table-cell" data-label="Итоговая сумма">{{ stat.total_amount|format_price }}</div>
                 <div class="table-cell branch-stats-cell" data-label="Статистика по филиалам">
                     {% if stat.sold_items %}
-                        <a href="{% url 'app_order:branch_statistics' stat.date|date:'Y-m-d' %}" class="button-link">Подробнее</a>
+                        <a href="{% url 'app_order:detail_statistics' stat.date|date:'Y-m-d' %}" class="button-link">Подробнее</a>
                     {% else %}
                         Нет данных
                     {% endif %}
@@ -149,4 +175,44 @@
 {% endblock %}
 
 {% block scripts %}
+<script>
+    // Modal functionality for email sending
+    document.addEventListener('DOMContentLoaded', function() {
+        var modal = document.getElementById("emailModal");
+        var openBtn = document.getElementById("openEmailModalBtn");
+        var closeBtn = document.getElementById("closeModalBtn");
+        var modalStartDate = document.getElementById("modal_start_date");
+        var modalEndDate = document.getElementById("modal_end_date");
+        var filterStartDate = document.getElementById("start_date");
+        var filterEndDate = document.getElementById("end_date");
+
+        // Open modal
+        if (openBtn) {
+            openBtn.onclick = function() {
+                // Pre-fill with filter dates if available
+                if (filterStartDate && filterStartDate.value) {
+                    modalStartDate.value = filterStartDate.value;
+                }
+                if (filterEndDate && filterEndDate.value) {
+                    modalEndDate.value = filterEndDate.value;
+                }
+                modal.style.display = "block";
+            }
+        }
+
+        // Close modal
+        if (closeBtn) {
+            closeBtn.onclick = function() {
+                modal.style.display = "none";
+            }
+        }
+
+        // Close when clicking outside modal
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    });
+</script>
 {% endblock %}
