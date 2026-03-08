@@ -88,7 +88,7 @@
                                         <span class="option-description">Оплата наличными при получении</span>
                                     {% elif choice.data.value == 'card' %}
                                         <span class="option-description">Оплата картой при получении</span>
-                                    {% elif choice.data.value == 'noname' %}
+                                    {% elif choice.data.value == 'noname' and user.is_staff %}
                                         <span class="option-description">Безналичный расчет</span>
                                     {% endif %}
                                 </label>
@@ -140,6 +140,14 @@
                         <a href="{% url 'app_cart:view_cart' %}" class="back-link">Вернуться в корзину</a>
                         <button type="submit" onclick="ym(105147095, 'reachGoal', 'order'); return true;" class="submit-order-btn">Подтвердить заказ</button>
                     </div>
+
+                    <div class="order-warning-text" style="text-align: center; color: #881c1c; margin: 10px auto;">
+                        <p>После оформления заказа с Вами свяжется оператор для подтверждения заказа.</p>
+                        <p>Если заказ не будет подтвержден, он будет отменен.</p>
+                        <p>В случае, если с Вами не связались в течении 15ти минут, пожалуйста, перезвоните нам по нашим номерам и сообщите Ваш
+                            номер заказа</p>
+                    </div>
+                    
                 </form>
 
                 <div class="order-summary">
