@@ -182,5 +182,11 @@
     display: none;
 }
 
+.delivery-text {
+    font-size: 0.5em;
+    color: var(--text-color);
+    opacity: 0.8;
+}
+
 
 
