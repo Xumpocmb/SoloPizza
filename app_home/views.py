@@ -20,9 +20,11 @@ from app_cart.session_cart import SessionCart  # Import SessionCart
 def home_page(request):
     active_vacancies = Vacancy.objects.filter(is_active=True)
     active_marquees = Marquee.objects.filter(is_active=True)
+    featured_products = Product.objects.filter(is_active=True, display_on_main=True).prefetch_related('variants')
     context = {
         "vacancies": active_vacancies,
         "marquees": active_marquees,
+        "featured_products": featured_products,
     }
     return render(request, "app_home/home.html", context=context)
 

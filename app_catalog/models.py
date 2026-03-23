@@ -51,6 +51,7 @@ class Product(models.Model):
     is_combo = models.BooleanField('Комбо-набор', default=False)
     is_sweet = models.BooleanField('Сладкий', default=False)
     is_carbonated = models.BooleanField('Газированный', default=None, null=True, blank=True, help_text='Применимо к напиткам')
+    display_on_main = models.BooleanField('Отображать на главной', default=False, help_text='Показывать товар на главной странице')
 
     # Fields for product parameters
     has_base_sauce = models.BooleanField('Наличие соуса основы', default=False)

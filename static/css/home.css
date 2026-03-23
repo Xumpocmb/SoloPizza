@@ -3,6 +3,19 @@
     font-size: 2.0rem;
 }
 
+.featured_title {
+    margin-bottom: 20px;
+    font-size: 2.0rem;
+}
+
+.featured_products_container {
+    margin-bottom: 40px;
+}
+
+.section_featured_products {
+    margin-bottom: 40px;
+}
+
 .page_text_container {
     display: flex;
     justify-content: center;

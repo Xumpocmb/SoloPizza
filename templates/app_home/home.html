@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="{% static 'css/promo_page.css' %}">
     <link rel="stylesheet" href="{% static 'css/swiper-bundle.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/swiper.css' %}">
+    <link rel="stylesheet" href="{% static 'css/catalog.css' %}">
 {% endblock %}
 {% block schema_markup %}
 <script type="application/ld+json">
@@ -117,6 +118,44 @@
                 </div>
             </section>
             {% include "app_home/includes/vacancy.html" %}
+            {% if featured_products %}
+                <section class="section_featured_products">
+                    <div class="featured_products_container">
+                        <div class="page_title">
+                            <h2 class="featured_title">Наши новинки:</h2>
+                            <div class="divider"></div>
+                        </div>
+                        <div class="items-catalog">
+                            {% for product in featured_products %}
+                                <div class="item-card">
+                                    <a href="{% url 'app_catalog:item_detail' product.slug %}">
+                                        {% if product.image %}
+                                        <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                                        {% else %}
+                                        <img src="{% static 'img/No-Image-Placeholder.svg' %}" alt="{{ product.name }}">
+                                        {% endif %}
+                                    </a>
+                                    <h2>{{ product.name }}</h2>
+                                    <p>{{ product.description|truncatewords:15 }}</p>
+                                    <div class="cart_price_section">
+                                        {% if product.is_weekly_special %}
+                                            <span class="discount-badge">Пицца недели</span>
+                                        {% endif %}
+                                        <div class="price">
+                                            {% if product.variants.exists %}
+                                                от {{ product.variants.first.price|floatformat:2 }} руб.
+                                            {% else %}
+                                                Цена не указана
+                                            {% endif %}
+                                        </div>
+                                        <a class="order-link" href="{% url 'app_catalog:item_detail' product.slug %}">Заказать</a>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </section>
+            {% endif %}
             {% if categories %}
                 <section class="section_categories">
                     <div class="categories_container">
