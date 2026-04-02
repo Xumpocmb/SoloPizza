@@ -116,6 +116,65 @@
         .back-to-statistics:hover {
             background-color: #5a6268;
         }
+
+        /* Стили для таблицы статистики сотрудников */
+        .employee-stats-table .table-header {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            padding: 12px 15px;
+            background-color: var(--accent-color);
+            color: white;
+            font-weight: 600;
+            border-radius: 4px 4px 0 0;
+        }
+
+        .employee-stats-table .table-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            align-items: center;
+        }
+
+        .employee-stats-table .table-row:hover {
+            background-color: #f8f9fa;
+        }
+
+        .employee-stats-table .table-cell {
+            padding: 5px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        @media screen and (max-width: 768px) {
+            .employee-stats-table .table-header {
+                display: none;
+            }
+
+            .employee-stats-table .table-row {
+                display: flex;
+                flex-direction: column;
+                padding: 15px;
+                margin-bottom: 10px;
+                border-radius: 4px;
+                background-color: #fff;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            }
+
+            .employee-stats-table .table-cell {
+                padding: 10px 5px;
+                width: 100%;
+                text-align: right;
+            }
+
+            .employee-stats-table .table-cell::before {
+                content: attr(data-label);
+                font-weight: bold;
+                margin-right: 10px;
+                color: var(--text-muted);
+                text-align: left;
+            }
+        }
     </style>
 {% endblock %}
 
@@ -242,6 +301,36 @@
                 <p>Нет данных для отображения.</p>
             </div>
         {% endif %}
+
+        <!-- Статистика по сотрудникам -->
+        <div class="branch-header" style="margin-top: 40px;">
+            <h2 class="branch-name">Статистика по сотрудникам</h2>
+
+            {% if employee_statistics %}
+                <div class="employee-stats-table" style="margin-top: 20px;">
+                    <div class="table-header">
+                        <div class="header-cell">Сотрудник</div>
+                        <div class="header-cell">Количество заказов</div>
+                        <div class="header-cell">Сумма заказов</div>
+                    </div>
+
+                    {% for employee in employee_statistics %}
+                    <div class="table-row">
+                        <div class="table-cell" data-label="Сотрудник">
+                            {{ employee.user.get_full_name|default:employee.user.username }}
+                            {% if employee.user.is_superuser %}
+                                <span style="font-size: 0.8em; color: #6c757d;">(Администратор)</span>
+                            {% endif %}
+                        </div>
+                        <div class="table-cell" data-label="Количество заказов">{{ employee.orders_count }}</div>
+                        <div class="table-cell" data-label="Сумма заказов">{{ employee.total_amount|format_price }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p style="margin-top: 20px; color: #6c757d;">Нет данных по сотрудникам за сегодня.</p>
+            {% endif %}
+        </div>
     </div>
 </main>
 {% endblock %}

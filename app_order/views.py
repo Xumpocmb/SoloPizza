@@ -793,6 +793,32 @@ def reports_view(request):
     total_noname = sum(branch["total_noname"] for branch in branch_stats.values())
     total_amount = total_cash + total_card + total_noname
 
+    # Статистика по сотрудникам (is_staff=True)
+    employee_stats = {}
+    orders_with_user = orders_today.filter(user__is_staff=True).select_related("user")
+    
+    for order in orders_with_user:
+        user = order.user
+        if user not in employee_stats:
+            employee_stats[user] = {
+                "orders_count": 0,
+                "total_amount": Decimal("0.00"),
+            }
+        employee_stats[user]["orders_count"] += 1
+        employee_stats[user]["total_amount"] += order.total_price
+
+    # Преобразуем в список для удобного отображения в шаблоне
+    employee_statistics = [
+        {
+            "user": user,
+            "orders_count": data["orders_count"],
+            "total_amount": data["total_amount"],
+        }
+        for user, data in employee_stats.items()
+    ]
+    # Сортируем по сумме заказов (по убыванию)
+    employee_statistics.sort(key=lambda x: x["total_amount"], reverse=True)
+
     # Формируем контекст
     context = {
         "branch_statistics": branch_stats,
@@ -802,6 +828,7 @@ def reports_view(request):
         "total_card": total_card,
         "total_noname": total_noname,
         "total_amount": total_amount,
+        "employee_statistics": employee_statistics,
         "breadcrumbs": [{"title": "Главная", "url": "/"}, {"title": "Отчеты", "url": "#"}],
     }
 
