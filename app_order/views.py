@@ -566,7 +566,7 @@ def print_check_fastfood_only(request, order_id):
 
     # Получаем позиции фастфуда, соусов и бургеров
     items = (
-        order.items.filter(product__category__name__in=["Фастфуд", "Бургеры", "Соусы", "Сковородки"])
+        order.items.filter(product__category__name__in=["Закуски", "Бургеры", "Соусы", "Горячие блюда"])
         .select_related("product__category", "variant__size", "board1__board", "board2__board", "sauce")
         .prefetch_related("addons")
     )
