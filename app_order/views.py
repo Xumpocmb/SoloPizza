@@ -169,10 +169,14 @@ def checkout(request):
             # Пересчитываем итоги заказа после добавления всех товаров
             order.recalculate_totals()
             session_cart.clear()  # Clear the session cart after order is placed
-            if not settings.DEBUG and not request.user.is_superuser and not request.user.is_staff:
-                from .tasks import send_order_notification
+            # ------------------------------
+            # --- УВЕДОМЛЕНИЯ В ТГ ОТКЛЮЧЕНЫ
+            # ------------------------------
 
-                send_order_notification.delay(order.id)
+            # if not settings.DEBUG and not request.user.is_superuser and not request.user.is_staff:
+            #     from .tasks import send_order_notification
+
+            #     send_order_notification.delay(order.id)
             messages.success(request, f"Ваш заказ №{order.id} успешно оформлен!")
             response = redirect("app_order:order_detail", order_id=order.id)
             # Set guest_token cookie if it doesn't exist, using the same token as the order
