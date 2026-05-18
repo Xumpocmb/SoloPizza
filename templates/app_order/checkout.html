@@ -79,21 +79,29 @@
                         <h2 class="section-title">Способ оплаты</h2>
 
                         <div class="options-group">
-                        {% for choice in form.payment_method %}
-                            <div class="option-item">
-                                {{ choice.tag }}
-                                <label for="{{ choice.id_for_label }}" class="option-label">
-                                    <span class="option-title">{{ choice.choice_label }}</span>
-                                    {% if choice.data.value == 'cash' %}
-                                        <span class="option-description">Оплата наличными при получении</span>
-                                    {% elif choice.data.value == 'card' %}
-                                        <span class="option-description">Оплата картой при получении</span>
-                                    {% elif choice.data.value == 'noname' and user.is_staff %}
-                                        <span class="option-description">Безналичный расчет</span>
-                                    {% endif %}
-                                </label>
-                            </div>
-                        {% endfor %}
+                            {% for choice in form.payment_method %}
+                                {% if choice.data.value == 'split' and not user.is_staff %}
+                                    {# Пропускаем вариант split для не-staff пользователей #}
+                                {% elif choice.data.value == 'noname' and not user.is_staff %}
+                                    {# Пропускаем вариант noname для не-staff пользователей #}
+                                {% else %}
+                                    <div class="option-item">
+                                        {{ choice.tag }}
+                                        <label for="{{ choice.id_for_label }}" class="option-label">
+                                            <span class="option-title">{{ choice.choice_label }}</span>
+                                            {% if choice.data.value == 'cash' %}
+                                                <span class="option-description">Оплата наличными при получении</span>
+                                            {% elif choice.data.value == 'card' %}
+                                                <span class="option-description">Оплата картой при получении</span>
+                                            {% elif choice.data.value == 'noname' and user.is_staff %}
+                                                <span class="option-description">Безналичный расчет</span>
+                                            {% elif choice.data.value == 'split' and user.is_staff %}
+                                                <span class="option-description">Раздельная оплата</span>
+                                            {% endif %}
+                                        </label>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
                             {{ form.payment_method.errors }}
                         </div>
                     </div>
