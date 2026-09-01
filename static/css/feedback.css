@@ -1,0 +1,205 @@
+/* Стили для страницы вопросов и предложений */
+
+/* Общие стили */
+.breadcrumbs {
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+}
+
+.breadcrumb-item {
+    color: var(--text-muted);
+    text-decoration: none;
+}
+
+.breadcrumb-item:hover {
+    color: var(--accent-color);
+    text-decoration: underline;
+}
+
+.breadcrumb-separator {
+    margin: 0 8px;
+    color: var(--text-muted);
+}
+
+.breadcrumb-item.active {
+    color: var(--accent-color);
+    font-weight: 500;
+}
+
+/* Стили страницы вопросов и предложений */
+.feedback-page {
+    padding: 20px 0;
+    margin-bottom: 40px;
+}
+
+.page-title {
+    font-size: 2.2rem;
+    margin-bottom: 15px;
+    color: var(--text-color);
+    font-weight: 700;
+    text-align: center;
+}
+
+.divider {
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
+    margin: 0 auto 30px;
+    width: 80%;
+}
+
+/* Стили для формы вопросов и предложений */
+.feedback-form-container {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 25px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.feedback-form-container:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+}
+
+.feedback-intro {
+    margin-bottom: 25px;
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    text-align: center;
+}
+
+.feedback-form {
+    margin-top: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid var(--divider-color);
+    border-radius: var(--border-radius);
+    background-color: var(--input-bg);
+    color: var(--text-color);
+    font-size: 1rem;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px var(--accent-color-rgba);
+    outline: none;
+}
+
+.form-group textarea {
+    min-height: 150px;
+    resize: vertical;
+}
+
+.form-error {
+    color: #e74c3c;
+    font-size: 0.9rem;
+    margin-top: 5px;
+}
+
+.form-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.feedback-submit-btn {
+    display: block;
+    text-align: center;
+    background: var(--accent-color);
+    color: white;
+    padding: 12px 15px;
+    border-radius: var(--border-radius);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    margin-top: auto;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 10px rgba(7, 155, 89, 0.3);
+    border: none;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.feedback-submit-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.7s ease;
+}
+
+.feedback-submit-btn:hover {
+    background: #068a50;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(7, 155, 89, 0.4);
+    border-radius: var(--border-radius);
+}
+
+.feedback-submit-btn:hover::before {
+    left: 100%;
+}
+
+/* Стили для уведомлений */
+.alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: var(--border-radius);
+    font-weight: 500;
+}
+
+.alert-success {
+    background-color: rgba(46, 204, 113, 0.2);
+    border-left: 4px solid #2ecc71;
+    color: #27ae60;
+}
+
+.alert-error {
+    background-color: rgba(231, 76, 60, 0.2);
+    border-left: 4px solid #e74c3c;
+    color: #c0392b;
+}
+
+/* Адаптивные стили */
+@media (max-width: 768px) {
+    .feedback-form-container {
+        padding: 20px;
+    }
+    
+    .page-title {
+        font-size: 1.8rem;
+        text-align: center;
+    }
+    
+    .feedback-intro {
+        font-size: 1rem;
+    }
+    
+    .form-group label {
+        font-size: 0.95rem;
+    }
+}
