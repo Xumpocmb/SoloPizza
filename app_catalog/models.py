@@ -10,7 +10,7 @@ from app_home.models import CafeBranch
 
 
 class Category(models.Model):
-    name = models.CharField(max_length=50, unique=True, verbose_name='Название категории')
+    name = models.CharField(max_length=50, verbose_name='Название категории')
     image = models.ImageField(upload_to='category_images', blank=True, null=True, verbose_name='Изображение')
     branch = models.ManyToManyField(CafeBranch, blank=True, verbose_name='Филиалы')
     is_active = models.BooleanField(default=True, verbose_name='Активна')

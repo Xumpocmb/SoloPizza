@@ -1,0 +1,137 @@
+# English translations for SoloPizza.
+# Copyright (C) 2025 Solo Pizza
+# This file is distributed under the same license as the PACKAGE package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: SoloPizza 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-09-05 00:00+0000\n"
+"PO-Revision-Date: 2026-09-05 00:00+0000\n"
+"Last-Translator: Solo Pizza <info@solopizza.by>\n"
+"Language-Team: English\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: templates/app_home/home.html:6
+msgid "Заказать пиццу в Барановичах с доставкой - Solo Pizza"
+msgstr "Order pizza in Baranovichi with delivery - Solo Pizza"
+
+#: templates/app_home/home.html:7 templates/app_home/home.html:9 templates/app_home/home.html:10
+msgid "Закажите вкусную пиццу с доставкой в Барановичах! Solo Pizza предлагает свежие пиццы и другие блюда. Быстрая доставка, отличное обслуживание."
+msgstr "Order delicious pizza with delivery in Baranovichi! Solo Pizza offers fresh pizzas and other dishes. Fast delivery, great service."
+
+#: templates/app_home/home.html:8
+msgid "заказать пиццу барановичи, доставка пиццы барановичи, пицца в барановичах, заказать пиццу онлайн, вкусная пицца, итальянская пицца, пицца с доставкой, доставка еды барановичи"
+msgstr "order pizza baranovichi, pizza delivery baranovichi, pizza in baranovichi, order pizza online, tasty pizza, italian pizza, pizza with delivery, food delivery baranovichi"
+
+#: templates/app_home/home.html:105
+msgid "Комбо-набор Охота - вкусная пицца с доставкой в Барановичах"
+msgstr "Hunting combo set - delicious pizza with delivery in Baranovichi"
+
+#: templates/app_home/home.html:109
+msgid "Комбо-набор Шеф - изысканная пицца с доставкой в Барановичах"
+msgstr "Chef combo set - exquisite pizza with delivery in Baranovichi"
+
+#: templates/app_home/home.html:113
+msgid "Комбо-набор Сочный - сочная пицца с доставкой в Барановичах"
+msgstr "Juicy combo set - juicy pizza with delivery in Baranovichi"
+
+#: templates/app_home/home.html:128
+msgid "Наши новинки:"
+msgstr "Our new items:"
+
+#: templates/app_home/home.html:145
+msgid "Пицца недели"
+msgstr "Pizza of the week"
+
+#: templates/app_home/home.html:149
+msgid "от %(price)s руб."
+msgstr "from %(price)s BYN"
+
+#: templates/app_home/home.html:151
+msgid "Цена не указана"
+msgstr "Price not specified"
+
+#: templates/app_home/home.html:154
+msgid "Заказать"
+msgstr "Order"
+
+#: templates/app_home/home.html:166
+msgid "Наше меню:"
+msgstr "Our menu:"
+
+#: templates/app_home/home.html:175
+msgid "Перейти в категорию: %(category_name)s"
+msgstr "Go to category: %(category_name)s"
+
+#: templates/app_home/home.html:194
+msgid "Доставка"
+msgstr "Delivery"
+
+#: templates/app_home/home.html:198
+msgid "Доставка по городу - 3 руб. При заказе от 20 руб. - доставка бесплатная!"
+msgstr "Delivery around the city - 3 BYN. Free delivery for orders over 20 BYN!"
+
+#: templates/app_home/home.html:199
+msgid "Подробнее о доставке"
+msgstr "More about delivery"
+
+#: templates/app_home/home.html:206
+msgid "О нас"
+msgstr "About us"
+
+#: templates/app_home/home.html:210
+msgid "Solo Pizza - это сеть пиццерий в Барановичах по адресам: ул. Ленина 9/1 и ул. Тексер, 4а. Мы предлагаем свежую, вкусную пиццу и другие блюда с доставкой по городу."
+msgstr "Solo Pizza is a chain of pizzerias in Baranovichi located at Lenin St. 9/1 and Tekser St. 4а. We offer fresh, tasty pizza and other dishes with delivery across the city."
+
+#: templates/footer.html:4
+msgid "Наше меню"
+msgstr "Our menu"
+
+#: templates/footer.html:16
+msgid "Компания"
+msgstr "Company"
+
+#: templates/footer.html:18 templates/footer.html:49
+msgid "Контакты"
+msgstr "Contacts"
+
+#: templates/footer.html:22
+msgid "Вакансии"
+msgstr "Vacancies"
+
+#: templates/footer.html:26
+msgid "Партнеры"
+msgstr "Partners"
+
+#: templates/footer.html:34
+msgid "Помощь"
+msgstr "Help"
+
+#: templates/footer.html:38
+msgid "Отзывы"
+msgstr "Reviews"
+
+#: templates/footer.html:41
+msgid "Вопросы и предложения"
+msgstr "Questions and suggestions"
+
+#: templates/footer.html:53
+msgid "Нет телефонов"
+msgstr "No phones"
+
+#: templates/footer.html:66
+msgid "Язык:"
+msgstr "Language:"
+
+#: templates/footer.html:78
+msgid "ОК"
+msgstr "OK"
+
+#: templates/footer.html:80
+msgid "Все права защищены."
+msgstr "All rights reserved."

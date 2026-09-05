@@ -1,7 +1,8 @@
+{% load i18n %}
 <footer>
     <div class="footer-columns">
         <div class="footer-column">
-            <h3>Наше меню</h3>
+            <h3>{% trans "Наше меню" %}</h3>
             <ul>
                 {% for category in categories %}
                 <li>
@@ -12,36 +13,36 @@
         </div>
         <div class="footer-column">
 
-            <h3>Компания</h3>
+            <h3>{% trans "Компания" %}</h3>
             <ul>
                 <li>
-                    <a href="{% url 'app_home:info' %}">О нас</a>
+                    <a href="{% url 'app_home:info' %}">{% trans "О нас" %}</a>
                 </li>
                 <li>
-                    <a href="{% url 'app_home:contacts' %}">Контакты</a>
+                    <a href="{% url 'app_home:contacts' %}">{% trans "Контакты" %}</a>
                 </li>
                 <li>
-                    <a href="{% url 'app_home:vacancy_list' %}">Вакансии</a>
+                    <a href="{% url 'app_home:vacancy_list' %}">{% trans "Вакансии" %}</a>
                 </li>
 
                 <li>
-                    <a href="{% url 'app_home:partners' %}">Партнеры</a>
+                    <a href="{% url 'app_home:partners' %}">{% trans "Партнеры" %}</a>
                 </li>
             </ul>
         </div>
         <div class="footer-column">
-            <h3>Помощь</h3>
+            <h3>{% trans "Помощь" %}</h3>
             <ul>
                 <li>
-                    <a href="{% url 'app_reviews:review_list' %}">Отзывы</a>
+                    <a href="{% url 'app_reviews:review_list' %}">{% trans "Отзывы" %}</a>
                 </li>
                 <li>
-                    <a href="{% url 'app_home:feedback' %}">Вопросы и предложения</a>
+                    <a href="{% url 'app_home:feedback' %}">{% trans "Вопросы и предложения" %}</a>
                 </li>
             </ul>
         </div>
         <div class="footer-column">
-            <h3>Контакты</h3>
+            <h3>{% trans "Контакты" %}</h3>
             <ul>
                 {% for phone in selected_branch.branch_phones.all %}
                 <li>
@@ -49,7 +50,7 @@
                 </li>
                 {% empty %}
                 <li>
-                    <div class="phone-text">Нет телефонов</div>
+                    <div class="phone-text">{% trans "Нет телефонов" %}</div>
                 </li>
                 {% endfor %}
                 <li>{{ selected_branch.address }}</li>
@@ -57,6 +58,23 @@
         </div>
     </div>
     <div class="company-info">
-        <p>&copy; 2025 Solo Pizza. Все права защищены.</p>
+        <form action="{% url 'set_language' %}" method="post" class="language-switcher">
+            {% csrf_token %}
+            <input name="next" type="hidden" value="{{ request.path }}">
+            <label for="language-select" class="language-switcher__label">{% trans "Язык:" %}</label>
+            <select id="language-select" name="language" class="language-switcher__select"
+                    onchange="this.form.submit()">
+                {% get_current_language as LANGUAGE_CODE %}
+                {% get_available_languages as LANGUAGES %}
+                {% get_language_info_list for LANGUAGES as languages %}
+                {% for language in languages %}
+                <option value="{{ language.code }}"{% if language.code == LANGUAGE_CODE %} selected{% endif %}>
+                    {{ language.name_local }} ({{ language.code }})
+                </option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="language-switcher__submit">{% trans "ОК" %}</button>
+        </form>
+        <p>&copy; 2025 Solo Pizza. {% trans "Все права защищены." %}</p>
     </div>
 </footer>
