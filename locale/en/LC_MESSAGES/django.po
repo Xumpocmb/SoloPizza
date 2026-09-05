@@ -135,3 +135,67 @@ msgstr "OK"
 #: templates/footer.html:80
 msgid "Все права защищены."
 msgstr "All rights reserved."
+
+#: templates/header.html:21
+msgid "Сейчас нет доступных филиалов."
+msgstr "There are no available branches right now."
+
+#: templates/header.html:63
+msgid "Главная"
+msgstr "Home"
+
+#: templates/header.html:66
+msgid "Каталог"
+msgstr "Catalog"
+
+#: templates/header.html:77
+msgid "Акции"
+msgstr "Promotions"
+
+#: templates/header.html:78
+msgid "Информация"
+msgstr "Information"
+
+#: templates/header.html:87
+msgid "Профиль"
+msgstr "Profile"
+
+#: templates/header.html:91
+msgid "Админ-панель"
+msgstr "Admin panel"
+
+#: templates/header.html:92
+msgid "Управление социальными аккаунтами"
+msgstr "Manage social accounts"
+
+#: templates/header.html:93
+msgid "Модерация"
+msgstr "Moderation"
+
+#: templates/header.html:94
+msgid "Статистика"
+msgstr "Statistics"
+
+#: templates/header.html:95 templates/header.html:98
+msgid "Отчеты"
+msgstr "Reports"
+
+#: templates/header.html:96 templates/header.html:99
+msgid "Продажа сертификатов"
+msgstr "Sell certificates"
+
+#: templates/header.html:101 templates/header.html:106
+msgid "Корзина"
+msgstr "Cart"
+
+#: templates/header.html:102 templates/header.html:107
+msgid "Заказы"
+msgstr "Orders"
+
+#: templates/header.html:103
+msgid "Выход"
+msgstr "Log out"
+
+#: templates/header.html:105
+msgid "Вход"
+msgstr "Log in"
