@@ -65,9 +65,9 @@ def vacancy_list(request):
     vacancies = Vacancy.objects.filter(is_active=True)
 
     # Добавляем хлебные крошки
-    breadcrumbs = [{"title": "Главная", "url": "/"}, {"title": "Вакансии", "url": "#"}]
+    breadcrumbs = [{"title": _("Главная"), "url": "/"}, {"title": _("Вакансии"), "url": "#"}]
 
-    context = {"vacancies": vacancies, "title": "Вакансии", "breadcrumbs": breadcrumbs}
+    context = {"vacancies": vacancies, "title": _("Вакансии"), "breadcrumbs": breadcrumbs}
     return render(request, "app_home/vacancy_list.html", context=context)
 
 
@@ -76,7 +76,7 @@ def vacancy_detail(request, vacancy_id):
     vacancy = get_object_or_404(Vacancy, id=vacancy_id, is_active=True)
 
     # Добавляем хлебные крошки
-    breadcrumbs = [{"title": "Главная", "url": "/"}, {"title": "Вакансии", "url": reverse("app_home:vacancy_list")}, {"title": vacancy.title, "url": "#"}]
+    breadcrumbs = [{"title": _("Главная"), "url": "/"}, {"title": _("Вакансии"), "url": reverse("app_home:vacancy_list")}, {"title": vacancy.title, "url": "#"}]
 
     context = {"vacancy": vacancy, "title": vacancy.title, "breadcrumbs": breadcrumbs}
     return render(request, "app_home/vacancy_detail.html", context=context)
@@ -100,23 +100,23 @@ def vacancy_apply(request, vacancy_id):
 
                 send_vacancy_application_notification.delay(application.id)
 
-            messages.success(request, "Ваш отклик успешно отправлен! Мы свяжемся с вами в ближайшее время.", extra_tags="success")
+            messages.success(request, _("Ваш отклик успешно отправлен! Мы свяжемся с вами в ближайшее время."), extra_tags="success")
             return redirect(reverse("app_home:vacancy_detail", kwargs={"vacancy_id": vacancy_id}))
         else:
             # Добавляем сообщение об ошибке, если форма не валидна
-            messages.error(request, "Пожалуйста, исправьте ошибки в форме.", extra_tags="error")
+            messages.error(request, _("Пожалуйста, исправьте ошибки в форме."), extra_tags="error")
     else:
         form = VacancyApplicationForm()
 
     # Добавляем хлебные крошки
     breadcrumbs = [
-        {"title": "Главная", "url": "/"},
-        {"title": "Вакансии", "url": reverse("app_home:vacancy_list")},
+        {"title": _("Главная"), "url": "/"},
+        {"title": _("Вакансии"), "url": reverse("app_home:vacancy_list")},
         {"title": vacancy.title, "url": reverse("app_home:vacancy_detail", kwargs={"vacancy_id": vacancy_id})},
-        {"title": "Отклик на вакансию", "url": "#"},
+        {"title": _("Отклик на вакансию"), "url": "#"},
     ]
 
-    context = {"vacancy": vacancy, "form": form, "breadcrumbs": breadcrumbs, "title": f"Отклик на вакансию: {vacancy.title}"}
+    context = {"vacancy": vacancy, "form": form, "breadcrumbs": breadcrumbs, "title": _("Отклик на вакансию: %(title)s") % {"title": vacancy.title}}
     return render(request, "app_home/vacancy_apply.html", context=context)
 
 

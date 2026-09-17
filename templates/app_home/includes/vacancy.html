@@ -1,11 +1,11 @@
-{% load static %}
+{% load static i18n %}
 {% load tag_split %}
 {% if vacancies %}
 <section class="vacancies-section">
     <div class="vacancies-container">
-        <h2 class="vacancies-title">Вакансии Solo Pizza</h2>
+        <h2 class="vacancies-title">{% trans "Вакансии Solo Pizza" %}</h2>
         <div class="divider"></div>
-        <p class="vacancies-subtitle">Присоединяйся к нашей команде! Мы ищем классных людей, которые любят пиццу, еду и хорошую атмосферу.</p>
+        <p class="vacancies-subtitle">{% trans "Присоединяйся к нашей команде! Мы ищем классных людей, которые любят пиццу, еду и хорошую атмосферу." %}</p>
         
         <div class="vacancies-grid">
             {% for vacancy in vacancies %}
@@ -30,11 +30,11 @@
                             </div>
                         {% endif %}
                         <a href="{% url 'app_home:vacancy_detail' vacancy.id %}"
-                           class="vacancy-details-btn">Подробнее</a>
+                           class="vacancy-details-btn">{% trans "Подробнее" %}</a>
                     </div>
                 </div>
             {% empty %}
-                <div class="no-vacancies">Сейчас нет активных вакансий, но загляните позже!</div>
+                <div class="no-vacancies">{% trans "Сейчас нет активных вакансий, но загляните позже!" %}</div>
             {% endfor %}
         </div>
     </div>

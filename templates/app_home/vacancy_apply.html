@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static i18n %}
 
 {% block title %}{{ title }}{% endblock %}
 
@@ -22,7 +22,7 @@
             </div>
             {% endif %}
             <div class="vacancy-application-container">
-                <h1 class="vacancy-application-title">Отклик на вакансию: {{ vacancy.title }}</h1>
+                <h1 class="vacancy-application-title">{% blocktrans with v_title=vacancy.title %}Отклик на вакансию: {{ v_title }}{% endblocktrans %}</h1>
                 
                 <div class="vacancy-application-form">
                     <form method="post" action="{% url 'app_home:vacancy_apply' vacancy_id=vacancy.id %}">
@@ -69,8 +69,8 @@
                         </div>
                         
                         <div class="form-actions">
-                            <button type="submit" class="vacancy-details-btn">Отправить отклик</button>
-                            <a href="{% url 'app_home:vacancy_detail' vacancy_id=vacancy.id %}" class="back-link">← Вернуться к вакансии</a>
+                            <button type="submit" class="vacancy-details-btn">{% trans "Отправить отклик" %}</button>
+                            <a href="{% url 'app_home:vacancy_detail' vacancy_id=vacancy.id %}" class="back-link">← {% trans "Вернуться к вакансии" %}</a>
                         </div>
                     </form>
                 </div>

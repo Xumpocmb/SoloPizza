@@ -1,13 +1,13 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static i18n %}
 {% load tag_split %}
 
 {% block title %}{{ title }}{% endblock %}
 
-{% block meta_description %}Вакансия {{ vacancy.title }} в Solo Pizza - {{ vacancy.description|truncatechars:100 }}{% endblock %}
-{% block meta_keywords %}вакансия {{ vacancy.title }}, работа в пиццерии, карьера в Solo Pizza, {{ vacancy.title }} в ресторане{% endblock %}
-{% block og_description %}Вакансия {{ vacancy.title }} в Solo Pizza - {{ vacancy.description|truncatechars:100 }}{% endblock %}
-{% block twitter_description %}Вакансия {{ vacancy.title }} в Solo Pizza - {{ vacancy.description|truncatechars:100 }}{% endblock %}
+{% block meta_description %}{% blocktrans with v_title=vacancy.title v_desc=vacancy.description|truncatechars:100 %}Вакансия {{ v_title }} в Solo Pizza - {{ v_desc }}{% endblocktrans %}{% endblock %}
+{% block meta_keywords %}{% blocktrans with v_title=vacancy.title %}вакансия {{ v_title }}, работа в пиццерии, карьера в Solo Pizza, {{ v_title }} в ресторане{% endblocktrans %}{% endblock %}
+{% block og_description %}{% blocktrans with v_title=vacancy.title v_desc=vacancy.description|truncatechars:100 %}Вакансия {{ v_title }} в Solo Pizza - {{ v_desc }}{% endblocktrans %}{% endblock %}
+{% block twitter_description %}{% blocktrans with v_title=vacancy.title v_desc=vacancy.description|truncatechars:100 %}Вакансия {{ v_title }} в Solo Pizza - {{ v_desc }}{% endblocktrans %}{% endblock %}
 
 {% block styles %}
     <link rel="stylesheet" href="{% static 'css/vacancies.css' %}">
@@ -55,7 +55,7 @@
                 
                 {% if vacancy.benefits %}
                     <div class="vacancy-benefits-section">
-                        <h2>Преимущества работы у нас:</h2>
+                        <h2>{% trans "Преимущества работы у нас:" %}</h2>
                         <div class="vacancy-benefits">
                             {% for benefit in vacancy.benefits|split:"," %}
                                 <span class="benefit-tag">{{ benefit|strip }}</span>
@@ -65,10 +65,10 @@
                 {% endif %}
                 
                 <div class="vacancy-apply">
-                    <a href="{% url 'app_home:vacancy_apply' vacancy_id=vacancy.id %}" class="vacancy-details-btn">Откликнуться на вакансию</a>
+                    <a href="{% url 'app_home:vacancy_apply' vacancy_id=vacancy.id %}" class="vacancy-details-btn">{% trans "Откликнуться на вакансию" %}</a>
                 </div>
                 
-                <a href="{% url 'app_home:vacancy_list' %}" class="back-link">← Вернуться к списку вакансий</a>
+                <a href="{% url 'app_home:vacancy_list' %}" class="back-link">← {% trans "Вернуться к списку вакансий" %}</a>
             </div>
         </div>
     </main>

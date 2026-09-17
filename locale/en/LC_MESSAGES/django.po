@@ -531,3 +531,103 @@ msgstr "We currently have no active partners."
 #: app_home/views.py:191
 msgid "Наши партнеры"
 msgstr "Our partners"
+
+#: templates/app_home/vacancy_list.html:7 templates/app_home/vacancy_list.html:9 templates/app_home/vacancy_list.html:10
+msgid "Вакансии в Solo Pizza - присоединяйтесь к нашей команде! Мы ищем классных людей, которые любят пиццу, еду и хорошую атмосферу."
+msgstr "Vacancies at Solo Pizza - join our team! We are looking for great people who love pizza, food and a good atmosphere."
+
+#: templates/app_home/vacancy_list.html:8
+msgid "вакансии, работа в пиццерии, карьера в Solo Pizza, работа в ресторане, трудоустройство"
+msgstr "vacancies, work at a pizzeria, career at Solo Pizza, restaurant jobs, employment"
+
+#: templates/app_home/includes/vacancy.html:6
+msgid "Вакансии Solo Pizza"
+msgstr "Solo Pizza vacancies"
+
+#: templates/app_home/includes/vacancy.html:8
+msgid "Присоединяйся к нашей команде! Мы ищем классных людей, которые любят пиццу, еду и хорошую атмосферу."
+msgstr "Join our team! We are looking for great people who love pizza, food and a good atmosphere."
+
+#: templates/app_home/includes/vacancy.html:33
+msgid "Подробнее"
+msgstr "Details"
+
+#: templates/app_home/includes/vacancy.html:37
+msgid "Сейчас нет активных вакансий, но загляните позже!"
+msgstr "There are no active vacancies right now, but check back later!"
+
+#: templates/app_home/vacancy_detail.html:7
+msgid "Вакансия %(v_title)s в Solo Pizza - %(v_desc)s"
+msgstr "Vacancy %(v_title)s at Solo Pizza - %(v_desc)s"
+
+#: templates/app_home/vacancy_detail.html:8
+msgid "вакансия %(v_title)s, работа в пиццерии, карьера в Solo Pizza, %(v_title)s в ресторане"
+msgstr "%(v_title)s vacancy, work at a pizzeria, career at Solo Pizza, %(v_title)s at a restaurant"
+
+#: templates/app_home/vacancy_detail.html:58
+msgid "Преимущества работы у нас:"
+msgstr "Benefits of working with us:"
+
+#: templates/app_home/vacancy_detail.html:68
+msgid "Откликнуться на вакансию"
+msgstr "Apply for the job"
+
+#: templates/app_home/vacancy_detail.html:71
+msgid "Вернуться к списку вакансий"
+msgstr "Back to vacancies"
+
+#: templates/app_home/vacancy_apply.html:25
+msgid "Отклик на вакансию: %(v_title)s"
+msgstr "Application for: %(v_title)s"
+
+#: templates/app_home/vacancy_apply.html:72
+msgid "Отправить отклик"
+msgstr "Send application"
+
+#: templates/app_home/vacancy_apply.html:73
+msgid "Вернуться к вакансии"
+msgstr "Back to vacancy"
+
+#: app_home/forms.py:50 app_home/forms.py:51 app_home/forms.py:52
+msgid "ФИО"
+msgstr "Full name"
+
+#: app_home/forms.py:51
+msgid "Возраст"
+msgstr "Age"
+
+#: app_home/forms.py:53
+msgid "Стаж работы (лет)"
+msgstr "Work experience (years)"
+
+#: app_home/forms.py:54
+msgid "Опыт работы"
+msgstr "Work experience"
+
+#: app_home/forms.py:57
+msgid "Введите ваше ФИО"
+msgstr "Enter your full name"
+
+#: app_home/forms.py:58
+msgid "Введите ваш возраст"
+msgstr "Enter your age"
+
+#: app_home/forms.py:60
+msgid "Стаж работы в годах"
+msgstr "Work experience in years"
+
+#: app_home/forms.py:61
+msgid "Опишите ваш опыт работы"
+msgstr "Describe your work experience"
+
+#: app_home/views.py:68
+msgid "Ваш отклик успешно отправлен! Мы свяжемся с вами в ближайшее время."
+msgstr "Your application has been sent successfully! We will contact you as soon as possible."
+
+#: app_home/views.py:116
+msgid "Отклик на вакансию"
+msgstr "Application for the job"
+
+#: app_home/views.py:119
+msgid "Отклик на вакансию: %(title)s"
+msgstr "Application for: %(title)s"

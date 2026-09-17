@@ -40,12 +40,19 @@ class VacancyApplicationForm(forms.ModelForm):
     class Meta:
         model = VacancyApplication
         fields = ['name', 'age', 'phone', 'experience_years', 'work_experience']
+        labels = {
+            'name': _('ФИО'),
+            'age': _('Возраст'),
+            'phone': _('Номер телефона'),
+            'experience_years': _('Стаж работы (лет)'),
+            'work_experience': _('Опыт работы'),
+        }
         widgets = {
-            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите ваше ФИО'}),
-            'age': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Введите ваш возраст', 'min': '16', 'max': '100'}),
-            'phone': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '375XXXXXXXXXXXX (минимум 12 цифр)'}),
-            'experience_years': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Стаж работы в годах', 'min': '0', 'max': '50'}),
-            'work_experience': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Опишите ваш опыт работы', 'rows': 5}),
+            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': _('Введите ваше ФИО')}),
+            'age': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': _('Введите ваш возраст'), 'min': '16', 'max': '100'}),
+            'phone': forms.TextInput(attrs={'class': 'form-control', 'placeholder': _('375XXXXXXXXXXXX (минимум 12 цифр)')}),
+            'experience_years': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': _('Стаж работы в годах'), 'min': '0', 'max': '50'}),
+            'work_experience': forms.Textarea(attrs={'class': 'form-control', 'placeholder': _('Опишите ваш опыт работы'), 'rows': 5}),
         }
         
     def clean_phone(self):
@@ -57,6 +64,6 @@ class VacancyApplicationForm(forms.ModelForm):
         
         # Проверяем длину номера
         if len(phone) < 12:
-            raise forms.ValidationError("Номер телефона должен содержать не менее 12 цифр.")
+            raise forms.ValidationError(_("Номер телефона должен содержать не менее 12 цифр."))
             
         return phone
