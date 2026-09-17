@@ -4,6 +4,7 @@ from django.db import models
 from django.conf import settings
 from django.db.models.signals import post_save, post_delete, m2m_changed
 from django.dispatch import receiver
+from django.utils.translation import gettext_lazy as _
 from app_catalog.models import AddonParams, ProductVariant, BoardParams, PizzaSauce
 from django.contrib.auth import get_user_model # Import get_user_model
 
@@ -81,12 +82,12 @@ class OrderManager(models.Manager):
 
 class Order(models.Model):
     STATUS_CHOICES = [
-        ("new", "Новый"),
-        ("confirmed", "Подтвержден"),
-        ("cooking", "Готовится"),
-        ("delivering", "Доставляется"),
-        ("completed", "Завершен"),
-        ("canceled", "Отменен"),
+        ("new", _("Новый")),
+        ("confirmed", _("Подтвержден")),
+        ("cooking", _("Готовится")),
+        ("delivering", _("Доставляется")),
+        ("completed", _("Завершен")),
+        ("canceled", _("Отменен")),
     ]
 
     PAYMENT_CHOICES = [

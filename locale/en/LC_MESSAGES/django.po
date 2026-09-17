@@ -1110,3 +1110,21 @@ msgstr "Order statistics"
 
 msgid "Детальная статистика за %(date)s"
 msgstr "Detailed statistics for %(date)s"
+
+msgid "Новый"
+msgstr "New"
+
+msgid "Подтвержден"
+msgstr "Confirmed"
+
+msgid "Готовится"
+msgstr "Cooking"
+
+msgid "Доставляется"
+msgstr "Delivering"
+
+msgid "Завершен"
+msgstr "Completed"
+
+msgid "Отменен"
+msgstr "Cancelled"
