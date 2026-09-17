@@ -503,3 +503,31 @@ msgstr "If you have not been contacted within 15 minutes, please call us back at
 #: app_home/views.py:166
 msgid "Информация о компании"
 msgstr "Company information"
+
+#: templates/app_home/partners.html:6 templates/app_home/partners.html:8 templates/app_home/partners.html:9
+msgid "Наши партнеры - список организаций и компаний, с которыми мы сотрудничаем."
+msgstr "Our partners - a list of organizations and companies we cooperate with."
+
+#: templates/app_home/partners.html:7
+msgid "партнеры, сотрудничество, организации, компании"
+msgstr "partners, cooperation, organizations, companies"
+
+#: templates/app_home/partners.html:35
+msgid "Посетителям, которые проводят время у наших партнеров и заказывают пиццу в Solo Pizza, предоставляется скидка 10% на все виды пиццы!"
+msgstr "Visitors who spend time at our partners and order pizza at Solo Pizza get a 10% discount on all types of pizza!"
+
+#: templates/app_home/partners.html:44
+msgid "Перейти к партнеру"
+msgstr "Go to partner"
+
+#: templates/app_home/partners.html:46
+msgid "Ссылка недоступна"
+msgstr "Link unavailable"
+
+#: templates/app_home/partners.html:54
+msgid "В настоящее время у нас нет активных партнеров."
+msgstr "We currently have no active partners."
+
+#: app_home/views.py:191
+msgid "Наши партнеры"
+msgstr "Our partners"

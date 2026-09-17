@@ -186,9 +186,9 @@ def partners_view(request):
 
     partners = Partner.objects.all()
 
-    breadcrumbs = [{"title": "Главная", "url": "/"}, {"title": "Партнеры", "url": reverse("app_home:partners")}]
+    breadcrumbs = [{"title": _("Главная"), "url": "/"}, {"title": _("Партнеры"), "url": reverse("app_home:partners")}]
 
-    context = {"partners": partners, "title": "Наши партнеры", "breadcrumbs": breadcrumbs}
+    context = {"partners": partners, "title": _("Наши партнеры"), "breadcrumbs": breadcrumbs}
 
     return render(request, "app_home/partners.html", context=context)
 
