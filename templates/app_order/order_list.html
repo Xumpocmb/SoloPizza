@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static i18n %}
 
-{% block meta_description %}История заказов Solo Pizza - просмотрите все ваши заказы, их статусы и детали.{% endblock %}
-{% block meta_keywords %}история заказов, список заказов, заказы пиццы, Solo Pizza заказы{% endblock %}
-{% block og_description %}История заказов Solo Pizza - просмотрите все ваши заказы, их статусы и детали.{% endblock %}
-{% block twitter_description %}История заказов Solo Pizza - просмотрите все ваши заказы, их статусы и детали.{% endblock %}
+{% block meta_description %}{% trans "История заказов Solo Pizza - просмотрите все ваши заказы, их статусы и детали." %}{% endblock %}
+{% block meta_keywords %}{% trans "история заказов, список заказов, заказы пиццы, Solo Pizza заказы" %}{% endblock %}
+{% block og_description %}{% trans "История заказов Solo Pizza - просмотрите все ваши заказы, их статусы и детали." %}{% endblock %}
+{% block twitter_description %}{% trans "История заказов Solo Pizza - просмотрите все ваши заказы, их статусы и детали." %}{% endblock %}
 
 {% block styles %}
     <link rel="stylesheet" href="{% static 'css/order_list.css' %}">
@@ -27,7 +27,7 @@
             </div>
         {% endif %}
         <div class="order-list-container">
-            <h1 class="page-title">Мои заказы</h1>
+            <h1 class="page-title">{% trans "Мои заказы" %}</h1>
             
             <!-- Debug information for guest token -->
             <div class="debug-info" style="display: none;">
@@ -43,7 +43,7 @@
                     <div class="search-group">
                         <input type="text"
                                name="search"
-                               placeholder="Поиск по ID, имени или телефону"
+                               placeholder="{% trans "Поиск по ID, имени или телефону" %}"
                                value="{{ search_query }}"
                                class="search-input">
                         <button type="submit" class="search-button">
@@ -53,7 +53,7 @@
 
                     <div class="filter-group">
                         <select name="status" class="status-filter">
-                            <option value="">Все статусы</option>
+                            <option value="">{% trans "Все статусы" %}</option>
                             {% for status in status_choices %}
                                 <option value="{{ status.0 }}"
                                         {% if status_filter == status.0 %}selected{% endif %}>
@@ -61,7 +61,7 @@
                                 </option>
                             {% endfor %}
                         </select>
-                        <button type="submit" class="filter-button">Применить</button>
+                        <button type="submit" class="filter-button">{% trans "Применить" %}</button>
                     </div>
                 </form>
             </div>
@@ -70,24 +70,24 @@
             <div class="orders-table">
                 <div class="table-header">
                     <div class="header-cell">ID</div>
-                    <div class="header-cell">Имя</div>
-                    <div class="header-cell">Статус</div>
-                    <div class="header-cell">Оплата</div>
+                    <div class="header-cell">{% trans "Имя" %}</div>
+                    <div class="header-cell">{% trans "Статус" %}</div>
+                    <div class="header-cell">{% trans "Оплата" %}</div>
                     {% if request.user.is_staff %}
-                    <div class="header-cell">Филиал</div>
+                    <div class="header-cell">{% trans "Филиал" %}</div>
                     {% endif %}
-                    <div class="header-cell">Детали</div>
+                    <div class="header-cell">{% trans "Детали" %}</div>
                     {% if request.user.is_staff or request.user.is_superuser %}
-                    <div class="header-cell">Чек</div>
-                    <div class="header-cell">Фастфуд</div>
+                    <div class="header-cell">{% trans "Чек" %}</div>
+                    <div class="header-cell">{% trans "Фастфуд" %}</div>
                     {% endif %}
                 </div>
 
                 {% for order in page_obj %}
                     <div class="table-row status-{{ order.status }}">
                         <div class="table-cell" data-label="ID">#{{ order.id }}</div>
-                        <div class="table-cell" data-label="Имя">{{ order.customer_name }}</div>
-                        <div class="table-cell" data-label="Статус">
+                        <div class="table-cell" data-label="{% trans "Имя" %}">{{ order.customer_name }}</div>
+                        <div class="table-cell" data-label="{% trans "Статус" %}">
                             {% if request.user.is_staff %}
                                 <form method="post" action="{% url 'app_order:update_order_status' order.id %}">
                                     {% csrf_token %}
@@ -108,15 +108,15 @@
                                 </span>
                             {% endif %}
                         </div>
-                        <div class="table-cell" data-label="Оплата">
+                        <div class="table-cell" data-label="{% trans "Оплата" %}">
                             {% if order.payment_status %}
-                                <span class="payment-paid">Оплачено</span>
+                                <span class="payment-paid">{% trans "Оплачено" %}</span>
                             {% else %}
-                                <span class="payment-unpaid">Не оплачено</span>
+                                <span class="payment-unpaid">{% trans "Не оплачено" %}</span>
                             {% endif %}
                         </div>
                         {% if request.user.is_staff %}
-                        <div class="table-cell" data-label="Филиал">
+                        <div class="table-cell" data-label="{% trans "Филиал" %}">
                             <div class="branch-info">
                                 <span class="branch-name">{{ order.branch.name }}</span>
                                 <button type="button" class="change-order-branch-btn" onclick="toggleOrderBranchSelector('order-branch-{{ order.id }}')">
@@ -143,27 +143,27 @@
                             </div>
                         </div>
                         {% endif %}
-                        <div class="table-cell actions-cell" data-label="Детали">
+                        <div class="table-cell actions-cell" data-label="{% trans "Детали" %}">
                             <a href="{% url 'app_order:order_detail' order.id %}"
                                class="view-button"
-                               title="Просмотреть">
+                               title="{% trans "Просмотреть" %}">
                                 <i class="fas fa-eye"></i>
                             </a>
                         </div>
                         {% if request.user.is_staff or request.user.is_superuser %}
-                        <div class="table-cell" data-label="Чек">
+                        <div class="table-cell" data-label="{% trans "Чек" %}">
                             <a href="{% url 'app_order:print_non_fastfood_check' order.id %}"
                             target="_blank"
                                class="pdf-button"
-                               title="Скачать чек">
+                               title="{% trans "Скачать чек" %}">
                                 <i class="fas fa-file-pdf"></i>
                             </a>
                         </div>
-                        <div class="table-cell" data-label="Фастфуд/Соусы/Бургеры">
+                        <div class="table-cell" data-label="{% trans "Фастфуд/Соусы/Бургеры" %}">
                             <a href="{% url 'app_order:print_fastfood_check' order.id %}"
                             target="_blank"
                                class="pdf-button"
-                               title="Скачать чек фастфуда, соусов и бургеров">
+                               title="{% trans "Скачать чек фастфуда, соусов и бургеров" %}">
                                 <i class="fas fa-file-pdf"></i>
                             </a>
                         </div>
@@ -171,7 +171,7 @@
                     </div>
                 {% empty %}
                     <div class="no-orders">
-                        <p>Заказы не найдены</p>
+                        <p>{% trans "Заказы не найдены" %}</p>
                     </div>
                 {% endfor %}
             </div>

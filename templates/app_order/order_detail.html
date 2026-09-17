@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static i18n %}
 
-{% block meta_description %}Детали заказа Solo Pizza - просмотрите информацию о вашем заказе, статус доставки и состав заказа.{% endblock %}
-{% block meta_keywords %}детали заказа, статус заказа, доставка пиццы, Solo Pizza заказ{% endblock %}
-{% block og_description %}Детали заказа Solo Pizza - просмотрите информацию о вашем заказе, статус доставки и состав заказа.{% endblock %}
-{% block twitter_description %}Детали заказа Solo Pizza - просмотрите информацию о вашем заказе, статус доставки и состав заказа.{% endblock %}
+{% block meta_description %}{% trans "Детали заказа Solo Pizza - просмотрите информацию о вашем заказе, статус доставки и состав заказа." %}{% endblock %}
+{% block meta_keywords %}{% trans "детали заказа, статус заказа, доставка пиццы, Solo Pizza заказ" %}{% endblock %}
+{% block og_description %}{% trans "Детали заказа Solo Pizza - просмотрите информацию о вашем заказе, статус доставки и состав заказа." %}{% endblock %}
+{% block twitter_description %}{% trans "Детали заказа Solo Pizza - просмотрите информацию о вашем заказе, статус доставки и состав заказа." %}{% endblock %}
 
 {% block styles %}
     <link rel="stylesheet" href="{% static 'css/order_detail.css' %}"/>
@@ -35,33 +35,33 @@
 
             <div class="order-header">
                 <h1 class="page_title">
-                    Заказ #{{ order.id }}
+                    {% blocktrans with order_id=order.id %}Заказ #{{ order_id }}{% endblocktrans %}
                     {% if request.user.is_staff or request.user.is_superuser %}
                         <a href="{% url 'app_order:print_non_fastfood_check' order.id %}" 
                            target="_blank"
                            class="pdf-button" 
-                           title="Скачать чек">
+                           title="{% trans "Скачать чек" %}">
                             <i class="fas fa-file-pdf"></i>
                         </a>
                         <a href="{% url 'app_order:print_fastfood_check' order.id %}" 
                            target="_blank"
                            class="pdf-button" 
-                           title="Скачать чек фастфуд">
+                           title="{% trans "Скачать чек фастфуд" %}">
                             <i class="fas fa-file-pdf"></i>
                         </a>
                         {% if is_editable %}
                         <a href="{% url 'app_order:add_item_to_order' order.id %}" 
                            class="add-item-button" 
-                           title="Добавить товар">
-                            <i class="fas fa-plus"></i> Добавить товар
+                           title="{% trans "Добавить товар" %}">
+                            <i class="fas fa-plus"></i> {% trans "Добавить товар" %}
                         </a>
                         {% endif %}
                     {% endif %}
                 </h1>
                 <div class="order-status {{ order.status }}">{{ order.get_status_display }}</div>
-                <p class="order-date">Дата: {{ order.created_at|date:'d.m.Y H:i' }}</p>
+                <p class="order-date">{% blocktrans with date=order.created_at|date:'d.m.Y H:i' %}Дата: {{ date }}{% endblocktrans %}</p>
                 {% if order.branch %}
-                <p class="branch-info">Филиал: {{ order.branch.name }}</p>
+                <p class="branch-info">{% blocktrans with branch=order.branch.name %}Филиал: {{ branch }}{% endblocktrans %}</p>
                 {% endif %}
                 <div class="divider"></div>
             </div>
@@ -71,7 +71,7 @@
                     {% csrf_token %}
                     {{ item_formset.management_form }}
 
-                    <h2 class="section-title">Состав заказа</h2>
+                    <h2 class="section-title">{% trans "Состав заказа" %}</h2>
 
                     <div class="order-items">
                         {% for form in item_formset %}
@@ -81,7 +81,7 @@
                                         <h3 class="item-name">
                                             {{ form.instance.product.name }}
                                             {% if form.instance.product.is_weekly_special %}
-                                                <span class="discount-badge">Пицца недели</span>
+                                                <span class="discount-badge">{% trans "Пицца недели" %}</span>
                                             {% endif %}
                                             {% if is_editable and request.user.is_staff %}
                                                 <button type="button" class="edit-item-btn"
@@ -103,7 +103,7 @@
                                     <div class="item-details">
                                         <div class="item-options">
                                             <div class="item-option">
-                                                <span class="option-label">Размер:</span>
+                                                <span class="option-label">{% trans "Размер:" %}</span>
                                                 <span class="option-value">
                                                     {% if form.instance.variant.size %}
                                                         {{ form.instance.variant.size.name }}
@@ -116,21 +116,19 @@
 
                                             {% if form.instance.board1 or form.instance.board2 %}
                                                 <div class="item-option">
-                                                    <span class="option-label">Борты:</span>
+                                                    <span class="option-label">{% trans "Борты:" %}</span>
                                                     <ul class="addons-list">
 
                                                         {% if form.instance.board1 %}
                                                             <li><span class="option-value">
-                                                            Борт 1: {{ form.instance.board1.board.name }} (+
-                                                            {{ form.instance.board1.price }} руб.)
+                                                            {% blocktrans with board=form.instance.board1.board.name price=form.instance.board1.price %}Борт 1: {{ board }} (+{{ price }} руб.){% endblocktrans %}
                                                             </span></li>
                                                         {% endif %}
 
 
                                                         {% if form.instance.board2 %}
                                                             <li><span class="option-value">
-                                                            Борт 2: {{ form.instance.board2.board.name }} (+
-                                                            {{ form.instance.board2.price }} руб.)
+                                                            {% blocktrans with board=form.instance.board2.board.name price=form.instance.board2.price %}Борт 2: {{ board }} (+{{ price }} руб.){% endblocktrans %}
                                                             </span></li>
                                                         {% endif %}
 
@@ -142,21 +140,21 @@
 
                                             {% if form.instance.sauce %}
                                                 <div class="item-option">
-                                                    <span class="option-label">Соус:</span>
+                                                    <span class="option-label">{% trans "Соус:" %}</span>
                                                     <span class="option-value">{{ form.instance.sauce.name }}</span>
                                                 </div>
                                             {% endif %}
 
                                             {% if form.instance.drink %}
                                                 <div class="item-option">
-                                                    <span class="option-label">Напиток:</span>
+                                                    <span class="option-label">{% trans "Напиток:" %}</span>
                                                     <span class="option-value">{{ form.instance.drink }}</span>
                                                 </div>
                                             {% endif %}
 
                                             {% if form.instance.addons.exists %}
                                                 <div class="item-option">
-                                                    <span class="option-label">Добавки:</span>
+                                                    <span class="option-label">{% trans "Добавки:" %}</span>
                                                     <ul class="addons-list">
                                                         {% for addon in form.instance.addons.all %}
                                                             <li>{{ addon.addon.name }} (+{{ addon.price }} руб.)</li>
@@ -183,54 +181,54 @@
                                      style="display: none;">
                                     {{ form.id }}
                                     <div class="form-group">
-                                        <label>Размер:</label>
+                                        <label>{% trans "Размер:" %}</label>
                                         {{ form.variant }}
                                     </div>
 
                                     <div class="form-group">
-                                        <label>Количество:</label>
+                                        <label>{% trans "Количество:" %}</label>
                                         {{ form.quantity }}
                                     </div>
 
                                     {% if form.instance.product.has_border %}
                                         <div class="form-group">
-                                            <label>Борт 1:</label>
+                                            <label>{% trans "Борт 1:" %}</label>
                                             {{ form.board1 }}
                                         </div>
                                         <div class="form-group">
-                                            <label>Борт 2:</label>
+                                            <label>{% trans "Борт 2:" %}</label>
                                             {{ form.board2 }}
                                         </div>
 
                                         <div class="form-group">
-                                            <label>Соус:</label>
+                                            <label>{% trans "Соус:" %}</label>
                                             {{ form.sauce }}
                                         </div>
 
                                         {% if form.instance.product.has_drink %}
                                         <div class="form-group">
-                                            <label>Напиток:</label>
+                                            <label>{% trans "Напиток:" %}</label>
                                             {{ form.drink }}
                                         </div>
                                         {% endif %}
 
                                         <div class="form-group">
-                                            <label>Добавки:</label>
+                                            <label>{% trans "Добавки:" %}</label>
                                             {{ form.addons }}
                                             {% if form.addons.errors %}
                                                 <div class="error">{{ form.addons.errors }}</div>
                                             {% endif %}
                                             <small class="form-text text-muted">
-                                                Удерживайте Ctrl для выбора нескольких добавок
+                                                {% trans "Удерживайте Ctrl для выбора нескольких добавок" %}
                                             </small>
                                         </div>
                                     {% endif %}
 
                                     <div class="form-actions">
                                         <button type="button" class="cancel-button cancel-item-edit"
-                                                data-item-id="{{ form.instance.id }}">Отмена
+                                                data-item-id="{{ form.instance.id }}">{% trans "Отмена" %}
                                         </button>
-                                        <button type="submit" class="save-button">Сохранить</button>
+                                        <button type="submit" class="save-button">{% trans "Сохранить" %}</button>
                                     </div>
                                 </div>
                             </div>
@@ -242,9 +240,9 @@
                     <div class="summary-card">
                         <div class="section-header">
                             <h2 class="section-title">
-                                <span>Детали заказа</span>
+                                <span>{% trans "Детали заказа" %}</span>
                                 {% if is_editable and request.user.is_staff %}
-                                    <button class="edit-toggle-btn" id="editOrderBtn" aria-label="Редактировать заказ">
+                                    <button class="edit-toggle-btn" id="editOrderBtn" aria-label="{% trans "Редактировать заказ" %}">
                                         <i class="fas fa-pencil-alt"></i>
                                     </button>
                                 {% endif %}
@@ -258,7 +256,7 @@
                                 {% csrf_token %}
 
                                 <div class="form-group">
-                                    <label>Способ получения:</label>
+                                    <label>{% trans "Способ получения:" %}</label>
                                     <div class="radio-group">
                                         {% for radio in form.delivery_type %}
                                             <div class="radio-item">
@@ -271,12 +269,12 @@
 
                                 <div class="form-group" id="address-field" 
                                      {% if form.delivery_type.value == 'delivery' %}style="display: block"{% else %}style="display: none"{% endif %}">
-                                    <label for="{{ form.address.id_for_label }}">Адрес доставки:</label>
+                                    <label for="{{ form.address.id_for_label }}">{% trans "Адрес доставки:" %}</label>
                                     {{ form.address }}
                                 </div>
 
                                 <div class="form-group">
-                                    <label>Способ оплаты:</label>
+                                    <label>{% trans "Способ оплаты:" %}</label>
                                     <div class="radio-group">
                                         {% for radio in form.payment_method %}
                                             <div class="radio-item">
@@ -290,152 +288,152 @@
                                 <!-- Split Payment Fields -->
                                 <div id="split-payment-fields" style="display: none;">
                                     <div class="form-group">
-                                        <label for="{{ form.cash_amount.id_for_label }}">Наличные:</label>
+                                        <label for="{{ form.cash_amount.id_for_label }}">{% trans "Наличные:" %}</label>
                                         {{ form.cash_amount }}
                                     </div>
                                     <div class="form-group">
-                                        <label for="{{ form.card_amount.id_for_label }}">Карта:</label>
+                                        <label for="{{ form.card_amount.id_for_label }}">{% trans "Карта:" %}</label>
                                         {{ form.card_amount }}
                                     </div>
                                     <div class="form-group">
-                                        <label for="{{ form.noname_amount.id_for_label }}">Безналичные:</label>
+                                        <label for="{{ form.noname_amount.id_for_label }}">{% trans "Безналичные:" %}</label>
                                         {{ form.noname_amount }}
                                     </div>
                                     <div class="form-group">
-                                        <small class="text-muted">Общая сумма раздельной оплаты должна совпадать с итоговой суммой заказа ({{ order.total_price|floatformat:2 }} руб.)</small>
+                                        <small class="text-muted">{% blocktrans with total=order.total_price|floatformat:2 %}Общая сумма раздельной оплаты должна совпадать с итоговой суммой заказа ({{ total }} руб.){% endblocktrans %}</small>
                                     </div>
                                 </div>
 
                                 <div class="form-group checkbox-group">
                                     {{ form.payment_status }}
-                                    <label for="{{ form.payment_status.id_for_label }}">Заказ оплачен</label>
+                                    <label for="{{ form.payment_status.id_for_label }}">{% trans "Заказ оплачен" %}</label>
                                 </div>
 
                                 <div class="form-group">
-                                    <label>Имя заказчика:</label>
+                                    <label>{% trans "Имя заказчика:" %}</label>
                                     {{ form.customer_name }}
                                 </div>
 
                                 <div class="form-group">
-                                    <label>Телефон:</label>
+                                    <label>{% trans "Телефон:" %}</label>
                                     {{ form.phone_number }}
                                 </div>
 
                                 <div class="form-group">
-                                    <label>Готов к:</label>
+                                    <label>{% trans "Готов к:" %}</label>
                                     {{ form.ready_by }}
                                 </div>
                                 
                                 <div class="form-group">
-                                    <label>Доставка к:</label>
+                                    <label>{% trans "Доставка к:" %}</label>
                                     {{ form.delivery_by }}
                                 </div>
                                 
                                 <div class="form-group">
-                                    <label>Комментарий:</label>
+                                    <label>{% trans "Комментарий:" %}</label>
                                     {{ form.comment }}
                                 </div>
                                 
                                 <div class="form-group checkbox-group">
                                     {{ form.is_partner }}
-                                    <label for="{{ form.is_partner.id_for_label }}">Партнёр</label>
+                                    <label for="{{ form.is_partner.id_for_label }}">{% trans "Партнёр" %}</label>
                                 </div>
                                 
                                 <div class="form-group">
-                                    <label>Процент скидки:</label>
+                                    <label>{% trans "Процент скидки:" %}</label>
                                     {{ form.partner_discount_percent }}
                                 </div>
 
                                 <div class="form-actions">
-                                    <button type="button" class="cancel-button" id="cancelEditBtn">Отмена</button>
-                                    <button type="submit" class="save-button">Сохранить изменения</button>
+                                    <button type="button" class="cancel-button" id="cancelEditBtn">{% trans "Отмена" %}</button>
+                                    <button type="submit" class="save-button">{% trans "Сохранить изменения" %}</button>
                                 </div>
                             </form>
                         </div>
 
                         <div class="view-mode" id="viewOrderDetails">
                             <div class="summary-row">
-                                <span class="summary-label">Способ получения:</span>
+                                <span class="summary-label">{% trans "Способ получения:" %}</span>
                                 <span class="summary-value">{{ order.get_delivery_type_display }}</span>
                             </div>
 
                             {% if order.delivery_type == 'delivery' %}
                                 <div class="summary-row">
-                                    <span class="summary-label">Адрес доставки:</span>
+                                    <span class="summary-label">{% trans "Адрес доставки:" %}</span>
                                     <span class="summary-value">{{ order.address }}</span>
                                 </div>
                             {% endif %}
 
                             <div class="summary-row">
-                                <span class="summary-label">Способ оплаты:</span>
+                                <span class="summary-label">{% trans "Способ оплаты:" %}</span>
                                 <span class="summary-value">{{ order.get_payment_method_display }}</span>
                             </div>
 
                             <!-- Display split payment details if payment method is split -->
                             {% if order.payment_method == 'split' %}
                                 <div class="summary-row">
-                                    <span class="summary-label">Раздельная оплата:</span>
+                                    <span class="summary-label">{% trans "Раздельная оплата:" %}</span>
                                     <span class="summary-value">
-                                        Наличные: {{ order.cash_amount|floatformat:2 }} руб.<br>
-                                        Карта: {{ order.card_amount|floatformat:2 }} руб.<br>
-                                        Безналичные: {{ order.noname_amount|floatformat:2 }} руб.
+                                        {% trans "Наличные:" %} {{ order.cash_amount|floatformat:2 }} руб.<br>
+                                        {% trans "Карта:" %} {{ order.card_amount|floatformat:2 }} руб.<br>
+                                        {% trans "Безналичные:" %} {{ order.noname_amount|floatformat:2 }} руб.
                                     </span>
                                 </div>
                                 <div class="summary-row">
-                                    <span class="summary-label">Общая сумма:</span>
+                                    <span class="summary-label">{% trans "Общая сумма:" %}</span>
                                     <span class="summary-value">{{ order.get_split_payment_total|floatformat:2 }} руб.</span>
                                 </div>
                             {% endif %}
 
                             <div class="summary-row">
-                                <span class="summary-label">Статус оплаты:</span>
+                                <span class="summary-label">{% trans "Статус оплаты:" %}</span>
                                 <span class="summary-value">
                                     {% if order.payment_status %}
-                                        <span class="payment-paid">Оплачено</span>
+                                        <span class="payment-paid">{% trans "Оплачено" %}</span>
                                     {% else %}
-                                        <span class="payment-unpaid">Не оплачено</span>
+                                        <span class="payment-unpaid">{% trans "Не оплачено" %}</span>
                                     {% endif %}
                                 </span>
                             </div>
                             
                             {% if order.ready_by %}
                             <div class="summary-row">
-                                <span class="summary-label">Готов к:</span>
+                                <span class="summary-label">{% trans "Готов к:" %}</span>
                                 <span class="summary-value">{{ order.ready_by|date:'d.m.Y H:i' }}</span>
                             </div>
                             {% endif %}
                             
                             {% if order.delivery_by %}
                             <div class="summary-row">
-                                <span class="summary-label">Доставка к:</span>
+                                <span class="summary-label">{% trans "Доставка к:" %}</span>
                                 <span class="summary-value">{{ order.delivery_by|date:'d.m.Y H:i' }}</span>
                             </div>
                             {% endif %}
 
                             <div class="summary-row">
-                                <span class="summary-label">Имя заказчика:</span>
+                                <span class="summary-label">{% trans "Имя заказчика:" %}</span>
                                 <span class="summary-value">{{ order.customer_name }}</span>
                             </div>
 
                             <div class="summary-row">
-                                <span class="summary-label">Телефон:</span>
+                                <span class="summary-label">{% trans "Телефон:" %}</span>
                                 <span class="summary-value">{{ order.phone_number }}</span>
                             </div>
                             
                             {% if order.is_partner %}
                                 <div class="summary-row">
-                                    <span class="summary-label">Партнёр:</span>
-                                    <span class="summary-value">Да</span>
+                                    <span class="summary-label">{% trans "Партнёр:" %}</span>
+                                    <span class="summary-value">{% trans "Да" %}</span>
                                 </div>
                                 <div class="summary-row">
-                                    <span class="summary-label">Процент скидки:</span>
+                                    <span class="summary-label">{% trans "Процент скидки:" %}</span>
                                     <span class="summary-value">{{ order.partner_discount_percent }}%</span>
                                 </div>
                             {% endif %}
 
                             {% if order.comment %}
                                 <div class="summary-row">
-                                    <span class="summary-label">Комментарий:</span>
+                                    <span class="summary-label">{% trans "Комментарий:" %}</span>
                                     <span class="summary-value">{{ order.comment }}</span>
                                 </div>
                             {% endif %}
@@ -443,43 +441,43 @@
 
                         <div class="summary-total">
                             <div class="summary-row">
-                                <span class="summary-label">Сумма заказа:</span>
+                                <span class="summary-label">{% trans "Сумма заказа:" %}</span>
                                 <span class="summary-value">{{ order.subtotal|floatformat:2 }} руб.</span>
                             </div>
 
                             {% if order.discount_amount > 0 %}
                                 <div class="summary-row discount-row">
-                                    <span class="summary-label">Скидка:</span>
+                                    <span class="summary-label">{% trans "Скидка:" %}</span>
                                     <span class="summary-value">-{{ order.discount_amount|floatformat:2 }} руб.</span>
                                 </div>
                                 
                                 {% if order.is_partner %}
                                 <div class="summary-row discount-details">
-                                    <span class="summary-label">Тип скидки:</span>
-                                    <span class="summary-value">Партнерская ({{ order.partner_discount_percent }}%)</span>
+                                    <span class="summary-label">{% trans "Тип скидки:" %}</span>
+                                    <span class="summary-value">{% blocktrans with percent=order.partner_discount_percent %}Партнерская ({{ percent }}%){% endblocktrans %}</span>
                                 </div>
                                 {% elif order.has_pickup_discount %}
                                 <div class="summary-row discount-details">
-                                    <span class="summary-label">Тип скидки:</span>
-                                    <span class="summary-value">Самовывоз (10%)</span>
+                                    <span class="summary-label">{% trans "Тип скидки:" %}</span>
+                                    <span class="summary-value">{% trans "Самовывоз (10%)" %}</span>
                                 </div>
                                 {% endif %}
                             {% endif %}
                             
                             {% if order.delivery_cost > 0 %}
                                 <div class="summary-row">
-                                    <span class="summary-label">Стоимость доставки:</span>
+                                    <span class="summary-label">{% trans "Стоимость доставки:" %}</span>
                                     <span class="summary-value">{{ order.delivery_cost|floatformat:2 }} руб.</span>
                                 </div>
                             {% elif order.delivery_type == 'delivery' %}
                                 <div class="summary-row">
-                                    <span class="summary-label">Стоимость доставки:</span>
-                                    <span class="summary-value">Бесплатно</span>
+                                    <span class="summary-label">{% trans "Стоимость доставки:" %}</span>
+                                    <span class="summary-value">{% trans "Бесплатно" %}</span>
                                 </div>
                             {% endif %}
 
                             <div class="summary-row total-row">
-                                <span class="summary-label">Итого к оплате:</span>
+                                <span class="summary-label">{% trans "Итого к оплате:" %}</span>
                                 <span class="summary-value">{{ order.total_price|floatformat:2 }} руб.</span>
                             </div>
                         </div>

@@ -885,3 +885,219 @@ msgstr "Add-ons:"
 
 msgid "Итого к оплате:"
 msgstr "Total to pay:"
+
+msgid ""
+"История заказов Solo Pizza - просмотрите все ваши заказы, их статусы и "
+"детали."
+msgstr ""
+"Solo Pizza order history - view all your orders, their statuses and details."
+
+msgid "история заказов, список заказов, заказы пиццы, Solo Pizza заказы"
+msgstr "order history, order list, pizza orders, Solo Pizza orders"
+
+msgid "Мои заказы"
+msgstr "My orders"
+
+msgid "Поиск по ID, имени или телефону"
+msgstr "Search by ID, name or phone"
+
+msgid "Все статусы"
+msgstr "All statuses"
+
+msgid "Применить"
+msgstr "Apply"
+
+msgid "Статус"
+msgstr "Status"
+
+msgid "Оплата"
+msgstr "Payment"
+
+msgid "Филиал"
+msgstr "Branch"
+
+msgid "Детали"
+msgstr "Details"
+
+msgid "Чек"
+msgstr "Receipt"
+
+msgid "Фастфуд"
+msgstr "Fast food"
+
+msgid "Оплачено"
+msgstr "Paid"
+
+msgid "Не оплачено"
+msgstr "Not paid"
+
+msgid "Просмотреть"
+msgstr "View"
+
+msgid "Скачать чек"
+msgstr "Download receipt"
+
+msgid "Скачать чек фастфуда, соусов и бургеров"
+msgstr "Download fast food, sauces and burgers receipt"
+
+msgid "Заказы не найдены"
+msgstr "No orders found"
+
+msgid ""
+"Детали заказа Solo Pizza - просмотрите информацию о вашем заказе, статус "
+"доставки и состав заказа."
+msgstr ""
+"Solo Pizza order details - view information about your order, delivery "
+"status and order contents."
+
+msgid "детали заказа, статус заказа, доставка пиццы, Solo Pizza заказ"
+msgstr "order details, order status, pizza delivery, Solo Pizza order"
+
+msgid "Заказ #%(order_id)s"
+msgstr "Order #%(order_id)s"
+
+msgid "Скачать чек фастфуд"
+msgstr "Download fast food receipt"
+
+msgid "Добавить товар"
+msgstr "Add item"
+
+msgid "Дата: %(date)s"
+msgstr "Date: %(date)s"
+
+msgid "Филиал: %(branch)s"
+msgstr "Branch: %(branch)s"
+
+msgid "Состав заказа"
+msgstr "Order contents"
+
+msgid "Размер:"
+msgstr "Size:"
+
+msgid "Борты:"
+msgstr "Edges:"
+
+msgid "Соус:"
+msgstr "Sauce:"
+
+msgid "Напиток:"
+msgstr "Drink:"
+
+msgid "Удерживайте Ctrl для выбора нескольких добавок"
+msgstr "Hold Ctrl to select multiple add-ons"
+
+msgid "Отмена"
+msgstr "Cancel"
+
+msgid "Сохранить"
+msgstr "Save"
+
+msgid "Детали заказа"
+msgstr "Order details"
+
+msgid "Редактировать заказ"
+msgstr "Edit order"
+
+msgid "Способ получения:"
+msgstr "Receiving method:"
+
+msgid "Адрес доставки:"
+msgstr "Delivery address:"
+
+msgid "Способ оплаты:"
+msgstr "Payment method:"
+
+msgid "Наличные:"
+msgstr "Cash:"
+
+msgid "Карта:"
+msgstr "Card:"
+
+msgid "Безналичные:"
+msgstr "Non-cash:"
+
+msgid ""
+"Общая сумма раздельной оплаты должна совпадать с итоговой суммой заказа "
+"(%(total)s руб.)"
+msgstr "The total split payment must match the order total (%(total)s RUB)"
+
+msgid "Заказ оплачен"
+msgstr "Order paid"
+
+msgid "Имя заказчика:"
+msgstr "Customer name:"
+
+msgid "Телефон:"
+msgstr "Phone:"
+
+msgid "Готов к:"
+msgstr "Ready by:"
+
+msgid "Доставка к:"
+msgstr "Deliver by:"
+
+msgid "Комментарий:"
+msgstr "Comment:"
+
+msgid "Партнёр"
+msgstr "Partner"
+
+msgid "Процент скидки:"
+msgstr "Discount percent:"
+
+msgid "Сохранить изменения"
+msgstr "Save changes"
+
+msgid "Раздельная оплата:"
+msgstr "Split payment:"
+
+msgid "Общая сумма:"
+msgstr "Total:"
+
+msgid "Статус оплаты:"
+msgstr "Payment status:"
+
+msgid "Да"
+msgstr "Yes"
+
+msgid "Сумма заказа:"
+msgstr "Order total:"
+
+msgid "Скидка:"
+msgstr "Discount:"
+
+msgid "Тип скидки:"
+msgstr "Discount type:"
+
+msgid "Партнерская (%(percent)s%)"
+msgstr "Partner (%(percent)s%)"
+
+msgid "Самовывоз (10%)"
+msgstr "Pickup (10%)"
+
+msgid "Стоимость доставки:"
+msgstr "Delivery cost:"
+
+msgid "Бесплатно"
+msgstr "Free"
+
+msgid "Фастфуд/Соусы/Бургеры"
+msgstr "Fast food/Sauces/Burgers"
+
+msgid "Количество:"
+msgstr "Quantity:"
+
+msgid "Борт 1:"
+msgstr "Edge 1:"
+
+msgid "Борт 2:"
+msgstr "Edge 2:"
+
+msgid "Борт 1: %(board)s (+%(price)s руб.)"
+msgstr "Edge 1: %(board)s (+%(price)s RUB)"
+
+msgid "Борт 2: %(board)s (+%(price)s руб.)"
+msgstr "Edge 2: %(board)s (+%(price)s RUB)"
+
+msgid "Партнёр:"
+msgstr "Partner:"
