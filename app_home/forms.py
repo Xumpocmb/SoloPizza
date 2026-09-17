@@ -1,4 +1,5 @@
 from django import forms
+from django.utils.translation import gettext_lazy as _
 from .models import VacancyApplication, Feedback
 
 
@@ -8,10 +9,15 @@ class FeedbackForm(forms.ModelForm):
     class Meta:
         model = Feedback
         fields = ['name', 'phone', 'message']
+        labels = {
+            'name': _('Имя'),
+            'phone': _('Номер телефона'),
+            'message': _('Сообщение'),
+        }
         widgets = {
-            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите ваше имя'}),
-            'phone': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '375XXXXXXXXXXXX (минимум 12 цифр)'}),
-            'message': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Введите ваш вопрос или предложение', 'rows': 5}),
+            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': _('Введите ваше имя')}),
+            'phone': forms.TextInput(attrs={'class': 'form-control', 'placeholder': _('375XXXXXXXXXXXX (минимум 12 цифр)')}),
+            'message': forms.Textarea(attrs={'class': 'form-control', 'placeholder': _('Введите ваш вопрос или предложение'), 'rows': 5}),
         }
         
     def clean_phone(self):
@@ -23,7 +29,7 @@ class FeedbackForm(forms.ModelForm):
         
         # Проверяем длину номера
         if len(phone) < 12:
-            raise forms.ValidationError("Номер телефона должен содержать не менее 12 цифр.")
+            raise forms.ValidationError(_("Номер телефона должен содержать не менее 12 цифр."))
             
         return phone
 

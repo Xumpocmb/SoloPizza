@@ -134,7 +134,7 @@ def contacts_view(request):
 def feedback_view(request):
     """Отображает форму вопросов и предложений и обрабатывает её отправку"""
 
-    breadcrumbs = [{"title": "Главная", "url": "/"}, {"title": "Вопросы и предложения", "url": reverse("app_home:feedback")}]
+    breadcrumbs = [{"title": _("Главная"), "url": "/"}, {"title": _("Вопросы и предложения"), "url": reverse("app_home:feedback")}]
 
     if request.method == "POST":
         form = FeedbackForm(request.POST)
@@ -145,15 +145,15 @@ def feedback_view(request):
             from app_home.tasks import send_feedback_notification
 
             send_feedback_notification.delay(feedback.id)
-            messages.success(request, "Ваш вопрос/предложение успешно отправлено! Мы свяжемся с вами в ближайшее время.", extra_tags="success")
+            messages.success(request, _("Ваш вопрос/предложение успешно отправлено! Мы свяжемся с вами в ближайшее время."), extra_tags="success")
             return redirect(reverse("app_home:feedback"))
         else:
             # Добавляем сообщение об ошибке, если форма не валидна
-            messages.error(request, "Пожалуйста, исправьте ошибки в форме.", extra_tags="error")
+            messages.error(request, _("Пожалуйста, исправьте ошибки в форме."), extra_tags="error")
     else:
         form = FeedbackForm()
 
-    context = {"breadcrumbs": breadcrumbs, "form": form, "title": "Вопросы и предложения"}
+    context = {"breadcrumbs": breadcrumbs, "form": form, "title": _("Вопросы и предложения")}
 
     return render(request, "app_home/feedback.html", context=context)
 

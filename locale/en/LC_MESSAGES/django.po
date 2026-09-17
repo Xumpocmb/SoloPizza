@@ -343,3 +343,59 @@ msgstr "Takeaway discount"
 #: templates/app_home/discounts.html:90
 msgid "Постоянная скидка ТОЛЬКО на пиццу при заказе с самовывозом."
 msgstr "Permanent discount ONLY on pizza when ordering for takeaway."
+
+#: templates/app_home/feedback.html:6 templates/app_home/feedback.html:8 templates/app_home/feedback.html:9
+msgid "Обратная связь Solo Pizza - оставьте ваш вопрос или предложение, и мы свяжемся с вами в ближайшее время."
+msgstr "Solo Pizza feedback - leave your question or suggestion and we will contact you as soon as possible."
+
+#: templates/app_home/feedback.html:7
+msgid "обратная связь, связаться с пиццерией, задать вопрос, предложение для пиццерии, контактная форма"
+msgstr "feedback, contact the pizzeria, ask a question, suggestion for the pizzeria, contact form"
+
+#: templates/app_home/feedback.html:35
+msgid "Оставьте ваш вопрос или предложение, и мы свяжемся с вами в ближайшее время."
+msgstr "Leave your question or suggestion and we will contact you as soon as possible."
+
+#: templates/app_home/feedback.html:39
+msgid "Форма обратной связи"
+msgstr "Feedback form"
+
+#: templates/app_home/feedback.html:70
+msgid "Отправить"
+msgstr "Send"
+
+#: app_home/forms.py:13
+msgid "Имя"
+msgstr "Name"
+
+#: app_home/forms.py:14
+msgid "Номер телефона"
+msgstr "Phone number"
+
+#: app_home/forms.py:15
+msgid "Сообщение"
+msgstr "Message"
+
+#: app_home/forms.py:18
+msgid "Введите ваше имя"
+msgstr "Enter your name"
+
+#: app_home/forms.py:19
+msgid "375XXXXXXXXXXXX (минимум 12 цифр)"
+msgstr "375XXXXXXXXXXXX (at least 12 digits)"
+
+#: app_home/forms.py:20
+msgid "Введите ваш вопрос или предложение"
+msgstr "Enter your question or suggestion"
+
+#: app_home/forms.py:27
+msgid "Номер телефона должен содержать не менее 12 цифр."
+msgstr "The phone number must contain at least 12 digits."
+
+#: app_home/views.py:148
+msgid "Ваш вопрос/предложение успешно отправлено! Мы свяжемся с вами в ближайшее время."
+msgstr "Your question/suggestion has been sent successfully! We will contact you as soon as possible."
+
+#: app_home/views.py:152
+msgid "Пожалуйста, исправьте ошибки в форме."
+msgstr "Please fix the errors in the form."

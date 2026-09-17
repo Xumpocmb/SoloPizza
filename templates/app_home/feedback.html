@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static i18n %}
 
 {% block title %}{{ title }}{% endblock %}
 
-{% block meta_description %}Обратная связь Solo Pizza - оставьте ваш вопрос или предложение, и мы свяжемся с вами в ближайшее время.{% endblock %}
-{% block meta_keywords %}обратная связь, связаться с пиццерией, задать вопрос, предложение для пиццерии, контактная форма{% endblock %}
-{% block og_description %}Обратная связь Solo Pizza - оставьте ваш вопрос или предложение, и мы свяжемся с вами в ближайшее время.{% endblock %}
-{% block twitter_description %}Обратная связь Solo Pizza - оставьте ваш вопрос или предложение, и мы свяжемся с вами в ближайшее время.{% endblock %}
+{% block meta_description %}{% trans "Обратная связь Solo Pizza - оставьте ваш вопрос или предложение, и мы свяжемся с вами в ближайшее время." %}{% endblock %}
+{% block meta_keywords %}{% trans "обратная связь, связаться с пиццерией, задать вопрос, предложение для пиццерии, контактная форма" %}{% endblock %}
+{% block og_description %}{% trans "Обратная связь Solo Pizza - оставьте ваш вопрос или предложение, и мы свяжемся с вами в ближайшее время." %}{% endblock %}
+{% block twitter_description %}{% trans "Обратная связь Solo Pizza - оставьте ваш вопрос или предложение, и мы свяжемся с вами в ближайшее время." %}{% endblock %}
 
 {% block styles %}
     <link rel="stylesheet" href="{% static 'css/promo_page.css' %}">
@@ -32,11 +32,11 @@
             </div>
 
             <div class="promo-description">
-                <p>Оставьте ваш вопрос или предложение, и мы свяжемся с вами в ближайшее время.</p>
+                <p>{% trans "Оставьте ваш вопрос или предложение, и мы свяжемся с вами в ближайшее время." %}</p>
             </div>
 
             <div class="text-content">
-                <h2 class="text-title">Форма обратной связи</h2>
+                <h2 class="text-title">{% trans "Форма обратной связи" %}</h2>
                 
                 <div class="feedback-form-container">
                     <form method="post" action="{% url 'app_home:feedback' %}" class="feedback-form">
@@ -67,7 +67,7 @@
                         </div>
                         
                         <div class="form-actions">
-                            <button type="submit" class="feedback-submit-btn">Отправить</button>
+                            <button type="submit" class="feedback-submit-btn">{% trans "Отправить" %}</button>
                         </div>
                     </form>
                 </div>
