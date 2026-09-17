@@ -1128,3 +1128,15 @@ msgstr "Completed"
 
 msgid "Отменен"
 msgstr "Cancelled"
+
+msgid "Наличные"
+msgstr "Cash"
+
+msgid "Карта"
+msgstr "Card"
+
+msgid "Самовывоз"
+msgstr "Pickup"
+
+msgid "Зал"
+msgstr "Dining room"

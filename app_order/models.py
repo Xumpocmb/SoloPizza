@@ -91,16 +91,16 @@ class Order(models.Model):
     ]
 
     PAYMENT_CHOICES = [
-        ("cash", "Наличные"),
-        ("card", "Карта"),
-        ('noname', 'Безналичный расчет'),
-        ('split', 'Раздельная оплата'),
+        ("cash", _("Наличные")),
+        ("card", _("Карта")),
+        ('noname', _('Безналичный расчет')),
+        ('split', _('Раздельная оплата')),
     ]
 
     DELIVERY_CHOICES = [
-        ("pickup", "Самовывоз"),
-        ("delivery", "Доставка"),
-        ("cafe", "Зал")
+        ("pickup", _("Самовывоз")),
+        ("delivery", _("Доставка")),
+        ("cafe", _("Зал"))
     ]
 
     EDITABLE_STATUSES = ["new", "confirmed"]
