@@ -27,7 +27,7 @@ class ProductVariantInline(admin.TabularInline):
     ordering = ('price',)
 
 
-class ProductAdmin(admin.ModelAdmin):
+class ProductAdmin(TabbedTranslationAdmin):
     list_display = ['name', 'category', 'is_active', 'is_weekly_special', 'has_base_sauce', 'has_border', 'has_addons', 'has_drink', 'has_additional_sauces', 'created_at']
     list_filter = ['category', 'is_active', 'is_weekly_special', 'has_base_sauce', 'has_border', 'has_addons', 'has_drink', 'has_additional_sauces']
     search_fields = ['name', 'description']
