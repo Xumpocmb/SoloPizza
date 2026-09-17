@@ -161,9 +161,9 @@ def feedback_view(request):
 def info_view(request):
     """Отображает страницу с информацией о компании"""
 
-    breadcrumbs = [{"title": "Главная", "url": "/"}, {"title": "Информация", "url": reverse("app_home:info")}]
+    breadcrumbs = [{"title": _("Главная"), "url": "/"}, {"title": _("Информация"), "url": reverse("app_home:info")}]
 
-    context = {"breadcrumbs": breadcrumbs, "title": "Информация о компании"}
+    context = {"breadcrumbs": breadcrumbs, "title": _("Информация о компании")}
 
     return render(request, "app_home/info.html", context=context)
 

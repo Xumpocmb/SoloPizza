@@ -399,3 +399,107 @@ msgstr "Your question/suggestion has been sent successfully! We will contact you
 #: app_home/views.py:152
 msgid "Пожалуйста, исправьте ошибки в форме."
 msgstr "Please fix the errors in the form."
+
+#: templates/app_home/info.html:6 templates/app_home/info.html:8 templates/app_home/info.html:9
+msgid "Информация о Solo Pizza в Барановичах - наша философия, история, традиции итальянской кухни и контроль качества."
+msgstr "Information about Solo Pizza in Baranovichi - our philosophy, history, traditions of Italian cuisine and quality control."
+
+#: templates/app_home/info.html:7
+msgid "Solo Pizza, пиццерия Барановичи, итальянская кухня, доставка пиццы, о нас, информация о компании"
+msgstr "Solo Pizza, Baranovichi pizzeria, Italian cuisine, pizza delivery, about us, company information"
+
+#: templates/app_home/info.html:30
+msgid "О компании Solo Pizza"
+msgstr "About Solo Pizza"
+
+#: templates/app_home/info.html:35
+msgid "Solo Pizza - это не просто пиццерия, это место, где традиции итальянской кухни встречаются с современными технологиями и высоким уровнем сервиса. Мы стремимся создать для наших гостей атмосферу уюта и комфорта, где каждый может насладиться настоящей итальянской пиццей."
+msgstr "Solo Pizza is not just a pizzeria, it is a place where the traditions of Italian cuisine meet modern technology and a high level of service. We strive to create a cozy and comfortable atmosphere for our guests, where everyone can enjoy real Italian pizza."
+
+#: templates/app_home/info.html:39
+msgid "Наша философия"
+msgstr "Our philosophy"
+
+#: templates/app_home/info.html:40
+msgid "Наша миссия - делать вкусную пиццу доступной для каждого жителя Барановичей, сохраняя при этом высокое качество продукции и обслуживания."
+msgstr "Our mission is to make tasty pizza accessible to every resident of Baranovichi while maintaining high quality of products and service."
+
+#: templates/app_home/info.html:42
+msgid "Контроль качества"
+msgstr "Quality control"
+
+#: templates/app_home/info.html:43
+msgid "В Solo Pizza мы уделяем особое внимание качеству используемых продуктов. Мы тщательно отбираем поставщиков и ингредиенты, чтобы наша пицца всегда была вкусной и полезной."
+msgstr "At Solo Pizza we pay special attention to the quality of the products we use. We carefully select suppliers and ingredients so that our pizza is always tasty and healthy."
+
+#: templates/app_home/info.html:44
+msgid "Наши повара регулярно проходят обучение и совершенствуют свои навыки, чтобы радить вас новыми вкусами и блюдами. Каждая пицца готовится с любовью и вниманием к деталям."
+msgstr "Our chefs regularly undergo training and improve their skills to delight you with new flavors and dishes. Every pizza is made with love and attention to detail."
+
+#: templates/app_home/info.html:47
+msgid "Мы понимаем, как важно получить заказ вовремя и в идеальном состоянии. Поэтому наша служба доставки работает быстро и эффективно, чтобы ваша пицца приехала к вам горячей и аппетитной."
+msgstr "We understand how important it is to receive your order on time and in perfect condition. That is why our delivery service works fast and efficiently so that your pizza arrives hot and appetizing."
+
+#: templates/app_home/info.html:48
+msgid "Для удобства наших клиентов мы разработали мобильное приложение, которое можно скачать в Google Play. С его помощью вы можете легко сделать заказ, отследить его статус и получить доступ к специальным предложениям и акциям."
+msgstr "For the convenience of our customers, we have developed a mobile app that can be downloaded from Google Play. With it, you can easily place an order, track its status and get access to special offers and promotions."
+
+#: templates/app_home/info.html:50
+msgid "Наш адрес"
+msgstr "Our address"
+
+#: templates/app_home/info.html:51
+msgid "Solo Pizza находится в центре города Барановичи по адресу: ул. Ленина, 9/1."
+msgstr "Solo Pizza is located in the center of Baranovichi at Lenin St., 9/1."
+
+#: templates/app_home/info.html:52
+msgid "Мы всегда рады видеть вас в нашей пиццерии, где вы можете насладиться не только вкусной едой, но и приятной атмосферой."
+msgstr "We are always glad to see you at our pizzeria, where you can enjoy not only tasty food, but also a pleasant atmosphere."
+
+#: templates/app_home/info.html:54
+msgid "Связаться с нами"
+msgstr "Contact us"
+
+#: templates/app_home/info.html:55
+msgid "Вы можете связаться с нами по телефонам, указанным на странице"
+msgstr "You can contact us by the phone numbers listed on the"
+
+#: templates/app_home/info.html:55
+msgid "контактов"
+msgstr "contacts"
+
+#: templates/app_home/info.html:55
+msgid "или посетить нашу страницу в Instagram, где мы регулярно публикуем новости, акции и специальные предложения."
+msgstr "or visit our Instagram page, where we regularly post news, promotions and special offers."
+
+#: templates/app_home/info.html:56
+msgid "Также вы можете оставить свой отзыв или предложение на странице"
+msgstr "You can also leave your review or suggestion on the"
+
+#: templates/app_home/info.html:56
+msgid "обратной связи"
+msgstr "feedback"
+
+#: templates/app_home/info.html:56
+msgid "Мы ценим мнение каждого клиента и стремимся становиться лучше с каждым днем."
+msgstr "We value the opinion of every customer and strive to become better every day."
+
+#: templates/app_home/info.html:58
+msgid "Оформление заказа"
+msgstr "Order placement"
+
+#: templates/app_home/info.html:59
+msgid "После оформления заказа с Вами свяжется оператор для подтверждения заказа."
+msgstr "After placing an order, an operator will contact you to confirm it."
+
+#: templates/app_home/info.html:60
+msgid "Если заказ не будет подтвержден, он будет отменен."
+msgstr "If the order is not confirmed, it will be cancelled."
+
+#: templates/app_home/info.html:61
+msgid "В случае, если с Вами не связались в течении 15ти минут, пожалуйста, перезвоните нам по нашим номерам и сообщите Ваш номер заказа"
+msgstr "If you have not been contacted within 15 minutes, please call us back at our numbers and provide your order number."
+
+#: app_home/views.py:166
+msgid "Информация о компании"
+msgstr "Company information"
