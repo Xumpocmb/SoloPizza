@@ -20,13 +20,24 @@ msgstr ""
 msgid "Заказать пиццу в Барановичах с доставкой - Solo Pizza"
 msgstr "Order pizza in Baranovichi with delivery - Solo Pizza"
 
-#: templates/app_home/home.html:7 templates/app_home/home.html:9 templates/app_home/home.html:10
-msgid "Закажите вкусную пиццу с доставкой в Барановичах! Solo Pizza предлагает свежие пиццы и другие блюда. Быстрая доставка, отличное обслуживание."
-msgstr "Order delicious pizza with delivery in Baranovichi! Solo Pizza offers fresh pizzas and other dishes. Fast delivery, great service."
+#: templates/app_home/home.html:7 templates/app_home/home.html:9
+#: templates/app_home/home.html:10
+msgid ""
+"Закажите вкусную пиццу с доставкой в Барановичах! Solo Pizza предлагает "
+"свежие пиццы и другие блюда. Быстрая доставка, отличное обслуживание."
+msgstr ""
+"Order delicious pizza with delivery in Baranovichi! Solo Pizza offers fresh "
+"pizzas and other dishes. Fast delivery, great service."
 
 #: templates/app_home/home.html:8
-msgid "заказать пиццу барановичи, доставка пиццы барановичи, пицца в барановичах, заказать пиццу онлайн, вкусная пицца, итальянская пицца, пицца с доставкой, доставка еды барановичи"
-msgstr "order pizza baranovichi, pizza delivery baranovichi, pizza in baranovichi, order pizza online, tasty pizza, italian pizza, pizza with delivery, food delivery baranovichi"
+msgid ""
+"заказать пиццу барановичи, доставка пиццы барановичи, пицца в барановичах, "
+"заказать пиццу онлайн, вкусная пицца, итальянская пицца, пицца с доставкой, "
+"доставка еды барановичи"
+msgstr ""
+"order pizza baranovichi, pizza delivery baranovichi, pizza in baranovichi, "
+"order pizza online, tasty pizza, italian pizza, pizza with delivery, food "
+"delivery baranovichi"
 
 #: templates/app_home/home.html:105
 msgid "Комбо-набор Охота - вкусная пицца с доставкой в Барановичах"
@@ -73,8 +84,10 @@ msgid "Доставка"
 msgstr "Delivery"
 
 #: templates/app_home/home.html:198
-msgid "Доставка по городу - 3 руб. При заказе от 20 руб. - доставка бесплатная!"
-msgstr "Delivery around the city - 3 BYN. Free delivery for orders over 20 BYN!"
+msgid ""
+"Доставка по городу - 3 руб. При заказе от 20 руб. - доставка бесплатная!"
+msgstr ""
+"Delivery around the city - 3 BYN. Free delivery for orders over 20 BYN!"
 
 #: templates/app_home/home.html:199
 msgid "Подробнее о доставке"
@@ -85,8 +98,14 @@ msgid "О нас"
 msgstr "About us"
 
 #: templates/app_home/home.html:210
-msgid "Solo Pizza - это сеть пиццерий в Барановичах по адресам: ул. Ленина 9/1 и ул. Тексер, 4а. Мы предлагаем свежую, вкусную пиццу и другие блюда с доставкой по городу."
-msgstr "Solo Pizza is a chain of pizzerias in Baranovichi located at Lenin St. 9/1 and Tekser St. 4а. We offer fresh, tasty pizza and other dishes with delivery across the city."
+msgid ""
+"Solo Pizza - это сеть пиццерий в Барановичах по адресам: ул. Ленина 9/1 и "
+"ул. Тексер, 4а. Мы предлагаем свежую, вкусную пиццу и другие блюда с "
+"доставкой по городу."
+msgstr ""
+"Solo Pizza is a chain of pizzerias in Baranovichi located at Lenin St. 9/1 "
+"and Tekser St. 4а. We offer fresh, tasty pizza and other dishes with "
+"delivery across the city."
 
 #: templates/footer.html:4
 msgid "Наше меню"
@@ -200,17 +219,30 @@ msgstr "Log out"
 msgid "Вход"
 msgstr "Log in"
 
-#: templates/app_home/contacts.html:6 templates/app_home/contacts.html:8 templates/app_home/contacts.html:9
-msgid "Контакты Solo Pizza - адреса, телефоны и время работы наших пиццерий. Свяжитесь с нами для заказа или с вопросами."
-msgstr "Solo Pizza contacts - addresses, phone numbers and working hours of our pizzerias. Contact us for orders or inquiries."
+#: templates/app_home/contacts.html:6 templates/app_home/contacts.html:8
+#: templates/app_home/contacts.html:9
+msgid ""
+"Контакты Solo Pizza - адреса, телефоны и время работы наших пиццерий. "
+"Свяжитесь с нами для заказа или с вопросами."
+msgstr ""
+"Solo Pizza contacts - addresses, phone numbers and working hours of our "
+"pizzerias. Contact us for orders or inquiries."
 
 #: templates/app_home/contacts.html:7
-msgid "контакты пиццерии, адрес Solo Pizza, телефон пиццерии, время работы, как связаться"
-msgstr "pizzeria contacts, Solo Pizza address, pizzeria phone, working hours, how to contact"
+msgid ""
+"контакты пиццерии, адрес Solo Pizza, телефон пиццерии, время работы, как "
+"связаться"
+msgstr ""
+"pizzeria contacts, Solo Pizza address, pizzeria phone, working hours, how to"
+" contact"
 
 #: templates/app_home/contacts.html:35
-msgid "Адреса, телефоны и время работы наших пиццерий. Свяжитесь с нами для заказа или с вопросами."
-msgstr "Addresses, phone numbers and working hours of our pizzerias. Contact us for orders or inquiries."
+msgid ""
+"Адреса, телефоны и время работы наших пиццерий. Свяжитесь с нами для заказа "
+"или с вопросами."
+msgstr ""
+"Addresses, phone numbers and working hours of our pizzerias. Contact us for "
+"orders or inquiries."
 
 #: templates/app_home/contacts.html:43
 msgid "Адрес"
@@ -232,21 +264,32 @@ msgstr "Learn more about our delivery:"
 msgid "Доставка пиццы в Барановичах - Solo Pizza"
 msgstr "Pizza delivery in Baranovichi - Solo Pizza"
 
-#: templates/app_home/delivery.html:6 templates/app_home/delivery.html:8 templates/app_home/delivery.html:9
-msgid "Узнайте о доставке пиццы и других блюд Solo Pizza по Барановичам. Стоимость доставки 3 руб., при заказе от 20 руб. - доставка бесплатно!"
-msgstr "Learn about pizza and other dishes delivery from Solo Pizza in Baranovichi. Delivery costs 3 BYN, free delivery for orders over 20 BYN!"
+#: templates/app_home/delivery.html:6 templates/app_home/delivery.html:8
+#: templates/app_home/delivery.html:9
+msgid ""
+"Узнайте о доставке пиццы и других блюд Solo Pizza по Барановичам. Стоимость "
+"доставки 3 руб., при заказе от 20 руб. - доставка бесплатно!"
+msgstr ""
+"Learn about pizza and other dishes delivery from Solo Pizza in Baranovichi. "
+"Delivery costs 3 BYN, free delivery for orders over 20 BYN!"
 
 #: templates/app_home/delivery.html:7
-msgid "доставка пиццы барановичи, доставка еды барановичи, стоимость доставки, бесплатная доставка пиццы, доставка по городу, Solo Pizza"
-msgstr "pizza delivery baranovichi, food delivery baranovichi, delivery cost, free pizza delivery, delivery around the city, Solo Pizza"
+msgid ""
+"доставка пиццы барановичи, доставка еды барановичи, стоимость доставки, "
+"бесплатная доставка пиццы, доставка по городу, Solo Pizza"
+msgstr ""
+"pizza delivery baranovichi, food delivery baranovichi, delivery cost, free "
+"pizza delivery, delivery around the city, Solo Pizza"
 
 #: templates/app_home/delivery.html:31
 msgid "Доставка по городу"
 msgstr "Delivery around the city"
 
 #: templates/app_home/delivery.html:32
-msgid "Мы осуществляем доставку пиццы и других блюд по всему городу Барановичи."
-msgstr "We deliver pizza and other dishes across the whole city of Baranovichi."
+msgid ""
+"Мы осуществляем доставку пиццы и других блюд по всему городу Барановичи."
+msgstr ""
+"We deliver pizza and other dishes across the whole city of Baranovichi."
 
 #: templates/app_home/delivery.html:34
 msgid "Стоимость доставки"
@@ -257,12 +300,21 @@ msgid "Доставка по городу - <strong>3 руб.</strong>"
 msgstr "Delivery around the city - <strong>3 BYN</strong>"
 
 #: templates/app_home/delivery.html:37
-msgid "При стоимости заказа <strong>более 20 руб.</strong> - доставка <strong>бесплатная</strong>!"
-msgstr "For orders over <strong>20 BYN</strong> - delivery is <strong>free</strong>!"
+msgid ""
+"При стоимости заказа <strong>более 20 руб.</strong> - доставка "
+"<strong>бесплатная</strong>!"
+msgstr ""
+"For orders over <strong>20 BYN</strong> - delivery is <strong>free</strong>!"
 
 #: templates/app_home/delivery.html:38
-msgid "При стоимости заказа <strong>менее 25 руб.</strong> если в заказе блюда из категории \"Фастфуд\", \"Бургеры\", \"Сковородки\", \"Напитки\", \"Соусы\"- доставка <strong>платная</strong>!"
-msgstr "For orders under <strong>25 BYN</strong> if the order contains items from categories \"Fast food\", \"Burgers\", \"Skillets\", \"Drinks\", \"Sauces\" - delivery is <strong>paid</strong>!"
+msgid ""
+"При стоимости заказа <strong>менее 25 руб.</strong> если в заказе блюда из "
+"категории \"Фастфуд\", \"Бургеры\", \"Сковородки\", \"Напитки\", \"Соусы\"- "
+"доставка <strong>платная</strong>!"
+msgstr ""
+"For orders under <strong>25 BYN</strong> if the order contains items from "
+"categories \"Fast food\", \"Burgers\", \"Skillets\", \"Drinks\", \"Sauces\" "
+"- delivery is <strong>paid</strong>!"
 
 #: templates/app_home/delivery.html:41
 msgid "Адреса заведений"
@@ -284,13 +336,22 @@ msgstr "Order pizza"
 msgid "Наши контакты"
 msgstr "Our contacts"
 
-#: templates/app_home/discounts.html:4 templates/app_home/discounts.html:6 templates/app_home/discounts.html:7
-msgid "Акции и скидки Solo Pizza - специальные предложения, выгодные комбо-наборы и сезонные скидки на пиццу и другие блюда."
-msgstr "Solo Pizza promotions and discounts - special offers, profitable combo sets and seasonal discounts on pizza and other dishes."
+#: templates/app_home/discounts.html:4 templates/app_home/discounts.html:6
+#: templates/app_home/discounts.html:7
+msgid ""
+"Акции и скидки Solo Pizza - специальные предложения, выгодные комбо-наборы и"
+" сезонные скидки на пиццу и другие блюда."
+msgstr ""
+"Solo Pizza promotions and discounts - special offers, profitable combo sets "
+"and seasonal discounts on pizza and other dishes."
 
 #: templates/app_home/discounts.html:5
-msgid "акции пиццерии, скидки на пиццу, специальные предложения, выгодные комбо, промокоды Solo Pizza"
-msgstr "pizzeria promotions, pizza discounts, special offers, profitable combos, Solo Pizza promo codes"
+msgid ""
+"акции пиццерии, скидки на пиццу, специальные предложения, выгодные комбо, "
+"промокоды Solo Pizza"
+msgstr ""
+"pizzeria promotions, pizza discounts, special offers, profitable combos, "
+"Solo Pizza promo codes"
 
 #: templates/app_home/discounts.html:28 app_home/views.py:59
 msgid "Наши акции"
@@ -329,8 +390,12 @@ msgid "Скидка на День Рождения"
 msgstr "Birthday discount"
 
 #: templates/app_home/discounts.html:72
-msgid "Скидка именинникам при предъявлении документа. Действует за 3 дня до и 3 дня после даты рождения. Скидка ТОЛЬКО на пиццу."
-msgstr "Discount for birthday people upon presenting an ID. Valid 3 days before and 3 days after the birthday. Discount applies ONLY to pizza."
+msgid ""
+"Скидка именинникам при предъявлении документа. Действует за 3 дня до и 3 дня"
+" после даты рождения. Скидка ТОЛЬКО на пиццу."
+msgstr ""
+"Discount for birthday people upon presenting an ID. Valid 3 days before and "
+"3 days after the birthday. Discount applies ONLY to pizza."
 
 #: templates/app_home/discounts.html:77
 msgid "СКИДКА ДЕЙСТВУЕТ ТОЛЬКО ЗАЛ ПРИ ПРЕДЪЯВЛЕНИИ ДОКУМЕНТА!"
@@ -344,17 +409,29 @@ msgstr "Takeaway discount"
 msgid "Постоянная скидка ТОЛЬКО на пиццу при заказе с самовывозом."
 msgstr "Permanent discount ONLY on pizza when ordering for takeaway."
 
-#: templates/app_home/feedback.html:6 templates/app_home/feedback.html:8 templates/app_home/feedback.html:9
-msgid "Обратная связь Solo Pizza - оставьте ваш вопрос или предложение, и мы свяжемся с вами в ближайшее время."
-msgstr "Solo Pizza feedback - leave your question or suggestion and we will contact you as soon as possible."
+#: templates/app_home/feedback.html:6 templates/app_home/feedback.html:8
+#: templates/app_home/feedback.html:9
+msgid ""
+"Обратная связь Solo Pizza - оставьте ваш вопрос или предложение, и мы "
+"свяжемся с вами в ближайшее время."
+msgstr ""
+"Solo Pizza feedback - leave your question or suggestion and we will contact "
+"you as soon as possible."
 
 #: templates/app_home/feedback.html:7
-msgid "обратная связь, связаться с пиццерией, задать вопрос, предложение для пиццерии, контактная форма"
-msgstr "feedback, contact the pizzeria, ask a question, suggestion for the pizzeria, contact form"
+msgid ""
+"обратная связь, связаться с пиццерией, задать вопрос, предложение для "
+"пиццерии, контактная форма"
+msgstr ""
+"feedback, contact the pizzeria, ask a question, suggestion for the pizzeria,"
+" contact form"
 
 #: templates/app_home/feedback.html:35
-msgid "Оставьте ваш вопрос или предложение, и мы свяжемся с вами в ближайшее время."
-msgstr "Leave your question or suggestion and we will contact you as soon as possible."
+msgid ""
+"Оставьте ваш вопрос или предложение, и мы свяжемся с вами в ближайшее время."
+msgstr ""
+"Leave your question or suggestion and we will contact you as soon as "
+"possible."
 
 #: templates/app_home/feedback.html:39
 msgid "Форма обратной связи"
@@ -393,68 +470,122 @@ msgid "Номер телефона должен содержать не мене
 msgstr "The phone number must contain at least 12 digits."
 
 #: app_home/views.py:148
-msgid "Ваш вопрос/предложение успешно отправлено! Мы свяжемся с вами в ближайшее время."
-msgstr "Your question/suggestion has been sent successfully! We will contact you as soon as possible."
+msgid ""
+"Ваш вопрос/предложение успешно отправлено! Мы свяжемся с вами в ближайшее "
+"время."
+msgstr ""
+"Your question/suggestion has been sent successfully! We will contact you as "
+"soon as possible."
 
 #: app_home/views.py:152
 msgid "Пожалуйста, исправьте ошибки в форме."
 msgstr "Please fix the errors in the form."
 
-#: templates/app_home/info.html:6 templates/app_home/info.html:8 templates/app_home/info.html:9
-msgid "Информация о Solo Pizza в Барановичах - наша философия, история, традиции итальянской кухни и контроль качества."
-msgstr "Information about Solo Pizza in Baranovichi - our philosophy, history, traditions of Italian cuisine and quality control."
+#: templates/app_home/info.html:6 templates/app_home/info.html:8
+#: templates/app_home/info.html:9
+msgid ""
+"Информация о Solo Pizza в Барановичах - наша философия, история, традиции "
+"итальянской кухни и контроль качества."
+msgstr ""
+"Information about Solo Pizza in Baranovichi - our philosophy, history, "
+"traditions of Italian cuisine and quality control."
 
 #: templates/app_home/info.html:7
-msgid "Solo Pizza, пиццерия Барановичи, итальянская кухня, доставка пиццы, о нас, информация о компании"
-msgstr "Solo Pizza, Baranovichi pizzeria, Italian cuisine, pizza delivery, about us, company information"
+msgid ""
+"Solo Pizza, пиццерия Барановичи, итальянская кухня, доставка пиццы, о нас, "
+"информация о компании"
+msgstr ""
+"Solo Pizza, Baranovichi pizzeria, Italian cuisine, pizza delivery, about us,"
+" company information"
 
 #: templates/app_home/info.html:30
 msgid "О компании Solo Pizza"
 msgstr "About Solo Pizza"
 
 #: templates/app_home/info.html:35
-msgid "Solo Pizza - это не просто пиццерия, это место, где традиции итальянской кухни встречаются с современными технологиями и высоким уровнем сервиса. Мы стремимся создать для наших гостей атмосферу уюта и комфорта, где каждый может насладиться настоящей итальянской пиццей."
-msgstr "Solo Pizza is not just a pizzeria, it is a place where the traditions of Italian cuisine meet modern technology and a high level of service. We strive to create a cozy and comfortable atmosphere for our guests, where everyone can enjoy real Italian pizza."
+msgid ""
+"Solo Pizza - это не просто пиццерия, это место, где традиции итальянской "
+"кухни встречаются с современными технологиями и высоким уровнем сервиса. Мы "
+"стремимся создать для наших гостей атмосферу уюта и комфорта, где каждый "
+"может насладиться настоящей итальянской пиццей."
+msgstr ""
+"Solo Pizza is not just a pizzeria, it is a place where the traditions of "
+"Italian cuisine meet modern technology and a high level of service. We "
+"strive to create a cozy and comfortable atmosphere for our guests, where "
+"everyone can enjoy real Italian pizza."
 
 #: templates/app_home/info.html:39
 msgid "Наша философия"
 msgstr "Our philosophy"
 
 #: templates/app_home/info.html:40
-msgid "Наша миссия - делать вкусную пиццу доступной для каждого жителя Барановичей, сохраняя при этом высокое качество продукции и обслуживания."
-msgstr "Our mission is to make tasty pizza accessible to every resident of Baranovichi while maintaining high quality of products and service."
+msgid ""
+"Наша миссия - делать вкусную пиццу доступной для каждого жителя Барановичей,"
+" сохраняя при этом высокое качество продукции и обслуживания."
+msgstr ""
+"Our mission is to make tasty pizza accessible to every resident of "
+"Baranovichi while maintaining high quality of products and service."
 
 #: templates/app_home/info.html:42
 msgid "Контроль качества"
 msgstr "Quality control"
 
 #: templates/app_home/info.html:43
-msgid "В Solo Pizza мы уделяем особое внимание качеству используемых продуктов. Мы тщательно отбираем поставщиков и ингредиенты, чтобы наша пицца всегда была вкусной и полезной."
-msgstr "At Solo Pizza we pay special attention to the quality of the products we use. We carefully select suppliers and ingredients so that our pizza is always tasty and healthy."
+msgid ""
+"В Solo Pizza мы уделяем особое внимание качеству используемых продуктов. Мы "
+"тщательно отбираем поставщиков и ингредиенты, чтобы наша пицца всегда была "
+"вкусной и полезной."
+msgstr ""
+"At Solo Pizza we pay special attention to the quality of the products we "
+"use. We carefully select suppliers and ingredients so that our pizza is "
+"always tasty and healthy."
 
 #: templates/app_home/info.html:44
-msgid "Наши повара регулярно проходят обучение и совершенствуют свои навыки, чтобы радить вас новыми вкусами и блюдами. Каждая пицца готовится с любовью и вниманием к деталям."
-msgstr "Our chefs regularly undergo training and improve their skills to delight you with new flavors and dishes. Every pizza is made with love and attention to detail."
+msgid ""
+"Наши повара регулярно проходят обучение и совершенствуют свои навыки, чтобы "
+"радить вас новыми вкусами и блюдами. Каждая пицца готовится с любовью и "
+"вниманием к деталям."
+msgstr ""
+"Our chefs regularly undergo training and improve their skills to delight you"
+" with new flavors and dishes. Every pizza is made with love and attention to"
+" detail."
 
 #: templates/app_home/info.html:47
-msgid "Мы понимаем, как важно получить заказ вовремя и в идеальном состоянии. Поэтому наша служба доставки работает быстро и эффективно, чтобы ваша пицца приехала к вам горячей и аппетитной."
-msgstr "We understand how important it is to receive your order on time and in perfect condition. That is why our delivery service works fast and efficiently so that your pizza arrives hot and appetizing."
+msgid ""
+"Мы понимаем, как важно получить заказ вовремя и в идеальном состоянии. "
+"Поэтому наша служба доставки работает быстро и эффективно, чтобы ваша пицца "
+"приехала к вам горячей и аппетитной."
+msgstr ""
+"We understand how important it is to receive your order on time and in "
+"perfect condition. That is why our delivery service works fast and "
+"efficiently so that your pizza arrives hot and appetizing."
 
 #: templates/app_home/info.html:48
-msgid "Для удобства наших клиентов мы разработали мобильное приложение, которое можно скачать в Google Play. С его помощью вы можете легко сделать заказ, отследить его статус и получить доступ к специальным предложениям и акциям."
-msgstr "For the convenience of our customers, we have developed a mobile app that can be downloaded from Google Play. With it, you can easily place an order, track its status and get access to special offers and promotions."
+msgid ""
+"Для удобства наших клиентов мы разработали мобильное приложение, которое "
+"можно скачать в Google Play. С его помощью вы можете легко сделать заказ, "
+"отследить его статус и получить доступ к специальным предложениям и акциям."
+msgstr ""
+"For the convenience of our customers, we have developed a mobile app that "
+"can be downloaded from Google Play. With it, you can easily place an order, "
+"track its status and get access to special offers and promotions."
 
 #: templates/app_home/info.html:50
 msgid "Наш адрес"
 msgstr "Our address"
 
 #: templates/app_home/info.html:51
-msgid "Solo Pizza находится в центре города Барановичи по адресу: ул. Ленина, 9/1."
+msgid ""
+"Solo Pizza находится в центре города Барановичи по адресу: ул. Ленина, 9/1."
 msgstr "Solo Pizza is located in the center of Baranovichi at Lenin St., 9/1."
 
 #: templates/app_home/info.html:52
-msgid "Мы всегда рады видеть вас в нашей пиццерии, где вы можете насладиться не только вкусной едой, но и приятной атмосферой."
-msgstr "We are always glad to see you at our pizzeria, where you can enjoy not only tasty food, but also a pleasant atmosphere."
+msgid ""
+"Мы всегда рады видеть вас в нашей пиццерии, где вы можете насладиться не "
+"только вкусной едой, но и приятной атмосферой."
+msgstr ""
+"We are always glad to see you at our pizzeria, where you can enjoy not only "
+"tasty food, but also a pleasant atmosphere."
 
 #: templates/app_home/info.html:54
 msgid "Связаться с нами"
@@ -469,8 +600,12 @@ msgid "контактов"
 msgstr "contacts"
 
 #: templates/app_home/info.html:55
-msgid "или посетить нашу страницу в Instagram, где мы регулярно публикуем новости, акции и специальные предложения."
-msgstr "or visit our Instagram page, where we regularly post news, promotions and special offers."
+msgid ""
+"или посетить нашу страницу в Instagram, где мы регулярно публикуем новости, "
+"акции и специальные предложения."
+msgstr ""
+"or visit our Instagram page, where we regularly post news, promotions and "
+"special offers."
 
 #: templates/app_home/info.html:56
 msgid "Также вы можете оставить свой отзыв или предложение на странице"
@@ -481,15 +616,19 @@ msgid "обратной связи"
 msgstr "feedback"
 
 #: templates/app_home/info.html:56
-msgid "Мы ценим мнение каждого клиента и стремимся становиться лучше с каждым днем."
-msgstr "We value the opinion of every customer and strive to become better every day."
+msgid ""
+"Мы ценим мнение каждого клиента и стремимся становиться лучше с каждым днем."
+msgstr ""
+"We value the opinion of every customer and strive to become better every "
+"day."
 
 #: templates/app_home/info.html:58
 msgid "Оформление заказа"
 msgstr "Order placement"
 
 #: templates/app_home/info.html:59
-msgid "После оформления заказа с Вами свяжется оператор для подтверждения заказа."
+msgid ""
+"После оформления заказа с Вами свяжется оператор для подтверждения заказа."
 msgstr "After placing an order, an operator will contact you to confirm it."
 
 #: templates/app_home/info.html:60
@@ -497,24 +636,35 @@ msgid "Если заказ не будет подтвержден, он буде
 msgstr "If the order is not confirmed, it will be cancelled."
 
 #: templates/app_home/info.html:61
-msgid "В случае, если с Вами не связались в течении 15ти минут, пожалуйста, перезвоните нам по нашим номерам и сообщите Ваш номер заказа"
-msgstr "If you have not been contacted within 15 minutes, please call us back at our numbers and provide your order number."
+msgid ""
+"В случае, если с Вами не связались в течении 15ти минут, пожалуйста, "
+"перезвоните нам по нашим номерам и сообщите Ваш номер заказа"
+msgstr ""
+"If you have not been contacted within 15 minutes, please call us back at our"
+" numbers and provide your order number."
 
 #: app_home/views.py:166
 msgid "Информация о компании"
 msgstr "Company information"
 
-#: templates/app_home/partners.html:6 templates/app_home/partners.html:8 templates/app_home/partners.html:9
-msgid "Наши партнеры - список организаций и компаний, с которыми мы сотрудничаем."
-msgstr "Our partners - a list of organizations and companies we cooperate with."
+#: templates/app_home/partners.html:6 templates/app_home/partners.html:8
+#: templates/app_home/partners.html:9
+msgid ""
+"Наши партнеры - список организаций и компаний, с которыми мы сотрудничаем."
+msgstr ""
+"Our partners - a list of organizations and companies we cooperate with."
 
 #: templates/app_home/partners.html:7
 msgid "партнеры, сотрудничество, организации, компании"
 msgstr "partners, cooperation, organizations, companies"
 
 #: templates/app_home/partners.html:35
-msgid "Посетителям, которые проводят время у наших партнеров и заказывают пиццу в Solo Pizza, предоставляется скидка 10% на все виды пиццы!"
-msgstr "Visitors who spend time at our partners and order pizza at Solo Pizza get a 10% discount on all types of pizza!"
+msgid ""
+"Посетителям, которые проводят время у наших партнеров и заказывают пиццу в "
+"Solo Pizza, предоставляется скидка 10% на все виды пиццы!"
+msgstr ""
+"Visitors who spend time at our partners and order pizza at Solo Pizza get a "
+"10% discount on all types of pizza!"
 
 #: templates/app_home/partners.html:44
 msgid "Перейти к партнеру"
@@ -532,21 +682,35 @@ msgstr "We currently have no active partners."
 msgid "Наши партнеры"
 msgstr "Our partners"
 
-#: templates/app_home/vacancy_list.html:7 templates/app_home/vacancy_list.html:9 templates/app_home/vacancy_list.html:10
-msgid "Вакансии в Solo Pizza - присоединяйтесь к нашей команде! Мы ищем классных людей, которые любят пиццу, еду и хорошую атмосферу."
-msgstr "Vacancies at Solo Pizza - join our team! We are looking for great people who love pizza, food and a good atmosphere."
+#: templates/app_home/vacancy_list.html:7
+#: templates/app_home/vacancy_list.html:9
+#: templates/app_home/vacancy_list.html:10
+msgid ""
+"Вакансии в Solo Pizza - присоединяйтесь к нашей команде! Мы ищем классных "
+"людей, которые любят пиццу, еду и хорошую атмосферу."
+msgstr ""
+"Vacancies at Solo Pizza - join our team! We are looking for great people who"
+" love pizza, food and a good atmosphere."
 
 #: templates/app_home/vacancy_list.html:8
-msgid "вакансии, работа в пиццерии, карьера в Solo Pizza, работа в ресторане, трудоустройство"
-msgstr "vacancies, work at a pizzeria, career at Solo Pizza, restaurant jobs, employment"
+msgid ""
+"вакансии, работа в пиццерии, карьера в Solo Pizza, работа в ресторане, "
+"трудоустройство"
+msgstr ""
+"vacancies, work at a pizzeria, career at Solo Pizza, restaurant jobs, "
+"employment"
 
 #: templates/app_home/includes/vacancy.html:6
 msgid "Вакансии Solo Pizza"
 msgstr "Solo Pizza vacancies"
 
 #: templates/app_home/includes/vacancy.html:8
-msgid "Присоединяйся к нашей команде! Мы ищем классных людей, которые любят пиццу, еду и хорошую атмосферу."
-msgstr "Join our team! We are looking for great people who love pizza, food and a good atmosphere."
+msgid ""
+"Присоединяйся к нашей команде! Мы ищем классных людей, которые любят пиццу, "
+"еду и хорошую атмосферу."
+msgstr ""
+"Join our team! We are looking for great people who love pizza, food and a "
+"good atmosphere."
 
 #: templates/app_home/includes/vacancy.html:33
 msgid "Подробнее"
@@ -561,8 +725,12 @@ msgid "Вакансия %(v_title)s в Solo Pizza - %(v_desc)s"
 msgstr "Vacancy %(v_title)s at Solo Pizza - %(v_desc)s"
 
 #: templates/app_home/vacancy_detail.html:8
-msgid "вакансия %(v_title)s, работа в пиццерии, карьера в Solo Pizza, %(v_title)s в ресторане"
-msgstr "%(v_title)s vacancy, work at a pizzeria, career at Solo Pizza, %(v_title)s at a restaurant"
+msgid ""
+"вакансия %(v_title)s, работа в пиццерии, карьера в Solo Pizza, %(v_title)s в"
+" ресторане"
+msgstr ""
+"%(v_title)s vacancy, work at a pizzeria, career at Solo Pizza, %(v_title)s "
+"at a restaurant"
 
 #: templates/app_home/vacancy_detail.html:58
 msgid "Преимущества работы у нас:"
@@ -622,7 +790,9 @@ msgstr "Describe your work experience"
 
 #: app_home/views.py:68
 msgid "Ваш отклик успешно отправлен! Мы свяжемся с вами в ближайшее время."
-msgstr "Your application has been sent successfully! We will contact you as soon as possible."
+msgstr ""
+"Your application has been sent successfully! We will contact you as soon as "
+"possible."
 
 #: app_home/views.py:116
 msgid "Отклик на вакансию"
@@ -631,3 +801,87 @@ msgstr "Application for the job"
 #: app_home/views.py:119
 msgid "Отклик на вакансию: %(title)s"
 msgstr "Application for: %(title)s"
+
+msgid ""
+"Оформление заказа в Solo Pizza - заполните контактные данные, выберите "
+"способ доставки и оплаты для завершения заказа."
+msgstr ""
+"Checkout at Solo Pizza - fill in your contact details, select delivery and "
+"payment methods to complete your order."
+
+msgid "оформление заказа, доставка пиццы, оплата заказа, Solo Pizza заказ"
+msgstr "checkout, pizza delivery, order payment, Solo Pizza order"
+
+msgid ""
+"В настоящий момент оформление новых заказов недоступно. Приносим свои "
+"извинения за доставленные неудобства."
+msgstr ""
+"Order placement is currently unavailable. We apologize for the "
+"inconvenience."
+
+msgid "Вернуться в корзину"
+msgstr "Back to cart"
+
+msgid "Контактные данные"
+msgstr "Contact details"
+
+msgid "Способ получения"
+msgstr "Receiving method"
+
+msgid "Доставим ваш заказ по указанному адресу"
+msgstr "We will deliver your order to the specified address"
+
+msgid "Заберите заказ в нашем кафе"
+msgstr "Pick up your order at our cafe"
+
+msgid "У нас в кафе за столиком"
+msgstr "Dine at our cafe"
+
+msgid "Способ оплаты"
+msgstr "Payment method"
+
+msgid "Оплата наличными при получении"
+msgstr "Pay in cash upon receipt"
+
+msgid "Оплата картой при получении"
+msgstr "Pay by card upon receipt"
+
+msgid "Безналичный расчет"
+msgstr "Non-cash payment"
+
+msgid "Раздельная оплата"
+msgstr "Split payment"
+
+msgid "Скидки"
+msgstr "Discounts"
+
+msgid "ПРЕДЗАКАЗ (поле можно оставить пустым)"
+msgstr "PRE-ORDER (field can be left empty)"
+
+msgid "Комментарий к заказу"
+msgstr "Order comment"
+
+msgid "Подтвердить заказ"
+msgstr "Confirm order"
+
+msgid ""
+"В случае, если с Вами не связались в течение 15ти минут, пожалуйста, "
+"перезвоните нам по нашим номерам и сообщите Ваш номер заказа."
+msgstr ""
+"If you have not been contacted within 15 minutes, please call us back at our"
+" numbers and provide your order number."
+
+msgid "Ваш заказ"
+msgstr "Your order"
+
+msgid "Борт 1: %(board)s"
+msgstr "Edge 1: %(board)s"
+
+msgid "Борт 2: %(board)s"
+msgstr "Edge 2: %(board)s"
+
+msgid "Добавки:"
+msgstr "Add-ons:"
+
+msgid "Итого к оплате:"
+msgstr "Total to pay:"

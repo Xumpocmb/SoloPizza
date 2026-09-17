@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static i18n %}
 {% load order_availability %}
 
-{% block meta_description %}Оформление заказа в Solo Pizza - заполните контактные данные, выберите способ доставки и оплаты для завершения заказа.{% endblock %}
-{% block meta_keywords %}оформление заказа, доставка пиццы, оплата заказа, Solo Pizza заказ{% endblock %}
-{% block og_description %}Оформление заказа в Solo Pizza - заполните контактные данные, выберите способ доставки и оплаты для завершения заказа.{% endblock %}
-{% block twitter_description %}Оформление заказа в Solo Pizza - заполните контактные данные, выберите способ доставки и оплаты для завершения заказа.{% endblock %}
+{% block meta_description %}{% trans "Оформление заказа в Solo Pizza - заполните контактные данные, выберите способ доставки и оплаты для завершения заказа." %}{% endblock %}
+{% block meta_keywords %}{% trans "оформление заказа, доставка пиццы, оплата заказа, Solo Pizza заказ" %}{% endblock %}
+{% block og_description %}{% trans "Оформление заказа в Solo Pizza - заполните контактные данные, выберите способ доставки и оплаты для завершения заказа." %}{% endblock %}
+{% block twitter_description %}{% trans "Оформление заказа в Solo Pizza - заполните контактные данные, выберите способ доставки и оплаты для завершения заказа." %}{% endblock %}
 
 {% block styles %}
     <link rel="stylesheet" href="{% static 'css/checkout.css' %}"/>
@@ -14,13 +14,13 @@
 {% block main %}
     <main class="checkout-page">
         <div class="checkout-container">
-            <h1 class="checkout-title">Оформление заказа</h1>
+            <h1 class="checkout-title">{% trans "Оформление заказа" %}</h1>
             
             {% are_orders_available as orders_available %}
             {% if not orders_available %}
                 <div class="alert alert-warning">
-                    <p>В настоящий момент оформление новых заказов недоступно. Приносим свои извинения за доставленные неудобства.</p>
-                    <a href="{% url 'app_cart:view_cart' %}" class="back-link">Вернуться в корзину</a>
+                    <p>{% trans "В настоящий момент оформление новых заказов недоступно. Приносим свои извинения за доставленные неудобства." %}</p>
+                    <a href="{% url 'app_cart:view_cart' %}" class="back-link">{% trans "Вернуться в корзину" %}</a>
                 </div>
             {% else %}
             <div class="checkout-content">
@@ -28,7 +28,7 @@
                     {% csrf_token %}
 
                     <div class="form-section">
-                        <h2 class="section-title">Контактные данные</h2>
+                        <h2 class="section-title">{% trans "Контактные данные" %}</h2>
 
                         <div class="form-group">
                             <label for="{{ form.customer_name.id_for_label }}">{{ form.customer_name.label }}</label>
@@ -44,7 +44,7 @@
                     </div>
 
                     <div class="form-section">
-                        <h2 class="section-title">Способ получения</h2>
+                        <h2 class="section-title">{% trans "Способ получения" %}</h2>
 
                         <div class="options-group">
                             {% for choice in form.delivery_type %}
@@ -53,14 +53,14 @@
                                     <label for="{{ choice.id_for_label }}" class="option-label">
                                         <span class="option-title">{{ choice.choice_label }}</span>
                                         {% if choice.data.value == 'delivery' %}
-                                        <span class="option-description">Доставим ваш заказ по указанному адресу</span>
+                                        <span class="option-description">{% trans "Доставим ваш заказ по указанному адресу" %}</span>
 
                                         {% endif %}
                                         {% if choice.data.value == 'pickup' %}
-                                            <span class="option-description">Заберите заказ в нашем кафе</span>
+                                            <span class="option-description">{% trans "Заберите заказ в нашем кафе" %}</span>
                                         {% endif %}
                                         {% if choice.data.value == 'cafe' %}
-                                            <span class="option-description">У нас в кафе за столиком</span>
+                                            <span class="option-description">{% trans "У нас в кафе за столиком" %}</span>
                                         {% endif %}
                                     </label>
                                 </div>
@@ -76,7 +76,7 @@
                     </div>
 
                     <div class="form-section">
-                        <h2 class="section-title">Способ оплаты</h2>
+                        <h2 class="section-title">{% trans "Способ оплаты" %}</h2>
 
                         <div class="options-group">
                             {% for choice in form.payment_method %}
@@ -90,13 +90,13 @@
                                         <label for="{{ choice.id_for_label }}" class="option-label">
                                             <span class="option-title">{{ choice.choice_label }}</span>
                                             {% if choice.data.value == 'cash' %}
-                                                <span class="option-description">Оплата наличными при получении</span>
+                                                <span class="option-description">{% trans "Оплата наличными при получении" %}</span>
                                             {% elif choice.data.value == 'card' %}
-                                                <span class="option-description">Оплата картой при получении</span>
+                                                <span class="option-description">{% trans "Оплата картой при получении" %}</span>
                                             {% elif choice.data.value == 'noname' and user.is_staff %}
-                                                <span class="option-description">Безналичный расчет</span>
+                                                <span class="option-description">{% trans "Безналичный расчет" %}</span>
                                             {% elif choice.data.value == 'split' and user.is_staff %}
-                                                <span class="option-description">Раздельная оплата</span>
+                                                <span class="option-description">{% trans "Раздельная оплата" %}</span>
                                             {% endif %}
                                         </label>
                                     </div>
@@ -108,7 +108,7 @@
                     
                     {% if user.is_superuser or user.is_staff %}
                     <div class="form-section">
-                        <h2 class="section-title">Скидки</h2>
+                        <h2 class="section-title">{% trans "Скидки" %}</h2>
                         <div class="form-group partner-discount-group">
                             <div class="partner-checkbox-container">
                                 {{ form.is_partner }}
@@ -124,7 +124,7 @@
                     {% endif %}
 
                     <div class="form-section">
-                        <h2 class="section-title">ПРЕДЗАКАЗ (поле можно оставить пустым)</h2>
+                        <h2 class="section-title">{% trans "ПРЕДЗАКАЗ (поле можно оставить пустым)" %}</h2>
                         <div class="form-group">
                             <label for="{{ form.ready_by.id_for_label }}">{{ form.ready_by.label }}</label>
                             {{ form.ready_by }}
@@ -139,27 +139,26 @@
                     </div>
                     
                     <div class="form-section">
-                        <h2 class="section-title">Комментарий к заказу</h2>
+                        <h2 class="section-title">{% trans "Комментарий к заказу" %}</h2>
                         <div class="form-group">{{ form.comment }}
                             {{ form.comment.errors }}</div>
                     </div>
 
                     <div class="form-actions">
-                        <a href="{% url 'app_cart:view_cart' %}" class="back-link">Вернуться в корзину</a>
-                        <button type="submit" onclick="ym(105147095, 'reachGoal', 'order'); return true;" class="submit-order-btn">Подтвердить заказ</button>
+                        <a href="{% url 'app_cart:view_cart' %}" class="back-link">{% trans "Вернуться в корзину" %}</a>
+                        <button type="submit" onclick="ym(105147095, 'reachGoal', 'order'); return true;" class="submit-order-btn">{% trans "Подтвердить заказ" %}</button>
                     </div>
 
                     <div class="order-warning-text" style="text-align: center; color: #881c1c; margin: 10px auto;">
-                        <p>После оформления заказа с Вами свяжется оператор для подтверждения заказа.</p>
-                        <p>Если заказ не будет подтвержден, он будет отменен.</p>
-                        <p>В случае, если с Вами не связались в течении 15ти минут, пожалуйста, перезвоните нам по нашим номерам и сообщите Ваш
-                            номер заказа</p>
+                        <p>{% trans "После оформления заказа с Вами свяжется оператор для подтверждения заказа." %}</p>
+                        <p>{% trans "Если заказ не будет подтвержден, он будет отменен." %}</p>
+                        <p>{% trans "В случае, если с Вами не связались в течение 15ти минут, пожалуйста, перезвоните нам по нашим номерам и сообщите Ваш номер заказа." %}</p>
                     </div>
                     
                 </form>
 
                 <div class="order-summary">
-                    <h2 class="section-title">Ваш заказ</h2>
+                    <h2 class="section-title">{% trans "Ваш заказ" %}</h2>
 
                     <div class="summary-items">
                         {% for item_data in cart_items %}
@@ -178,16 +177,16 @@
                                 {% if item_data.board1 or item_data.board2 %}
                                     <div class="item-options">
                                         {% if item_data.board1 %}
-                                            <span class="item-option">Борт 1: {{ item_data.board1.board.name }}</span>
+                                            <span class="item-option">{% blocktrans with board=item_data.board1.board.name %}Борт 1: {{ board }}{% endblocktrans %}</span>
                                         {% endif %}
                                         {% if item_data.board2 %}
-                                            <span class="item-option">Борт 2: {{ item_data.board2.board.name }}</span>
+                                            <span class="item-option">{% blocktrans with board=item_data.board2.board.name %}Борт 2: {{ board }}{% endblocktrans %}</span>
                                         {% endif %}
                                     </div>
                                 {% endif %}
 
                                 {% if item_data.addons %}
-                                Добавки:
+                                {% trans "Добавки:" %}
                                     <div class="item-addons">
                                         {% for addon in item_data.addons %}
                                             <span class="item-option">{{ addon.addon.name }}</span>
@@ -200,7 +199,7 @@
 
                     <div class="summary-totals">
                  <div class="summary-row grand-total">
-                     <span class="total-label">Итого к оплате:</span>
+                     <span class="total-label">{% trans "Итого к оплате:" %}</span>
                      <span class="total-value">
                          {{ cart_totals|floatformat:2 }} руб.
                      </span>
