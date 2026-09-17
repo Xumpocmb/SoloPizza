@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static i18n %}
 
-{% block title %}Доставка пиццы в Барановичах - Solo Pizza{% endblock %}
+{% block title %}{% trans "Доставка пиццы в Барановичах - Solo Pizza" %}{% endblock %}
 
-{% block meta_description %}Узнайте о доставке пиццы и других блюд Solo Pizza по Барановичам. Стоимость доставки 3 руб., при заказе от 20 руб. - доставка бесплатно!{% endblock %}
-{% block meta_keywords %}доставка пиццы барановичи, доставка еды барановичи, стоимость доставки, бесплатная доставка пиццы, доставка по городу, Solo Pizza{% endblock %}
-{% block og_description %}Узнайте о доставке пиццы и других блюд Solo Pizza по Барановичам. Стоимость доставки 3 руб., при заказе от 20 руб. - доставка бесплатно!{% endblock %}
-{% block twitter_description %}Узнайте о доставке пиццы и других блюд Solo Pizza по Барановичам. Стоимость доставки 3 руб., при заказе от 20 руб. - доставка бесплатно!{% endblock %}
+{% block meta_description %}{% trans "Узнайте о доставке пиццы и других блюд Solo Pizza по Барановичам. Стоимость доставки 3 руб., при заказе от 20 руб. - доставка бесплатно!" %}{% endblock %}
+{% block meta_keywords %}{% trans "доставка пиццы барановичи, доставка еды барановичи, стоимость доставки, бесплатная доставка пиццы, доставка по городу, Solo Pizza" %}{% endblock %}
+{% block og_description %}{% trans "Узнайте о доставке пиццы и других блюд Solo Pizza по Барановичам. Стоимость доставки 3 руб., при заказе от 20 руб. - доставка бесплатно!" %}{% endblock %}
+{% block twitter_description %}{% trans "Узнайте о доставке пиццы и других блюд Solo Pizza по Барановичам. Стоимость доставки 3 руб., при заказе от 20 руб. - доставка бесплатно!" %}{% endblock %}
 
 {% block styles %}
     <link rel="stylesheet" href="{% static 'css/promo_page.css' %}">
@@ -17,40 +17,40 @@
         <section class="promo-section">
         <div class="container">
             <div class="breadcrumbs">
-                <a href="{% url "app_home:home" %}" class="breadcrumb-link">Главная</a>
+                <a href="{% url "app_home:home" %}" class="breadcrumb-link">{% trans "Главная" %}</a>
                 <span class="breadcrumb-separator">></span>
-                <span class="breadcrumb-item active">Доставка</span>
+                <span class="breadcrumb-item active">{% trans "Доставка" %}</span>
             </div>
 
             <div class="promo-header">
-                <h1 class="promo-title">Доставка</h1>
+                <h1 class="promo-title">{% trans "Доставка" %}</h1>
                 <div class="divider"></div>
             </div>
             <div class="text-content">
                 <div class="delivery-info">
-                    <h2 class="text-title">Доставка по городу</h2>
-                    <p>Мы осуществляем доставку пиццы и других блюд по всему городу Барановичи.</p>
+                    <h2 class="text-title">{% trans "Доставка по городу" %}</h2>
+                    <p>{% trans "Мы осуществляем доставку пиццы и других блюд по всему городу Барановичи." %}</p>
 
-                    <h2 class="text-title">Стоимость доставки</h2>
+                    <h2 class="text-title">{% trans "Стоимость доставки" %}</h2>
                     <ul>
-                        <li>Доставка по городу - <strong>3 руб.</strong></li>
-                        <li>При стоимости заказа <strong>более 20 руб.</strong> - доставка <strong>бесплатная</strong>!</li>
-                        <li>При стоимости заказа <strong>менее 25 руб.</strong> если в заказе блюда из категории "Фастфуд", "Бургеры", "Сковородки", "Напитки", "Соусы"- доставка <strong>платная</strong>!</li>
+                        <li>{% blocktrans %}Доставка по городу - <strong>3 руб.</strong>{% endblocktrans %}</li>
+                        <li>{% blocktrans %}При стоимости заказа <strong>более 20 руб.</strong> - доставка <strong>бесплатная</strong>!{% endblocktrans %}</li>
+                        <li>{% blocktrans %}При стоимости заказа <strong>менее 25 руб.</strong> если в заказе блюда из категории "Фастфуд", "Бургеры", "Сковородки", "Напитки", "Соусы"- доставка <strong>платная</strong>!{% endblocktrans %}</li>
                     </ul>
 
-                    <h2 class="text-title">Адреса заведений</h2>
+                    <h2 class="text-title">{% trans "Адреса заведений" %}</h2>
                     <ul>
                         {% for branch in branches %}
                         <li>{{ branch.address }}</li>
                         {% endfor %}
                     </ul>
 
-                    <h2 class="text-title">Время доставки</h2>
-                    <p>Уточняйте у операторов.</p>
+                    <h2 class="text-title">{% trans "Время доставки" %}</h2>
+                    <p>{% trans "Уточняйте у операторов." %}</p>
                 </div>
                 <div class="action-buttons">
-                        <a href="{% url "app_home:home" %}">Заказать пиццу</a>
-                        <a href="{% url 'app_home:contacts' %}">Наши контакты</a>
+                        <a href="{% url "app_home:home" %}">{% trans "Заказать пиццу" %}</a>
+                        <a href="{% url 'app_home:contacts' %}">{% trans "Наши контакты" %}</a>
                 </div>
             </div>
         </div>

@@ -227,3 +227,59 @@ msgstr "No phones specified"
 #: templates/app_home/contacts.html:60
 msgid "Узнайте подробнее о нашей доставке:"
 msgstr "Learn more about our delivery:"
+
+#: templates/app_home/delivery.html:4
+msgid "Доставка пиццы в Барановичах - Solo Pizza"
+msgstr "Pizza delivery in Baranovichi - Solo Pizza"
+
+#: templates/app_home/delivery.html:6 templates/app_home/delivery.html:8 templates/app_home/delivery.html:9
+msgid "Узнайте о доставке пиццы и других блюд Solo Pizza по Барановичам. Стоимость доставки 3 руб., при заказе от 20 руб. - доставка бесплатно!"
+msgstr "Learn about pizza and other dishes delivery from Solo Pizza in Baranovichi. Delivery costs 3 BYN, free delivery for orders over 20 BYN!"
+
+#: templates/app_home/delivery.html:7
+msgid "доставка пиццы барановичи, доставка еды барановичи, стоимость доставки, бесплатная доставка пиццы, доставка по городу, Solo Pizza"
+msgstr "pizza delivery baranovichi, food delivery baranovichi, delivery cost, free pizza delivery, delivery around the city, Solo Pizza"
+
+#: templates/app_home/delivery.html:31
+msgid "Доставка по городу"
+msgstr "Delivery around the city"
+
+#: templates/app_home/delivery.html:32
+msgid "Мы осуществляем доставку пиццы и других блюд по всему городу Барановичи."
+msgstr "We deliver pizza and other dishes across the whole city of Baranovichi."
+
+#: templates/app_home/delivery.html:34
+msgid "Стоимость доставки"
+msgstr "Delivery cost"
+
+#: templates/app_home/delivery.html:36
+msgid "Доставка по городу - <strong>3 руб.</strong>"
+msgstr "Delivery around the city - <strong>3 BYN</strong>"
+
+#: templates/app_home/delivery.html:37
+msgid "При стоимости заказа <strong>более 20 руб.</strong> - доставка <strong>бесплатная</strong>!"
+msgstr "For orders over <strong>20 BYN</strong> - delivery is <strong>free</strong>!"
+
+#: templates/app_home/delivery.html:38
+msgid "При стоимости заказа <strong>менее 25 руб.</strong> если в заказе блюда из категории \"Фастфуд\", \"Бургеры\", \"Сковородки\", \"Напитки\", \"Соусы\"- доставка <strong>платная</strong>!"
+msgstr "For orders under <strong>25 BYN</strong> if the order contains items from categories \"Fast food\", \"Burgers\", \"Skillets\", \"Drinks\", \"Sauces\" - delivery is <strong>paid</strong>!"
+
+#: templates/app_home/delivery.html:41
+msgid "Адреса заведений"
+msgstr "Venue addresses"
+
+#: templates/app_home/delivery.html:48
+msgid "Время доставки"
+msgstr "Delivery time"
+
+#: templates/app_home/delivery.html:49
+msgid "Уточняйте у операторов."
+msgstr "Check with our operators."
+
+#: templates/app_home/delivery.html:52
+msgid "Заказать пиццу"
+msgstr "Order pizza"
+
+#: templates/app_home/delivery.html:53
+msgid "Наши контакты"
+msgstr "Our contacts"

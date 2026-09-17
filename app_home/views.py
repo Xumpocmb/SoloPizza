@@ -172,9 +172,9 @@ def delivery_view(request):
 
     branches = CafeBranch.objects.filter(is_active=True)
 
-    breadcrumbs = [{"title": "Главная", "url": "/"}, {"title": "Доставка", "url": reverse("app_home:delivery")}]
+    breadcrumbs = [{"title": _("Главная"), "url": "/"}, {"title": _("Доставка"), "url": reverse("app_home:delivery")}]
 
-    context = {"breadcrumbs": breadcrumbs, "title": "Доставка", "branches": branches}
+    context = {"breadcrumbs": breadcrumbs, "title": _("Доставка"), "branches": branches}
 
     return render(request, "app_home/delivery.html", context=context)
 
