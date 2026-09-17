@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static i18n %}
 
 {% block title %}{{ title }}{% endblock %}
 
-{% block meta_description %}Контакты Solo Pizza - адреса, телефоны и время работы наших пиццерий. Свяжитесь с нами для заказа или с вопросами.{% endblock %}
-{% block meta_keywords %}контакты пиццерии, адрес Solo Pizza, телефон пиццерии, время работы, как связаться{% endblock %}
-{% block og_description %}Контакты Solo Pizza - адреса, телефоны и время работы наших пиццерий. Свяжитесь с нами для заказа или с вопросами.{% endblock %}
-{% block twitter_description %}Контакты Solo Pizza - адреса, телефоны и время работы наших пиццерий. Свяжитесь с нами для заказа или с вопросами.{% endblock %}
+{% block meta_description %}{% trans "Контакты Solo Pizza - адреса, телефоны и время работы наших пиццерий. Свяжитесь с нами для заказа или с вопросами." %}{% endblock %}
+{% block meta_keywords %}{% trans "контакты пиццерии, адрес Solo Pizza, телефон пиццерии, время работы, как связаться" %}{% endblock %}
+{% block og_description %}{% trans "Контакты Solo Pizza - адреса, телефоны и время работы наших пиццерий. Свяжитесь с нами для заказа или с вопросами." %}{% endblock %}
+{% block twitter_description %}{% trans "Контакты Solo Pizza - адреса, телефоны и время работы наших пиццерий. Свяжитесь с нами для заказа или с вопросами." %}{% endblock %}
 
 {% block styles %}
     <link rel="stylesheet" href="{% static 'css/promo_page.css' %}">
@@ -32,7 +32,7 @@
             </div>
 
             <div class="promo-description">
-                <p>Адреса, телефоны и время работы наших пиццерий. Свяжитесь с нами для заказа или с вопросами.</p>
+                <p>{% trans "Адреса, телефоны и время работы наших пиццерий. Свяжитесь с нами для заказа или с вопросами." %}</p>
             </div>
 
             <div class="text-content">
@@ -40,25 +40,25 @@
                 
                 <div class="branch-info">
                     <div class="contact-section">
-                        <h3>Адрес</h3>
+                        <h3>{% trans "Адрес" %}</h3>
                         <p>{{ selected_branch.address }}</p>
                     </div>
 
                     <div class="contact-section">
-                        <h3>Телефоны</h3>
+                        <h3>{% trans "Телефоны" %}</h3>
                         <ul class="phone-list">
                             {% for phone in selected_branch.branch_phones.all %}
                                 <li>{{ phone.phone }}</li>
                             {% empty %}
-                                <li>Телефоны не указаны</li>
+                                <li>{% trans "Телефоны не указаны" %}</li>
                             {% endfor %}
                         </ul>
                     </div>
                 </div>
                 
                 <div class="delivery-link-section">
-                    <p>Узнайте подробнее о нашей доставке:</p>
-                    <a href="{% url 'app_home:delivery' %}">Доставка</a>
+                    <p>{% trans "Узнайте подробнее о нашей доставке:" %}</p>
+                    <a href="{% url 'app_home:delivery' %}">{% trans "Доставка" %}</a>
                 </div>
             </div>
         </div>

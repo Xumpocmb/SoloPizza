@@ -3,6 +3,7 @@ from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
 from django.urls import reverse
+from django.utils.translation import gettext as _
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Count
@@ -121,9 +122,9 @@ def vacancy_apply(request, vacancy_id):
 def contacts_view(request):
     """Отображает страницу контактов с информацией о выбранном филиале"""
 
-    breadcrumbs = [{"title": "Главная", "url": "/"}, {"title": "Контакты", "url": reverse("app_home:contacts")}]
+    breadcrumbs = [{"title": _("Главная"), "url": "/"}, {"title": _("Контакты"), "url": reverse("app_home:contacts")}]
 
-    context = {"breadcrumbs": breadcrumbs, "title": "Контакты"}
+    context = {"breadcrumbs": breadcrumbs, "title": _("Контакты")}
 
     return render(request, "app_home/contacts.html", context=context)
 

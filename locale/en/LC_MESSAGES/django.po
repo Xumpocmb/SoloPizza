@@ -199,3 +199,31 @@ msgstr "Log out"
 #: templates/header.html:105
 msgid "Вход"
 msgstr "Log in"
+
+#: templates/app_home/contacts.html:6 templates/app_home/contacts.html:8 templates/app_home/contacts.html:9
+msgid "Контакты Solo Pizza - адреса, телефоны и время работы наших пиццерий. Свяжитесь с нами для заказа или с вопросами."
+msgstr "Solo Pizza contacts - addresses, phone numbers and working hours of our pizzerias. Contact us for orders or inquiries."
+
+#: templates/app_home/contacts.html:7
+msgid "контакты пиццерии, адрес Solo Pizza, телефон пиццерии, время работы, как связаться"
+msgstr "pizzeria contacts, Solo Pizza address, pizzeria phone, working hours, how to contact"
+
+#: templates/app_home/contacts.html:35
+msgid "Адреса, телефоны и время работы наших пиццерий. Свяжитесь с нами для заказа или с вопросами."
+msgstr "Addresses, phone numbers and working hours of our pizzerias. Contact us for orders or inquiries."
+
+#: templates/app_home/contacts.html:43
+msgid "Адрес"
+msgstr "Address"
+
+#: templates/app_home/contacts.html:48
+msgid "Телефоны"
+msgstr "Phones"
+
+#: templates/app_home/contacts.html:53
+msgid "Телефоны не указаны"
+msgstr "No phones specified"
+
+#: templates/app_home/contacts.html:60
+msgid "Узнайте подробнее о нашей доставке:"
+msgstr "Learn more about our delivery:"
