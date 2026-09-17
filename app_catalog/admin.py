@@ -1,10 +1,11 @@
 from django.contrib import admin
 from django.utils.html import format_html
+from modeltranslation.admin import TabbedTranslationAdmin
 
 from .models import Category, Product, ProductVariant, PizzaSizes, PizzaBoard, PizzaSauce, BoardParams, PizzaAddon, AddonParams, RollTopping, IceCreamTopping, ComboDrinks
 
 
-class CategoryAdmin(admin.ModelAdmin):
+class CategoryAdmin(TabbedTranslationAdmin):
     list_display = ('name', 'display_image', 'is_active', 'is_for_admin', 'order')
     list_editable = ('is_active', 'is_for_admin', 'order')
     list_filter = ('is_active', 'is_for_admin')

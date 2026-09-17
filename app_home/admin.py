@@ -34,7 +34,7 @@ class OrderAvailabilityAdmin(admin.ModelAdmin):
 
 
 @admin.register(Discount)
-class DiscountAdmin(admin.ModelAdmin):
+class DiscountAdmin(TabbedTranslationAdmin):
     list_display = ["name", "percent"]
     search_fields = ["name"]
 
@@ -46,7 +46,7 @@ class CafeBranchPhoneAdmin(admin.TabularInline):
     verbose_name_plural = "Номера телефонов"
 
 
-class CafeBranchAdmin(admin.ModelAdmin):
+class CafeBranchAdmin(TabbedTranslationAdmin):
     inlines = [CafeBranchPhoneAdmin]
     list_display = ["name", "check_font_size", "check_tape_width"]
     search_fields = ["name"]
@@ -111,7 +111,7 @@ class WorkingHoursAdmin(admin.ModelAdmin):
 
 
 @admin.register(Partner)
-class PartnerAdmin(admin.ModelAdmin):
+class PartnerAdmin(TabbedTranslationAdmin):
     list_display = ("name", "link")
     search_fields = ("name",)
     list_per_page = 20
