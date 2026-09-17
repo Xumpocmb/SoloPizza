@@ -8,6 +8,7 @@ from django.shortcuts import redirect, render, get_object_or_404
 from django.urls import reverse
 from django.views.decorators.http import require_POST
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 from datetime import time
 from app_cart.models import CartItem
 from app_cart.session_cart import SessionCart
@@ -258,7 +259,7 @@ def order_detail(request, order_id):
     order_form = OrderEditForm(instance=order)
     items_formset = OrderItemFormSet(instance=order)
 
-    breadcrumbs = [{"title": "Главная", "url": "/"}, {"title": "Мои заказы", "url": reverse("app_order:order_list")}, {"title": f"Заказ #{order.id}", "url": "#"}]
+    breadcrumbs = [{"title": _("Главная"), "url": "/"}, {"title": _("Мои заказы"), "url": reverse("app_order:order_list")}, {"title": _("Заказ #%(number)s") % {"number": order.id}, "url": "#"}]
 
     return render(
         request,
@@ -383,7 +384,7 @@ def order_list(request):
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
-    breadcrumbs = [{"title": "Главная", "url": "/"}, {"title": "Мои заказы", "url": reverse("app_order:order_list")}]  # Текущая страница
+    breadcrumbs = [{"title": _("Главная"), "url": "/"}, {"title": _("Мои заказы"), "url": reverse("app_order:order_list")}]  # Текущая страница
 
     # Получаем информацию о выбранном филиале
     try:
@@ -645,7 +646,7 @@ def order_statistics_view(request):
         "sort_dir": sort_dir,
         "start_date": start_date,
         "end_date": end_date,
-        "breadcrumbs": [{"title": "Главная", "url": "/"}, {"title": "Статистика заказов", "url": "#"}],
+        "breadcrumbs": [{"title": _("Главная"), "url": "/"}, {"title": _("Статистика заказов"), "url": "#"}],
     }
     return render(request, "app_order/order_statistics.html", context)
 
@@ -677,9 +678,9 @@ def detail_statistics_view(request, date):
         "branch_statistics": branch_statistics,
         "selected_date": selected_date,
         "breadcrumbs": [
-            {"title": "Главная", "url": "/"},
-            {"title": "Статистика заказов", "url": reverse("app_order:order_statistics")},
-            {"title": f"Детальная статистика за {selected_date.strftime('%d.%m.%Y')}", "url": "#"},
+            {"title": _("Главная"), "url": "/"},
+            {"title": _("Статистика заказов"), "url": reverse("app_order:order_statistics")},
+            {"title": _("Детальная статистика за %(date)s") % {"date": selected_date.strftime("%d.%m.%Y")}, "url": "#"},
         ],
     }
     return render(request, "app_order/detail_statistics.html", context)
@@ -833,7 +834,7 @@ def reports_view(request):
         "total_noname": total_noname,
         "total_amount": total_amount,
         "employee_statistics": employee_statistics,
-        "breadcrumbs": [{"title": "Главная", "url": "/"}, {"title": "Отчеты", "url": "#"}],
+        "breadcrumbs": [{"title": _("Главная"), "url": "/"}, {"title": _("Отчеты"), "url": "#"}],
     }
 
     return render(request, "app_order/reports.html", context)

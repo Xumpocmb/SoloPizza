@@ -2,6 +2,7 @@ from django.db.models import Min
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 
 from app_catalog.models import Category, Product, AddonParams, BoardParams, ProductVariant, PizzaSauce, PizzaAddon, PizzaBoard, PizzaSizes, ComboDrinks
 
@@ -11,8 +12,8 @@ def category_detail(request, slug):
     items = Product.objects.filter(category=category, is_active=True).prefetch_related("variants").annotate(min_price=Min("variants__price"))
 
     breadcrumbs = [
-        {"title": "Главная", "url": "/"},
-        {"title": "Каталог", "url": reverse("app_catalog:catalog")},
+        {"title": _("Главная"), "url": "/"},
+        {"title": _("Каталог"), "url": reverse("app_catalog:catalog")},
         {"title": category.name, "url": category.get_absolute_url()},
     ]
     context = {
@@ -99,8 +100,8 @@ def item_detail(request, slug):
 
     category = item.category
     breadcrumbs = [
-        {"title": "Главная", "url": "/"},
-        {"title": "Каталог", "url": reverse("app_catalog:catalog")},
+        {"title": _("Главная"), "url": "/"},
+        {"title": _("Каталог"), "url": reverse("app_catalog:catalog")},
         {"title": category.name, "url": category.get_absolute_url()},
         {"title": item.name, "url": "#"},
     ]
@@ -127,8 +128,8 @@ def catalog_view(request):
     context = {}
 
     breadcrumbs = [
-        {"title": "Главная", "url": "/"},
-        {"title": "Каталог", "url": reverse("app_catalog:catalog")},
+        {"title": _("Главная"), "url": "/"},
+        {"title": _("Каталог"), "url": reverse("app_catalog:catalog")},
     ]
 
     # Добавляем общие параметры каталога

@@ -1101,3 +1101,12 @@ msgstr "Edge 2: %(board)s (+%(price)s RUB)"
 
 msgid "Партнёр:"
 msgstr "Partner:"
+
+msgid "Заказ #%(number)s"
+msgstr "Order #%(number)s"
+
+msgid "Статистика заказов"
+msgstr "Order statistics"
+
+msgid "Детальная статистика за %(date)s"
+msgstr "Detailed statistics for %(date)s"
