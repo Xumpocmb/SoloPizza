@@ -283,3 +283,63 @@ msgstr "Order pizza"
 #: templates/app_home/delivery.html:53
 msgid "Наши контакты"
 msgstr "Our contacts"
+
+#: templates/app_home/discounts.html:4 templates/app_home/discounts.html:6 templates/app_home/discounts.html:7
+msgid "Акции и скидки Solo Pizza - специальные предложения, выгодные комбо-наборы и сезонные скидки на пиццу и другие блюда."
+msgstr "Solo Pizza promotions and discounts - special offers, profitable combo sets and seasonal discounts on pizza and other dishes."
+
+#: templates/app_home/discounts.html:5
+msgid "акции пиццерии, скидки на пиццу, специальные предложения, выгодные комбо, промокоды Solo Pizza"
+msgstr "pizzeria promotions, pizza discounts, special offers, profitable combos, Solo Pizza promo codes"
+
+#: templates/app_home/discounts.html:28 app_home/views.py:59
+msgid "Наши акции"
+msgstr "Our promotions"
+
+#: templates/app_home/discounts.html:41
+msgid "Акция доступна"
+msgstr "The offer is available"
+
+#: templates/app_home/discounts.html:41
+msgid "только по будням и на самовынос"
+msgstr "on weekdays and for takeaway only"
+
+#: templates/app_home/discounts.html:41
+msgid "на определенную пиццу размером 32см."
+msgstr "on a specific 32 cm pizza."
+
+#: templates/app_home/discounts.html:45
+msgid "Перейти к пицце недели"
+msgstr "Go to pizza of the week"
+
+#: templates/app_home/discounts.html:53
+msgid "Выгодные КОМБО"
+msgstr "Profitable COMBOS"
+
+#: templates/app_home/discounts.html:58
+msgid "Акция доступна только по будням, с 11:00 до 17:00"
+msgstr "The offer is available only on weekdays, from 11:00 to 17:00"
+
+#: templates/app_home/discounts.html:60
+msgid "Перейти к КОМБО"
+msgstr "Go to COMBOS"
+
+#: templates/app_home/discounts.html:67
+msgid "Скидка на День Рождения"
+msgstr "Birthday discount"
+
+#: templates/app_home/discounts.html:72
+msgid "Скидка именинникам при предъявлении документа. Действует за 3 дня до и 3 дня после даты рождения. Скидка ТОЛЬКО на пиццу."
+msgstr "Discount for birthday people upon presenting an ID. Valid 3 days before and 3 days after the birthday. Discount applies ONLY to pizza."
+
+#: templates/app_home/discounts.html:77
+msgid "СКИДКА ДЕЙСТВУЕТ ТОЛЬКО ЗАЛ ПРИ ПРЕДЪЯВЛЕНИИ ДОКУМЕНТА!"
+msgstr "DISCOUNT APPLIES ONLY FOR DINE-IN UPON PRESENTING AN ID!"
+
+#: templates/app_home/discounts.html:85
+msgid "Скидка на самовывоз"
+msgstr "Takeaway discount"
+
+#: templates/app_home/discounts.html:90
+msgid "Постоянная скидка ТОЛЬКО на пиццу при заказе с самовывозом."
+msgstr "Permanent discount ONLY on pizza when ordering for takeaway."

@@ -55,7 +55,8 @@ def select_branch(request):
 
 def discounts_view(request):
     pizza_weekly = Product.objects.filter(category__slug="picca", is_active=True, is_weekly_special=True).first()
-    context = {"pizza_weekly": pizza_weekly}
+    breadcrumbs = [{"title": _("Главная"), "url": "/"}, {"title": _("Акции"), "url": reverse("app_home:discounts")}]
+    context = {"pizza_weekly": pizza_weekly, "breadcrumbs": breadcrumbs, "title": _("Наши акции")}
     return render(request, "app_home/discounts.html", context=context)
 
 
