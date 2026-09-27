@@ -35,7 +35,7 @@
 
             <div class="order-header">
                 <h1 class="page_title">
-                    {% blocktrans with order_id=order.id %}Заказ #{{ order_id }}{% endblocktrans %}
+                    {% blocktrans with order_number=order.print_number %}Заказ #{{ order_number }}{% endblocktrans %}
                     {% if request.user.is_staff or request.user.is_superuser %}
                         <a href="{% url 'app_order:print_non_fastfood_check' order.id %}" 
                            target="_blank"

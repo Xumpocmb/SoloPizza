@@ -156,6 +156,13 @@ class Order(models.Model):
     def __str__(self):
         return f"Заказ #{self.id} от {self.created_at.strftime('%d.%m.%Y')}"
 
+    @property
+    def print_number(self):
+        """Номер заказа для печати чека: id филиала + id заказа (3 цифры)."""
+        order_part = f"{self.id:03d}"
+        branch_part = self.branch_id if self.branch_id is not None else 0
+        return f"{branch_part}{order_part}"
+
     def recalculate_totals(self):
         """Пересчитывает и сохраняет итоговые суммы заказа"""
         Order.objects.get_order_totals(self.id)

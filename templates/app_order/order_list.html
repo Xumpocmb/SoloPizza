@@ -85,7 +85,7 @@
 
                 {% for order in page_obj %}
                     <div class="table-row status-{{ order.status }}">
-                        <div class="table-cell" data-label="ID">#{{ order.id }}</div>
+                        <div class="table-cell" data-label="ID">#{{ order.print_number }}</div>
                         <div class="table-cell" data-label="{% trans "Имя" %}">{{ order.customer_name }}</div>
                         <div class="table-cell" data-label="{% trans "Статус" %}">
                             {% if request.user.is_staff %}

@@ -4,7 +4,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>{{ check_title }} - Заказ #{{ order.id }}</title>
+    <title>{{ check_title }} - Заказ #{{ order.print_number }}</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/print_check.css' %}">
     <style>
@@ -115,7 +115,7 @@
 
     {% if show_order_details %}
     <div class="order-details">
-        <div><strong>Заказ #:</strong> 00{{ order.id }}</div>
+        <div><strong>Заказ #:</strong> {{ order.print_number }}</div>
         <div><strong>Дата:</strong> {{ order.created_at|date:"d.m.Y H:i" }}</div>
         <div><strong>Клиент:</strong> {{ order.customer_name }}</div>
         <div><strong>Телефон:</strong> {{ order.phone_number }}</div>
@@ -126,7 +126,7 @@
     {% else %}
     <!-- Для чека "Только Фастфуд" показываем минимум -->
     <div class="order-details">
-        <div><strong>Заказ #:</strong> 00{{ order.id }}</div>
+        <div><strong>Заказ #:</strong> {{ order.print_number }}</div>
         <div><strong>Дата:</strong> {{ order.created_at|date:"d.m.Y H:i" }}</div>
     </div>
     {% endif %}
