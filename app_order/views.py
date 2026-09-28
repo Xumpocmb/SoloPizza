@@ -178,7 +178,7 @@ def checkout(request):
             #     from .tasks import send_order_notification
 
             #     send_order_notification.delay(order.id)
-            messages.success(request, f"Ваш заказ №{order.id} успешно оформлен!")
+            messages.success(request, f"Ваш заказ №{order.print_number} успешно оформлен!")
             response = redirect("app_order:order_detail", order_id=order.id)
             # Set guest_token cookie if it doesn't exist, using the same token as the order
             if not request.COOKIES.get("guest_token"):
@@ -259,7 +259,7 @@ def order_detail(request, order_id):
     order_form = OrderEditForm(instance=order)
     items_formset = OrderItemFormSet(instance=order)
 
-    breadcrumbs = [{"title": _("Главная"), "url": "/"}, {"title": _("Мои заказы"), "url": reverse("app_order:order_list")}, {"title": _("Заказ #%(number)s") % {"number": order.id}, "url": "#"}]
+    breadcrumbs = [{"title": _("Главная"), "url": "/"}, {"title": _("Мои заказы"), "url": reverse("app_order:order_list")}, {"title": _("Заказ #%(number)s") % {"number": order.print_number}, "url": "#"}]
 
     return render(
         request,

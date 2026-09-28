@@ -48,11 +48,11 @@ class CafeBranchPhoneAdmin(admin.TabularInline):
 
 class CafeBranchAdmin(TabbedTranslationAdmin):
     inlines = [CafeBranchPhoneAdmin]
-    list_display = ["name", "check_font_size", "check_tape_width"]
+    list_display = ["name", "check_digit", "check_font_size", "check_tape_width"]
     search_fields = ["name"]
     fieldsets = (
         ("Основная информация", {"fields": ("name", "address", "is_active", "latitude", "longitude", "delivery_zone")}),
-        ("Настройки печати чеков", {"fields": ("check_font_size", "check_tape_width")}),
+        ("Настройки печати чеков", {"fields": ("check_digit", "check_font_size", "check_tape_width")}),
     )
 
 

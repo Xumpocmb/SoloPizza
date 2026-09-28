@@ -154,13 +154,14 @@ class Order(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"Заказ #{self.id} от {self.created_at.strftime('%d.%m.%Y')}"
+        return f"Заказ #{self.print_number} от {self.created_at.strftime('%d.%m.%Y')}"
 
     @property
     def print_number(self):
-        """Номер заказа для печати чека: id филиала + id заказа (3 цифры)."""
+        """Номер заказа для печати чека: цифра в чеке филиала + id заказа (3 цифры)."""
         order_part = f"{self.id:03d}"
-        branch_part = self.branch_id if self.branch_id is not None else 0
+        branch = self.branch
+        branch_part = branch.check_digit if branch is not None and branch.check_digit is not None else 0
         return f"{branch_part}{order_part}"
 
     def recalculate_totals(self):

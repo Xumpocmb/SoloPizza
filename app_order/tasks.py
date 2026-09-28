@@ -55,7 +55,7 @@ def send_order_notification(order_id):
         # Формируем сообщение
         order_text = (
             f"ФИЛИАЛ: {order.branch.name}\n\n"
-            f"Заказ {order.id}\n"
+            f"Заказ {order.print_number}\n"
             f"Способ доставки: {dict(Order.DELIVERY_CHOICES)[order.delivery_type]}\n"
             f"Телефон: {order.phone_number}\n"
             f'Создан: {timezone.localtime(order.created_at).strftime("%d.%m.%Y %H:%M:%S")}\n'

@@ -54,6 +54,13 @@ class CafeBranch(models.Model):
     # Настройки для печати чеков
     check_font_size = models.PositiveSmallIntegerField(verbose_name="Размер шрифта для чеков", default=18, help_text="Размер шрифта в пикселях")
     check_tape_width = models.PositiveSmallIntegerField(verbose_name="Ширина ленты для чеков", default=80, help_text="Ширина ленты в миллиметрах")
+    check_digit = models.PositiveSmallIntegerField(
+        verbose_name="Цифра в чеке",
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(0, message="Цифра в чеке должна быть от 0 до 9"), MaxValueValidator(9, message="Цифра в чеке должна быть от 0 до 9")],
+        help_text="Первая цифра номера заказа в чеке (0-9). Если не задана — 0.",
+    )
 
     class Meta:
         db_table = "branches"
