@@ -10,7 +10,7 @@
     position: relative;
     isolation: isolate;
     overflow: hidden;
-    padding: clamp(44px, 7vw, 92px) var(--hp-gutter) clamp(36px, 5vw, 64px);
+    padding: clamp(44px, 7vw, 92px) 0 clamp(36px, 5vw, 64px);
     border-radius: 0 0 var(--hp-radius-lg) var(--hp-radius-lg);
     box-shadow: var(--hp-shadow-lg);
     color: #fff;
@@ -31,6 +31,9 @@
 .hp-hero__inner {
     max-width: var(--hp-container);
     margin: 0 auto;
+    /* Горизонтальный отступ задаём здесь, а не на .hp-hero: иначе на экранах
+       шире контейнера текст героя и содержимое секций не совпадут по краю. */
+    padding: 0 var(--hp-gutter);
     display: flex;
     flex-direction: column;
     align-items: flex-start;
