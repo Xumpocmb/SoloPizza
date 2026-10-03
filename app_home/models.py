@@ -80,6 +80,14 @@ class CafeBranchPhone(models.Model):
         verbose_name = "Телефон филиала"
         verbose_name_plural = "Телефоны филиалов"
 
+    def __str__(self):
+        return self.phone or ""
+
+    @property
+    def dial(self):
+        """Номер в формате, пригодном для ссылки tel: (только цифры и ведущий плюс)."""
+        return "".join(ch for ch in (self.phone or "") if ch.isdigit() or ch == "+")
+
 
 class Vacancy(models.Model):
     title = models.CharField("Название", max_length=100)

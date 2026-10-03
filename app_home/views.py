@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.admin.views.decorators import staff_member_required
-from django.db.models import Count
+from django.db.models import Count, Min
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
@@ -21,11 +21,30 @@ from app_cart.session_cart import SessionCart  # Import SessionCart
 def home_page(request):
     active_vacancies = Vacancy.objects.filter(is_active=True)
     active_marquees = Marquee.objects.filter(is_active=True)
-    featured_products = Product.objects.filter(is_active=True, display_on_main=True).prefetch_related('variants')
+    featured_products = (
+        Product.objects.filter(is_active=True, display_on_main=True)
+        .prefetch_related("variants")
+        .annotate(min_price=Min("variants__price"))[:8]
+    )
+    slides = [
+        {
+            "image": "img/slider/kombo_ohota.gif",
+            "alt": _("Комбо-набор Охота - вкусная пицца с доставкой в Барановичах"),
+        },
+        {
+            "image": "img/slider/kombo_shef.gif",
+            "alt": _("Комбо-набор Шеф - изысканная пицца с доставкой в Барановичах"),
+        },
+        {
+            "image": "img/slider/kombo_sochnyj.gif",
+            "alt": _("Комбо-набор Сочный - сочная пицца с доставкой в Барановичах"),
+        },
+    ]
     context = {
         "vacancies": active_vacancies,
         "marquees": active_marquees,
         "featured_products": featured_products,
+        "slides": slides,
     }
     return render(request, "app_home/home.html", context=context)
 

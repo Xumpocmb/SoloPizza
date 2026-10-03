@@ -7,11 +7,10 @@
 {% block og_description %}{% trans "Закажите вкусную пиццу с доставкой в Барановичах! Solo Pizza предлагает свежие пиццы и другие блюда. Быстрая доставка, отличное обслуживание." %}{% endblock %}
 {% block twitter_description %}{% trans "Закажите вкусную пиццу с доставкой в Барановичах! Solo Pizza предлагает свежие пиццы и другие блюда. Быстрая доставка, отличное обслуживание." %}{% endblock %}
 {% block styles %}
-    <link rel="stylesheet" href="{% static 'css/home.css' %}">
-    <link rel="stylesheet" href="{% static 'css/promo_page.css' %}">
     <link rel="stylesheet" href="{% static 'css/swiper-bundle.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/swiper.css' %}">
-    <link rel="stylesheet" href="{% static 'css/catalog.css' %}">
+    <link rel="stylesheet" href="{% static 'css/promo_page.css' %}">
+    <link rel="stylesheet" href="{% static 'css/home_page.css' %}">
 {% endblock %}
 {% block schema_markup %}
 <script type="application/ld+json">
@@ -75,141 +74,226 @@
 </script>
 {% endblock %}
 {% block main %}
-    <main>
-        <div class="main-wrapper">
-            
-            <section class="site-greetings">
-                <div class="page_title">
-                    <h1>{% trans "Заказать пиццу в Барановичах с доставкой - Solo Pizza" %}</h1>
-                </div>
-            </section>
+<main class="home-page">
+    <section class="hp-hero">
+        <div class="hp-hero__inner">
+            <p class="hp-hero__eyebrow">
+                <i class="fas fa-motorcycle" aria-hidden="true"></i>
+                {% trans "Доставка по Барановичам от 3 руб." %}
+            </p>
+            <h1 class="hp-hero__title">{% trans "Пицца в Барановичах с доставкой" %}</h1>
+            <p class="hp-hero__lead">{% trans "Свежая пицца из печи, напитки и комбо-наборы. Выбирайте блюда в меню и оформляйте заказ онлайн — привезём горячим." %}</p>
+            <div class="hp-hero__actions">
+                <a class="hp-btn hp-btn--light"
+                   href="{% if categories %}#hp-menu{% else %}{% url 'app_catalog:catalog' %}{% endif %}">
+                    <i class="fas fa-utensils" aria-hidden="true"></i>
+                    {% trans "Смотреть меню" %}
+                </a>
+                {% if selected_branch %}
+                    {% with phone=selected_branch.branch_phones.first %}
+                        {% if phone.dial %}
+                            <a class="hp-btn hp-btn--outline" href="tel:{{ phone.dial }}">
+                                <i class="fas fa-phone" aria-hidden="true"></i>
+                                {{ phone.phone }}
+                            </a>
+                        {% endif %}
+                    {% endwith %}
+                {% endif %}
+            </div>
+            <ul class="hp-hero__facts">
+                <li>
+                    <i class="fas fa-truck" aria-hidden="true"></i>
+                    {% trans "Доставка по городу — 3 руб." %}
+                </li>
+                <li>
+                    <i class="fas fa-tag" aria-hidden="true"></i>
+                    {% trans "Бесплатно при заказе от 20 руб." %}
+                </li>
+                {% if selected_branch %}
+                    <li>
+                        <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
+                        {{ selected_branch.address }}
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </section>
 
-            {% if marquees %}
-            {% for marquee in marquees %}
-            <section class="ticker-section">
-                <div class="ticker-container">
-                    <div class="ticker">
-                        <h2>{{ marquee.text }}</h2>
-                    </div>
+    {% if marquees %}
+        <section class="hp-marquee" aria-label="{% trans 'Актуальные акции' %}">
+            <div class="hp-marquee__track">
+                <div class="hp-marquee__group">
+                    {% for marquee in marquees %}
+                        <span class="hp-marquee__item">{{ marquee.text }}</span>
+                        <span class="hp-marquee__dot" aria-hidden="true"></span>
+                    {% endfor %}
                 </div>
-            </section>
-            {% endfor %}
-            {% endif %}
+                <div class="hp-marquee__group" aria-hidden="true">
+                    {% for marquee in marquees %}
+                        <span class="hp-marquee__item">{{ marquee.text }}</span>
+                        <span class="hp-marquee__dot" aria-hidden="true"></span>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+    {% endif %}
 
-            <section class="slides">
+    <div class="hp-container">
+        {% if slides %}
+            <section class="hp-section hp-slides" aria-roledescription="carousel"
+                     aria-label="{% trans 'Актуальные комбо-наборы' %}">
                 <div class="swiper-container">
                     <div class="swiper-wrapper">
-                        <div class="swiper-slide">
-                            <img src="{% static 'img/slider/kombo_ohota.gif' %}"
-                                 alt="{% trans "Комбо-набор Охота - вкусная пицца с доставкой в Барановичах" %}">
-                        </div>
-                        <div class="swiper-slide">
-                            <img src="{% static 'img/slider/kombo_shef.gif' %}"
-                                 alt="{% trans "Комбо-набор Шеф - изысканная пицца с доставкой в Барановичах" %}">
-                        </div>
-                        <div class="swiper-slide">
-                            <img src="{% static 'img/slider/kombo_sochnyj.gif' %}"
-                                 alt="{% trans "Комбо-набор Сочный - сочная пицца с доставкой в Барановичах" %}">
-                        </div>
+                        {% for slide in slides %}
+                            <div class="swiper-slide">
+                                <img src="{% static slide.image %}" alt="{{ slide.alt }}"
+                                     {% if forloop.first %}fetchpriority="high"{% endif %}>
+                            </div>
+                        {% endfor %}
                     </div>
-                    <div class="swiper-button-next"></div>
-                    <div class="swiper-button-prev"></div>
+                    <div class="swiper-button-next" aria-label="{% trans 'Следующий слайд' %}"></div>
+                    <div class="swiper-button-prev" aria-label="{% trans 'Предыдущий слайд' %}"></div>
                     <div class="swiper-pagination"></div>
                 </div>
             </section>
-            {% include "app_home/includes/vacancy.html" %}
-            {% if featured_products %}
-                <section class="section_featured_products">
-                    <div class="featured_products_container">
-                        <div class="page_title">
-                            <h2 class="featured_title">{% trans "Наши новинки:" %}</h2>
-                            <div class="divider"></div>
-                        </div>
-                        <div class="items-catalog">
-                            {% for product in featured_products %}
-                                <div class="item-card">
-                                    <a href="{% url 'app_catalog:item_detail' product.slug %}">
-                                        {% if product.image %}
-                                        <img src="{{ product.image.url }}" alt="{{ product.name }}">
-                                        {% else %}
-                                        <img src="{% static 'img/No-Image-Placeholder.svg' %}" alt="{{ product.name }}">
-                                        {% endif %}
-                                    </a>
-                                    <h2>{{ product.name }}</h2>
-                                    <p>{{ product.description|truncatewords:15 }}</p>
-                                    <div class="cart_price_section">
+        {% endif %}
+
+        {% if categories %}
+            <section class="hp-section" id="hp-menu">
+                <div class="hp-head">
+                    <h2 class="hp-head__title">{% trans "Наше меню" %}</h2>
+                    <div class="divider"></div>
+                    <p class="hp-head__sub">{% trans "Выберите категорию, чтобы посмотреть состав, размеры и цены." %}</p>
+                </div>
+                <div class="hp-menu__grid">
+                    {% for category in categories %}
+                        <a class="hp-cat"
+                           href="{% url 'app_catalog:category_detail' category.slug %}">
+                            <div class="hp-cat__media">
+                                {% if category.image %}
+                                    <img src="{{ category.image.url }}" alt="{{ category.name }}"
+                                         loading="lazy" decoding="async">
+                                {% else %}
+                                    <img src="{% static 'img/No-Image-Placeholder.svg' %}" alt="{{ category.name }}"
+                                         loading="lazy" decoding="async">
+                                {% endif %}
+                            </div>
+                            <span class="hp-cat__arrow" aria-hidden="true">
+                                <i class="fas fa-arrow-right"></i>
+                            </span>
+                            <p class="hp-cat__name">{{ category.name }}</p>
+                        </a>
+                    {% endfor %}
+                </div>
+            </section>
+        {% endif %}
+
+        {% if featured_products %}
+            <section class="hp-section">
+                <div class="hp-head">
+                    <h2 class="hp-head__title">{% trans "Наши новинки" %}</h2>
+                    <div class="divider"></div>
+                    <p class="hp-head__sub">{% trans "Свежие позиции, которые готовятся из свежих ингредиентов." %}</p>
+                    <a class="hp-head__link" href="{% url 'app_catalog:catalog' %}">
+                        {% trans "Всё меню" %}
+                        <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                    </a>
+                </div>
+                <div class="hp-grid">
+                    {% for product in featured_products %}
+                        <article class="hp-card">
+                            <a class="hp-card__media" href="{% url 'app_catalog:item_detail' product.slug %}">
+                                {% if product.image %}
+                                    <img src="{{ product.image.url }}" alt="{{ product.name }}"
+                                         loading="lazy" decoding="async">
+                                {% else %}
+                                    <img src="{% static 'img/No-Image-Placeholder.svg' %}" alt="{{ product.name }}"
+                                         loading="lazy" decoding="async">
+                                {% endif %}
+                                {% if product.is_weekly_special or product.is_combo or product.is_spicy %}
+                                    <div class="hp-card__badges">
                                         {% if product.is_weekly_special %}
-                                            <span class="discount-badge">{% trans "Пицца недели" %}</span>
+                                            <span class="hp-badge hp-badge--accent">{% trans "Пицца недели" %}</span>
                                         {% endif %}
-                                        <div class="price">
-                                            {% if product.variants.exists %}
-                                                {% blocktrans with price=product.variants.first.price|floatformat:2 %}от {{ price }} руб.{% endblocktrans %}
-                                            {% else %}
-                                                {% trans "Цена не указана" %}
-                                            {% endif %}
-                                        </div>
-                                        <a class="order-link" href="{% url 'app_catalog:item_detail' product.slug %}">{% trans "Заказать" %}</a>
-                                    </div>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                </section>
-            {% endif %}
-            {% if categories %}
-                <section class="section_categories">
-                    <div class="categories_container">
-                        <div class="page_title">
-                            <h2 class="categories_title">{% trans "Наше меню:" %}</h2>
-                            <div class="divider"></div>
-                        </div>
-                        <div class="categories">
-                            {% for category in categories %}
-                                <div class="category-card" tabindex="0">
-                                    
-                                    <a href="{% url 'app_catalog:category_detail' category.slug %}"
-                                       class="category-card__link"
-                                       aria-label="{% blocktrans with category_name=category.name %}Перейти в категорию: {{ category_name }}{% endblocktrans %}">
-                                    <div class="category-card__image">
-                                        {% if category.image %}
-                                        <img src="{{ category.image.url }}" alt="{{ category.name }}">
-                                        {% else %}
-                                        <img src="{% static 'img/test.jpg' %}" alt="{{ category.name }}">
+                                        {% if product.is_combo %}
+                                            <span class="hp-badge">{% trans "Комбо" %}</span>
+                                        {% endif %}
+                                        {% if product.is_spicy %}
+                                            <span class="hp-badge hp-badge--hot">{% trans "Острый" %}</span>
                                         {% endif %}
                                     </div>
-                                        <p class="category_name">{{ category.name }}</p>
-                                    </a>
-                                </div>
+                                {% endif %}
+                            </a>
+                            <div class="hp-card__body">
+                                <h3 class="hp-card__title">
+                                    <a href="{% url 'app_catalog:item_detail' product.slug %}">{{ product.name }}</a>
+                                </h3>
+                                {% if product.description %}
+                                    <p class="hp-card__desc">{{ product.description|truncatewords:14 }}</p>
+                                {% endif %}
+                            </div>
+                            <div class="hp-card__foot">
+                                {% if product.min_price %}
+                                    <div class="hp-card__price">
+                                        {% blocktrans with price=product.min_price|floatformat:2 %}от {{ price }} руб.{% endblocktrans %}
+                                    </div>
+                                {% else %}
+                                    <div class="hp-card__price hp-card__price--empty">{% trans "Цена не указана" %}</div>
+                                {% endif %}
+                                <a class="hp-btn hp-btn--primary hp-btn--sm"
+                                   href="{% url 'app_catalog:item_detail' product.slug %}">{% trans "Заказать" %}</a>
+                            </div>
+                        </article>
+                    {% endfor %}
+                </div>
+            </section>
+        {% endif %}
+
+        {% include "app_home/includes/vacancy.html" %}
+
+        <section class="hp-section">
+            <div class="hp-head">
+                <h2 class="hp-head__title">{% trans "Доставка и контакты" %}</h2>
+                <div class="divider"></div>
+            </div>
+            <div class="hp-info">
+                <div class="hp-info__card">
+                    <span class="hp-info__icon" aria-hidden="true">
+                        <i class="fas fa-truck"></i>
+                    </span>
+                    <h3 class="hp-info__title">{% trans "Доставка" %}</h3>
+                    <p class="hp-info__text">{% trans "Доставка по городу — 3 руб. При заказе от 20 руб. доставка бесплатная." %}</p>
+                    <a class="hp-info__link" href="{% url 'app_home:delivery' %}">{% trans "Подробнее о доставке" %}</a>
+                </div>
+                <div class="hp-info__card">
+                    <span class="hp-info__icon" aria-hidden="true">
+                        <i class="fas fa-store"></i>
+                    </span>
+                    <h3 class="hp-info__title">{% trans "Филиалы" %}</h3>
+                    {% if branches %}
+                        <p class="hp-info__text">{% trans "Solo Pizza — сеть пиццерий в Барановичах:" %}</p>
+                        <ul class="hp-info__list">
+                            {% for branch in branches %}
+                                <li class="hp-info__list-item">{{ branch.address }}</li>
                             {% endfor %}
-                        </div>
-                    </div>
-                </section>
-            {% endif %}
-            <section class="section_delivery_info">
-                <div class="delivery_info_container">
-                    <div class="page_title">
-                        <h2 class="delivery_title">{% trans "Доставка" %}</h2>
-                        <div class="divider"></div>
-                    </div>
-                    <div class="delivery_info centered-text">
-                        <p>{% trans "Доставка по городу - 3 руб. При заказе от 20 руб. - доставка бесплатная!" %}</p>
-                        <a href="{% url 'app_home:delivery' %}">{% trans "Подробнее о доставке" %}</a>
-                    </div>
+                        </ul>
+                    {% else %}
+                        <p class="hp-info__text">{% trans "Филиалы скоро появятся." %}</p>
+                    {% endif %}
+                    <a class="hp-info__link" href="{% url 'app_home:contacts' %}">{% trans "Контакты" %}</a>
                 </div>
-            </section>
-            <section class="section_about_us">
-                <div class="about_us_container">
-                    <div class="page_title">
-                        <h2 class="about_title">{% trans "О нас" %}</h2>
-                        <div class="divider"></div>
-                    </div>
-                    <div class="about_info centered-text">
-                        <p>{% trans "Solo Pizza - это сеть пиццерий в Барановичах по адресам: ул. Ленина 9/1 и ул. Тексер, 4а. Мы предлагаем свежую, вкусную пиццу и другие блюда с доставкой по городу." %}</p>
-                    </div>
+                <div class="hp-info__card">
+                    <span class="hp-info__icon" aria-hidden="true">
+                        <i class="fas fa-pizza-slice"></i>
+                    </span>
+                    <h3 class="hp-info__title">{% trans "О нас" %}</h3>
+                    <p class="hp-info__text">{% trans "Готовим пиццу из свежих ингредиентов и доставляем горячей по всему городу." %}</p>
+                    <a class="hp-info__link" href="{% url 'app_home:info' %}">{% trans "О компании" %}</a>
                 </div>
-            </section>
-        </div>
-    </main>
+            </div>
+        </section>
+    </div>
+</main>
 {% endblock %}
 {% block scripts %}
     <script src="{% static 'js/swiper-bundle.min.js' %}" defer></script>
