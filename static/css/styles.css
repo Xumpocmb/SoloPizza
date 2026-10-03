@@ -4173,28 +4173,14 @@ body.dark .snowflake,
 @media (max-width: 640px){
 
     :where(.s-home) .hp-menu__grid, :where(.s-catalog) .hp-menu__grid {
-    display: flex;
+    grid-template-columns: repeat(2, 1fr);
     gap: 12px;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    padding-bottom: 4px;
-    margin: 0 calc(var(--hp-gutter) * -1);
-    padding-left: var(--hp-gutter);
-    padding-right: var(--hp-gutter);
-
-}
-
-
-    :where(.s-home) .hp-menu__grid::-webkit-scrollbar, :where(.s-catalog) .hp-menu__grid::-webkit-scrollbar {
-    display: none;
 
 }
 
 
     :where(.s-home) .hp-cat, :where(.s-catalog) .hp-cat {
-    flex: 0 0 74%;
-    scroll-snap-align: start;
+    min-width: 0;
 
 }
 
