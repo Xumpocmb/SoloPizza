@@ -4990,6 +4990,23 @@ body.dark .snowflake,
 }
 
 
+/* <button class="order-link"> несёт стили браузера: рамку, шрифт и курсор */
+:where(.s-item) button.order-link {
+    width: 100%;
+    border: none;
+    font-family: inherit;
+    font-weight: inherit;
+    line-height: 1.2;
+    text-align: center;
+    cursor: pointer;
+}
+
+
+:where(.s-item) button.order-link:active {
+    transform: translateY(1px);
+}
+
+
 @media (max-width: 768px){
 
     :where(.s-item) .item-detail {
