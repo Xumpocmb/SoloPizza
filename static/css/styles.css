@@ -286,6 +286,45 @@ a:hover {
     color: white;
 }
 
+/* --- Формы --------------------------------------------------------------
+   Общие строки, которые раньше копировались в promo_page.css, vacancies.css,
+   checkout.css, add_item_to_order.css и item_detail.css. Страничные файлы
+   подключаются после styles.css и могут их переопределить (у order_detail.css
+   и map.css своя высота .form-group).
+
+   Базовые правила лежат выше input[type="number"], а :focus — ниже
+   input[type="number"]:focus. Специфичность у них одинаковая, поэтому
+   решает порядок: иначе поле количества стало бы шириной 100% и потеряло
+   бы фокусное кольцо.
+   ----------------------------------------------------------------------- */
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid var(--divider-color);
+    border-radius: var(--border-radius);
+    background-color: var(--input-bg);
+    color: var(--text-color);
+    font-size: 1rem;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-group textarea {
+    min-height: 150px;
+    resize: vertical;
+}
+
+.form-error {
+    color: #e74c3c;
+    font-size: 0.9rem;
+    margin-top: 5px;
+}
+
 .page_title {
     text-align: center;
     color: var(--accent-color);
@@ -757,6 +796,12 @@ input[type="number"]:focus {
     border-color: var(--accent-color);
 }
 
+.form-group input:focus,
+.form-group textarea:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px var(--accent-color-rgba);
+    outline: none;
+}
 
 .custom-select {
     width: 50%;

@@ -173,10 +173,6 @@
 }
 
 
-.form-group {
-    margin-bottom: 20px;
-}
-
 /* Класс для скрытия селекторов */
 .option-selector.hidden,
 .board-selector.hidden {
