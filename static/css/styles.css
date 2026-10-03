@@ -450,6 +450,7 @@ a:hover {
 
 .cart-wrapper a:hover {
     background-color: rgba(7, 155, 89, 0.1);
+    border-radius: 20px;
 }
 
 .cart-icon svg {
