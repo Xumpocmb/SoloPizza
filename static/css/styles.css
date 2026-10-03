@@ -3643,23 +3643,13 @@ body.dark .snowflake,
 
 
 /* ==== catalog.css → s-catalog-category ==== */
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap'); .items-catalog{ width: 100%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 20px; }
-
-@media (max-width: 992px){
-
-    :where(.s-catalog-category) .items-catalog {
-    grid-template-columns: repeat(2, 1fr);
-
-}
-
-
-}
-
+.items-catalog{ width: 100%; display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 20px; }
 
 @media (max-width: 600px){
 
     :where(.s-catalog-category) .items-catalog {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
 
 }
 
