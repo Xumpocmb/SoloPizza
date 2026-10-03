@@ -7,9 +7,7 @@
 {% block twitter_description %}Отзыв от {{ review.user.username }} о Solo Pizza - {{ review.text|truncatechars:100 }}{% endblock %}
 
 
-{% block styles %}
-    <link rel="stylesheet" href="{% static 'css/reviews.css' %}">
-{% endblock %}
+{% block body_class %}s-reviews{% endblock %}
 
 {% block main %}
 <main>

@@ -8,10 +8,6 @@
 {% block twitter_description %}{% trans "Закажите вкусную пиццу с доставкой в Барановичах! Solo Pizza предлагает свежие пиццы и другие блюда. Быстрая доставка, отличное обслуживание." %}{% endblock %}
 {% block styles %}
     <link rel="stylesheet" href="{% static 'css/swiper-bundle.min.css' %}">
-    <link rel="stylesheet" href="{% static 'css/swiper.css' %}">
-    <link rel="stylesheet" href="{% static 'css/promo_page.css' %}">
-    <link rel="stylesheet" href="{% static 'css/sections.css' %}">
-    <link rel="stylesheet" href="{% static 'css/home_page.css' %}">
 {% endblock %}
 {% block schema_markup %}
 <script type="application/ld+json">
@@ -74,6 +70,8 @@
     }
 </script>
 {% endblock %}
+{% block body_class %}s-home s-promo{% endblock %}
+
 {% block main %}
 <main class="home-page">
     <section class="hp-hero">

@@ -4,7 +4,6 @@
 {% block title %}Продажа сертификатов{% endblock %}
 
 {% block styles %}
-    <link rel="stylesheet" href="{% static 'css/promo_page.css' %}">
     <style>
         .certificate-form-container {
             max-width: 600px;
@@ -125,6 +124,8 @@
         }
     </style>
 {% endblock %}
+
+{% block body_class %}s-promo{% endblock %}
 
 {% block main %}
 <main>

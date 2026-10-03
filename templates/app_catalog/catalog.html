@@ -34,10 +34,8 @@
 }
 </script>
 {% endblock %}
-{% block styles %}
-    <link rel="stylesheet" href="{% static 'css/sections.css' %}">
-    <link rel="stylesheet" href="{% static 'css/catalog_page.css' %}">
-{% endblock %}
+{% block body_class %}s-catalog{% endblock %}
+
 {% block main %}
     <main class="catalog-page">
         <div class="breadcrumbs">

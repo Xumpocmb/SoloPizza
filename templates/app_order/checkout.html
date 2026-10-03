@@ -7,9 +7,7 @@
 {% block og_description %}{% trans "Оформление заказа в Solo Pizza - заполните контактные данные, выберите способ доставки и оплаты для завершения заказа." %}{% endblock %}
 {% block twitter_description %}{% trans "Оформление заказа в Solo Pizza - заполните контактные данные, выберите способ доставки и оплаты для завершения заказа." %}{% endblock %}
 
-{% block styles %}
-    <link rel="stylesheet" href="{% static 'css/checkout.css' %}"/>
-{% endblock %}
+{% block body_class %}s-checkout{% endblock %}
 
 {% block main %}
     <main class="checkout-page">

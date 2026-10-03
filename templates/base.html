@@ -24,13 +24,7 @@
     <link rel="shortcut icon" href="{% static 'img/favicon.ico' %}" type="image/x-icon">
     <title>{% block title %}{{ title|default:"Solo Pizza" }}{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-    <link rel="stylesheet" href="{% static 'css/alert.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    {% if SNOW_ENABLED %}
-        <link rel="stylesheet" href="{% static 'css/snow.css' %}">
-    {% endif %}
-    {% block styles %}
-    {% endblock %}
     {% block schema_markup %}
     {% endblock %}
     <!-- Yandex.Metrika counter -->
@@ -47,7 +41,7 @@
     <noscript><div><img src="https://mc.yandex.ru/watch/105147095" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
     <!-- /Yandex.Metrika counter -->
 </head>
-<body>
+<body class="{% block body_class %}{% endblock %}">
 {% include 'header.html' %}
 {% include 'notifications.html' %}
 

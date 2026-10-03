@@ -6,9 +6,7 @@
 {% block og_description %}{% trans "История заказов Solo Pizza - просмотрите все ваши заказы, их статусы и детали." %}{% endblock %}
 {% block twitter_description %}{% trans "История заказов Solo Pizza - просмотрите все ваши заказы, их статусы и детали." %}{% endblock %}
 
-{% block styles %}
-    <link rel="stylesheet" href="{% static 'css/order_list.css' %}">
-{% endblock %}
+{% block body_class %}s-order-list{% endblock %}
 
 {% block main %}
     <main class="order-list-page">

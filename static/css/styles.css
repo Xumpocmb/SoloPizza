@@ -1,3 +1,17 @@
+/* =====================================================================
+   Solo Pizza — единый файл стилей.
+
+   Собран из отдельных страничных файлов. Правила страниц
+   префиксуются через :where(.s-страница), что не меняет
+   специфичность, поэтому каскад остаётся прежним.
+
+   Порядок секций значим: при равной специфичности побеждает
+   последнее правило, а страница может попадать в несколько
+   секций сразу.
+   ===================================================================== */
+
+
+/* ==== База: переменные, типографика, кнопки, формы ==== */
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
 :root {
@@ -33,7 +47,7 @@
     --button-text: #ffffff;
 }
 
-* {
+:where(body:not(.s-print)) * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -848,3 +862,7118 @@ input[type="number"]:focus {
     margin: 0 5px;
     color: var(--text-muted);
 }
+
+
+/* ==== alert.css (подключается глобально) ==== */
+/* Container for stacked notifications */
+#notification-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1050; /* Ensure it's above most other elements */
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Space between notifications */
+    max-width: 350px; /* Limit width for better readability */
+}
+
+/* Individual notification styles */
+.notification {
+    position: relative;
+    padding: 15px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    font-size: 16px;
+    line-height: 1.5;
+    color: #333;
+    opacity: 1;
+    transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+    transform: translateX(0);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.notification.hide {
+    opacity: 0;
+    transform: translateX(100%);
+}
+
+.notification.success {
+    background-color: #e6ffed;
+    color: #1a7e3d;
+    border: 1px solid #b3e6c9;
+}
+
+.notification.warning {
+    background-color: #fff8e6;
+    color: #8a6d3b;
+    border: 1px solid #ffeeba;
+}
+
+.notification.error {
+    background-color: #ffe6e6;
+    color: #a94442;
+    border: 1px solid #f5c6cb;
+}
+
+.notification.info {
+    background-color: #e6f7ff;
+    color: #31708f;
+    border: 1px solid #bce8f1;
+}
+
+/* Close button style */
+.notification .close-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+    color: inherit;
+    margin-left: 15px;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+}
+
+.notification .close-btn:hover {
+    opacity: 1;
+}
+
+
+/* ==== snow.css (подключается глобально) ==== */
+/* Стили для падающих снежинок */
+.snowflake {
+    position: fixed;
+    top: -10px;
+    z-index: 9999;
+    pointer-events: none;
+    color: #fff;
+    font-size: 20px;
+    animation: fall linear infinite;
+    text-shadow: 0 5px #fff, 0 0 10px #fff, 0 0 15px #fff, 0 0 20px #fff;
+    user-select: none;
+    will-change: transform;
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.9));
+}
+
+/* Для светлой темы (по умолчанию) */
+:root .snowflake {
+    color: #dadada;
+    text-shadow: 0 0 5px #4b4b4b, 0 0 10px #535353, 0 15px #494949, 0 0 20px #5c5c5c;
+}
+
+/* Для темной темы */
+body.dark .snowflake,
+.dark .snowflake {
+    color: #fff;
+    text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #fff, 0 0 20px #fff;
+}
+
+@keyframes fall {
+    0% {
+        transform: translateY(-10vh) translateX(0) rotate(0deg);
+        opacity: var(--opacity, 0.7);
+    }
+
+    85% {
+        opacity: var(--opacity, 0.7);
+    }
+
+    100% {
+        transform: translateY(100vh) translateX(var(--drift, 0px)) rotate(var(--rotation, 0deg));
+        opacity: 0.2;
+    }
+}
+
+
+/* ==== 404.css → s-404 ==== */
+:where(.s-404) .container-404 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    min-height: 60vh;
+    padding: 2rem;
+}
+
+
+:where(.s-404) .content-404 {
+    max-width: 600px;
+}
+
+
+:where(.s-404) .title-404 {
+    font-size: 8rem;
+    font-weight: 700;
+    color: var(--accent-color);
+    margin-bottom: 0;
+    line-height: 1;
+    text-shadow: 2px 2px 8px var(--accent-color-rgba);
+}
+
+
+:where(.s-404) .subtitle-404 {
+    font-size: 2rem;
+    color: var(--text-color);
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-weight: 700;
+}
+
+
+:where(.s-404) .description-404 {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+}
+
+
+:where(.s-404) .btn-404 {
+    padding: 12px 30px;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+
+@media (max-width: 768px){
+
+    :where(.s-404) .title-404 {
+    font-size: 6rem;
+
+}
+
+    :where(.s-404) .subtitle-404 {
+    font-size: 1.5rem;
+
+}
+
+    :where(.s-404) .description-404 {
+    font-size: 1rem;
+
+}
+
+
+}
+
+
+
+/* ==== promo_page.css → s-promo ==== */
+/* Общие стили для страниц с промо-информацией */
+
+/* Структура страницы */
+:where(.s-promo) .promo-section {
+    background-color: var(--bg-color);
+    padding: 40px 0;
+}
+
+
+:where(.s-promo) .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+
+:where(.s-promo) .promo-header {
+    margin-bottom: 30px;
+}
+
+
+:where(.s-promo) .promo-title {
+    color: var(--accent-color);
+    text-align: center;
+    margin-bottom: 15px;
+    font-size: 2.2rem;
+    font-weight: 700;
+    text-align: center;
+}
+
+
+:where(.s-promo) .divider {
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
+    margin: 0 auto 30px;
+    width: 80%;
+}
+
+
+:where(.s-promo) .promo-description {
+    margin-bottom: 30px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 1.1rem;
+}
+
+
+:where(.s-promo) .text-content {
+    margin-bottom: 30px;
+}
+
+
+:where(.s-promo) .text-title {
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    color: var(--accent-color);
+    border-bottom: 2px solid var(--hover-bg);
+    padding-bottom: 10px;
+}
+
+
+/* Хлебные крошки */
+:where(.s-promo) .breadcrumbs {
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+}
+
+
+:where(.s-promo) .breadcrumb-link {
+    color: var(--text-muted);
+    text-decoration: none;
+}
+
+
+:where(.s-promo) .breadcrumb-link:hover {
+    color: var(--accent-color);
+    text-decoration: underline;
+}
+
+
+:where(.s-promo) .breadcrumb-separator {
+    margin: 0 8px;
+    color: var(--text-muted);
+}
+
+
+:where(.s-promo) .current-page {
+    color: var(--accent-color);
+    font-weight: 500;
+}
+
+
+/* Стили для карточек */
+:where(.s-promo) .promo-card {
+    background: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 25px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 2px solid transparent;
+    position: relative;
+}
+
+
+:where(.s-promo) .promo-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+    border: 2px solid var(--accent-color);
+}
+
+
+:where(.s-promo) .promo-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+
+:where(.s-promo) .promo-card-title {
+    margin: 0;
+    color: var(--accent-color);
+    font-size: 1.4rem;
+}
+
+
+:where(.s-promo) .promo-card-content {
+    padding-top: 15px;
+}
+
+
+:where(.s-promo) .promo-description {
+    margin-bottom: 15px;
+    line-height: 1.6;
+    color: var(--text-muted);
+}
+
+
+:where(.s-promo) .promo-badge {
+    background: var(--accent-color-rgba);
+    color: var(--accent-color);
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+
+/* Стили для списка промо-элементов */
+:where(.s-promo) .promo-list {
+    list-style: none;
+    padding: 0;
+}
+
+
+:where(.s-promo) .promo-list-item {
+    background: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 20px;
+    margin-bottom: 15px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+
+:where(.s-promo) .promo-list-item:hover {
+    transform: translateX(5px);
+}
+
+
+:where(.s-promo) .promo-list-title {
+    margin-top: 0;
+    color: var(--accent-color);
+    font-size: 1.3rem;
+}
+
+
+/* Стили для сетки */
+:where(.s-promo) .promo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 25px;
+    align-items: stretch;
+}
+
+
+/* Стили для вакансий */
+:where(.s-promo) .vacancies-section {
+    background-color: var(--bg-color);
+    padding: 40px 0;
+}
+
+
+:where(.s-promo) .vacancies-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+
+:where(.s-promo) .vacancies-title {
+    color: var(--accent-color);
+    text-align: center;
+    margin-bottom: 15px;
+    font-size: 2.5rem;
+}
+
+
+:where(.s-promo) .vacancies-subtitle {
+    color: var(--text-muted);
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto 30px;
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+
+:where(.s-promo) .vacancies-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 25px;
+    align-items: stretch;
+}
+
+
+/* Стили для карточки вакансии */
+:where(.s-promo) .vacancy-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: var(--card-bg);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s, border 0.3s;
+    border: 2px solid transparent;
+    position: relative;
+}
+
+
+:where(.s-promo) .vacancy-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    border: 2px solid var(--accent-color);
+}
+
+
+:where(.s-promo) .vacancy-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background: var(--accent-color);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+}
+
+
+:where(.s-promo) .vacancy-card:hover::before {
+    transform: scaleX(1);
+}
+
+
+:where(.s-promo) .vacancy-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+
+:where(.s-promo) .vacancy-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+
+:where(.s-promo) .vacancy-title {
+    color: var(--accent-color);
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.4rem;
+    font-weight: 600;
+    position: relative;
+    padding-bottom: 8px;
+}
+
+
+:where(.s-promo) .vacancy-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 40px;
+    height: 2px;
+    background: var(--accent-color);
+}
+
+
+:where(.s-promo) .vacancy-description {
+    color: var(--text-muted);
+    margin-bottom: 15px;
+    line-height: 1.5;
+    font-size: 0.95rem;
+}
+
+
+:where(.s-promo) .vacancy-salary {
+    background: var(--accent-color-rgba);
+    color: var(--accent-color);
+    padding: 8px 12px;
+    border-radius: 6px;
+    display: inline-block;
+    margin-bottom: 15px;
+    font-weight: bold;
+    font-size: 1.1rem;
+    box-shadow: 0 2px 5px rgba(7, 155, 89, 0.2);
+}
+
+
+/* Блок с преимуществами */
+:where(.s-promo) .vacancy-benefits {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+
+:where(.s-promo) .benefit-tag {
+    background: var(--hover-bg);
+    color: var(--text-color);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    border: 1px solid var(--divider-color);
+    transition: all 0.3s ease;
+}
+
+
+:where(.s-promo) .benefit-tag:hover {
+    background: var(--accent-color-rgba);
+    color: var(--accent-color);
+    border-color: var(--accent-color);
+    transform: translateY(-2px);
+}
+
+
+/* Кнопка отклика */
+:where(.s-promo) .vacancy-apply-btn {
+    margin-top: auto;
+    display: block;
+    text-align: center;
+    background: var(--accent-color);
+    color: white;
+    padding: 12px 15px;
+    border-radius: var(--border-radius);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 10px rgba(7, 155, 89, 0.3);
+    border: none;
+    position: relative;
+    overflow: hidden;
+}
+
+
+:where(.s-promo) .vacancy-apply-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.7s ease;
+}
+
+
+:where(.s-promo) .vacancy-apply-btn:hover {
+    background: #068a50;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(7, 155, 89, 0.4);
+    border-radius: var(--border-radius);
+}
+
+
+:where(.s-promo) .vacancy-apply-btn:hover::before {
+    left: 100%;
+}
+
+
+/* Кнопка «Подробнее» в карточке вакансии */
+:where(.s-promo) .vacancy-details-btn {
+    margin-top: auto;
+    align-self: flex-start;
+    display: inline-block;
+    text-align: center;
+    background: var(--accent-color);
+    color: white;
+    padding: 10px 18px;
+    border-radius: var(--border-radius);
+    text-decoration: none;
+    font-weight: 600;
+    transition: background 0.3s ease, transform 0.3s ease;
+}
+
+
+:where(.s-promo) .vacancy-details-btn:hover {
+    background: #068a50;
+    color: white;
+    border-radius: var(--border-radius);
+    transform: translateY(-2px);
+}
+
+
+/* Сообщение об отсутствии вакансий */
+:where(.s-promo) .no-vacancies {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 40px;
+    color: var(--text-muted);
+}
+
+
+/* Стили для детальной страницы вакансии */
+:where(.s-promo) .vacancy-detail {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 30px;
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    border-top: 5px solid var(--accent-color);
+}
+
+
+:where(.s-promo) .vacancy-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+
+:where(.s-promo) .vacancy-header-image {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: var(--border-radius);
+    margin-right: 30px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border: 3px solid var(--accent-color-rgba);
+}
+
+
+:where(.s-promo) .vacancy-header-content h1 {
+    margin-top: 0;
+    color: var(--accent-color);
+    font-size: 2rem;
+    margin-bottom: 15px;
+}
+
+
+:where(.s-promo) .vacancy-salary {
+    font-size: 1.3rem;
+    font-weight: bold;
+    margin: 15px 0;
+    color: var(--accent-color);
+    display: inline-block;
+    padding: 8px 15px;
+    background: var(--accent-color-rgba);
+    border-radius: var(--border-radius);
+}
+
+
+:where(.s-promo) .vacancy-description {
+    margin: 25px 0;
+    line-height: 1.7;
+    white-space: pre-line;
+    color: var(--text-color);
+    font-size: 1.05rem;
+}
+
+
+:where(.s-promo) .vacancy-benefits-section {
+    margin: 30px 0;
+    padding: 20px;
+    background: var(--bg-color);
+    border-radius: var(--border-radius);
+    border-left: 4px solid var(--accent-color);
+}
+
+
+:where(.s-promo) .vacancy-benefits-section h2 {
+    font-size: 1.4rem;
+    margin-bottom: 15px;
+    color: var(--accent-color);
+}
+
+
+:where(.s-promo) .vacancy-apply {
+    margin-top: 40px;
+    text-align: center;
+}
+
+
+:where(.s-promo) .back-link {
+    display: inline-block;
+    margin-top: 25px;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+
+:where(.s-promo) .back-link:hover {
+    color: var(--accent-color);
+    transform: translateX(-5px);
+}
+
+
+/* Стили для страницы отклика на вакансию */
+:where(.s-promo) .vacancy-application-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 30px;
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    border-top: 5px solid var(--accent-color);
+}
+
+
+:where(.s-promo) .vacancy-application-title {
+    color: var(--accent-color);
+    margin-bottom: 30px;
+    font-size: 1.8rem;
+    position: relative;
+    padding-bottom: 10px;
+}
+
+
+:where(.s-promo) .vacancy-application-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background: var(--accent-color);
+}
+
+
+/* Стили для формы обратной связи и отклика на вакансию */
+:where(.s-promo) .feedback-form-container {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 25px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+
+:where(.s-promo) .feedback-form-container:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+}
+
+
+:where(.s-promo) .feedback-form {
+    margin-top: 20px;
+}
+
+
+:where(.s-promo) .form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+
+:where(.s-promo) .form-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+
+:where(.s-promo) .feedback-submit-btn {
+    display: block;
+    text-align: center;
+    background: var(--accent-color);
+    color: white;
+    padding: 12px 15px;
+    border-radius: var(--border-radius);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    margin-top: auto;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 10px rgba(7, 155, 89, 0.3);
+    border: none;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+
+:where(.s-promo) .feedback-submit-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.7s ease;
+}
+
+
+:where(.s-promo) .feedback-submit-btn:hover {
+    background: #068a50;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(7, 155, 89, 0.4);
+    border-radius: var(--border-radius);
+}
+
+
+:where(.s-promo) .feedback-submit-btn:hover::before {
+    left: 100%;
+}
+
+
+/* Стили для уведомлений */
+:where(.s-promo) .alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: var(--border-radius);
+    font-weight: 500;
+}
+
+
+:where(.s-promo) .alert-success {
+    background-color: rgba(46, 204, 113, 0.2);
+    border-left: 4px solid #2ecc71;
+    color: #27ae60;
+}
+
+
+:where(.s-promo) .alert-error {
+    background-color: rgba(231, 76, 60, 0.2);
+    border-left: 4px solid #e74c3c;
+    color: #c0392b;
+}
+
+
+/* Стили для страницы контактов */
+:where(.s-promo) .branch-info {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 25px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+
+:where(.s-promo) .branch-info:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+}
+
+
+:where(.s-promo) .branch-info h2 {
+    font-size: 1.6rem;
+    margin-bottom: 20px;
+    color: var(--accent-color);
+    border-bottom: 2px solid var(--hover-bg);
+    padding-bottom: 10px;
+}
+
+
+:where(.s-promo) .contact-section {
+    margin-bottom: 25px;
+}
+
+
+:where(.s-promo) .contact-section h3 {
+    font-size: 1.3rem;
+    margin-bottom: 12px;
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+}
+
+
+:where(.s-promo) .contact-section h3:before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background-color: var(--accent-color);
+    margin-right: 10px;
+    border-radius: 50%;
+}
+
+
+:where(.s-promo) .phone-list {
+    list-style: none;
+    padding: 0;
+}
+
+
+:where(.s-promo) .phone-list li {
+    padding: 8px 0;
+    font-size: 1.1rem;
+    border-bottom: 1px solid var(--hover-bg);
+    transition: all 0.2s ease;
+}
+
+
+:where(.s-promo) .phone-list li:hover {
+    padding-left: 5px;
+    color: var(--accent-color);
+}
+
+
+:where(.s-promo) .branch-selection {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 2px solid var(--hover-bg);
+}
+
+
+:where(.s-promo) .branch-selection h3 {
+    font-size: 1.4rem;
+    margin-bottom: 15px;
+    color: var(--accent-color);
+}
+
+
+:where(.s-promo) .branch-form select {
+    width: 100%;
+    padding: 12px 15px;
+    border-radius: var(--border-radius);
+    border: 2px solid var(--hover-bg);
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-size: 1rem;
+    margin-top: 10px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23079b59' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: calc(100% - 15px) center;
+    padding-right: 40px;
+}
+
+
+:where(.s-promo) .branch-form select:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px var(--accent-color-rgba);
+    outline: none;
+}
+
+
+:where(.s-promo) .delivery-info {
+    margin-bottom: 20px;
+}
+
+
+:where(.s-promo) .action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+
+/* Адаптивные стили */
+@media (max-width: 768px){
+
+    :where(.s-promo) .promo-title {
+    font-size: 1.8rem;
+    text-align: center;
+
+}
+
+
+    :where(.s-promo) .branch-info {
+    padding: 20px;
+
+}
+
+
+    :where(.s-promo) .branch-info h2 {
+    font-size: 1.4rem;
+
+}
+
+
+    :where(.s-promo) .contact-section h3 {
+    font-size: 1.2rem;
+
+}
+
+
+    :where(.s-promo) .promo-list-item {
+    padding: 15px;
+
+}
+
+
+    :where(.s-promo) .promo-card {
+    padding: 20px;
+
+}
+
+
+    :where(.s-promo) .vacancies-grid {
+    grid-template-columns: 1fr;
+
+}
+
+
+    :where(.s-promo) .vacancies-title {
+    font-size: 1.5rem;
+
+}
+
+
+    :where(.s-promo) .vacancy-header {
+    flex-direction: column;
+    text-align: center;
+
+}
+
+
+    :where(.s-promo) .vacancy-header-image {
+    margin-right: 0;
+    margin-bottom: 20px;
+
+}
+
+
+    :where(.s-promo) .vacancy-header-content h1::after {
+    left: 50%;
+    transform: translateX(-50%);
+
+}
+
+
+    :where(.s-promo) .vacancy-detail {
+    padding: 20px;
+
+}
+
+
+    :where(.s-promo) .feedback-form-container {
+    padding: 20px;
+
+}
+
+
+    :where(.s-promo) .form-group label {
+    font-size: 0.95rem;
+
+}
+
+
+}
+
+
+
+/* ==== vacancies.css → s-vacancies ==== */
+/* Стили для хлебных крошек */
+:where(.s-vacancies) .breadcrumbs {
+    padding: 15px 0;
+    margin: 0 auto 10px;
+    max-width: 1200px;
+    font-size: 0.9rem;
+}
+
+
+:where(.s-vacancies) .breadcrumbs a {
+    color: var(--accent-color);
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+
+:where(.s-vacancies) .breadcrumbs a:hover {
+    color: var(--text-color);
+    text-decoration: underline;
+}
+
+
+:where(.s-vacancies) .breadcrumb-separator {
+    margin: 0 5px;
+    color: var(--text-muted);
+}
+
+
+:where(.s-vacancies) .breadcrumb-current {
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+
+/* Основные стили секции */
+:where(.s-vacancies) .vacancies-section {
+    background-color: var(--bg-color);
+    padding: 40px 0;
+}
+
+
+:where(.s-vacancies) .vacancies-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+
+:where(.s-vacancies) .vacancies-title {
+    color: var(--accent-color);
+    text-align: center;
+    margin-bottom: 15px;
+    font-size: 2.5rem;
+}
+
+
+:where(.s-vacancies) .vacancies-subtitle {
+    color: var(--text-muted);
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto 30px;
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+
+/* Сетка вакансий */
+:where(.s-vacancies) .vacancies-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 25px;
+    align-items: stretch;
+}
+
+
+/* Карточка вакансии */
+:where(.s-vacancies) .vacancy-card {
+    display: flex;
+    /* Делаем flex-контейнером */
+    flex-direction: column;
+    /* Вертикальное расположение элементов */
+    height: 100%;
+    /* Занимаем всю доступную высоту */
+    background: var(--card-bg);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s, border 0.3s;
+    border: 2px solid transparent;
+    position: relative;
+}
+
+
+:where(.s-vacancies) .vacancy-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    border: 2px solid var(--accent-color);
+}
+
+
+:where(.s-vacancies) .vacancy-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background: var(--accent-color);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+}
+
+
+:where(.s-vacancies) .vacancy-card:hover::before {
+    transform: scaleX(1);
+}
+
+
+:where(.s-vacancies) .vacancy-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+
+:where(.s-vacancies) .vacancy-content {
+    flex: 1;
+    /* Занимает всё доступное пространство */
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+
+:where(.s-vacancies) .vacancy-title {
+    color: var(--accent-color);
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.4rem;
+    font-weight: 600;
+    position: relative;
+    padding-bottom: 8px;
+}
+
+
+:where(.s-vacancies) .vacancy-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 40px;
+    height: 2px;
+    background: var(--accent-color);
+}
+
+
+:where(.s-vacancies) .vacancy-description {
+    color: var(--text-muted);
+    margin-bottom: 15px;
+    line-height: 1.5;
+    font-size: 0.95rem;
+}
+
+
+:where(.s-vacancies) .vacancy-salary {
+    background: var(--accent-color-rgba);
+    color: var(--accent-color);
+    padding: 8px 12px;
+    border-radius: 6px;
+    display: inline-block;
+    margin-bottom: 15px;
+    font-weight: bold;
+    font-size: 1.1rem;
+    box-shadow: 0 2px 5px rgba(7, 155, 89, 0.2);
+}
+
+
+/* Блок с преимуществами */
+:where(.s-vacancies) .vacancy-benefits {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+
+:where(.s-vacancies) .benefit-tag {
+    background: var(--hover-bg);
+    color: var(--text-color);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    border: 1px solid var(--divider-color);
+    transition: all 0.3s ease;
+}
+
+
+:where(.s-vacancies) .benefit-tag:hover {
+    background: var(--accent-color-rgba);
+    color: var(--accent-color);
+    border-color: var(--accent-color);
+    transform: translateY(-2px);
+}
+
+
+/* Кнопка отклика */
+:where(.s-vacancies) .vacancy-apply-btn {
+    margin-top: auto;
+    /* Автоматический отступ сверху */
+    display: block;
+    text-align: center;
+    background: var(--accent-color);
+    color: white;
+    padding: 12px 15px;
+    border-radius: var(--border-radius);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 10px rgba(7, 155, 89, 0.3);
+    border: none;
+    position: relative;
+    overflow: hidden;
+}
+
+
+:where(.s-vacancies) .vacancy-apply-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.7s ease;
+}
+
+
+:where(.s-vacancies) .vacancy-apply-btn:hover {
+    background: #068a50;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(7, 155, 89, 0.4);
+    border-radius: var(--border-radius);
+}
+
+
+:where(.s-vacancies) .vacancy-apply-btn:hover::before {
+    left: 100%;
+}
+
+
+/* Сообщение об отсутствии вакансий */
+:where(.s-vacancies) .no-vacancies {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 40px;
+    color: var(--text-muted);
+}
+
+
+/* Ссылка на все вакансии */
+:where(.s-vacancies) .vacancies-footer {
+    text-align: center;
+    margin-top: 40px;
+}
+
+
+:where(.s-vacancies) .all-vacancies-link {
+    display: inline-block;
+    color: var(--accent-color);
+    text-decoration: none;
+    font-weight: bold;
+    padding: 12px 25px;
+    border: 2px solid var(--accent-color);
+    border-radius: var(--border-radius);
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+
+:where(.s-vacancies) .all-vacancies-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0%;
+    height: 100%;
+    background-color: var(--accent-color);
+    transition: width 0.3s ease;
+    z-index: -1;
+}
+
+
+:where(.s-vacancies) .all-vacancies-link:hover {
+    color: white;
+    border-radius: var(--border-radius);
+}
+
+
+:where(.s-vacancies) .all-vacancies-link:hover::before {
+    width: 100%;
+}
+
+
+/* Стили для детальной страницы вакансии */
+:where(.s-vacancies) .vacancy-details-btn {
+    display: block;
+    text-align: center;
+    background: var(--accent-color);
+    color: white;
+    padding: 12px 15px;
+    border-radius: var(--border-radius);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    margin-top: auto;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 10px rgba(7, 155, 89, 0.3);
+    border: none;
+    position: relative;
+    overflow: hidden;
+}
+
+
+:where(.s-vacancies) .vacancy-details-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.7s ease;
+}
+
+
+:where(.s-vacancies) .vacancy-details-btn:hover {
+    background: #068a50;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(7, 155, 89, 0.4);
+    border-radius: var(--border-radius);
+}
+
+
+:where(.s-vacancies) .vacancy-details-btn:hover::before {
+    left: 100%;
+}
+
+
+/* Стили для детальной страницы вакансии */
+:where(.s-vacancies) .vacancy-detail {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 30px;
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    border-top: 5px solid var(--accent-color);
+}
+
+
+:where(.s-vacancies) .divider {
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
+    margin: 20px auto;
+    width: 100%;
+}
+
+
+:where(.s-vacancies) .vacancy-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+
+:where(.s-vacancies) .vacancy-header-image {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: var(--border-radius);
+    margin-right: 30px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border: 3px solid var(--accent-color-rgba);
+}
+
+
+:where(.s-vacancies) .vacancy-header-content h1 {
+    margin-top: 0;
+    color: var(--accent-color);
+    font-size: 2rem;
+    margin-bottom: 15px;
+}
+
+
+:where(.s-vacancies) .vacancy-salary {
+    font-size: 1.3rem;
+    font-weight: bold;
+    margin: 15px 0;
+    color: var(--accent-color);
+    display: inline-block;
+    padding: 8px 15px;
+    background: var(--accent-color-rgba);
+    border-radius: var(--border-radius);
+}
+
+
+:where(.s-vacancies) .vacancy-description {
+    margin: 25px 0;
+    line-height: 1.7;
+    white-space: pre-line;
+    color: var(--text-color);
+    font-size: 1.05rem;
+}
+
+
+:where(.s-vacancies) .vacancy-benefits-section {
+    margin: 30px 0;
+    padding: 20px;
+    background: var(--bg-color);
+    border-radius: var(--border-radius);
+    border-left: 4px solid var(--accent-color);
+}
+
+
+:where(.s-vacancies) .vacancy-benefits-section h2 {
+    font-size: 1.4rem;
+    margin-bottom: 15px;
+    color: var(--accent-color);
+}
+
+
+:where(.s-vacancies) .vacancy-apply {
+    margin-top: 40px;
+    text-align: center;
+}
+
+
+:where(.s-vacancies) .back-link {
+    display: inline-block;
+    margin-top: 25px;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+
+:where(.s-vacancies) .back-link:hover {
+    color: var(--accent-color);
+    transform: translateX(-5px);
+}
+
+
+/* Стили для страницы отклика на вакансию */
+:where(.s-vacancies) .vacancy-application-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 30px;
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    border-top: 5px solid var(--accent-color);
+}
+
+
+:where(.s-vacancies) .vacancy-application-title {
+    color: var(--accent-color);
+    margin-bottom: 30px;
+    font-size: 1.8rem;
+    position: relative;
+    padding-bottom: 10px;
+}
+
+
+:where(.s-vacancies) .vacancy-application-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background: var(--accent-color);
+}
+
+
+:where(.s-vacancies) .vacancy-application-form {
+    margin-top: 20px;
+}
+
+
+:where(.s-vacancies) .form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+
+:where(.s-vacancies) .form-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+
+:where(.s-vacancies) .form-actions .back-link {
+    align-self: center;
+}
+
+
+/* Адаптивность */
+@media (max-width: 768px){
+
+    :where(.s-vacancies) .vacancies-grid {
+    grid-template-columns: 1fr;
+
+}
+
+
+    :where(.s-vacancies) .vacancies-title {
+    font-size: 1.5rem;
+
+}
+
+
+    :where(.s-vacancies) .vacancy-header {
+    flex-direction: column;
+    text-align: center;
+
+}
+
+
+    :where(.s-vacancies) .vacancy-header-image {
+    margin-right: 0;
+    margin-bottom: 20px;
+
+}
+
+
+    :where(.s-vacancies) .vacancy-header-content h1::after {
+    left: 50%;
+    transform: translateX(-50%);
+
+}
+
+
+    :where(.s-vacancies) .vacancy-detail {
+    padding: 20px;
+
+}
+
+
+}
+
+
+
+/* ==== auth_register.css → s-auth ==== */
+:where(.s-auth) .form-control {
+    margin-bottom: 15px;
+    padding: 12px 15px;
+    border-radius: var(--border-radius);
+    border: 2px solid #079b59;
+    font-size: 16px;
+    width: 100%;
+    max-width: 350px;
+    transition: all 0.3s ease;
+}
+
+
+:where(.s-auth) .form-control:focus {
+    outline: none;
+    border-color: #045e36;
+    box-shadow: 0 0 8px rgba(4, 94, 54, 0.5);
+    transform: translateY(-2px);
+}
+
+
+:where(.s-auth) .register-button {
+    padding: 12px 30px;
+    border-radius: var(--border-radius);
+    border: none;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    background-color: var(--accent-color);
+    color: white;
+    margin-top: 15px;
+    transition: all 0.3s ease;
+}
+
+
+:where(.s-auth) .register-button:hover {
+    background-color: #045e36;
+}
+
+
+:where(.s-auth) .register-button:active {
+    background-color: #045e36;
+}
+
+
+:where(.s-auth) .register-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+
+:where(.s-auth) .register-button:disabled:hover {
+    background-color: #ccc;
+}
+
+
+:where(.s-auth) .auth_container {
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+
+:where(.s-auth) .auth_form_wrapper {
+    width: 80%;
+    max-width: 500px;
+    padding: 50px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    border-radius: 10px;
+    background-color: var(--card-bg);
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+
+:where(.s-auth) .auth_form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+
+:where(.s-auth) .auth_form_title {
+    margin-bottom: 30px;
+    color: var(--accent-color);
+    font-size: 32px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+
+:where(.s-auth) .register-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+
+:where(.s-auth) .register-link p {
+    margin-bottom: 10px;
+    color: var(--text-color);
+    font-size: 18px;
+}
+
+
+:where(.s-auth) .register-link a {
+    margin-right: 10px;
+    text-decoration: none;
+    color: var(--accent-color);
+    font-weight: bold;
+}
+
+
+:where(.s-auth) .google-login-btn {
+    display: inline-block;
+    background-color: #4285F4;
+    color: white !important;
+    padding: 12px 24px;
+    border-radius: 4px;
+    margin: 15px 0;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+    transition: all 0.3s ease;
+}
+
+
+:where(.s-auth) .google-login-btn:hover {
+    background-color: #357ae8;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transform: translateY(-2px);
+}
+
+
+:where(.s-auth) .google-login-btn i {
+    margin-right: 10px;
+}
+
+
+:where(.s-auth) .error {
+    color: var(--error-color);
+}
+
+
+:where(.s-auth) .register-site-btn {
+    display: inline-block;
+    background-color: var(--accent-color);
+    color: white !important;
+    padding: 10px 20px;
+    border-radius: 4px;
+    margin: 10px 0;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+
+:where(.s-auth) .register-site-btn:hover {
+    background-color: #045e36;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+    transform: translateY(-2px);
+}
+
+
+/* ==== reviews.css → s-reviews ==== */
+/* Container for all pages */
+:where(.s-reviews) .reviews-container, :where(.s-reviews) .moderation-container, :where(.s-reviews) .moderation-form-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+
+/* Common card style */
+:where(.s-reviews) .review-card, :where(.s-reviews) .moderation-item, :where(.s-reviews) .moderation-form-container {
+    background-color: var(--card-bg);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+
+:where(.s-reviews) .moderation-item {
+    border-left: 4px solid #ffc107;
+}
+
+
+/* Review header */
+:where(.s-reviews) .review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+
+:where(.s-reviews) .review-author {
+    font-weight: bold;
+    color: var(--accent-color);
+}
+
+
+:where(.s-reviews) .review-date {
+    font-size: 0.9rem;
+    opacity: 0.7;
+}
+
+
+/* Rating stars */
+:where(.s-reviews) .review-rating {
+    display: flex;
+    gap: 0.2rem;
+    font-size: 1.2rem;
+}
+
+
+:where(.s-reviews) .star {
+    color: #ccc;
+}
+
+
+:where(.s-reviews) .star.filled {
+    color: gold;
+}
+
+
+:where(.s-reviews) .rating-stars {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    margin: 10px 0;
+}
+
+
+:where(.s-reviews) .rating-stars input[type="radio"] {
+    display: none;
+}
+
+
+:where(.s-reviews) .rating-stars .star-label {
+    font-size: 2rem;
+    color: #ddd;
+    cursor: pointer;
+    transition: color 0.2s;
+    margin-right: 5px;
+}
+
+
+:where(.s-reviews) .rating-stars input[type="radio"]:checked~.star-label, :where(.s-reviews) .rating-stars input[type="radio"]:hover~.star-label, :where(.s-reviews) .rating-stars .star-label:hover, :where(.s-reviews) .rating-stars .star-label:hover~.star-label {
+    color: gold;
+}
+
+
+/* Review text */
+:where(.s-reviews) .review-text {
+    white-space: pre-wrap;
+    word-break: break-word;
+    background-color: rgba(0 0 0 / 5%);
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 1rem;
+}
+
+
+:where(.s-reviews) .read-more {
+    color: var(--accent-color);
+    text-decoration: none;
+}
+
+
+:where(.s-reviews) .read-more:hover {
+    text-decoration: underline;
+}
+
+
+:where(.s-reviews) .your-review {
+    border: 2px solid var(--accent-color);
+}
+
+
+:where(.s-reviews) .review-status {
+    font-size: 0.9em;
+    color: #666;
+    margin-top: 10px;
+    font-style: italic;
+}
+
+
+/* Form elements */
+:where(.s-reviews) .form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: flex-start;
+    margin-top: 1.5rem;
+}
+
+
+:where(.s-reviews) .moderation-form p {
+    margin-bottom: 1rem;
+}
+
+
+:where(.s-reviews) .moderation-form label {
+    display: block;
+    margin-bottom: 0.3rem;
+    font-weight: 500;
+}
+
+
+:where(.s-reviews) select.form-select, :where(.s-reviews) textarea.form-textarea {
+    width: 100%;
+    padding: 0.6rem 0.8rem;
+    font-size: 1rem;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    transition: border-color 0.3s ease;
+}
+
+
+:where(.s-reviews) select.form-select:focus, :where(.s-reviews) textarea.form-textarea:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px var(--accent-color-rgba);
+}
+
+
+/* Buttons */
+:where(.s-reviews) .btn {
+    display: inline-block;
+    padding: 0.6rem 1.2rem;
+    font-size: 1rem;
+    font-weight: 500;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+    margin: 0.3rem 0;
+}
+
+
+:where(.s-reviews) .btn-primary {
+    background-color: var(--accent-color);
+    color: #fff;
+}
+
+
+:where(.s-reviews) .btn-primary:hover {
+    background-color: #05a962;
+    transform: translateY(-1px);
+}
+
+
+:where(.s-reviews) .btn-secondary {
+    background-color: var(--hover-bg);
+    color: var(--text-color);
+}
+
+
+:where(.s-reviews) .btn-secondary:hover {
+    background-color: #777777;
+    transform: translateY(-1px);
+}
+
+
+:where(.s-reviews) .btn-danger {
+    background-color: #e74c3c;
+    color: #fff;
+}
+
+
+:where(.s-reviews) .btn-danger:hover {
+    background-color: #c0392b;
+}
+
+
+/* Responsive adjustments */
+@media (max-width: 600px){
+
+    :where(.s-reviews) .review-header {
+    flex-direction: column;
+    align-items: flex-start;
+
+}
+
+
+    :where(.s-reviews) .btn {
+    width: 100%;
+    text-align: center;
+
+}
+
+
+    :where(.s-reviews) .form-actions {
+    flex-direction: column;
+
+}
+
+
+}
+
+
+/* Dark theme overrides */
+:where(.s-reviews) .dark .review-date, :where(.s-reviews) .dark .review-status {
+    color: #aaa;
+}
+
+
+:where(.s-reviews) .dark .review-card, :where(.s-reviews) .dark .moderation-item, :where(.s-reviews) .dark .moderation-form-container {
+    background-color: var(--card-bg);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+
+:where(.s-reviews) .dark .moderation-item {
+    border-left-color: #ffc107;
+}
+
+
+:where(.s-reviews) .dark .rating-stars .star-label {
+    color: #555;
+}
+
+
+:where(.s-reviews) .dark .rating-stars input[type="radio"]:checked~.star-label, :where(.s-reviews) .dark .rating-stars input[type="radio"]:hover~.star-label, :where(.s-reviews) .dark .rating-stars .star-label:hover, :where(.s-reviews) .dark .rating-stars .star-label:hover~.star-label {
+    color: gold;
+}
+
+
+
+/* ==== print_check.css → s-print ==== */
+/* Стили для страницы чека */
+@media print{
+
+    :where(.s-print) .no-print {
+    display: none !important;
+
+}
+
+
+}
+
+
+
+:where(.s-print) .header {
+    text-align: center;
+    margin-bottom: 3mm;
+    font-weight: 800; /* Увеличена толщина шрифта заголовка */
+    font-size: 20px; /* Увеличен размер шрифта заголовка */
+}
+
+
+/* .order-details {
+    margin-bottom: 3mm;
+} */
+
+:where(.s-print) .order-details div {
+    line-height: 1.0; /* Увеличен интервал между строками */
+}
+
+
+:where(.s-print) .items-container {
+    width: 100%;
+    margin-bottom: 3mm;
+}
+
+
+:where(.s-print) .items-header {
+    background-color: #f9f9f9;
+    padding: 1mm;
+    margin-bottom: 2mm;
+    border-bottom: 1px dotted #aaa;
+}
+
+
+:where(.s-print) .items-header h3 {
+    margin: 0;
+    font-weight: 800;
+    font-size: 22px;
+}
+
+
+:where(.s-print) .items-list {
+    width: 100%;
+    border-top: 4px dotted #aaa;
+}
+
+
+:where(.s-print) .item-block {
+    border-bottom: 4px dotted #aaa;
+}
+
+
+:where(.s-print) .item-param {
+    margin: 0;
+    white-space: normal;
+    word-wrap: break-word;
+}
+
+
+:where(.s-print) .item-param strong {
+    font-weight: 600; /* Жирный шрифт для названий параметров */
+}
+
+
+:where(.s-print) .totals {
+    text-align: right;
+    font-weight: 800; /* Экстра-жирный шрифт */
+    margin-top: 2mm;
+    font-size: 18px; /* Увеличен размер шрифта итогов */
+}
+
+
+:where(.s-print) .footer {
+    text-align: center;
+    margin-top: 5mm;
+    font-style: italic;
+    font-size: 16px; /* Увеличен в 2 раза с 8px */
+}
+
+
+:where(.s-print) .btn-print {
+    display: block;
+    width: 100%;
+    padding: 5px;
+    margin: 10px 0;
+    background-color: #007bff;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+
+:where(.s-print) .btn-print:hover {
+    background-color: #0056b3;
+}
+
+
+:where(.s-print) .discount-info {
+    font-size: 14px; /* Увеличен в 2 раза с 7px */
+    text-align: right;
+    font-style: italic;
+}
+
+
+
+:where(.s-print) .underlined_text {
+    text-decoration: underline;
+}
+
+
+
+/* ==== map.css → s-map ==== */
+/* Общий стиль страницы */
+:where(.s-map) .map-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 90%;
+    /*height: 100%;*/
+    margin: 80px auto;
+}
+
+
+:where(.s-map) #map-container {
+    position: relative;
+    width: 100%;
+    height: 50vh;
+    margin-bottom: 20px;
+}
+
+
+/* Стиль карты */
+:where(.s-map) #map {
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 3;
+    margin-bottom: 20px;
+}
+
+
+:where(.s-map) #center-marker {
+    position: absolute;
+    top: 45%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 25px;
+    background: url('https://cdn-icons-png.flaticon.com/512/684/684908.png') no-repeat center center;
+    background-size: contain;
+    pointer-events: none; /* Отключаем взаимодействие с маркером */
+    z-index: 1000; /* Маркер поверх карты */
+}
+
+
+/* Стиль для отображения адреса */
+:where(.s-map) #suggest {
+    text-align: center;
+    font-size: 18px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+
+:where(.s-map) #address-text {
+    font-weight: bold;
+    color: #079b59;
+}
+
+
+/* Стиль для формы */
+:where(.s-map) .address-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    margin: 0 auto;
+}
+
+
+:where(.s-map) .form-group {
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+
+:where(.s-map) label {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 5px;
+    display: block;
+    color: #333;
+}
+
+
+:where(.s-map) .form-group input[type="text"], :where(.s-map) textarea {
+    width: 90%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    transition: border-color 0.3s;
+}
+
+
+:where(.s-map) input[type="text"]:focus {
+    border-color: #079b59;
+    outline: none;
+}
+
+
+:where(.s-map) textarea {
+    resize: vertical;
+    font-family: 'Roboto', sans-serif;
+    transition: border-color 0.3s;
+}
+
+
+:where(.s-map) textarea:focus {
+    border-color: #079b59;
+    outline: none;
+}
+
+
+:where(.s-map) .submit-btn {
+    background-color: #079b59;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+
+:where(.s-map) .submit-btn:hover {
+    background-color: #068a50;
+}
+
+
+:where(.s-map) .find-btn {
+    background-color: #079b59;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 10px;
+    transition: background-color 0.3s;
+}
+
+
+:where(.s-map) .find-btn:hover {
+    background-color: #068a50;
+}
+
+
+/* Общие стили для группы выбора */
+:where(.s-map) .delivery-method {
+    margin-bottom: 20px;
+}
+
+
+:where(.s-map) .delivery-method label {
+    font-size: 16px;
+    font-weight: bold;
+    display: block;
+    margin-bottom: 10px;
+}
+
+
+/* Стили для контейнера с опциями */
+:where(.s-map) .delivery-options {
+    display: flex;
+    gap: 15px;
+}
+
+
+/* Стили для каждой опции */
+:where(.s-map) .delivery-option {
+    position: relative;
+    padding: 15px 20px;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    flex: 1;
+}
+
+
+:where(.s-map) .delivery-option:hover {
+    border-color: #007bff;
+}
+
+
+:where(.s-map) .delivery-option input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+
+:where(.s-map) .delivery-option span {
+    font-size: 14px;
+    color: #333;
+    display: block;
+    margin-top: 5px;
+}
+
+
+/* Стили для выбранной опции */
+:where(.s-map) .delivery-option input[type="radio"]:checked+span {
+    color: #fff;
+}
+
+
+:where(.s-map) .delivery-option input[type="radio"]:checked {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+
+:where(.s-map) .delivery-option input[type="radio"]:checked+span {
+    color: #fff;
+}
+
+
+:where(.s-map) .delivery-option input[type="radio"]:checked {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+
+/* ==== catalog_admin.css → s-catalog-admin ==== */
+/* Компактный стиль для страницы каталога администратора */
+:where(.s-catalog-admin) .items-catalog-admin {
+    margin-top: 20px;
+    width: auto;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding: 10px;
+}
+
+
+:where(.s-catalog-admin) .item-card-admin {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 10px;
+    min-height: 80px;
+}
+
+
+:where(.s-catalog-admin) .item-card-admin:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+
+:where(.s-catalog-admin) .item-info-admin {
+    flex-grow: 1;
+    padding-right: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+
+:where(.s-catalog-admin) .item-info-admin h2 {
+    font-size: 18px;
+    margin: 0 0 5px 0;
+    color: var(--text-color);
+}
+
+
+:where(.s-catalog-admin) .item-info-admin p {
+    font-size: 14px;
+    margin: 0 0 5px 0;
+    color: var(--text-muted);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+
+:where(.s-catalog-admin) .item-price-admin {
+    font-size: 16px;
+    color: var(--accent-color);
+    font-weight: bold;
+    margin: 0;
+    min-width: 80px;
+    text-align: right;
+}
+
+
+:where(.s-catalog-admin) .cart_price_section-admin {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 0;
+    flex-shrink: 0;
+}
+
+
+:where(.s-catalog-admin) .admin-controls {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+
+:where(.s-catalog-admin) .admin-controls .btn {
+    padding: 5px 10px;
+    font-size: 0.8rem;
+    border-radius: 4px;
+    text-decoration: none;
+    display: inline-block;
+}
+
+
+:where(.s-catalog-admin) .admin-controls .btn-outline-primary {
+    color: #079b59;
+    border: 1px solid #079b59;
+}
+
+
+:where(.s-catalog-admin) .admin-controls .btn-outline-primary:hover {
+    background-color: #079b59;
+    color: white;
+}
+
+
+:where(.s-catalog-admin) .admin-controls .btn-outline-danger {
+    color: #dc3545;
+    border: 1px solid #dc3545;
+}
+
+
+:where(.s-catalog-admin) .admin-controls .btn-outline-danger:hover {
+    background-color: #dc3545;
+    color: white;
+}
+
+
+/* Стили для формы добавления в корзину */
+:where(.s-catalog-admin) .add-to-cart-form-admin {
+    display: none;
+    background-color: var(--hover-bg);
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--divider-color);
+}
+
+
+:where(.s-catalog-admin) .add-to-cart-form-admin.open {
+    display: block;
+}
+
+
+:where(.s-catalog-admin) .size-selector-admin {
+    margin-bottom: 10px;
+}
+
+
+:where(.s-catalog-admin) .size-selector-admin h3 {
+    font-size: 14px;
+    margin: 0 0 5px 0;
+    color: var(--text-color);
+}
+
+
+:where(.s-catalog-admin) .size-options-admin {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+
+:where(.s-catalog-admin) .size-option-admin {
+    padding: 5px 10px;
+    background-color: var(--bg-color);
+    border: 1px solid var(--divider-color);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.2s;
+}
+
+
+:where(.s-catalog-admin) .size-option-admin:hover {
+    background-color: var(--accent-color-rgba);
+    border-color: var(--accent-color);
+}
+
+
+:where(.s-catalog-admin) .size-option-admin.selected {
+    background-color: var(--accent-color);
+    color: white;
+    border-color: var(--accent-color);
+}
+
+
+:where(.s-catalog-admin) .form-group-admin {
+    margin-bottom: 10px;
+}
+
+
+:where(.s-catalog-admin) .form-group-admin label {
+    /* display: block; */
+    font-size: 13px;
+    margin-bottom: 3px;
+    color: var(--text-color);
+}
+
+
+:where(.s-catalog-admin) .quantity-input-admin {
+    width: 60px;
+    padding: 5px;
+    border: 1px solid var(--divider-color);
+    border-radius: var(--border-radius);
+    font-size: 14px;
+}
+
+
+:where(.s-catalog-admin) .option-selector-admin {
+    margin-bottom: 10px;
+}
+
+
+:where(.s-catalog-admin) .custom-radio-list-admin, :where(.s-catalog-admin) .custom-checkbox-list-admin {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+
+:where(.s-catalog-admin) .custom-radio-list-admin li, :where(.s-catalog-admin) .custom-checkbox-list-admin li {
+    margin-bottom: 5px;
+}
+
+
+:where(.s-catalog-admin) .custom-select-admin {
+    width: 100%;
+    padding: 5px;
+    border: 1px solid var(--divider-color);
+    border-radius: var(--border-radius);
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-size: 14px;
+}
+
+
+:where(.s-catalog-admin) .board-pair-admin {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+    align-items: center;
+}
+
+
+:where(.s-catalog-admin) .board-pair-admin label {
+    font-size: 12px;
+    flex: 1;
+}
+
+
+:where(.s-catalog-admin) .board-pair-admin select {
+    flex: 2;
+    margin-left: 5px;
+}
+
+
+:where(.s-catalog-admin) .add-to-cart-btn-admin {
+    background-color: var(--accent-color);
+    color: white;
+    padding: 8px 15px;
+    border-radius: var(--border-radius);
+    text-align: center;
+    text-decoration: none;
+    transition: background-color 0.3s;
+    display: inline-block;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+}
+
+
+:where(.s-catalog-admin) .add-to-cart-btn-admin:hover {
+    background-color: #068a50;
+}
+
+
+:where(.s-catalog-admin) .toggle-form-btn {
+    background-color: var(--accent-color);
+    color: white;
+    padding: 5px 10px;
+    border-radius: var(--border-radius);
+    text-decoration: none;
+    transition: background-color 0.3s;
+    display: inline-block;
+    font-size: 12px;
+    border: none;
+    cursor: pointer;
+    margin-left: 5px;
+}
+
+
+:where(.s-catalog-admin) .toggle-form-btn:hover {
+    background-color: #068a50;
+}
+
+
+@media (max-width: 768px){
+
+    :where(.s-catalog-admin) .item-card-admin {
+    flex-direction: column;
+    text-align: center;
+
+}
+
+
+    :where(.s-catalog-admin) .item-price-admin {
+    text-align: center;
+    margin-top: 5px;
+
+}
+
+
+    :where(.s-catalog-admin) .cart_price_section-admin {
+    flex-direction: column;
+    align-items: flex-start;
+
+}
+
+
+    :where(.s-catalog-admin) .admin-controls {
+    width: 100%;
+    justify-content: space-around;
+
+}
+
+
+    :where(.s-catalog-admin) .board-pair-admin {
+    flex-direction: column;
+
+}
+
+
+    :where(.s-catalog-admin) .board-pair-admin select {
+    margin-left: 0;
+    margin-top: 5px;
+
+}
+
+
+}
+
+
+
+/* ==== catalog.css → s-catalog-category ==== */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap'); .items-catalog{ width: 100%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 20px; }
+
+@media (max-width: 992px){
+
+    :where(.s-catalog-category) .items-catalog {
+    grid-template-columns: repeat(2, 1fr);
+
+}
+
+
+}
+
+
+@media (max-width: 600px){
+
+    :where(.s-catalog-category) .items-catalog {
+    grid-template-columns: 1fr;
+
+}
+
+
+}
+
+
+:where(.s-catalog-category) .item-card {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+
+:where(.s-catalog-category) .item-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+
+:where(.s-catalog-category) .item-card img {
+    display: block;
+    margin: auto;
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: var(--border-radius);
+}
+
+
+:where(.s-catalog-category) .item-card h2 {
+    font-size: 20px;
+    margin: 15px;
+    color: var(--text-color);
+    flex-grow: 1;
+}
+
+
+:where(.s-catalog-category) .item-card p {
+    font-size: 16px;
+    margin: 0 15px 10px;
+    color: var(--text-color);
+    flex-grow: 1;
+}
+
+
+:where(.s-catalog-category) .cart_price_section .price {
+    font-size: 18px;
+    color: var(--accent-color);
+}
+
+
+:where(.s-catalog-category) .discount-badge {
+    background-color: #ef7700;
+    color: white;
+    padding: 3px;
+    border-radius: var(--border-radius);
+    font-size: 0.8rem;
+    /* font-weight: 600; */
+    text-align: center;
+    width: 22%;
+}
+
+
+:where(.s-catalog-category) .cart_price_section .order-link {
+    background-color: var(--accent-color);
+    color: white;
+    padding: 10px 20px;
+    border-radius: var(--border-radius);
+    text-align: center;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+
+
+:where(.s-catalog-category) .item-card .order-link:hover {
+    background-color: #068a50;
+    border-radius: var(--border-radius);
+}
+
+
+:where(.s-catalog-category) .cart_price_section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+    padding: 10px 15px;
+    background-color: var(--hover-bg);
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+
+:where(.s-catalog-category) .page_title {
+    text-align: center;
+    margin-bottom: 20px;
+    color: var(--text-color);
+}
+
+
+:where(.s-catalog-category) .delivery-text {
+    font-size: 0.5em;
+    color: var(--text-color);
+    opacity: 0.8;
+}
+
+
+
+/* ==== catalog_page.css → s-catalog ==== */
+/* ==========================================================================
+   Solo Pizza — страница каталога
+   Специфика страницы поверх общих примитивов sections.css: шапка в фирменном
+   градиенте и пустое состояние. Сетка категорий, заголовок секции и кнопки
+   берутся из sections.css — поэтому вид совпадает с главной.
+   ========================================================================== */
+
+/* --- Хлебные крошки ----------------------------------------------------- */
+
+/* Ширину и боковые отступы повторяем у .hp-container, иначе на экранах шире
+   1200px крошки и содержимое секций разъезжаются по горизонтали. */
+:where(.s-catalog) .catalog-page .breadcrumbs {
+    max-width: var(--hp-container);
+    margin: 0 auto;
+    padding: 15px var(--hp-gutter);
+}
+
+
+/* --- Шапка -------------------------------------------------------------- */
+
+:where(.s-catalog) .cp-banner {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    padding: clamp(34px, 5vw, 58px) 0 clamp(30px, 4vw, 46px);
+    border-radius: 0 0 var(--hp-radius-lg) var(--hp-radius-lg);
+    box-shadow: var(--hp-shadow-lg);
+    color: #fff;
+    background: var(--hp-brand-gradient);
+}
+
+
+:where(.s-catalog) .cp-banner::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-image: var(--hp-brand-dots);
+    background-size: 22px 22px;
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+
+:where(.s-catalog) .cp-banner__inner {
+    max-width: var(--hp-container);
+    margin: 0 auto;
+    padding: 0 var(--hp-gutter);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+}
+
+
+:where(.s-catalog) .cp-banner__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    padding: 8px 16px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.16);
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+}
+
+
+:where(.s-catalog) .cp-banner__title {
+    margin: 0;
+    max-width: 24ch;
+    font-size: clamp(1.9rem, 4.4vw, 3.1rem);
+    font-weight: 700;
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    color: #fff;
+}
+
+
+:where(.s-catalog) .cp-banner__lead {
+    margin: 0;
+    max-width: 58ch;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: clamp(0.98rem, 1.4vw, 1.1rem);
+    line-height: 1.6;
+}
+
+
+:where(.s-catalog) .cp-banner__facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 28px;
+    margin: 8px 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+
+:where(.s-catalog) .cp-banner__facts li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.92);
+}
+
+
+:where(.s-catalog) .cp-banner__facts i {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+}
+
+
+/* --- Пустое состояние --------------------------------------------------- */
+
+:where(.s-catalog) .cp-empty {
+    display: grid;
+    place-items: center;
+    gap: 12px;
+    padding: clamp(32px, 6vw, 64px) 20px;
+    border: 1px dashed var(--divider-color);
+    border-radius: var(--hp-radius);
+    background: var(--card-bg);
+    text-align: center;
+}
+
+
+:where(.s-catalog) .cp-empty__icon {
+    display: grid;
+    place-items: center;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--hp-accent-soft);
+    color: var(--hp-accent-strong);
+    font-size: 1.5rem;
+}
+
+
+:where(.s-catalog) .cp-empty__title {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 500;
+}
+
+
+:where(.s-catalog) .cp-empty__text {
+    margin: 0;
+    max-width: 44ch;
+    color: var(--text-muted);
+    line-height: 1.6;
+}
+
+
+
+/* ==== sections.css → s-home, s-catalog ==== */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap'); /* ========================================================================== Solo Pizza — общие примитивы страниц Токены, контейнер, заголовок секции, кнопки и карточка категории. Подключается и главной (home_page.css), и каталогом (catalog_page.css), поэтому здесь не должно быть ничего, специфичного для одной страницы. Фирменный акцент (--accent-color #079b59) сохранён как основа палитры. Все поверхности берутся из тем, поэтому тёмная тема работает из коробки. ========================================================================== */ .home-page, .catalog-page{ --hp-accent: var(--accent-color); --hp-accent-strong: #068a50; --hp-accent-soft: rgba(7, 155, 89, 0.12); --hp-accent-line: rgba(7, 155, 89, 0.28); --hp-container: 1200px; --hp-gutter: clamp(16px, 4vw, 24px); --hp-section-gap: clamp(40px, 6vw, 72px); --hp-radius: 20px; --hp-radius-lg: 28px; --hp-radius-sm: 12px; --hp-shadow-sm: 0 2px 10px rgba(16, 40, 30, 0.06); --hp-shadow: 0 12px 32px rgba(16, 40, 30, 0.09); --hp-shadow-lg: 0 26px 64px rgba(4, 60, 38, 0.20); /* Фирменный фон для верхних блоков страниц: герой главной и шапка каталога */ --hp-brand-gradient: radial-gradient(120% 140% at 88% 6%, rgba(12, 190, 112, 0.55) 0%, rgba(12, 190, 112, 0) 55%), radial-gradient(90% 120% at 2% 98%, rgba(4, 84, 54, 0.95) 0%, rgba(4, 84, 54, 0) 62%), linear-gradient(150deg, #046b3c 0%, #079b59 52%, #0ab268 100%); --hp-brand-dots: radial-gradient(rgba(255, 255, 255, 0.16) 1px, transparent 1px); }
+
+/* --- Контейнер ---------------------------------------------------------- */
+
+:where(.s-home) .hp-container, :where(.s-catalog) .hp-container {
+    width: 100%;
+    max-width: var(--hp-container);
+    margin: 0 auto;
+    padding: 0 var(--hp-gutter) clamp(32px, 5vw, 56px);
+}
+
+
+:where(.s-home) .hp-section, :where(.s-catalog) .hp-section {
+    margin-top: var(--hp-section-gap);
+}
+
+
+/* --- Заголовок секции --------------------------------------------------- */
+
+:where(.s-home) .hp-head, :where(.s-catalog) .hp-head {
+    margin-bottom: clamp(18px, 2.5vw, 28px);
+    text-align: center;
+}
+
+
+:where(.s-home) .hp-head__title, :where(.s-catalog) .hp-head__title {
+    margin: 0 0 12px;
+    font-size: clamp(1.6rem, 3.2vw, 2.4rem);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    color: var(--accent-color);
+}
+
+
+:where(.s-home) .hp-head .divider, :where(.s-catalog) .hp-head .divider {
+    margin: 0 auto 16px;
+}
+
+
+:where(.s-home) .hp-head__sub, :where(.s-catalog) .hp-head__sub {
+    margin: 0 auto;
+    max-width: 62ch;
+    color: var(--text-muted);
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+
+:where(.s-home) .hp-head__link, :where(.s-catalog) .hp-head__link {
+    display: inline-block;
+    margin-top: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+
+/* --- Кнопки ------------------------------------------------------------- */
+
+:where(.s-home) .hp-btn, :where(.s-catalog) .hp-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 28px;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    background: none;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 500;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+}
+
+
+:where(.s-home) .hp-btn:hover, :where(.s-catalog) .hp-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.16);
+    border-radius: 999px;
+}
+
+
+:where(.s-home) .hp-btn:active, :where(.s-catalog) .hp-btn:active {
+    transform: translateY(0);
+}
+
+
+:where(.s-home) .hp-btn--sm, :where(.s-catalog) .hp-btn--sm {
+    padding: 10px 18px;
+    font-size: 0.92rem;
+}
+
+
+:where(.s-home) .hp-btn--primary, :where(.s-catalog) .hp-btn--primary {
+    background: var(--hp-accent);
+    color: #fff;
+    box-shadow: 0 8px 20px var(--hp-accent-line);
+}
+
+
+:where(.s-home) .hp-btn--primary:hover, :where(.s-catalog) .hp-btn--primary:hover {
+    background: var(--hp-accent-strong);
+    color: #fff;
+}
+
+
+:where(.s-home) .hp-btn--light, :where(.s-catalog) .hp-btn--light {
+    background: #fff;
+    color: var(--hp-accent-strong);
+    box-shadow: 0 10px 26px rgba(3, 58, 36, 0.28);
+}
+
+
+:where(.s-home) .hp-btn--light:hover, :where(.s-catalog) .hp-btn--light:hover {
+    background: #fff;
+    color: var(--hp-accent-strong);
+}
+
+
+:where(.s-home) .hp-btn--outline, :where(.s-catalog) .hp-btn--outline {
+    background: rgba(255, 255, 255, 0.14);
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+
+:where(.s-home) .hp-btn--outline:hover, :where(.s-catalog) .hp-btn--outline:hover {
+    background: rgba(255, 255, 255, 0.24);
+    color: #fff;
+}
+
+
+/* --- Сетка категорий ---------------------------------------------------- */
+
+:where(.s-home) .hp-menu__grid, :where(.s-catalog) .hp-menu__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: clamp(14px, 2vw, 22px);
+}
+
+
+/* --- Карточка категории ------------------------------------------------- */
+
+:where(.s-home) .hp-cat, :where(.s-catalog) .hp-cat {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    background: var(--card-bg);
+    border: 1px solid var(--divider-color);
+    border-radius: var(--hp-radius);
+    box-shadow: var(--hp-shadow-sm);
+    color: var(--text-color);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+
+:where(.s-home) .hp-cat:hover, :where(.s-catalog) .hp-cat:hover {
+    transform: translateY(-4px);
+    border-color: var(--hp-accent-line);
+    border-radius: var(--hp-radius);
+    background: var(--card-bg);
+    box-shadow: var(--hp-shadow);
+    color: var(--text-color);
+}
+
+
+:where(.s-home) .hp-cat__media, :where(.s-catalog) .hp-cat__media {
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background: var(--hover-bg);
+}
+
+
+:where(.s-home) .hp-cat__media img, :where(.s-catalog) .hp-cat__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.45s ease;
+}
+
+
+:where(.s-home) .hp-cat:hover .hp-cat__media img, :where(.s-catalog) .hp-cat:hover .hp-cat__media img {
+    transform: scale(1.06);
+}
+
+
+:where(.s-home) .hp-cat__name, :where(.s-catalog) .hp-cat__name {
+    margin: 0;
+    padding: 14px 16px 16px;
+    font-size: 1.05rem;
+    font-weight: 500;
+    line-height: 1.3;
+}
+
+
+:where(.s-home) .hp-cat__arrow, :where(.s-catalog) .hp-cat__arrow {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: var(--hp-shadow-sm);
+    color: var(--hp-accent-strong);
+    font-size: 0.8rem;
+    transition: transform 0.25s ease;
+}
+
+
+:where(.s-home) .hp-cat:hover .hp-cat__arrow, :where(.s-catalog) .hp-cat:hover .hp-cat__arrow {
+    transform: translateX(3px);
+}
+
+
+/* --- Фокус -------------------------------------------------------------- */
+
+:where(.s-home) .home-page :focus-visible, :where(.s-home) .catalog-page :focus-visible, :where(.s-catalog) .home-page :focus-visible, :where(.s-catalog) .catalog-page :focus-visible {
+    outline: 2px solid var(--hp-accent);
+    outline-offset: 3px;
+    border-radius: 6px;
+}
+
+
+/* --- Адаптив ------------------------------------------------------------ */
+
+@media (max-width: 640px){
+
+    :where(.s-home) .hp-menu__grid, :where(.s-catalog) .hp-menu__grid {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+    margin: 0 calc(var(--hp-gutter) * -1);
+    padding-left: var(--hp-gutter);
+    padding-right: var(--hp-gutter);
+
+}
+
+
+    :where(.s-home) .hp-menu__grid::-webkit-scrollbar, :where(.s-catalog) .hp-menu__grid::-webkit-scrollbar {
+    display: none;
+
+}
+
+
+    :where(.s-home) .hp-cat, :where(.s-catalog) .hp-cat {
+    flex: 0 0 74%;
+    scroll-snap-align: start;
+
+}
+
+
+}
+
+
+@media (prefers-reduced-motion: reduce){
+
+
+    :where(.s-home) .hp-cat, :where(.s-home) .hp-cat__media img, :where(.s-home) .hp-btn, :where(.s-catalog) .hp-cat, :where(.s-catalog) .hp-cat__media img, :where(.s-catalog) .hp-btn {
+    transition: none;
+
+}
+
+
+    :where(.s-home) .hp-cat:hover, :where(.s-home) .hp-btn:hover, :where(.s-catalog) .hp-cat:hover, :where(.s-catalog) .hp-btn:hover {
+    transform: none;
+
+}
+
+
+}
+
+
+
+/* ==== swiper.css → s-home ==== */
+:where(.s-home) .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--switch-bg);
+    transition: 0.3s;
+    border-radius: 34px;
+}
+
+
+:where(.s-home) .slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 2px;
+    bottom: 2px;
+    background-color: var(--switch-thumb);
+    transition: 0.3s;
+    border-radius: 50%;
+}
+
+
+:where(.s-home) input:checked + .slider:before {
+    transform: translateX(20px);
+}
+
+
+:where(.s-home) input:checked + .slider {
+    background-color: var(--accent-color);
+}
+
+
+:where(.s-home) .swiper-container {
+    position: relative;
+    max-width: 1200px;
+    margin: 2rem auto;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    --swiper-navigation-color: var(--accent-color);
+    --swiper-pagination-color: var(--accent-color);
+}
+
+
+:where(.s-home) .swiper-slide img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+    border-radius: 12px;
+}
+
+
+:where(.s-home) .swiper-button-next, :where(.s-home) .swiper-button-prev {
+    color: var(--accent-color);
+}
+
+
+:where(.s-home) .swiper-button-next::after, :where(.s-home) .swiper-button-prev::after {
+    font-size: 20px;
+}
+
+
+:where(.s-home) .swiper-pagination-bullet {
+    background: var(--switch-bg);
+    opacity: 0.6;
+}
+
+
+:where(.s-home) .swiper-pagination-bullet-active {
+    background: var(--accent-color);
+    opacity: 1;
+}
+
+
+
+/* ==== home_page.css → s-home ==== */
+/* ==========================================================================
+   Solo Pizza — главная страница
+   Общие примитивы (токены, контейнер, заголовок секции, кнопки, карточка
+   категории) живут в sections.css — здесь только специфика главной.
+   ========================================================================== */
+
+/* --- Первый экран ------------------------------------------------------- */
+
+:where(.s-home) .hp-hero {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    padding: clamp(44px, 7vw, 92px) 0 clamp(36px, 5vw, 64px);
+    border-radius: 0 0 var(--hp-radius-lg) var(--hp-radius-lg);
+    box-shadow: var(--hp-shadow-lg);
+    color: #fff;
+    background: var(--hp-brand-gradient);
+}
+
+
+:where(.s-home) .hp-hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-image: var(--hp-brand-dots);
+    background-size: 22px 22px;
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+
+:where(.s-home) .hp-hero__inner {
+    max-width: var(--hp-container);
+    margin: 0 auto;
+    /* Горизонтальный отступ задаём здесь, а не на .hp-hero: иначе на экранах
+       шире контейнера текст героя и содержимое секций не совпадут по краю. */
+    padding: 0 var(--hp-gutter);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 18px;
+}
+
+
+:where(.s-home) .hp-hero__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    padding: 8px 16px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.16);
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+}
+
+
+:where(.s-home) .hp-hero__title {
+    margin: 0;
+    max-width: 20ch;
+    font-size: clamp(2.1rem, 5.4vw, 3.9rem);
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: #fff;
+}
+
+
+:where(.s-home) .hp-hero__lead {
+    margin: 0;
+    max-width: 54ch;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: clamp(1rem, 1.5vw, 1.18rem);
+    line-height: 1.6;
+}
+
+
+:where(.s-home) .hp-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 6px;
+}
+
+
+:where(.s-home) .hp-hero__facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 28px;
+    margin: 12px 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+
+:where(.s-home) .hp-hero__facts li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.92);
+}
+
+
+:where(.s-home) .hp-hero__facts i {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+}
+
+
+/* --- Бегущая строка ----------------------------------------------------- */
+
+:where(.s-home) .hp-marquee {
+    overflow: hidden;
+    margin-top: clamp(16px, 3vw, 28px);
+    padding: 14px 0;
+    border-radius: var(--hp-radius-sm);
+    background: linear-gradient(90deg, var(--hp-accent-strong), var(--hp-accent) 45%, #0ab268);
+    color: #fff;
+    box-shadow: var(--hp-shadow-sm);
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+}
+
+
+:where(.s-home) .hp-marquee__track {
+    display: flex;
+    width: max-content;
+    animation: hp-marquee-scroll 28s linear infinite;
+}
+
+
+:where(.s-home) .hp-marquee:hover .hp-marquee__track {
+    animation-play-state: paused;
+}
+
+
+:where(.s-home) .hp-marquee__group {
+    display: flex;
+    align-items: center;
+    gap: 2.5rem;
+    padding-right: 2.5rem;
+}
+
+
+:where(.s-home) .hp-marquee__item {
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+}
+
+
+:where(.s-home) .hp-marquee__dot {
+    flex: none;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.7);
+}
+
+
+@keyframes hp-marquee-scroll{ from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+/* --- Слайдер ------------------------------------------------------------ */
+
+:where(.s-home) .hp-slides .swiper-container {
+    max-width: none;
+    margin: 0;
+    border-radius: var(--hp-radius);
+    box-shadow: var(--hp-shadow);
+}
+
+
+:where(.s-home) .hp-slides .swiper-slide img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+
+:where(.s-home) .hp-slides .swiper-button-next, :where(.s-home) .hp-slides .swiper-button-prev {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: var(--hp-shadow-sm);
+    color: var(--hp-accent-strong);
+    transition: background-color 0.2s ease;
+}
+
+
+:where(.s-home) .hp-slides .swiper-button-next:hover, :where(.s-home) .hp-slides .swiper-button-prev:hover {
+    background: #fff;
+    color: var(--hp-accent-strong);
+}
+
+
+:where(.s-home) .hp-slides .swiper-pagination-bullet {
+    background: #fff;
+    opacity: 0.5;
+}
+
+
+:where(.s-home) .hp-slides .swiper-pagination-bullet-active {
+    background: #fff;
+    opacity: 1;
+}
+
+
+/* --- Сетки -------------------------------------------------------------- */
+
+:where(.s-home) .hp-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: clamp(14px, 2vw, 22px);
+}
+
+
+/* --- Карточка товара ---------------------------------------------------- */
+
+:where(.s-home) .hp-card {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--card-bg);
+    border: 1px solid var(--divider-color);
+    border-radius: var(--hp-radius);
+    box-shadow: var(--hp-shadow-sm);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+
+:where(.s-home) .hp-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--hp-accent-line);
+    box-shadow: var(--hp-shadow);
+}
+
+
+:where(.s-home) .hp-card__media {
+    position: relative;
+    display: block;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background: var(--hover-bg);
+}
+
+
+:where(.s-home) .hp-card__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.45s ease;
+}
+
+
+:where(.s-home) .hp-card:hover .hp-card__media img {
+    transform: scale(1.05);
+}
+
+
+:where(.s-home) .hp-card__badges {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+
+:where(.s-home) .hp-badge {
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: rgba(15, 20, 18, 0.72);
+    color: #fff;
+    font-size: 0.74rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+}
+
+
+:where(.s-home) .hp-badge--accent {
+    background: var(--hp-accent);
+}
+
+
+:where(.s-home) .hp-badge--hot {
+    background: #d1493a;
+}
+
+
+:where(.s-home) .hp-card__body {
+    flex: 1;
+    padding: 16px 16px 4px;
+}
+
+
+:where(.s-home) .hp-card__title {
+    margin: 0 0 6px;
+    font-size: 1.06rem;
+    font-weight: 500;
+    line-height: 1.3;
+}
+
+
+:where(.s-home) .hp-card__title a {
+    color: var(--text-color);
+}
+
+
+:where(.s-home) .hp-card__title a:hover {
+    background: none;
+    color: var(--hp-accent-strong);
+}
+
+
+:where(.s-home) .hp-card__desc {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.92rem;
+    line-height: 1.5;
+}
+
+
+:where(.s-home) .hp-card__foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 16px 16px;
+}
+
+
+:where(.s-home) .hp-card__price {
+    font-size: 1.12rem;
+    font-weight: 700;
+    color: var(--hp-accent-strong);
+    white-space: nowrap;
+}
+
+
+:where(.s-home) .hp-card__price small {
+    display: block;
+    font-size: 0.74rem;
+    font-weight: 400;
+    color: var(--text-muted);
+}
+
+
+:where(.s-home) .hp-card__price--empty {
+    font-size: 0.95rem;
+    font-weight: 400;
+    color: var(--text-muted);
+}
+
+
+/* --- Информационные карточки ------------------------------------------- */
+
+:where(.s-home) .hp-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: clamp(14px, 2vw, 22px);
+}
+
+
+:where(.s-home) .hp-info__card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: clamp(20px, 2.5vw, 26px);
+    background: var(--card-bg);
+    border: 1px solid var(--divider-color);
+    border-radius: var(--hp-radius);
+    box-shadow: var(--hp-shadow-sm);
+}
+
+
+:where(.s-home) .hp-info__icon {
+    display: grid;
+    place-items: center;
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    background: var(--hp-accent-soft);
+    color: var(--hp-accent-strong);
+    font-size: 1.1rem;
+}
+
+
+:where(.s-home) .hp-info__title {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+
+:where(.s-home) .hp-info__text {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+
+:where(.s-home) .hp-info__list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+
+:where(.s-home) .hp-info__list-item {
+    display: grid;
+    grid-template-columns: 7px 1fr;
+    gap: 12px;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+
+:where(.s-home) .hp-info__list-item::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    margin-top: 0.6em;
+    border-radius: 50%;
+    background: var(--hp-accent);
+}
+
+
+:where(.s-home) .hp-info__link {
+    align-self: flex-start;
+    margin-top: auto;
+    padding-top: 4px;
+    font-weight: 500;
+}
+
+
+/* --- Вакансии (стили promo_page.css в контексте новой главной) ----------- */
+
+:where(.s-home) .home-page .vacancies-section {
+    margin-top: var(--hp-section-gap);
+    padding: 0;
+    background: none;
+}
+
+
+:where(.s-home) .home-page .vacancies-container {
+    max-width: none;
+    margin: 0;
+}
+
+
+:where(.s-home) .home-page .vacancies-title {
+    margin-bottom: 12px;
+    color: var(--accent-color);
+    text-align: center;
+    font-size: clamp(1.6rem, 3.2vw, 2.4rem);
+}
+
+
+:where(.s-home) .home-page .vacancies-title + .divider {
+    margin: 0 auto 16px;
+}
+
+
+:where(.s-home) .home-page .vacancies-subtitle {
+    max-width: 62ch;
+    margin: 0 auto;
+    color: var(--text-muted);
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+
+/* --- Адаптив ------------------------------------------------------------ */
+
+@media (max-width: 640px){
+
+    :where(.s-home) .hp-hero__actions {
+    width: 100%;
+
+}
+
+
+    :where(.s-home) .hp-hero__actions .hp-btn {
+    flex: 1 1 auto;
+
+}
+
+
+}
+
+
+@media (prefers-reduced-motion: reduce){
+
+
+    :where(.s-home) .hp-marquee {
+    -webkit-mask-image: none;
+    mask-image: none;
+
+}
+
+
+    :where(.s-home) .hp-marquee__track {
+    animation: none;
+
+}
+
+
+    :where(.s-home) .hp-card, :where(.s-home) .hp-card__media img {
+    transition: none;
+
+}
+
+
+    :where(.s-home) .hp-card:hover {
+    transform: none;
+
+}
+
+
+}
+
+
+/* ==== item_detail.css → s-item ==== */
+:where(.s-item) .item_container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin: 20px auto;
+    width: 90%;
+}
+
+
+:where(.s-item) .item-image {
+    width: 25%;
+    height: auto;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+:where(.s-item) .item-image img, :where(.s-item) .item-image-border {
+    max-width: 100%;
+    height: auto;
+    border: 3px solid var(--accent-color);
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+
+:where(.s-item) .item-image img:hover, :where(.s-item) .item-image-border:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+
+:where(.s-item) .item_name {
+    font-size: 20px;
+    margin: 15px;
+    color: var(--text-color);
+    flex-grow: 1;
+}
+
+
+:where(.s-item) .item-info {
+    flex: 1;
+    text-align: center;
+}
+
+
+:where(.s-item) .item-info h1 {
+    font-size: 28px;
+    margin-bottom: 10px;
+    color: var(--text-color);
+}
+
+
+:where(.s-item) .item-info p {
+    font-size: 16px;
+    color: #888;
+    /* Можно использовать оттенок текста из темы */
+    margin-bottom: 20px;
+}
+
+
+:where(.s-item) .item-price {
+    font-size: 22px;
+    color: var(--accent-color);
+    /* Акцентный цвет */
+    margin-bottom: 20px;
+}
+
+
+:where(.s-item) .order-link {
+    display: inline-block;
+    background-color: var(--accent-color);
+    color: white;
+    padding: 15px 30px;
+    border-radius: var(--border-radius);
+    text-decoration: none;
+    font-size: 18px;
+    transition: background-color 0.3s;
+}
+
+
+:where(.s-item) .order-link:hover {
+    background-color: #068a50;
+    border-radius: var(--border-radius);
+    /* Темнее акцента */
+}
+
+
+@media (max-width: 768px){
+
+    :where(.s-item) .item-detail {
+    padding: 10px;
+
+}
+
+
+    :where(.s-item) .item-image {
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 10px;
+
+}
+
+
+    :where(.s-item) .item-info h1 {
+    font-size: 24px;
+
+}
+
+
+    :where(.s-item) .item-info p {
+    font-size: 14px;
+
+}
+
+
+    :where(.s-item) .item-price {
+    font-size: 20px;
+
+}
+
+
+    :where(.s-item) .order-link {
+    padding: 10px 20px;
+    font-size: 16px;
+
+}
+
+
+}
+
+
+:where(.s-item) .size-selector .size-options {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+
+:where(.s-item) .size-selector .size-option {
+    padding: 10px 20px;
+    border: 1px solid var(--hover-bg);
+    /* Цвет границы */
+    border-radius: var(--border-radius);
+    background: none;
+    color: var(--text-color);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    font-size: inherit;
+}
+
+
+:where(.s-item) .size-selector .size-option:hover {
+    background-color: var(--hover-bg);
+}
+
+
+:where(.s-item) .size-selector .size-option.selected {
+    background-color: var(--accent-color);
+    color: white;
+    border-color: var(--accent-color);
+}
+
+
+:where(.s-item) .form-group h3 {
+    margin-bottom: 5px;
+    color: var(--text-color);
+}
+
+
+:where(.s-item) .form-group ul {
+    list-style: none;
+    padding: 0;
+}
+
+
+:where(.s-item) .form-group li {
+    margin-bottom: 5px;
+    color: var(--text-color);
+}
+
+
+/* Добавляем отступы между парами селектов */
+:where(.s-item) .board-pair {
+    margin-bottom: 1.5rem;
+}
+
+
+:where(.s-item) .board-pair label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+
+
+/* Класс для скрытия селекторов */
+:where(.s-item) .option-selector.hidden, :where(.s-item) .board-selector.hidden {
+    display: none;
+}
+
+
+:where(.s-item) .delivery-text {
+    font-size: 0.5em;
+    color: var(--text-color);
+    opacity: 0.8;
+}
+
+
+
+
+
+
+/* ==== cart.css → s-cart ==== */
+/* Основные стили корзины */
+:where(.s-cart) .cart-page {
+    width: 90%;
+    max-width: 1200px;
+    padding: 20px;
+    margin: 60px auto;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+
+
+:where(.s-cart) .cart-items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+
+:where(.s-cart) .cart-item-card {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+}
+
+
+:where(.s-cart) .cart-item-card.unavailable {
+    opacity: 0.4;
+    border-left: 3px solid #ff5722;
+}
+
+
+:where(.s-cart) .cart-item-card:hover {
+    transform: translateY(-2px);
+}
+
+
+@media (max-width: 768px){
+
+    :where(.s-cart) .cart-item-card {
+    flex-direction: column;
+
+}
+
+
+}
+
+
+/* Изображение товара */
+:where(.s-cart) .cart-item-image {
+    flex: 0 0 200px;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+}
+
+
+:where(.s-cart) .cart-item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s;
+}
+
+
+:where(.s-cart) .cart-item-image:hover img {
+    transform: scale(1.05);
+}
+
+
+/* Информация о товаре */
+:where(.s-cart) .cart-item-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+
+:where(.s-cart) .item-name {
+    font-size: 1.4rem;
+    color: var(--text-color);
+}
+
+
+:where(.s-cart) .item-options {
+    margin-bottom: 15px;
+}
+
+
+:where(.s-cart) .item-option {
+    margin-bottom: 8px;
+    display: flex;
+    flex-direction: column;
+}
+
+
+:where(.s-cart) .option-label {
+    font-weight: 600;
+    margin-right: 5px;
+    color: var(--text-color);
+}
+
+
+:where(.s-cart) .option-value {
+    color: var(--text-color);
+}
+
+
+:where(.s-cart) .board-list {
+    list-style: none;
+    padding: 0;
+    margin: 5px 0 0 0;
+    display: block;
+    width: 100%;
+}
+
+
+:where(.s-cart) .addons-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    list-style: none;
+    padding: 0;
+    margin: 5px 0;
+}
+
+
+:where(.s-cart) .addons-list li {
+    background-color: var(--hover-bg);
+    padding: 3px 8px;
+    border-radius: var(--border-radius);
+    font-size: 0.9rem;
+}
+
+
+/* Управление количеством и удалением */
+:where(.s-cart) .item-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-top: auto;
+}
+
+
+:where(.s-cart) .quantity-form {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+
+:where(.s-cart) .quantity-selector {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+
+:where(.s-cart) .quantity-btn {
+    width: 30px;
+    height: 30px;
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+}
+
+
+:where(.s-cart) .quantity-btn:hover {
+    background-color: #068a50;
+}
+
+
+:where(.s-cart) .quantity-value {
+    width: 40px;
+    text-align: center;
+    font-weight: 600;
+}
+
+
+:where(.s-cart) .remove-btn {
+    background-color: #ff4d4d;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: background-color 0.2s;
+}
+
+
+:where(.s-cart) .remove-btn:hover {
+    background-color: #e03e3e;
+}
+
+
+/* Итоговая цена за позицию */
+:where(.s-cart) .item-total {
+    flex: 0 0 100px;
+    text-align: right;
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--text-color);
+}
+
+
+/* Итоговая сумма и кнопка оформления */
+:where(.s-cart) .cart-summary {
+    margin-top: 30px;
+    padding: 20px;
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+
+:where(.s-cart) .total-summary {
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+}
+
+
+:where(.s-cart) .total-label {
+    font-weight: 600;
+    margin-right: 10px;
+}
+
+
+:where(.s-cart) .total-amount {
+    font-weight: 700;
+    color: var(--accent-color);
+}
+
+
+:where(.s-cart) .checkout-btn {
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: background-color 0.2s;
+    text-decoration: none;
+}
+
+
+:where(.s-cart) .checkout-btn:hover {
+    background-color: #068a50;
+    border-radius: var(--border-radius);
+}
+
+
+/* Пустая корзина */
+:where(.s-cart) .empty-cart-message {
+    text-align: center;
+    padding: 50px 20px;
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+}
+
+
+:where(.s-cart) .empty-cart-icon {
+    font-size: 3rem;
+    color: var(--accent-color);
+    margin-bottom: 20px;
+}
+
+
+:where(.s-cart) .empty-text {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+    color: var(--text-color);
+}
+
+
+:where(.s-cart) .continue-shopping-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background-color: var(--accent-color);
+    color: white;
+    padding: 10px 20px;
+    border-radius: var(--border-radius);
+    text-decoration: none;
+    font-size: 1rem;
+    transition: background-color 0.2s;
+}
+
+
+:where(.s-cart) .continue-shopping-btn:hover {
+    background-color: #068a50;
+    color: white;
+    border-radius: var(--border-radius);
+}
+
+
+/* Адаптивные стили */
+@media (max-width: 576px){
+
+    :where(.s-cart) .cart-page {
+    width: 95%;
+    padding: 10px;
+
+}
+
+
+    :where(.s-cart) .cart-item-card {
+    padding: 15px;
+
+}
+
+
+    :where(.s-cart) .item-controls {
+    flex-direction: column;
+    align-items: flex-start;
+
+}
+
+
+    :where(.s-cart) .cart-summary {
+    align-items: center;
+    text-align: center;
+
+}
+
+
+}
+
+
+/* Стили для блока скидки */
+:where(.s-cart) .summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    width: 100%;
+    max-width: 300px;
+}
+
+
+:where(.s-cart) .discount-row {
+    color: var(--accent-color);
+    font-weight: 600;
+}
+
+
+:where(.s-cart) .total-row {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--hover-bg);
+}
+
+
+:where(.s-cart) .summary-label {
+    color: var(--text-color);
+}
+
+
+:where(.s-cart) .summary-value {
+    font-weight: 600;
+}
+
+
+/* Стили для бейджа скидки */
+:where(.s-cart) .item-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+
+:where(.s-cart) .discount-badge {
+    background-color: var(--accent-color);
+    color: white;
+    padding: 3px 8px;
+    border-radius: var(--border-radius);
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+
+
+/* ==== checkout.css → s-checkout ==== */
+/* Основные стили страницы оформления */
+:where(.s-checkout) .checkout-page {
+    width: 90%;
+    max-width: 1200px;
+    /* padding: 20px; */
+    margin: 60px auto;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+
+
+:where(.s-checkout) .checkout-container {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 25px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+
+:where(.s-checkout) .checkout-title {
+    font-size: 1.8rem;
+    margin-bottom: 30px;
+    color: var(--text-color);
+}
+
+
+:where(.s-checkout) .checkout-content {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 30px;
+}
+
+
+@media (max-width: 768px){
+
+    :where(.s-checkout) .checkout-content {
+    grid-template-columns: 1fr;
+
+}
+
+
+}
+
+
+/* Стили для формы */
+:where(.s-checkout) .form-section {
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--hover-bg);
+}
+
+
+:where(.s-checkout) .section-title {
+    font-size: 1.3rem;
+    margin-bottom: 20px;
+    color: var(--text-color);
+}
+
+
+:where(.s-checkout) .form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+
+:where(.s-checkout) .form-input, :where(.s-checkout) .form-textarea {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    background-color: var(--card-bg);
+    color: var(--text-color);
+}
+
+
+:where(.s-checkout) .form-input:focus, :where(.s-checkout) .form-textarea:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px var(--accent-color-rgba);
+}
+
+
+:where(.s-checkout) .form-textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+
+/* Стили для выбора способа доставки */
+:where(.s-checkout) .delivery-options-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+
+:where(.s-checkout) .delivery-option {
+    display: flex;
+    align-items: center;
+}
+
+
+:where(.s-checkout) .delivery-option input[type="radio"] {
+    margin-right: 10px;
+}
+
+
+:where(.s-checkout) .delivery-label {
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: var(--border-radius);
+    transition: background-color 0.2s;
+    flex-grow: 1;
+}
+
+
+:where(.s-checkout) .delivery-label:hover {
+    background-color: var(--hover-bg);
+}
+
+
+:where(.s-checkout) .delivery-type {
+    font-weight: 600;
+    margin-bottom: 3px;
+    color: var(--text-color);
+}
+
+
+:where(.s-checkout) .delivery-description {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    color: var(--text-color);
+}
+
+
+:where(.s-checkout) .address-group {
+    display: none;
+    margin-top: 15px;
+}
+
+
+/* Кнопки */
+:where(.s-checkout) .form-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 30px;
+}
+
+
+/* Стили для блока скидки партнера */
+:where(.s-checkout) .partner-discount-group {
+    margin-top: 10px;
+}
+
+
+:where(.s-checkout) .partner-checkbox-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+
+:where(.s-checkout) .partner-checkbox-container label {
+    margin-left: 10px;
+    font-weight: 500;
+}
+
+
+:where(.s-checkout) .partner-discount-input {
+    margin-top: 10px;
+    padding-left: 25px;
+}
+
+
+:where(.s-checkout) .partner-discount {
+    width: 100px;
+}
+
+
+:where(.s-checkout) .back-link {
+    color: var(--accent-color);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+
+
+:where(.s-checkout) .back-link:hover {
+    color: #068a50;
+}
+
+
+:where(.s-checkout) .submit-order-btn {
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+
+:where(.s-checkout) .submit-order-btn:hover {
+    background-color: #068a50;
+}
+
+
+/* Стили для блока с товарами */
+:where(.s-checkout) .order-summary {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 20px;
+    align-self: start;
+    position: sticky;
+    top: 20px;
+}
+
+
+:where(.s-checkout) .summary-items {
+    margin-bottom: 20px;
+}
+
+
+:where(.s-checkout) .summary-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px dashed var(--hover-bg);
+}
+
+
+:where(.s-checkout) .item-info {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+}
+
+
+:where(.s-checkout) .item-name {
+    font-weight: 600;
+    margin-bottom: 3px;
+    color: var(--text-color);
+}
+
+
+:where(.s-checkout) .item-quantity {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    color: var(--text-color);
+}
+
+
+:where(.s-checkout) .item-price {
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+
+
+:where(.s-checkout) .item-options {
+    display: flex;
+    flex-direction: column;
+}
+
+
+:where(.s-checkout) .item-addons {
+    display: flex;
+    flex-direction: column;
+}
+
+
+
+:where(.s-checkout) .summary-total {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.2rem;
+    font-weight: 700;
+    padding-top: 10px;
+    border-top: 2px solid var(--hover-bg);
+}
+
+
+:where(.s-checkout) .total-label {
+    color: var(--text-color);
+}
+
+
+:where(.s-checkout) .total-price {
+    color: var(--accent-color);
+}
+
+
+/* Ошибки формы */
+:where(.s-checkout) .errorlist {
+    list-style: none;
+    padding: 0;
+    margin: 5px 0 0 0;
+    color: #e74c3c;
+    font-size: 0.9rem;
+}
+
+
+/* Общие стили для групп опций */
+:where(.s-checkout) .options-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+
+:where(.s-checkout) .option-item {
+    display: flex;
+    align-items: center;
+}
+
+
+:where(.s-checkout) .option-item input[type="radio"] {
+    margin-right: 10px;
+}
+
+
+:where(.s-checkout) .option-label {
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    padding: 12px;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--hover-bg);
+    background-color: var(--card-bg);
+    transition: all 0.2s;
+    flex-grow: 1;
+}
+
+
+:where(.s-checkout) .option-item input[type="radio"]:checked + .option-label {
+    border-color: var(--accent-color);
+    background-color: var(--accent-color-rgba);
+}
+
+
+:where(.s-checkout) .option-label:hover {
+    background-color: var(--hover-bg);
+}
+
+
+:where(.s-checkout) .option-title {
+    font-weight: 600;
+    margin-bottom: 3px;
+    color: var(--text-color);
+}
+
+
+:where(.s-checkout) .option-description {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    color: var(--text-color);
+}
+
+
+/* Специфичные стили для способа оплаты */
+:where(.s-checkout) .payment-options {
+    margin-top: 15px;
+}
+
+
+:where(.s-checkout) .payment-icon {
+    margin-right: 8px;
+    font-size: 1.2rem;
+}
+
+
+
+/* ==== add_item_to_order.css → s-add-item ==== */
+/* Стили для страницы добавления товара в заказ */
+:where(.s-add-item) .add-item-page {
+    width: 90%;
+    max-width: 800px;
+    margin: 60px auto;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+
+
+:where(.s-add-item) .checkout-container {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 25px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+
+:where(.s-add-item) .checkout-title {
+    font-size: 1.8rem;
+    margin-bottom: 30px;
+    color: var(--text-color);
+    text-align: center;
+}
+
+
+:where(.s-add-item) .form-section {
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--hover-bg);
+}
+
+
+:where(.s-add-item) #pizza-options {
+    background-color: var(--bg-color);
+    border-radius: var(--border-radius);
+    padding: 20px;
+    margin-top: 10px;
+    border-left: 4px solid var(--accent-color);
+    transition: all 0.3s ease;
+    opacity: 1;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+
+:where(.s-add-item) .section-title {
+    font-size: 1.3rem;
+    margin-bottom: 20px;
+    color: var(--accent-color);
+    font-weight: 600;
+}
+
+
+:where(.s-add-item) .form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+
+/* Стили для select элементов */
+:where(.s-add-item) select, :where(.s-add-item) .styled-select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid var(--divider-color);
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23079b59' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: calc(100% - 15px) center;
+    cursor: pointer;
+    transition: border-color 0.3s, box-shadow 0.3s, transform 0.2s;
+}
+
+
+:where(.s-add-item) .styled-select:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+
+:where(.s-add-item) select:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px var(--accent-color-rgba);
+}
+
+
+:where(.s-add-item) select option {
+    padding: 10px;
+}
+
+
+/* Стили для input элементов */
+:where(.s-add-item) input[type="number"] {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid var(--divider-color);
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+
+:where(.s-add-item) input[type="number"]:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px var(--accent-color-rgba);
+}
+
+
+/* Стили для кнопок */
+:where(.s-add-item) .form-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 30px;
+}
+
+
+:where(.s-add-item) .btn {
+    padding: 12px 25px;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+
+:where(.s-add-item) .btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.5);
+    opacity: 0;
+    border-radius: 100%;
+    transform: scale(1, 1) translate(-50%);
+    transform-origin: 50% 50%;
+}
+
+
+:where(.s-add-item) .btn:focus:not(:active)::after {
+    animation: ripple 1s ease-out;
+}
+
+
+@keyframes ripple{ 0% { transform: scale(0, 0); opacity: 0.5; } 20% { transform: scale(25, 25); opacity: 0.3; } 100% { opacity: 0; transform: scale(40, 40); } }
+
+:where(.s-add-item) .btn-primary {
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+}
+
+
+:where(.s-add-item) .btn-primary:hover {
+    background-color: #068a50;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(7, 155, 89, 0.3);
+}
+
+
+:where(.s-add-item) .btn-primary:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 5px rgba(7, 155, 89, 0.3);
+}
+
+
+:where(.s-add-item) .btn-secondary {
+    background-color: transparent;
+    color: var(--text-color);
+    border: 1px solid var(--divider-color);
+}
+
+
+:where(.s-add-item) .btn-secondary:hover {
+    background-color: var(--hover-bg);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+
+:where(.s-add-item) .btn-secondary:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+
+/* Стили для ошибок формы */
+:where(.s-add-item) .errorlist {
+    list-style: none;
+    color: var(--error-color);
+    font-size: 0.9rem;
+    margin-top: 5px;
+    padding-left: 0;
+}
+
+
+/* Стили для множественного выбора (addons) */
+:where(.s-add-item) select[multiple] {
+    height: auto;
+    min-height: 150px;
+    padding: 10px;
+    background-image: none;
+}
+
+
+:where(.s-add-item) select[multiple] option {
+    padding: 8px 10px;
+    margin-bottom: 2px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+
+:where(.s-add-item) select[multiple] option:checked {
+    background-color: var(--accent-color-rgba);
+    color: var(--text-color);
+    font-weight: 600;
+}
+
+
+:where(.s-add-item) select[multiple] option:hover {
+    background-color: var(--hover-bg);
+}
+
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 768px){
+
+    :where(.s-add-item) .add-item-page {
+    width: 95%;
+    margin: 30px auto;
+
+}
+
+    
+    :where(.s-add-item) .checkout-container {
+    padding: 15px;
+
+}
+
+    
+    :where(.s-add-item) .form-actions {
+    flex-direction: column;
+    gap: 15px;
+
+}
+
+    
+    :where(.s-add-item) .btn {
+    width: 100%;
+
+}
+
+
+}
+
+
+/* ==== order_detail.css → s-order-detail ==== */
+:where(.s-order-detail) .order-detail-page {
+    width: 100%;
+    max-width: 1200px;
+    padding: 20px;
+    margin: 60px auto;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+
+
+:where(.s-order-detail) .order-detail-container {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 25px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+
+
+:where(.s-order-detail) .order-content {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 30px;
+}
+
+
+:where(.s-order-detail) .order-header {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+
+:where(.s-order-detail) .page_title {
+    display: block;
+    align-items: center;
+    /* gap: 10px; */
+}
+
+
+:where(.s-order-detail) .branch-info {
+    color: var(--text-muted);
+    margin: 5px 0;
+    font-size: 0.95rem;
+}
+
+
+:where(.s-order-detail) .pdf-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent-color);
+
+    border-radius: 50%;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+
+:where(.s-order-detail) .add-item-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    background-color: var(--accent-color);
+    padding: 5px 10px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    margin-left: 10px;
+}
+
+
+:where(.s-order-detail) .add-item-button:hover {
+    background-color: var(--accent-hover);
+    transform: translateY(-2px);
+}
+
+
+:where(.s-order-detail) .pdf-button:hover {
+    background-color: var(--accent-hover);
+    border-radius: 50%;
+    transform: scale(1.05);
+}
+
+
+:where(.s-order-detail) .order-items-form {
+    background: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--divider-color);
+}
+
+
+:where(.s-order-detail) .section-title {
+    font-size: 1.3rem;
+    margin: 0 0 20px 0;
+    color: var(--text-color);
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--divider-color);
+}
+
+
+:where(.s-order-detail) .order-items {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+
+:where(.s-order-detail) .order-item {
+    background: var(--card-bg);
+    border-radius: calc(var(--border-radius) - 5px);
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--divider-color);
+}
+
+
+:where(.s-order-detail) .item-header {
+    display: flex;
+    padding: 15px;
+    gap: 15px;
+    border-bottom: 1px solid var(--divider-color);
+}
+
+
+:where(.s-order-detail) .item-image {
+    flex: 0 0 80px;
+    height: 80px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--hover-bg);
+}
+
+
+:where(.s-order-detail) .item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+
+:where(.s-order-detail) .item-name {
+    flex: 1;
+    font-size: 1.05rem;
+    margin: 0;
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+
+:where(.s-order-detail) .discount-badge {
+    background: var(--accent-color);
+    color: white;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+}
+
+
+:where(.s-order-detail) .edit-item-btn {
+    background: none;
+    border: none;
+    color: var(--accent-color);
+    cursor: pointer;
+    padding: 5px;
+    opacity: 0.8;
+}
+
+
+:where(.s-order-detail) .edit-toggle-btn {
+    background: none;
+    border: none;
+    color: var(--accent-color);
+    cursor: pointer;
+    padding: 5px;
+    opacity: 0.8;
+}
+
+
+:where(.s-order-detail) .item-details {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+
+:where(.s-order-detail) .item-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+
+:where(.s-order-detail) .item-option {
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+
+:where(.s-order-detail) .option-label {
+    font-weight: 500;
+    color: var(--text-muted);
+}
+
+
+:where(.s-order-detail) .addons-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 5px;
+    padding: 0;
+    list-style: none;
+}
+
+
+:where(.s-order-detail) .addons-list li {
+    background: var(--hover-bg);
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+}
+
+
+:where(.s-order-detail) .item-quantity-price {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 5px;
+}
+
+
+:where(.s-order-detail) .quantity {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+
+:where(.s-order-detail) .item-total {
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--text-color);
+}
+
+
+:where(.s-order-detail) .original-price {
+    text-decoration: line-through;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+
+:where(.s-order-detail) .discounted-price {
+    color: var(--accent-color);
+}
+
+
+:where(.s-order-detail) .item-edit-mode {
+    padding: 15px;
+    background: var(--hover-bg);
+    border-top: 1px solid var(--divider-color);
+}
+
+
+:where(.s-order-detail) .form-group {
+    margin-bottom: 15px;
+}
+
+
+:where(.s-order-detail) .form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+
+:where(.s-order-detail) .form-group select, :where(.s-order-detail) .form-group input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--divider-color);
+    border-radius: 6px;
+    background: var(--card-bg);
+    color: var(--text-color);
+}
+
+
+:where(.s-order-detail) .form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+
+:where(.s-order-detail) .save-button {
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+
+:where(.s-order-detail) .cancel-button {
+    background: var(--hover-bg);
+    color: var(--text-color);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+
+:where(.s-order-detail) .order-summary {
+    position: sticky;
+    top: 20px;
+}
+
+
+:where(.s-order-detail) .summary-card {
+    background: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--divider-color);
+}
+
+
+:where(.s-order-detail) .summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px dashed var(--divider-color);
+}
+
+
+:where(.s-order-detail) .summary-label {
+    color: var(--text-muted);
+}
+
+
+:where(.s-order-detail) .summary-value {
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+
+:where(.s-order-detail) .discount-row {
+    color: var(--accent-color);
+}
+
+
+:where(.s-order-detail) .discount-details {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-top: -5px;
+    margin-bottom: 5px;
+}
+
+
+:where(.s-order-detail) .total-row {
+    font-weight: 700;
+    border-top: 1px solid var(--divider-color);
+    margin-top: 10px;
+    padding-top: 10px;
+}
+
+
+:where(.s-order-detail) .payment-paid {
+    color: var(--success-color);
+}
+
+
+:where(.s-order-detail) .payment-unpaid {
+    color: var(--error-color);
+}
+
+
+@media (max-width: 900px){
+
+    :where(.s-order-detail) .order-content {
+    grid-template-columns: 1fr;
+
+}
+
+
+    :where(.s-order-detail) .order-summary {
+    position: static;
+
+}
+
+
+}
+
+
+
+
+/*------------------------------------------------------------*/
+:where(.s-order-detail) .section-title {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+}
+
+
+:where(.s-order-detail) .edit-toggle-btn {
+    background: none;
+    border: none;
+    color: var(--accent-color);
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+
+:where(.s-order-detail) .edit-toggle-btn:hover {
+    background-color: var(--accent-color-rgba);
+    transform: scale(1.1);
+}
+
+
+:where(.s-order-detail) .edit-mode {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+
+@keyframes fadeIn{ from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+
+/*--------------------------------------------------------*/
+
+:where(.s-order-detail) .order-edit-form {
+    margin-bottom: 20px;
+}
+
+
+:where(.s-order-detail) .form-group {
+    margin-bottom: 15px;
+}
+
+
+:where(.s-order-detail) .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+
+:where(.s-order-detail) .form-group input[type="text"], :where(.s-order-detail) .form-group input[type="tel"], :where(.s-order-detail) .form-group textarea {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: var(--card-bg);
+    color: var(--text-color);
+}
+
+
+:where(.s-order-detail) .form-group textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+
+:where(.s-order-detail) .form-group ul {
+    list-style: none;
+    padding: 0;
+    margin: 5px 0 0 0;
+}
+
+
+:where(.s-order-detail) .form-group ul li {
+    margin-bottom: 5px;
+}
+
+
+:where(.s-order-detail) .form-group ul li label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 4px;
+    background-color: var(--card-bg);
+    transition: background-color 0.2s;
+}
+
+
+:where(.s-order-detail) .form-group ul li label:hover {
+    background-color: var(--hover-bg);
+}
+
+
+
+
+/*------------------------------------------------------*/
+/* Стили для радио-групп */
+:where(.s-order-detail) .radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+
+:where(.s-order-detail) .radio-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+
+:where(.s-order-detail) .radio-item input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+
+:where(.s-order-detail) .radio-item label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding-left: 32px;
+    min-height: 24px;
+    color: var(--text-color);
+    transition: color 0.2s;
+}
+
+
+/* Кастомный радио-индикатор */
+:where(.s-order-detail) .radio-item label::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--accent-color);
+    border-radius: 50%;
+    background: var(--card-bg);
+    transition: all 0.2s;
+}
+
+
+/* Внутренняя точка (видна только когда выбрано) */
+:where(.s-order-detail) .radio-item label::after {
+    content: '';
+    position: absolute;
+    left: 6px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--accent-color);
+    transform: scale(0);
+    transition: transform 0.2s;
+}
+
+
+/* Состояния */
+:where(.s-order-detail) .radio-item input[type="radio"]:checked + label::after {
+    transform: scale(1);
+}
+
+
+:where(.s-order-detail) .radio-item input[type="radio"]:focus + label::before {
+    box-shadow: 0 0 0 3px var(--accent-color-rgba);
+}
+
+
+:where(.s-order-detail) .radio-item:hover label::before {
+    border-color: var(--accent-color);
+    background-color: var(--accent-color-rgba);
+}
+
+
+:where(.s-order-detail) .radio-item:hover input[type="radio"]:checked + label::before {
+    background-color: var(--card-bg);
+}
+
+
+/* Стили для чекбокса */
+:where(.s-order-detail) .checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+
+:where(.s-order-detail) .checkbox-group input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+
+:where(.s-order-detail) .checkbox-group label {
+    position: relative;
+    padding-left: 30px;
+    cursor: pointer;
+}
+
+
+:where(.s-order-detail) .checkbox-group label::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--accent-color);
+    border-radius: 4px;
+    background: var(--card-bg);
+    transition: all 0.2s;
+}
+
+
+:where(.s-order-detail) .checkbox-group label::after {
+    content: '✓';
+    position: absolute;
+    left: 5px;
+    top: 50%;
+    transform: translateY(-50%) scale(0);
+    color: var(--accent-color);
+    font-weight: bold;
+    transition: transform 0.2s;
+}
+
+
+:where(.s-order-detail) .checkbox-group input[type="checkbox"]:checked + label::after {
+    transform: translateY(-50%) scale(1);
+}
+
+
+:where(.s-order-detail) .checkbox-group input[type="checkbox"]:focus + label::before {
+    box-shadow: 0 0 0 3px var(--accent-color-rgba);
+}
+
+
+
+/* ==== order_list.css → s-order-list ==== */
+/* Основные стили страницы */
+:where(.s-order-list) .order-list-page {
+    width: 100%;
+    max-width: 1200px;
+    padding: 20px;
+    margin: 60px auto;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+
+
+:where(.s-order-list) .order-list-container {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 25px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+
+:where(.s-order-list) .page-title {
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    color: var(--text-color);
+}
+
+
+:where(.s-order-list) .selected-branch-info {
+    margin-bottom: 20px;
+    padding: 10px 15px;
+    background-color: var(--accent-light);
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+}
+
+
+:where(.s-order-list) .selected-branch-info p {
+    margin: 0;
+    color: var(--text-color);
+    font-weight: 500;
+}
+
+
+/* Панель управления */
+:where(.s-order-list) .order-controls {
+    margin-bottom: 25px;
+}
+
+
+:where(.s-order-list) .search-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: center;
+}
+
+
+:where(.s-order-list) .search-group {
+    display: flex;
+    flex: 1;
+    min-width: 250px;
+}
+
+
+:where(.s-order-list) .search-input {
+    flex: 1;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: var(--border-radius);
+    background-color: var(--card-bg);
+    color: var(--text-color);
+}
+
+
+:where(.s-order-list) .search-button {
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 0 15px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+
+:where(.s-order-list) .search-button:hover {
+    background-color: #068a50;
+}
+
+
+:where(.s-order-list) .filter-group {
+    display: flex;
+    min-width: 300px;
+}
+
+
+:where(.s-order-list) .status-filter {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: var(--border-radius);
+    background-color: var(--card-bg);
+    color: var(--text-color);
+}
+
+
+:where(.s-order-list) .filter-button {
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 0 15px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+
+:where(.s-order-list) .filter-button:hover {
+    background-color: #068a50;
+    border-radius: var(--border-radius);
+}
+
+
+/* Информация о филиале */
+:where(.s-order-list) .selected-branch-info {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+
+:where(.s-order-list) .branch-display {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+
+:where(.s-order-list) .change-branch-btn {
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+
+:where(.s-order-list) .change-branch-btn:hover {
+    background-color: #068a50;
+}
+
+
+:where(.s-order-list) .branch-selector {
+    margin-top: 15px;
+    padding: 15px;
+    background-color: var(--hover-bg);
+    border-radius: var(--border-radius);
+}
+
+
+:where(.s-order-list) .branch-select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: var(--border-radius);
+    background-color: var(--card-bg);
+    color: var(--text-color);
+}
+
+
+:where(.s-order-list) .apply-branch-btn, :where(.s-order-list) .cancel-branch-btn {
+    padding: 8px 15px;
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-right: 10px;
+}
+
+
+:where(.s-order-list) .apply-branch-btn {
+    background-color: var(--accent-color);
+    color: white;
+}
+
+
+:where(.s-order-list) .apply-branch-btn:hover {
+    background-color: #068a50;
+}
+
+
+:where(.s-order-list) .cancel-branch-btn {
+    background-color: #f44336;
+    color: white;
+}
+
+
+:where(.s-order-list) .cancel-branch-btn:hover {
+    background-color: #d32f2f;
+}
+
+
+/* Стили для изменения филиала заказа */
+:where(.s-order-list) .branch-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+
+:where(.s-order-list) .branch-name {
+    font-size: 0.9rem;
+    margin-right: 5px;
+}
+
+
+:where(.s-order-list) .change-order-branch-btn {
+    background: none;
+    border: none;
+    color: var(--accent-color);
+    cursor: pointer;
+    padding: 3px;
+    border-radius: 3px;
+    transition: background-color 0.2s;
+}
+
+
+:where(.s-order-list) .change-order-branch-btn:hover {
+    background-color: var(--accent-color-rgba);
+}
+
+
+:where(.s-order-list) .order-branch-selector {
+    margin-top: 8px;
+    padding: 8px;
+    background-color: var(--hover-bg);
+    border-radius: var(--border-radius);
+}
+
+
+:where(.s-order-list) .branch-selector-buttons {
+    display: flex;
+    margin-top: 8px;
+    gap: 5px;
+}
+
+
+:where(.s-order-list) .branch-selector-buttons .apply-branch-btn, :where(.s-order-list) .branch-selector-buttons .cancel-branch-btn {
+    padding: 4px 8px;
+    font-size: 0.8rem;
+    margin: 0;
+}
+
+
+/* Таблица заказов */
+:where(.s-order-list) .orders-table {
+    margin-bottom: 30px;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+}
+
+
+:where(.s-order-list) .table-header {
+    display: grid;
+    grid-template-columns: 0.6fr 1.5fr 1.2fr 1fr 1fr 0.5fr 0.5fr 0.5fr;
+    background-color: var(--accent-color);
+    color: white;
+    font-weight: 600;
+    padding: 12px 15px;
+}
+
+
+:where(.s-order-list) .header-cell {
+    padding: 5px;
+}
+
+
+:where(.s-order-list) .table-header .header-cell a {
+    color: white;
+    text-decoration: none;
+}
+
+
+:where(.s-order-list) .table-header .header-cell a:hover {
+    color: #f0f0f0;
+    text-decoration: underline;
+}
+
+
+:where(.s-order-list) .table-row {
+    display: grid;
+    grid-template-columns: 0.6fr 1.5fr 1.2fr 1fr 1fr 0.5fr 0.5fr 0.5fr;
+    padding: 12px 15px;
+    border-bottom: 1px solid var(--hover-bg);
+    transition: background-color 0.2s;
+    align-items: center;
+}
+
+
+:where(.s-order-list) .table-row:hover {
+    background-color: var(--hover-bg);
+}
+
+
+:where(.s-order-list) .table-cell {
+    padding: 5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+/* Бейджи статусов */
+:where(.s-order-list) .status-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: var(--border-radius);
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+
+:where(.s-order-list) .status-badge.new {
+    background-color: #3498db;
+    color: white;
+}
+
+
+:where(.s-order-list) .status-badge.confirmed {
+    background-color: #2ecc71;
+    color: white;
+}
+
+
+:where(.s-order-list) .status-badge.cooking {
+    background-color: #f39c12;
+    color: white;
+}
+
+
+:where(.s-order-list) .status-badge.delivering {
+    background-color: #9b59b6;
+    color: white;
+}
+
+
+:where(.s-order-list) .status-badge.completed {
+    background-color: #27ae60;
+    color: white;
+}
+
+
+:where(.s-order-list) .status-badge.canceled {
+    background-color: #e74c3c;
+    color: white;
+}
+
+
+/* Статус оплаты */
+:where(.s-order-list) .payment-paid {
+    color: #2ecc71;
+    font-weight: 600;
+}
+
+
+:where(.s-order-list) .payment-unpaid {
+    color: #e74c3c;
+    font-weight: 600;
+}
+
+
+:where(.s-order-list) .view-button, :where(.s-order-list) .edit-button {
+    color: var(--text-color);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 5px;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+
+:where(.s-order-list) .view-button {
+    color: var(--accent-color);
+}
+
+
+:where(.s-order-list) .view-button:hover {
+    background-color: var(--accent-color-rgba);
+    border-radius: 50%;
+}
+
+
+:where(.s-order-list) .edit-button {
+    color: #f39c12;
+}
+
+
+:where(.s-order-list) .edit-button:hover {
+    background-color: rgba(243, 156, 18, 0.2);
+}
+
+
+/* Пагинация */
+:where(.s-order-list) .pagination {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    margin-top: 30px;
+}
+
+
+:where(.s-order-list) .page-link {
+    padding: 8px 12px;
+    border: 1px solid var(--hover-bg);
+    border-radius: var(--border-radius);
+    color: var(--text-color);
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+
+:where(.s-order-list) .page-link:hover {
+    background-color: var(--hover-bg);
+    border-radius: var(--border-radius);
+}
+
+
+:where(.s-order-list) .current-page {
+    background-color: var(--accent-color);
+    color: white;
+    border-color: var(--accent-color);
+}
+
+
+:where(.s-order-list) .first-page, :where(.s-order-list) .last-page {
+    padding: 8px 10px;
+}
+
+
+/* Нет заказов */
+:where(.s-order-list) .no-orders {
+    padding: 30px;
+    text-align: center;
+    color: var(--text-color);
+    opacity: 0.7;
+}
+
+
+/* Адаптивность */
+@media (max-width: 1200px){
+
+
+    :where(.s-order-list) .table-header, :where(.s-order-list) .table-row {
+    grid-template-columns: 80px 120px 140px 120px 120px 120px 100px 80px;
+
+}
+
+
+}
+
+
+@media (max-width: 992px){
+
+    :where(.s-order-list) .orders-table {
+    overflow-x: auto;
+
+}
+
+
+    :where(.s-order-list) .table-header, :where(.s-order-list) .table-row {
+    grid-template-columns: repeat(9, minmax(100px, 1fr));
+    width: 1000px;
+
+}
+
+
+    :where(.s-order-list) .table-container {
+    padding: 0;
+    overflow-x: hidden;
+
+}
+
+
+    :where(.s-order-list) .table-header {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    overflow-x: auto;
+    max-width: 100%;
+
+}
+
+
+}
+
+
+@media (max-width: 768px){
+
+    :where(.s-order-list) .search-form {
+    flex-direction: column;
+    align-items: stretch;
+
+}
+
+
+    :where(.s-order-list) .search-group, :where(.s-order-list) .filter-group {
+    min-width: 100%;
+
+}
+
+
+}
+
+
+
+:where(.s-order-list) .status-form {
+    display: inline-block;
+    margin: 0;
+    min-width: 120px;
+}
+
+
+:where(.s-order-list) .status-select {
+    width: 100%;
+    padding: 6px 10px;
+    border-radius: var(--border-radius);
+    border: 1px solid #ddd;
+    background-color: white;
+    cursor: pointer;
+    font-size: 14px;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 14px;
+}
+
+
+:where(.s-order-list) .status-select:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px var(--accent-color-rgba);
+}
+
+
+:where(.s-order-list) .status-select:disabled {
+    opacity: 0.7;
+    background-image: none;
+    position: relative;
+}
+
+
+:where(.s-order-list) .status-select:disabled::after {
+    content: "";
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    width: 14px;
+    height: 14px;
+    border: 2px solid #ccc;
+    border-top-color: var(--accent-color);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+
+@keyframes spin{ to { transform: rotate(360deg); } }
+
+
+:where(.s-order-list) .table-row {
+    transition: background-color 0.3s ease;
+}
+
+
+/* Цвета строк для разных статусов */
+:where(.s-order-list) .table-row.status-new {
+    background-color: rgba(33, 150, 243, 0.2);
+    border-left: 4px solid #2196f3;
+}
+
+
+:where(.s-order-list) .table-row.status-confirmed {
+    background-color: rgba(255, 193, 7, 0.2);
+    border-left: 4px solid #ffc107;
+}
+
+
+:where(.s-order-list) .table-row.status-cooking {
+    background-color: rgba(76, 175, 80, 0.2);
+    border-left: 4px solid #4caf50;
+}
+
+
+:where(.s-order-list) .table-row.status-delivering {
+    background-color: rgba(3, 169, 244, 0.2);
+    border-left: 4px solid #03a9f4;
+}
+
+
+:where(.s-order-list) .table-row.status-completed {
+    background-color: rgba(46, 125, 50, 0.2);
+    border-left: 4px solid #2e7d32;
+}
+
+
+:where(.s-order-list) .table-row.status-canceled {
+    background-color: rgba(198, 40, 40, 0.2);
+    border-left: 4px solid #c62828;
+}
+
+
+/* Темная тема */
+:where(.s-order-list) .dark .table-row.status-new {
+    background-color: rgba(33, 150, 243, 0.3);
+}
+
+
+:where(.s-order-list) .dark .table-row.status-confirmed {
+    background-color: rgba(255, 193, 7, 0.3);
+}
+
+
+:where(.s-order-list) .dark .table-row.status-cooking {
+    background-color: rgba(76, 175, 80, 0.3);
+}
+
+
+:where(.s-order-list) .dark .table-row.status-delivering {
+    background-color: rgba(3, 169, 244, 0.3);
+}
+
+
+:where(.s-order-list) .dark .table-row.status-completed {
+    background-color: rgba(46, 125, 50, 0.3);
+}
+
+
+:where(.s-order-list) .dark .table-row.status-canceled {
+    background-color: rgba(198, 40, 40, 0.3);
+}
+
+
+:where(.s-order-list) .table-cell {
+    transition: background-color 0.3s ease;
+}
+
+
+/* Медиа-запросы для адаптивности */
+@media screen and (max-width: 992px){
+
+    :where(.s-order-list) .order-list-container {
+    padding: 15px;
+    overflow-x: hidden;
+    /* Предотвращаем горизонтальную прокрутку контейнера */
+
+}
+
+
+    :where(.s-order-list) .page-title {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+
+}
+
+
+    :where(.s-order-list) .order-controls {
+    margin-bottom: 20px;
+
+}
+
+
+    :where(.s-order-list) .search-form {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 15px;
+
+}
+
+
+    :where(.s-order-list) .search-group, :where(.s-order-list) .filter-group {
+    width: 100%;
+    min-width: auto;
+
+}
+
+
+    :where(.s-order-list) .search-input {
+    height: 42px;
+    font-size: 16px;
+    /* Предотвращает масштабирование на iOS */
+
+}
+
+
+    :where(.s-order-list) .search-button, :where(.s-order-list) .filter-button {
+    height: 42px;
+    padding: 0 15px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+}
+
+
+    :where(.s-order-list) .search-button i, :where(.s-order-list) .filter-button i {
+    margin-right: 5px;
+
+}
+
+
+    :where(.s-order-list) .filter-button {
+    width: 100%;
+    /* margin-top: 10px; */
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: background-color 0.3s;
+
+}
+
+
+    :where(.s-order-list) .filter-button:hover {
+    background-color: #068a50;
+
+}
+
+
+    :where(.s-order-list) .status-filter {
+    height: 42px;
+    font-size: 16px;
+    /* Предотвращает масштабирование на iOS */
+
+}
+
+
+    /* Убираем горизонтальную прокрутку для таблицы */
+    :where(.s-order-list) .orders-table {
+    width: 100%;
+    overflow-x: visible;
+
+}
+
+
+    /* Уменьшаем ширину заголовка таблицы */
+    :where(.s-order-list) .table-header {
+    width: 100%;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+
+}
+
+
+    /* Изменение отображения таблицы для мобильных устройств */
+    :where(.s-order-list) .table-header {
+    display: none;
+    /* Скрываем заголовки на мобильных */
+
+}
+
+
+    /* Обновляем стили для строк таблицы */
+    :where(.s-order-list) .table-row {
+    display: flex;
+    flex-direction: column;
+    grid-template-columns: none;
+    /* Отключаем grid-шаблон для мобильных */
+    width: 100%;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: var(--border-radius);
+    position: relative;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    border-left-width: 5px;
+
+}
+
+
+    :where(.s-order-list) .table-cell {
+    padding: 10px 5px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid var(--hover-bg);
+    width: 100%;
+    font-size: 14px;
+
+}
+
+
+    :where(.s-order-list) .table-cell:last-child {
+    border-bottom: none;
+
+}
+
+
+    /* Добавляем подписи для ячеек на мобильных */
+    :where(.s-order-list) .table-cell::before {
+    content: attr(data-label);
+    font-weight: bold;
+    width: 35%;
+    margin-right: 10px;
+    flex-shrink: 0;
+    font-size: 13px;
+    color: #666;
+
+}
+
+
+    /* Улучшение отображения статусов на мобильных */
+    :where(.s-order-list) .status-badge {
+    width: 100%;
+    text-align: center;
+    padding: 6px 10px;
+
+}
+
+
+    /* Стили для селекта статуса на мобильных */
+    :where(.s-order-list) .status-select {
+    width: 100%;
+    height: 38px;
+    font-size: 14px;
+
+}
+
+
+    /* Стили для кнопок действий */
+    :where(.s-order-list) .actions-cell {
+    justify-content: flex-start;
+    margin-top: 10px;
+
+}
+
+
+    /* Улучшение отображения кнопок на мобильных */
+    :where(.s-order-list) .view-button, :where(.s-order-list) .pdf-button {
+    width: 36px;
+    height: 36px;
+    font-size: 1.1rem;
+    background-color: var(--hover-bg);
+    border-radius: var(--border-radius);
+    margin-right: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+}
+
+
+    :where(.s-order-list) .view-button:hover, :where(.s-order-list) .pdf-button:hover {
+    background-color: var(--accent-color-rgba);
+    border-radius: var(--border-radius);
+    color: var(--accent-color);
+
+}
+
+
+    /* Стили для пагинации */
+    :where(.s-order-list) .pagination {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 20px;
+
+}
+
+
+    :where(.s-order-list) .page-link {
+    min-width: 36px;
+    height: 36px;
+
+}
+
+
+    /* Стили для пустого состояния */
+    :where(.s-order-list) .no-orders {
+    padding: 30px 15px;
+    text-align: center;
+    background-color: var(--hover-bg);
+    border-radius: var(--border-radius);
+    margin-top: 20px;
+
+}
+
+
+    :where(.s-order-list) .no-orders p {
+    font-size: 16px;
+    color: var(--text-color);
+    margin: 0;
+
+}
+
+
+}
+
+
+
+/* ==== order_statistics.css → s-order-stats ==== */
+/* Стили для страницы статистики заказов */
+:where(.s-order-stats) .order-list-page {
+    width: 100%;
+    max-width: 1200px;
+    padding: 20px;
+    margin: 60px auto;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+
+
+:where(.s-order-stats) .order-list-container {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 25px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+
+:where(.s-order-stats) .page-title {
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    color: var(--text-color);
+}
+
+
+/* Панель управления */
+:where(.s-order-stats) .order-controls {
+    margin-bottom: 25px;
+}
+
+
+:where(.s-order-stats) .search-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: center;
+}
+
+
+:where(.s-order-stats) .search-group {
+    display: flex;
+    flex: 1;
+    min-width: 250px;
+}
+
+
+:where(.s-order-stats) .search-input {
+    flex: 1;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: var(--border-radius);
+    background-color: var(--card-bg);
+    color: var(--text-color);
+}
+
+
+:where(.s-order-stats) .search-button {
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 0 15px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+
+:where(.s-order-stats) .search-button:hover {
+    background-color: #068a50;
+}
+
+
+:where(.s-order-stats) .filter-group {
+    display: flex;
+    min-width: 300px;
+}
+
+
+:where(.s-order-stats) .status-filter {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: var(--border-radius);
+    background-color: var(--card-bg);
+    color: var(--text-color);
+}
+
+
+:where(.s-order-stats) .filter-button {
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+
+:where(.s-order-stats) .filter-button:hover {
+    background-color: #068a50;
+    border-radius: var(--border-radius);
+}
+
+
+/* Стили для кнопки сброса фильтра */
+:where(.s-order-stats) .filter-button.reset-button {
+    background-color: var(--text-muted);
+    color: white;
+    margin-left: 10px;
+}
+
+
+:where(.s-order-stats) .filter-button.reset-button:hover {
+    background-color: #868e96; /* Немного темнее */
+}
+
+
+/* Дополнительные стили для группы фильтров на странице статистики */
+:where(.s-order-stats) .order-controls .filter-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+
+:where(.s-order-stats) .order-controls .filter-group label {
+    font-weight: 500;
+}
+
+
+/* Стили для таблицы статистики */
+:where(.s-order-stats) .statistics-table {
+    margin-bottom: 30px;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+
+:where(.s-order-stats) .statistics-table .table-header, :where(.s-order-stats) .statistics-table .table-row {
+    display: grid;
+    /* 7 колонок для новой структуры */
+    grid-template-columns: 10% 10% 12% 12% 12% 14% 30%;
+    padding: 12px 15px;
+    align-items: center;
+    border-bottom: 1px solid var(--hover-bg);
+}
+
+
+:where(.s-order-stats) .statistics-table .table-header {
+    background-color: var(--accent-color);
+    color: white;
+    font-weight: 600;
+}
+
+
+:where(.s-order-stats) .statistics-table .table-row:hover {
+    background-color: var(--hover-bg);
+}
+
+
+:where(.s-order-stats) .statistics-table .header-cell, :where(.s-order-stats) .statistics-table .table-cell {
+    padding: 5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+:where(.s-order-stats) .statistics-table .header-cell a {
+    color: white;
+    text-decoration: none;
+}
+
+
+:where(.s-order-stats) .statistics-table .header-cell a:hover {
+    text-decoration: underline;
+}
+
+
+/* Выравнивание для колонок */
+:where(.s-order-stats) .header-cell.date-col, :where(.s-order-stats) .header-cell.orders-count-col, :where(.s-order-stats) .header-cell.branch-stats-col {
+    text-align: center;
+}
+
+:where(.s-order-stats) .header-cell.cash-col, :where(.s-order-stats) .header-cell.card-col, :where(.s-order-stats) .header-cell.noname-col, :where(.s-order-stats) .header-cell.total-col {
+    text-align: right;
+}
+
+
+/* Стили для ячеек с данными */
+:where(.s-order-stats) .table-cell.date-col, :where(.s-order-stats) .table-cell.orders-count-col {
+    text-align: center;
+}
+
+:where(.s-order-stats) .table-cell.cash-col, :where(.s-order-stats) .table-cell.card-col, :where(.s-order-stats) .table-cell.noname-col, :where(.s-order-stats) .table-cell.total-col {
+    font-family: monospace; /* Моноширинный шрифт для цифр */
+    text-align: right;
+}
+
+
+:where(.s-order-stats) .table-cell.branch-stats-cell {
+    text-align: center;
+}
+
+
+/* Стили для кнопки-ссылки */
+:where(.s-order-stats) .button-link {
+    display: inline-block;
+    padding: 5px 10px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 0.9em;
+    transition: background-color 0.2s;
+}
+
+
+:where(.s-order-stats) .button-link:hover {
+    background-color: #0056b3;
+}
+
+
+
+/* Адаптивность для таблицы статистики */
+@media screen and (max-width: 992px){
+
+    :where(.s-order-stats) .statistics-table .table-header {
+    display: none; /* Скрываем заголовки на мобильных */
+
+}
+
+
+    :where(.s-order-stats) .statistics-table .table-row {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: var(--border-radius);
+    background-color: var(--card-bg);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+
+}
+
+
+    :where(.s-order-stats) .statistics-table .table-cell {
+    padding: 10px 5px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid var(--hover-bg);
+    width: 100%;
+    text-align: right; /* Выравниваем значение справа */
+
+}
+
+
+    :where(.s-order-stats) .statistics-table .table-cell:last-child {
+    border-bottom: none;
+
+}
+
+
+    :where(.s-order-stats) .statistics-table .table-cell::before {
+    content: attr(data-label);
+    font-weight: bold;
+    width: 50%; /* Увеличим место для заголовка */
+    margin-right: 10px;
+    flex-shrink: 0;
+    color: var(--text-muted);
+    text-align: left; /* Заголовок слева */
+
+}
+
+    
+    :where(.s-order-stats) .table-cell.branch-stats-cell {
+    justify-content: space-between;
+
+}
+
+
+}
+

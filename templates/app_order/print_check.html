@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <title>{{ check_title }} - Заказ #{{ order.print_number }}</title>
     {% load static %}
-    <link rel="stylesheet" href="{% static 'css/print_check.css' %}">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     <style>
         :root {
             --check-font-size: {{ branch.check_font_size }}px;
@@ -111,7 +111,7 @@
         }
     </style>
 </head>
-<body>
+<body class="s-print">
 
     {% if show_order_details %}
     <div class="order-details">

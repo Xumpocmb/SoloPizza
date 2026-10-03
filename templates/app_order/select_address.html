@@ -3,7 +3,6 @@
 
 {% block styles %}
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
-    <link rel="stylesheet" href="{% static 'css/map.css' %}">
 {% endblock %}
 
 {% block scripts %}
@@ -11,6 +10,8 @@
     <p>7b1cd3ea-8fb0-4be5-b6be-48ed9e921920</p>
     <script src="{% static 'js/map.js' %}" defer></script>
 {% endblock %}
+
+{% block body_class %}s-map{% endblock %}
 
 {% block main %}
     <main class="map-page">

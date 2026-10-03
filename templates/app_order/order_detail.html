@@ -6,13 +6,11 @@
 {% block og_description %}{% trans "Детали заказа Solo Pizza - просмотрите информацию о вашем заказе, статус доставки и состав заказа." %}{% endblock %}
 {% block twitter_description %}{% trans "Детали заказа Solo Pizza - просмотрите информацию о вашем заказе, статус доставки и состав заказа." %}{% endblock %}
 
-{% block styles %}
-    <link rel="stylesheet" href="{% static 'css/order_detail.css' %}"/>
-{% endblock %}
-
 {% block scripts %}
     {{ block.super }}
 {% endblock %}
+
+{% block body_class %}s-order-detail{% endblock %}
 
 {% block main %}
     <main class="order-detail-page">

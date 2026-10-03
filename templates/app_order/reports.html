@@ -10,8 +10,6 @@
 {% block twitter_description %}Отчеты по заказам Solo Pizza - просмотрите данные о суммах заказов по филиалам за текущий день.{% endblock %}
 
 {% block styles %}
-    <link rel="stylesheet" href="{% static 'css/order_list.css' %}">
-    <link rel="stylesheet" href="{% static 'css/order_statistics.css' %}">
     <style>
         .branch-statistics-container {
             max-width: 1200px;
@@ -177,6 +175,8 @@
         }
     </style>
 {% endblock %}
+
+{% block body_class %}s-order-list s-order-stats{% endblock %}
 
 {% block main %}
 <main class="order-list-page">
