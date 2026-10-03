@@ -88,6 +88,7 @@
 
 .item-card .order-link:hover {
     background-color: #068a50;
+    border-radius: var(--border-radius);
 }
 
 .cart_price_section {

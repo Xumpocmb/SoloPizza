@@ -102,6 +102,7 @@
 
 .filter-button:hover {
     background-color: #068a50;
+    border-radius: var(--border-radius);
 }
 
 /* Информация о филиале */
@@ -345,6 +346,7 @@
 
 .view-button:hover {
     background-color: var(--accent-color-rgba);
+    border-radius: 50%;
 }
 
 .edit-button {
@@ -374,6 +376,7 @@
 
 .page-link:hover {
     background-color: var(--hover-bg);
+    border-radius: var(--border-radius);
 }
 
 .current-page {
@@ -723,6 +726,7 @@
     .view-button:hover,
     .pdf-button:hover {
         background-color: var(--accent-color-rgba);
+        border-radius: var(--border-radius);
         color: var(--accent-color);
     }
 
