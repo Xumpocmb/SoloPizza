@@ -1140,3 +1140,152 @@ msgstr "Pickup"
 
 msgid "Зал"
 msgstr "Dining room"
+
+#: templates/app_home/home.html:81
+msgid "Доставка по Барановичам от 3 руб."
+msgstr "Delivery across Baranovichi from 3 BYN"
+
+#: templates/app_home/home.html:83
+msgid "Пицца в Барановичах с доставкой"
+msgstr "Pizza delivery in Baranovichi"
+
+#: templates/app_home/home.html:84
+msgid ""
+"Свежая пицца, горячие блюда, напитки и комбо-наборы. Выбирайте блюда в меню "
+"и оформляйте заказ онлайн — привезём горячим."
+msgstr ""
+"Fresh pizza, hot dishes, drinks and combo sets. Pick a dish from the menu "
+"and order online — we'll bring it hot."
+
+#: templates/app_home/home.html:89
+msgid "Смотреть меню"
+msgstr "Browse the menu"
+
+#: templates/app_home/home.html:105
+msgid "Доставка по городу — 3 руб."
+msgstr "City delivery — 3 BYN"
+
+#: templates/app_home/home.html:109
+msgid "Бесплатно при заказе от 20 руб."
+msgstr "Free with an order from 20 BYN"
+
+#: templates/app_home/home.html:122
+msgid "Актуальные акции"
+msgstr "Current promotions"
+
+#: templates/app_home/home.html:143
+msgid "Актуальные комбо-наборы"
+msgstr "Current combo sets"
+
+#: templates/app_home/home.html:153
+msgid "Следующий слайд"
+msgstr "Next slide"
+
+#: templates/app_home/home.html:154
+msgid "Предыдущий слайд"
+msgstr "Previous slide"
+
+#: templates/app_home/home.html:165
+msgid "Выберите категорию, чтобы посмотреть состав, размеры и цены."
+msgstr "Pick a category to see the ingredients, sizes and prices."
+
+#: templates/app_home/home.html:193
+msgid "Наши новинки"
+msgstr "New arrivals"
+
+#: templates/app_home/home.html:195
+msgid "Свежие позиции, которые готовятся из свежих ингредиентов."
+msgstr "Fresh picks made with fresh ingredients."
+
+#: templates/app_home/home.html:197
+msgid "Всё меню"
+msgstr "Full menu"
+
+#: templates/app_home/home.html:218
+msgid "Комбо"
+msgstr "Combo"
+
+#: templates/app_home/home.html:221
+msgid "Острый"
+msgstr "Spicy"
+
+#: templates/app_home/home.html:255
+msgid "Доставка и контакты"
+msgstr "Delivery and contacts"
+
+#: templates/app_home/home.html:264
+msgid "Доставка по городу — 3 руб. При заказе от 20 руб. доставка бесплатная."
+msgstr "City delivery is 3 BYN. Free on orders from 20 BYN."
+
+#: templates/app_home/home.html:271
+msgid "Филиалы"
+msgstr "Locations"
+
+#: templates/app_home/home.html:273
+msgid "Solo Pizza — сеть пиццерий в Барановичах:"
+msgstr "Solo Pizza is a chain of pizzerias in Baranovichi:"
+
+#: templates/app_home/home.html:280
+msgid "Филиалы скоро появятся."
+msgstr "More locations coming soon."
+
+#: templates/app_home/home.html:289
+msgid ""
+"Готовим пиццу из свежих ингредиентов и доставляем горячей по всему городу."
+msgstr ""
+"We cook pizza from fresh ingredients and deliver it hot across the city."
+
+#: templates/app_home/home.html:290
+msgid "О компании"
+msgstr "About us"
+
+#: templates/app_catalog/catalog.html:4
+msgid "Каталог пиццы в Барановичах - Solo Pizza"
+msgstr "Pizza menu in Baranovichi - Solo Pizza"
+
+#: templates/app_catalog/catalog.html:52
+msgid "Меню Solo Pizza"
+msgstr "Solo Pizza menu"
+
+#: templates/app_catalog/catalog.html:54
+msgid "Каталог пиццы в Барановичах"
+msgstr "Pizza menu in Baranovichi"
+
+#: templates/app_catalog/catalog.html:71
+msgid "Доставка от 3 руб."
+msgstr "Delivery from 3 BYN"
+
+#: templates/app_catalog/catalog.html:80
+msgid "Категории меню"
+msgstr "Menu categories"
+
+#: templates/app_catalog/catalog.html:82
+msgid ""
+"Пицца, напитки, фастфуд и десерты — всё, что можно заказать с доставкой."
+msgstr ""
+"Pizza, drinks, fast food and desserts — everything you can order with "
+"delivery."
+
+#: templates/app_catalog/catalog.html:111
+msgid "Категории скоро появятся"
+msgstr "Categories coming soon"
+
+#: templates/app_catalog/catalog.html:113
+msgid "На главную"
+msgstr "Back to home"
+
+#: templates/app_catalog/catalog.html:55
+msgid ""
+"Выберите категорию, чтобы посмотреть состав, размеры и цены, а затем "
+"оформить заказ онлайн."
+msgstr ""
+"Pick a category to see the ingredients, sizes and prices, then place your "
+"order."
+
+#: templates/app_catalog/catalog.html:112
+msgid ""
+"Меню для этого филиала ещё не заполнено. Загляните позже или выберите другой"
+" филиал."
+msgstr ""
+"This location's menu is not filled in yet. Check back later or pick another "
+"location."
