@@ -4819,7 +4819,16 @@ body.dark .snowflake,
 
 
     :where(.s-home) .hp-card__foot {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
     padding: 12px 10px;
+
+}
+
+
+    :where(.s-home) .hp-card__foot .hp-btn {
+    width: 100%;
 
 }
 
