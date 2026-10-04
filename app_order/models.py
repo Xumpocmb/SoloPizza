@@ -258,37 +258,6 @@ class Order(models.Model):
         if not hasattr(self, "_pickup_discount"):
             self._pickup_discount = Order.objects.get_order_totals(self)["pickup_discount_applied"]
         return self._pickup_discount
-        
-    def add_item_from_cart(self, cart_item):
-        """Добавляет товар из корзины в заказ"""
-        order_item = OrderItem.objects.create(
-            order=self,
-            product=cart_item.item,  # Исправлено: cart_item.item вместо cart_item.product
-            variant=cart_item.item_variant,  # Исправлено: cart_item.item_variant вместо cart_item.variant
-            quantity=cart_item.quantity
-        )
-        
-        # Копируем дополнительные параметры
-        if cart_item.board1:
-            order_item.board1 = cart_item.board1
-            
-        if cart_item.board2:
-            order_item.board2 = cart_item.board2
-                
-        if cart_item.sauce:
-            order_item.sauce = cart_item.sauce
-            
-        if cart_item.drink:
-            order_item.drink = cart_item.drink
-            
-        order_item.save()
-        
-        # Добавляем добавки - исправлено для работы с ManyToManyField
-        if cart_item.addons.exists():
-            order_item.addons.set(cart_item.addons.all())
-                
-        self.recalculate_totals()
-        return order_item
 
 
 class OrderItem(models.Model):
