@@ -69,7 +69,9 @@ class OrderManager(models.Manager):
             order = self.get_queryset().get(id=order)
 
         discounts = DiscountCache()
-        item_calculations = [(item, item.calculate_item_total(discounts=discounts)) for item in order.items.all()]
+        item_calculations = [
+            (item, item.calculate_item_total(discounts=discounts)) for item in self._order_items(order)
+        ]
 
         totals = {
             "subtotal": Decimal("0.00"),
@@ -89,6 +91,13 @@ class OrderManager(models.Manager):
         totals["total_price"] = totals["subtotal"] - totals["discount_amount"] + totals["delivery_cost"]
 
         return totals
+
+    def _order_items(self, order):
+        """Позиции заказа вместе со всем, что нужно расчёту, если они не загружены заранее."""
+        if "items" in getattr(order, "_prefetched_objects_cache", {}):
+            return order.items.all()
+
+        return order.items.select_related("product__category", "variant__size", "board1", "board2").prefetch_related("addons")
 
     def _calculate_delivery_cost(self, order, item_calculations=None):
         """Динамический расчет стоимости доставки"""

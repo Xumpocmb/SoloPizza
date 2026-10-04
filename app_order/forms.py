@@ -1,5 +1,6 @@
 from django import forms
 from django.forms import inlineformset_factory
+from django.forms.models import BaseInlineFormSet
 from django.contrib import messages
 from django.utils import timezone
 from app_catalog.models import AddonParams, PizzaSauce, ProductVariant, BoardParams, Product
@@ -249,30 +250,68 @@ class OrderItemEditForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop("request", None)  # Получаем request из kwargs
+        self.catalog_cache = kwargs.pop("catalog_cache", None)
         super().__init__(*args, **kwargs)
         if self.instance and hasattr(self.instance, "product"):
             self._initialize_form_fields()
 
+    def _set_choices(self, name, key, build):
+        """Отдаёт позициям формы общий queryset и один раз посчитанный список вариантов."""
+        field = self.fields[name]
+
+        if self.catalog_cache is None:
+            field.queryset = build()
+            return
+
+        if key not in self.catalog_cache:
+            self.catalog_cache[key] = build()
+
+        field.queryset = self.catalog_cache[key]
+
+        choices_key = ("choices", name, key)
+        if choices_key not in self.catalog_cache:
+            # Отрисовка селекта иначе заново выполняет запрос на каждую позицию формы
+            choices = []
+            if field.empty_label is not None:
+                choices.append(("", field.empty_label))
+            choices.extend(
+                (field.prepare_value(obj), field.label_from_instance(obj)) for obj in field.queryset
+            )
+            self.catalog_cache[choices_key] = choices
+
+        field.choices = self.catalog_cache[choices_key]
+
     def _initialize_form_fields(self):
         """Инициализирует все поля формы на основе продукта"""
         product = self.instance.product
-        self.fields["variant"].queryset = ProductVariant.objects.filter(product=product)
+        self._set_choices(
+            "variant",
+            ("variants", product.pk),
+            lambda: ProductVariant.objects.filter(product=product).select_related("product", "size"),
+        )
 
         # Для пицц и кальцоне
         if product.category.name in ["Пицца", "Кальцоне"]:
-            self.fields["sauce"].queryset = PizzaSauce.objects.filter(is_active=True)
+            self._set_choices("sauce", "sauces", lambda: PizzaSauce.objects.filter(is_active=True))
             self._update_size_dependent_fields()
         else:
             self._hide_pizza_specific_fields()
 
     def _update_size_dependent_fields(self):
-        """Обновляет поля, зависящие от размера (борты и добавки)"""
+        """Инициализирует поля, зависящие от размера (борты и добавки)"""
         size = self.instance.variant.size if self.instance.variant else None
         if size:
-            self.fields["board1"].queryset = BoardParams.objects.filter(size=size)
-            self.fields["board2"].queryset = BoardParams.objects.filter(size=size)
-            self.fields["addons"].queryset = AddonParams.objects.filter(addon__is_active=True,
-                                                                        size=size).select_related("addon")
+            self._set_choices(
+                "board1", ("boards", size.pk), lambda: BoardParams.objects.filter(size=size).select_related("board", "size")
+            )
+            self._set_choices(
+                "board2", ("boards", size.pk), lambda: BoardParams.objects.filter(size=size).select_related("board", "size")
+            )
+            self._set_choices(
+                "addons",
+                ("addons", size.pk),
+                lambda: AddonParams.objects.filter(addon__is_active=True, size=size).select_related("addon", "size"),
+            )
         else:
             self.fields["board1"].queryset = BoardParams.objects.none()
             self.fields["board2"].queryset = BoardParams.objects.none()
@@ -339,8 +378,27 @@ class OrderItemEditForm(forms.ModelForm):
         return cleaned_data
 
 
-OrderItemFormSet = inlineformset_factory(Order, OrderItem, form=OrderItemEditForm, extra=0, can_delete=False,
-                                         fields=["variant", "quantity", "board1", "board2", "sauce", "drink", "addons"])
+class OrderItemFormSetBase(BaseInlineFormSet):
+    """Формасет позиций заказа: один раз подтягивает связанные данные и общие queryset."""
+
+    def __init__(self, *args, form_kwargs=None, **kwargs):
+        form_kwargs = dict(form_kwargs or {})
+        self.catalog_cache = form_kwargs.setdefault("catalog_cache", {})
+        kwargs.setdefault(
+            "queryset",
+            OrderItem.objects.select_related(
+                "product__category",
+                "variant__size",
+                "board1__board",
+                "board2__board",
+                "sauce",
+            ).prefetch_related("addons__addon"),
+        )
+        super().__init__(*args, form_kwargs=form_kwargs, **kwargs)
+
+
+OrderItemFormSet = inlineformset_factory(Order, OrderItem, form=OrderItemEditForm, formset=OrderItemFormSetBase, extra=0,
+                                         can_delete=False, fields=["variant", "quantity", "board1", "board2", "sauce", "drink", "addons"])
 
 
 class AddToOrderForm(forms.Form):
