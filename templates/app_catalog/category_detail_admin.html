@@ -44,6 +44,8 @@
                                 </a>
                                 <p>{{ item.description }}</p>
                             </div>
+                            {% with params_flags=item.has_base_sauce|yesno:'true,false'|add:','|add:item.has_border|yesno:'true,false'|add:','|add:item.has_addons|yesno:'true,false'|add:','|add:item.has_drink|yesno:'true,false' %}
+                            {% with has_no_params=item.has_base_sauce is False and item.has_border is False and item.has_addons is False and item.has_drink is False %}
                             <div class="cart_price_section-admin">
                                 <div class="item-price-admin" id="item-price-{{ item.slug }}">
                                     {% if item.min_price %}
@@ -52,7 +54,12 @@
                                         Цена не указана
                                     {% endif %}
                                 </div>
-                                <button class="toggle-form-btn" onclick="toggleForm('{{ item.slug }}')">Параметры</button>
+                                <div class="admin-actions">
+                                    {% if has_no_params and item.variants.all %}
+                                        <button type="button" class="quick-add-btn" title="Добавить в заказ" onclick="quickAdd('{{ item.slug }}', '{% if item.variants.all %}{{ item.variants.first.id }}{% endif %}')">+</button>
+                                    {% endif %}
+                                    <button class="toggle-form-btn" onclick="toggleForm('{{ item.slug }}')">Параметры</button>
+                                </div>
                             </div>
 
                             <!-- Форма добавления в корзину -->
@@ -174,34 +181,27 @@
                             });
                             this.classList.add('selected');
 
-                            // Обновляем цену товара
-                            updatePrice(itemSlug, variantId);
-
-                            // Загружаем параметры для выбранного варианта
+                            // Загружаем данные варианта (цена + параметры) одним запросом
                             loadVariantData(itemSlug, variantId, itemCategory);
                         });
                     });
 
                     // Функция обновления цены товара
-                    function updatePrice(itemSlug, variantId) {
-                        fetch(`/catalog/variant-data/${variantId}/`)
-                            .then(response => response.json())
-                            .then(data => {
-                                const priceElement = document.getElementById(`item-price-${itemSlug}`);
-                                if (priceElement) {
-                                    priceElement.innerHTML = `${data.price.toFixed(2)} руб.`;
-                                }
-                            })
-                            .catch(error => {
-                                console.error('Ошибка при загрузке данных варианта:', error);
-                            });
+                    function updatePriceElement(itemSlug, price) {
+                        const priceElement = document.getElementById(`item-price-${itemSlug}`);
+                        if (priceElement) {
+                            priceElement.innerHTML = `${price.toFixed(2)} руб.`;
+                        }
                     }
-                    
+
                     // Функция загрузки данных варианта
                     function loadVariantData(itemSlug, variantId, itemCategory) {
                         fetch(`/catalog/variant-data/${variantId}/`)
                             .then(response => response.json())
                             .then(data => {
+                                // Обновляем цену
+                                updatePriceElement(itemSlug, data.price);
+
                                 // Получаем информацию о параметрах товара из скрытого поля
                                 const paramsInput = document.getElementById(`item-params-${itemSlug}`);
                                 if (!paramsInput) {
@@ -362,6 +362,16 @@
                             }
                         });
                     });
+
+                    function quickAdd(itemSlug, variantId) {
+                        const form = document.getElementById(`add-to-cart-form-${itemSlug}`);
+                        if (!form) return;
+                        const variantInput = document.getElementById(`variant_id_${itemSlug}`);
+                        if (variantInput && variantId) {
+                            variantInput.value = variantId;
+                        }
+                        form.submit();
+                    }
                 </script>
             {% else %}
                 <div class="page_title">
