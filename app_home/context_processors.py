@@ -7,12 +7,26 @@ from app_cart.session_cart import SessionCart  # Import SessionCart
 DEFAULT_BRANCH_ID = 1
 
 
+def get_active_branches(request):
+    """Активные филиалы вместе с телефонами и графиком, один запрос на запрос.
+
+    Список живёт на request, поэтому контекстный процессор и представления берут
+    одни и те же объекты: филиалы не выбираются заново в каждом шаблоне, а телефоны
+    и график приходят вместе с ними.
+    """
+    branches = getattr(request, "_active_branches", None)
+    if branches is None:
+        branches = list(CafeBranch.objects.filter(is_active=True).prefetch_related("working_hours", "branch_phones"))
+        request._active_branches = branches
+    return branches
+
+
 def site_context_processor(request):
     # Телефоны и график нужны шапке, подвалу, главной и микроразметке, поэтому
     # забираем их одним запросом и делимся одними и теми же объектами: иначе
     # branch_phones выбирается заново в каждом шаблоне, а branches — ещё раз
     # в restaurant_schema.
-    branches = list(CafeBranch.objects.filter(is_active=True).prefetch_related("working_hours", "branch_phones"))
+    branches = get_active_branches(request)
 
     # Initialize selected_branch_id with default value
     selected_branch_id = request.session.get("selected_branch_id", DEFAULT_BRANCH_ID)

@@ -14,6 +14,7 @@ from functools import wraps
 from app_cart.models import CartItem
 from app_cart.session_cart import SessionCart
 from app_cart.utils import validate_cart_items_for_branch
+from app_home.context_processors import get_active_branches
 from app_home.models import CafeBranch, WorkingHours
 from app_order.forms import CheckoutForm, OrderEditForm, OrderItemFormSet, AddToOrderForm
 from app_order.models import OrderItem, Order, OrderStatistic, suspended_order_totals
@@ -78,12 +79,14 @@ def checkout(request):
     if not cart_items:  # Check if session cart is empty
         return redirect("app_cart:view_cart")
 
-    # Получаем выбранный филиал
+    # Получаем выбранный филиал (объекты из контекстного процессора — с телефонами и графиком)
     selected_branch_id = request.session.get("selected_branch_id", DEFAULT_BRANCH_ID)
-    try:
-        selected_branch = CafeBranch.objects.get(id=selected_branch_id)
-    except CafeBranch.DoesNotExist:
-        selected_branch = CafeBranch.objects.get(id=DEFAULT_BRANCH_ID)
+    selected_branch = next((branch for branch in get_active_branches(request) if str(branch.id) == str(selected_branch_id)), None)
+    if selected_branch is None:
+        try:
+            selected_branch = CafeBranch.objects.get(id=selected_branch_id)
+        except CafeBranch.DoesNotExist:
+            selected_branch = CafeBranch.objects.get(id=DEFAULT_BRANCH_ID)
 
     # Проверяем, разрешено ли пользователю делать заказ в текущее время
     if not is_order_time_allowed(request.user):
@@ -102,13 +105,6 @@ def checkout(request):
 
         messages.error(request, f"Заказы принимаются в соответствии с графиком работы филиала: {time_info}.")
         return redirect("app_cart:view_cart")
-
-    # Получаем выбранный филиал
-    selected_branch_id = request.session.get("selected_branch_id", DEFAULT_BRANCH_ID)
-    try:
-        selected_branch = CafeBranch.objects.get(id=selected_branch_id)
-    except CafeBranch.DoesNotExist:
-        selected_branch = CafeBranch.objects.get(id=DEFAULT_BRANCH_ID)
 
     if request.method == "POST":
         form = CheckoutForm(request.POST)
@@ -348,22 +344,22 @@ def order_list(request):
     current_session_key = request.session.session_key
 
     if request.user.is_staff:
-        orders = Order.objects.filter(branch_id=selected_branch_id).order_by("-created_at")
+        orders = Order.objects.filter(branch_id=selected_branch_id).select_related("branch").order_by("-created_at")
     else:
         # Prioritize user's orders if authenticated
         if request.user.is_authenticated:
-            orders = Order.objects.filter(user=request.user, branch_id=selected_branch_id).order_by("-created_at")
+            orders = Order.objects.filter(user=request.user, branch_id=selected_branch_id).select_related("branch").order_by("-created_at")
         else:
             # For unauthenticated users, show orders that match their tokens
             # Since guest_token is a UUID4 (cryptographically secure), we can safely
             # allow access to orders that were created with this token, regardless of user assignment
             guest_token = request.COOKIES.get("guest_token")
             if guest_token:
-                orders = Order.objects.filter(guest_token=guest_token, branch_id=selected_branch_id).order_by("-created_at")
+                orders = Order.objects.filter(guest_token=guest_token, branch_id=selected_branch_id).select_related("branch").order_by("-created_at")
             else:
                 # Fallback to session_key if no guest_token
                 session_key = request.session.session_key or request.session.create()
-                orders = Order.objects.filter(session_key=session_key, user__isnull=True, branch_id=selected_branch_id).order_by("-created_at")
+                orders = Order.objects.filter(session_key=session_key, user__isnull=True, branch_id=selected_branch_id).select_related("branch").order_by("-created_at")
 
     # Additional debug info for unauthenticated users
     debug_total_orders_for_guest_token = 0
@@ -399,13 +395,15 @@ def order_list(request):
     breadcrumbs = [{"title": _("Главная"), "url": "/"}, {"title": _("Мои заказы"), "url": reverse("app_order:order_list")}]  # Текущая страница
 
     # Получаем информацию о выбранном филиале
-    try:
-        selected_branch = CafeBranch.objects.get(id=selected_branch_id)
-    except CafeBranch.DoesNotExist:
-        selected_branch = CafeBranch.objects.get(id=DEFAULT_BRANCH_ID)
-
-    # Получаем список всех филиалов для возможности изменения филиала заказа
-    branches = CafeBranch.objects.filter(is_active=True)
+    branches = get_active_branches(request)
+    # идентификатор приходит из сессии строкой, поэтому сравниваем как строки
+    selected_branch = next((branch for branch in branches if str(branch.id) == str(selected_branch_id)), None)
+    if selected_branch is None:
+        # выбранный филиал мог быть отключён, тогда показываем именно его
+        try:
+            selected_branch = CafeBranch.objects.get(id=selected_branch_id)
+        except CafeBranch.DoesNotExist:
+            selected_branch = CafeBranch.objects.get(id=DEFAULT_BRANCH_ID)
 
     context = {
         "page_obj": page_obj,
