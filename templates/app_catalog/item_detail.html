@@ -36,9 +36,7 @@
 {% block body_class %}s-item{% endblock %}
 
 {% block main %}
-    <main>
-
-        <section class="item">
+    <main class="item-page">
         <div class="breadcrumbs">
             {% for crumb in breadcrumbs %}
                 <a href="{{ crumb.url }}" class="breadcrumb-link">{{ crumb.title }}</a>
@@ -47,6 +45,8 @@
                 {% endif %}
             {% endfor %}
         </div>
+
+        <section class="item">
             <div class="item_container">
                 {% if not user.is_staff and not user.is_superuser %}
                 <div class="item-image">
