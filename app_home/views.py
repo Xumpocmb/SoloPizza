@@ -23,7 +23,6 @@ def home_page(request):
     active_marquees = Marquee.objects.filter(is_active=True)
     featured_products = (
         Product.objects.filter(is_active=True, display_on_main=True)
-        .prefetch_related("variants")
         .annotate(min_price=Min("variants__price"))[:8]
     )
     slides = [
