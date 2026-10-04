@@ -18,6 +18,8 @@ class Category(models.Model):
                                        help_text='Установите, если хотите скрыть эту категорию от пользователей. Она будет видна только администраторам')
     slug = models.SlugField(max_length=100, unique=True, blank=True, null=True, verbose_name='URL')
     order = models.PositiveIntegerField('Порядок', default=0)
+    is_fastfood = models.BooleanField(default=False, verbose_name='Чек фастфуда',
+                                     help_text='Включать товары этой категории в чек "Только фастфуд" и учитывать в правиле доставки для фастфуда')
 
     class Meta:
         db_table = 'categories'

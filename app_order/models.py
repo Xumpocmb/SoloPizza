@@ -116,9 +116,9 @@ class OrderManager(models.Manager):
         # Сумма товаров без учета доставки
         subtotal = sum(calculation["final_total"] for _, calculation in item_calculations)
 
-        # Проверяем, все ли товары в заказе относятся к фастфуду (за исключением "Напитки", "Соусы")
+        # Проверяем, все ли товары в заказе относятся к фастфуду (по опции категории)
         is_all_fastfood = all(
-            item.product.category.name in ["Закуски", "Бургеры", "Соусы", "Напитки", "Горячие блюда", "Сеты"]
+            item.product.category.is_fastfood
             for item, _ in item_calculations
         )
 

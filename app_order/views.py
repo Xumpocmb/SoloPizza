@@ -615,9 +615,9 @@ def print_check_fastfood_only(request, order_id):
 
     order = get_object_or_404(Order, id=order_id)
 
-    # Получаем позиции фастфуда, соусов и бургеров
+    # Получаем позиции фастфуда по опции категории
     items = (
-        order.items.filter(product__category__name__in=["Закуски", "Бургеры", "Соусы", "Горячие блюда", "Сеты"])
+        order.items.filter(product__category__is_fastfood=True)
         .select_related("product__category", "variant__size", "board1__board", "board2__board", "sauce")
         .prefetch_related("addons__addon")
     )
