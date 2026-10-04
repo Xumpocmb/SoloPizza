@@ -78,11 +78,20 @@ class Product(models.Model):
         return reverse('app_catalog:item_detail', kwargs={'slug': self.slug})
 
     def is_available_in_branch(self, branch):
-        """Проверяет, доступен ли товар в указанном филиале"""
-        # Если у категории нет филиалов, товар доступен везде
-        if not self.category.branch.exists():
+        """Доступен ли товар в указанном филиале.
+
+        Пустой список филиалов у категории означает «доступен везде». Список
+        кэшируется на инстансе, а all() берёт данные из prefetch, поэтому на
+        странице корзины проверка не ходит в базу: SessionCart подтягивает
+        категорию и её филиалы одним запросом.
+        """
+        if branch is None:
             return True
-        return self.category.branch.filter(id=branch.id).exists()
+
+        if not hasattr(self, "_category_branch_ids"):
+            self._category_branch_ids = frozenset(b.pk for b in self.category.branch.all())
+
+        return not self._category_branch_ids or branch.pk in self._category_branch_ids
 
 
 class PizzaSizes(models.Model):

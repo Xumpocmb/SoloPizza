@@ -66,11 +66,13 @@ class SessionCart:
         # Flatten list of lists for addons_ids
         addons_ids = [addon_id for item in self.cart.values() if item["addons_ids"] for addon_id in item["addons_ids"]]
 
-        products = Product.objects.filter(id__in=product_ids)
-        variants = ProductVariant.objects.filter(id__in=product_variants_ids)
-        boards = BoardParams.objects.filter(id__in=board_ids)
+        products = Product.objects.filter(id__in=product_ids).select_related("category").prefetch_related("category__branch")
+        # select_related для всего, что __str__ и шаблон корзины достают по FK:
+        # без него на каждую позицию идут отдельные запросы.
+        variants = ProductVariant.objects.filter(id__in=product_variants_ids).select_related("product", "size")
+        boards = BoardParams.objects.filter(id__in=board_ids).select_related("board", "size")
         sauces = PizzaSauce.objects.filter(id__in=sauce_ids)
-        addons = AddonParams.objects.filter(id__in=addons_ids)
+        addons = AddonParams.objects.filter(id__in=addons_ids).select_related("addon", "size")
 
         product_map = {str(p.id): p for p in products}
         variant_map = {str(v.id): v for v in variants}
