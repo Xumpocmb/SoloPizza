@@ -1311,11 +1311,57 @@ body.dark .snowflake,
 
 
 /* Стили для сетки */
-:where(.s-promo) .promo-grid {
+:where(.s-promo) .promo-grid,
+:where(.s-promo) .promo-cards {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 25px;
     align-items: stretch;
+}
+
+
+/* В сетке карточки тянутся на всю высоту колонки, отступ задаёт gap */
+:where(.s-promo) .promo-cards .promo-card {
+    margin-bottom: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+
+:where(.s-promo) .promo-cards .promo-card-content {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+
+:where(.s-promo) .promo-cards .promo-card-content > a {
+    margin-top: auto;
+    align-self: flex-start;
+}
+
+
+/* Предупреждение внутри карточки акции */
+:where(.s-promo) .restriction-banner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 15px;
+    padding: 12px 15px;
+    border-radius: var(--border-radius);
+    border-left: 4px solid #e0a800;
+    background-color: #fff8e6;
+    color: #8a6d3b;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+
+/* Ссылка на страницу доставки в контактах */
+:where(.s-promo) .delivery-link-section {
+    margin-top: 25px;
+    text-align: center;
+    color: var(--text-muted);
 }
 
 
@@ -1922,6 +1968,214 @@ body.dark .snowflake,
 }
 
 
+/* ==== about_page.css → s-about ==== */
+/* Страница «О компании»: карточки, шаги оформления заказа и блок контактов */
+
+:where(.s-about) .about-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    margin-bottom: 40px;
+}
+
+
+:where(.s-about) .about-card {
+    display: flex;
+    flex-direction: column;
+    padding: 28px 25px;
+    background: var(--card-bg);
+    border: 1px solid var(--divider-color);
+    border-radius: var(--border-radius);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+
+:where(.s-about) .about-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--accent-color);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+}
+
+
+:where(.s-about) .about-card__icon {
+    display: grid;
+    place-items: center;
+    width: 54px;
+    height: 54px;
+    margin-bottom: 18px;
+    border-radius: 50%;
+    background: var(--accent-color-rgba);
+    color: var(--accent-color);
+    font-size: 1.4rem;
+}
+
+
+:where(.s-about) .about-card__title {
+    margin: 0 0 12px;
+    color: var(--accent-color);
+    font-size: 1.35rem;
+    line-height: 1.25;
+}
+
+
+/* Адрес выбранного филиала — главный акцент в карточке */
+:where(.s-about) .about-card__address {
+    margin: 0 0 12px;
+    font-size: 1.15rem;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+
+:where(.s-about) .about-card p {
+    margin: 0 0 12px;
+    line-height: 1.6;
+}
+
+
+:where(.s-about) .about-card p:last-child {
+    margin-bottom: 0;
+}
+
+
+/* Шаги оформления заказа */
+:where(.s-about) .about-steps {
+    margin-bottom: 40px;
+    padding: 30px 25px;
+    background: var(--card-bg);
+    border: 1px solid var(--divider-color);
+    border-radius: var(--border-radius);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+}
+
+
+:where(.s-about) .about-steps__title {
+    margin: 0 0 22px;
+    color: var(--accent-color);
+    font-size: 1.6rem;
+    text-align: center;
+}
+
+
+:where(.s-about) .about-steps__list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: none;
+}
+
+
+:where(.s-about) .about-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+}
+
+
+:where(.s-about) .about-step__num {
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--accent-color);
+    color: #fff;
+    font-size: 1.05rem;
+    font-weight: 700;
+}
+
+
+:where(.s-about) .about-step p {
+    margin: 0;
+    line-height: 1.55;
+}
+
+
+/* Блок контактов */
+:where(.s-about) .about-cta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 25px;
+    padding: 30px 35px;
+    border-radius: var(--border-radius);
+    background: linear-gradient(120deg, var(--accent-color), var(--accent-color) 55%, #0ab268);
+    color: #fff;
+}
+
+
+:where(.s-about) .about-cta__text {
+    flex: 1 1 380px;
+}
+
+
+:where(.s-about) .about-cta__title {
+    margin: 0 0 12px;
+    color: #fff;
+    font-size: 1.6rem;
+}
+
+
+:where(.s-about) .about-cta__text p {
+    margin: 0 0 10px;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.92);
+}
+
+
+:where(.s-about) .about-cta__text p:last-child {
+    margin-bottom: 0;
+}
+
+
+:where(.s-about) .about-cta__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+
+:where(.s-about) .about-cta__actions .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border-color: transparent;
+    font-weight: 500;
+}
+
+
+/* На зелёном фоне кнопки светлые: заливка и контур, текст — фирменный зелёный */
+:where(.s-about) .about-cta__actions .btn-primary {
+    background-color: #fff;
+    color: var(--accent-color);
+}
+
+
+:where(.s-about) .about-cta__actions .btn-primary:hover {
+    background-color: rgba(255, 255, 255, 0.88);
+    color: var(--accent-color);
+}
+
+
+:where(.s-about) .about-cta__actions .btn-outline {
+    background-color: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.75);
+    color: #fff;
+}
+
+
+:where(.s-about) .about-cta__actions .btn-outline:hover {
+    background-color: #fff;
+    color: var(--accent-color);
+}
+
+
 /* Адаптивные стили */
 @media (max-width: 768px){
 
@@ -1958,6 +2212,45 @@ body.dark .snowflake,
 
     :where(.s-promo) .promo-card {
     padding: 20px;
+
+}
+
+
+    :where(.s-promo) .promo-cards {
+    grid-template-columns: 1fr;
+
+}
+
+
+    :where(.s-about) .about-cards,
+    :where(.s-about) .about-steps__list {
+    grid-template-columns: 1fr;
+
+}
+
+
+    :where(.s-about) .about-card,
+    :where(.s-about) .about-steps {
+    padding: 22px 20px;
+
+}
+
+
+    :where(.s-about) .about-cta {
+    padding: 24px 20px;
+
+}
+
+
+    :where(.s-about) .about-cta__actions {
+    width: 100%;
+
+}
+
+
+    :where(.s-about) .about-cta__actions .btn {
+    flex: 1 1 auto;
+    justify-content: center;
 
 }
 

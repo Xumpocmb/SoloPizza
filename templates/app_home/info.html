@@ -8,55 +8,98 @@
 {% block og_description %}{% trans "Информация о Solo Pizza в Барановичах - наша философия, история, традиции итальянской кухни и контроль качества." %}{% endblock %}
 {% block twitter_description %}{% trans "Информация о Solo Pizza в Барановичах - наша философия, история, традиции итальянской кухни и контроль качества." %}{% endblock %}
 
-{% block body_class %}s-promo{% endblock %}
+{% block body_class %}s-about s-promo{% endblock %}
 
 {% block main %}
 <main>
     <section class="promo-section">
         <div class="container">
-            <div class="promo-header">
-                <div class="breadcrumbs">
-                    {% for crumb in breadcrumbs %}
-                        {% if crumb.url != "#" %}
-                            <a href="{{ crumb.url }}" class="breadcrumb-link">{{ crumb.title }}</a>
-                        {% else %}
-                            <span class="current-page">{{ crumb.title }}</span>
-                        {% endif %}
-                        {% if not forloop.last %}<span class="breadcrumb-separator">></span>{% endif %}
-                    {% endfor %}
-                </div>
-                <h1 class="promo-title">{% trans "О компании Solo Pizza" %}</h1>
-                <div class="divider"></div>
-            </div>
-    
+            {% trans "О компании Solo Pizza" as promo_heading %}
+            {% include "app_home/_promo_header.html" with heading=promo_heading %}
+
             <div class="promo-description">
                 <p>{% trans "Solo Pizza - это не просто пиццерия, это место, где традиции итальянской кухни встречаются с современными технологиями и высоким уровнем сервиса. Мы стремимся создать для наших гостей атмосферу уюта и комфорта, где каждый может насладиться настоящей итальянской пиццей." %}</p>
             </div>
-    
-            <div class="text-content">
-                <h2 class="text-title">{% trans "Наша философия" %}</h2>
-                <p>{% trans "Наша миссия - делать вкусную пиццу доступной для каждого жителя Барановичей, сохраняя при этом высокое качество продукции и обслуживания." %}</p>
-                
-                <h2 class="text-title">{% trans "Контроль качества" %}</h2>
-                <p>{% trans "В Solo Pizza мы уделяем особое внимание качеству используемых продуктов. Мы тщательно отбираем поставщиков и ингредиенты, чтобы наша пицца всегда была вкусной и полезной." %}</p>
-                <p>{% trans "Наши повара регулярно проходят обучение и совершенствуют свои навыки, чтобы радить вас новыми вкусами и блюдами. Каждая пицца готовится с любовью и вниманием к деталям." %}</p>
-                
-                <h2 class="text-title">{% trans "Доставка" %}</h2>
-                <p>{% trans "Мы понимаем, как важно получить заказ вовремя и в идеальном состоянии. Поэтому наша служба доставки работает быстро и эффективно, чтобы ваша пицца приехала к вам горячей и аппетитной." %}</p>
-                <p>{% trans "Для удобства наших клиентов мы разработали мобильное приложение, которое можно скачать в Google Play. С его помощью вы можете легко сделать заказ, отследить его статус и получить доступ к специальным предложениям и акциям." %}</p>
-                
-                <h2 class="text-title">{% trans "Наш адрес" %}</h2>
-                <p>{% trans "Solo Pizza находится в центре города Барановичи по адресу: ул. Ленина, 9/1." %}</p>
-                <p>{% trans "Мы всегда рады видеть вас в нашей пиццерии, где вы можете насладиться не только вкусной едой, но и приятной атмосферой." %}</p>
-                
-                <h2 class="text-title">{% trans "Связаться с нами" %}</h2>
-                <p>{% trans "Вы можете связаться с нами по телефонам, указанным на странице" %} <a href="{% url 'app_home:contacts' %}">{% trans "контактов" %}</a>, {% trans "или посетить нашу страницу в Instagram, где мы регулярно публикуем новости, акции и специальные предложения." %}</p>
-                <p>{% trans "Также вы можете оставить свой отзыв или предложение на странице" %} <a href="{% url 'app_home:feedback' %}">{% trans "обратной связи" %}</a>. {% trans "Мы ценим мнение каждого клиента и стремимся становиться лучше с каждым днем." %}</p>
 
-                <h2 class="text-title">{% trans "Оформление заказа" %}</h2>
-                <p>{% trans "После оформления заказа с Вами свяжется оператор для подтверждения заказа." %}</p>
+            <div class="about-cards">
+                <article class="about-card">
+                    <span class="about-card__icon" aria-hidden="true">
+                        <i class="fas fa-heart"></i>
+                    </span>
+                    <h2 class="about-card__title">{% trans "Наша философия" %}</h2>
+                    <p>{% trans "Наша миссия - делать вкусную пиццу доступной для каждого жителя Барановичей, сохраняя при этом высокое качество продукции и обслуживания." %}</p>
+                </article>
+
+                <article class="about-card">
+                    <span class="about-card__icon" aria-hidden="true">
+                        <i class="fas fa-award"></i>
+                    </span>
+                    <h2 class="about-card__title">{% trans "Контроль качества" %}</h2>
+                    <p>{% trans "В Solo Pizza мы уделяем особое внимание качеству используемых продуктов. Мы тщательно отбираем поставщиков и ингредиенты, чтобы наша пицца всегда была вкусной и полезной." %}</p>
+                    <p>{% trans "Наши повара регулярно проходят обучение и совершенствуют свои навыки, чтобы радить вас новыми вкусами и блюдами. Каждая пицца готовится с любовью и вниманием к деталям." %}</p>
+                </article>
+
+                <article class="about-card">
+                    <span class="about-card__icon" aria-hidden="true">
+                        <i class="fas fa-truck"></i>
+                    </span>
+                    <h2 class="about-card__title">{% trans "Доставка" %}</h2>
+                    <p>{% trans "Мы понимаем, как важно получить заказ вовремя и в идеальном состоянии. Поэтому наша служба доставки работает быстро и эффективно, чтобы ваша пицца приехала к вам горячей и аппетитной." %}</p>
+                    <p>{% trans "Для удобства наших клиентов мы разработали мобильное приложение, которое можно скачать в Google Play. С его помощью вы можете легко сделать заказ, отследить его статус и получить доступ к специальным предложениям и акциям." %}</p>
+                </article>
+
+                <article class="about-card">
+                    <span class="about-card__icon" aria-hidden="true">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </span>
+                    <h2 class="about-card__title">{% trans "Наш адрес" %}</h2>
+                    {% if selected_branch %}
+                        <p class="about-card__address">{{ selected_branch.address }}</p>
+                        <p>{% trans "Мы всегда рады видеть вас в нашей пиццерии, где вы можете насладиться не только вкусной едой, но и приятной атмосферой." %}</p>
+                    {% else %}
+                        <p>{% trans "Сейчас нет доступных филиалов." %}</p>
+                    {% endif %}
+                </article>
+            </div>
+
+            <div class="about-steps">
+                <h2 class="about-steps__title">{% trans "Оформление заказа" %}</h2>
+                <ol class="about-steps__list">
+                    <li class="about-step">
+                        <span class="about-step__num" aria-hidden="true">1</span>
+                        <p>{% trans "После оформления заказа с Вами свяжется оператор для подтверждения заказа." %}</p>
+                    </li>
+                    <li class="about-step">
+                        <span class="about-step__num" aria-hidden="true">2</span>
                         <p>{% trans "Если заказ не будет подтвержден, он будет отменен." %}</p>
+                    </li>
+                    <li class="about-step">
+                        <span class="about-step__num" aria-hidden="true">3</span>
                         <p>{% trans "В случае, если с Вами не связались в течении 15ти минут, пожалуйста, перезвоните нам по нашим номерам и сообщите Ваш номер заказа" %}</p>
+                    </li>
+                </ol>
+            </div>
+
+            <div class="about-cta">
+                <div class="about-cta__text">
+                    <h2 class="about-cta__title">{% trans "Связаться с нами" %}</h2>
+                    <p>{% trans "Вы можете связаться с нами по телефонам, указанным на странице контактов, или посетить нашу страницу в Instagram, где мы регулярно публикуем новости, акции и специальные предложения." %}</p>
+                    <p>{% trans "Также вы можете оставить свой отзыв или предложение на странице обратной связи. Мы ценим мнение каждого клиента и стремимся становиться лучше с каждым днем." %}</p>
+                </div>
+                <div class="about-cta__actions">
+                    {% if selected_branch %}
+                        {% with phone=selected_branch.branch_phones.first %}
+                            {% if phone.dial %}
+                                <a class="btn btn-primary" href="tel:{{ phone.dial }}">
+                                    <i class="fas fa-phone-alt" aria-hidden="true"></i>
+                                    {{ phone.phone }}
+                                </a>
+                            {% endif %}
+                        {% endwith %}
+                    {% endif %}
+                    <a class="btn btn-outline" href="{% url 'app_home:contacts' %}">{% trans "Наши контакты" %}</a>
+                    <a class="btn btn-outline" href="{% url 'app_home:feedback' %}">{% trans "Вопросы и предложения" %}</a>
+                </div>
             </div>
         </div>
     </section>

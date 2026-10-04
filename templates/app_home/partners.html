@@ -14,25 +14,12 @@
 <main>
     <section class="promo-section">
         <div class="container">
-            <div class="promo-header">
-                <div class="breadcrumbs">
-                    {% for crumb in breadcrumbs %}
-                        {% if crumb.url != "#" %}
-                            <a href="{{ crumb.url }}" class="breadcrumb-link">{{ crumb.title }}</a>
-                        {% else %}
-                            <span class="current-page">{{ crumb.title }}</span>
-                        {% endif %}
-                        {% if not forloop.last %}<span class="breadcrumb-separator">></span>{% endif %}
-                    {% endfor %}
-                </div>
-                <h1 class="promo-title">{{ title }}</h1>
-                <div class="divider"></div>
-            </div>
-    
+            {% include "app_home/_promo_header.html" %}
+
             <div class="promo-description">
                 <p>{% trans "Посетителям, которые проводят время у наших партнеров и заказывают пиццу в Solo Pizza, предоставляется скидка 10% на все виды пиццы!" %}</p>
             </div>
-    
+
             {% if partners %}
             <ul class="promo-list">
                 {% for partner in partners %}

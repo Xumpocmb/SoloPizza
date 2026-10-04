@@ -11,24 +11,17 @@
 {% block body_class %}s-promo{% endblock %}
 
 {% block main %}
-    <main>
-        <section class="promo-section">
+<main>
+    <section class="promo-section">
         <div class="container">
-            <div class="breadcrumbs">
-                <a href="{% url "app_home:home" %}" class="breadcrumb-link">{% trans "Главная" %}</a>
-                <span class="breadcrumb-separator">></span>
-                <span class="breadcrumb-item active">{% trans "Доставка" %}</span>
+            {% include "app_home/_promo_header.html" %}
+
+            <div class="promo-description">
+                <p>{% trans "Мы осуществляем доставку пиццы и других блюд по всему городу Барановичи." %}</p>
             </div>
 
-            <div class="promo-header">
-                <h1 class="promo-title">{% trans "Доставка" %}</h1>
-                <div class="divider"></div>
-            </div>
             <div class="text-content">
                 <div class="delivery-info">
-                    <h2 class="text-title">{% trans "Доставка по городу" %}</h2>
-                    <p>{% trans "Мы осуществляем доставку пиццы и других блюд по всему городу Барановичи." %}</p>
-
                     <h2 class="text-title">{% trans "Стоимость доставки" %}</h2>
                     <ul>
                         <li>{% blocktrans %}Доставка по городу - <strong>3 руб.</strong>{% endblocktrans %}</li>
@@ -46,16 +39,13 @@
                     <h2 class="text-title">{% trans "Время доставки" %}</h2>
                     <p>{% trans "Уточняйте у операторов." %}</p>
                 </div>
+
                 <div class="action-buttons">
-                        <a href="{% url "app_home:home" %}">{% trans "Заказать пиццу" %}</a>
-                        <a href="{% url 'app_home:contacts' %}">{% trans "Наши контакты" %}</a>
+                    <a href="{% url 'app_home:home' %}" class="btn btn-primary">{% trans "Заказать пиццу" %}</a>
+                    <a href="{% url 'app_home:contacts' %}" class="btn btn-outline">{% trans "Наши контакты" %}</a>
                 </div>
             </div>
         </div>
     </section>
-            
-    </main>
-{% endblock %}
-
-{% block scripts %}
+</main>
 {% endblock %}

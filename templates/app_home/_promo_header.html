@@ -1,0 +1,22 @@
+{% comment %}
+Общая шапка промо-страниц: хлебные крошки, заголовок и разделитель.
+Чтобы разделы (доставка, контакты, акции, партнеры, о компании) выглядели
+одинаково, шапка вынесена сюда, а не дублируется в каждом шаблоне.
+
+Ожидаемый контекст: breadcrumbs (список dict с title и url), title.
+При необходимости своего заголовка: {% include ... with heading="..." %}.
+{% endcomment %}
+<div class="promo-header">
+    <div class="breadcrumbs">
+        {% for crumb in breadcrumbs %}
+            {% if forloop.last or crumb.url == "#" %}
+                <span class="current-page">{{ crumb.title }}</span>
+            {% else %}
+                <a href="{{ crumb.url }}" class="breadcrumb-link">{{ crumb.title }}</a>
+            {% endif %}
+            {% if not forloop.last %}<span class="breadcrumb-separator">></span>{% endif %}
+        {% endfor %}
+    </div>
+    <h1 class="promo-title">{{ heading|default:title }}</h1>
+    <div class="divider"></div>
+</div>

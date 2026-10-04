@@ -14,20 +14,7 @@
 <main>
     <section class="promo-section">
         <div class="container">
-            <div class="promo-header">
-                <div class="breadcrumbs">
-                    {% for crumb in breadcrumbs %}
-                        {% if crumb.url != "#" %}
-                            <a href="{{ crumb.url }}" class="breadcrumb-link">{{ crumb.title }}</a>
-                        {% else %}
-                            <span class="current-page">{{ crumb.title }}</span>
-                        {% endif %}
-                        {% if not forloop.last %}<span class="breadcrumb-separator">></span>{% endif %}
-                    {% endfor %}
-                </div>
-                <h1 class="promo-title">{{ title }}</h1>
-                <div class="divider"></div>
-            </div>
+            {% include "app_home/_promo_header.html" %}
 
             <div class="promo-description">
                 <p>{% trans "Адреса, телефоны и время работы наших пиццерий. Свяжитесь с нами для заказа или с вопросами." %}</p>
@@ -35,7 +22,7 @@
 
             <div class="text-content">
                 <h2 class="text-title">{{ selected_branch.name }}</h2>
-                
+
                 <div class="branch-info">
                     <div class="contact-section">
                         <h3>{% trans "Адрес" %}</h3>
@@ -53,7 +40,7 @@
                         </ul>
                     </div>
                 </div>
-                
+
                 <div class="delivery-link-section">
                     <p>{% trans "Узнайте подробнее о нашей доставке:" %}</p>
                     <a href="{% url 'app_home:delivery' %}">{% trans "Доставка" %}</a>
