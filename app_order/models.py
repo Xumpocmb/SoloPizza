@@ -1,5 +1,7 @@
 from decimal import Decimal
+from contextlib import contextmanager
 import json
+import threading
 from django.db import models
 from django.conf import settings
 from django.db.models.signals import post_save, post_delete, m2m_changed
@@ -19,55 +21,97 @@ class DecimalEncoder(json.JSONEncoder):
         return super().default(o)
 
 
+class DiscountCache:
+    """Кэш скидок на время одного пересчёта: иначе запрос на скидку уходит на каждую позицию."""
+
+    def __init__(self):
+        self._discounts = {}
+
+    def find(self, slug=None, name=None):
+        key = slug or name
+        if key not in self._discounts:
+            try:
+                if slug:
+                    self._discounts[key] = Discount.objects.get(slug=slug)
+                else:
+                    self._discounts[key] = Discount.objects.get(name=name)
+            except Discount.DoesNotExist:
+                self._discounts[key] = None
+        return self._discounts[key]
+
+    def percent(self, slug=None, name=None):
+        discount = self.find(slug=slug, name=name)
+        return discount.percent if discount is not None else None
+
+
+_recalculation_state = threading.local()
+
+
+@contextmanager
+def suspended_order_totals():
+    """Откладывает пересчёт итогов на время массового изменения позиций заказа."""
+    previous = getattr(_recalculation_state, "suspended", False)
+    _recalculation_state.suspended = True
+    try:
+        yield
+    finally:
+        _recalculation_state.suspended = previous
+
+
+def order_recalculation_suspended():
+    return getattr(_recalculation_state, "suspended", False)
+
+
 class OrderManager(models.Manager):
-    def get_order_totals(self, order_id):
-        order = self.get_queryset().get(id=order_id)
-        items = order.items.all()
+    def get_order_totals(self, order):
+        """Считает итоги заказа, ничего не сохраняя. Принимает заказ или его id."""
+        if not isinstance(order, Order):
+            order = self.get_queryset().get(id=order)
+
+        discounts = DiscountCache()
+        item_calculations = [(item, item.calculate_item_total(discounts=discounts)) for item in order.items.all()]
 
         totals = {
             "subtotal": Decimal("0.00"),
             "discount_amount": Decimal("0.00"),
-            "delivery_cost": self._calculate_delivery_cost(order),
-            "items": [],
+            "delivery_cost": self._calculate_delivery_cost(order, item_calculations),
+            "items": item_calculations,
             "pickup_discount_applied": False,
         }
 
-        for item in items:
-            calculation = item.calculate_item_total()
+        for _, calculation in item_calculations:
             totals["subtotal"] += calculation["original_total"]
             totals["discount_amount"] += calculation["discount_amount"]
 
             if calculation["is_pickup_discount"]:
                 totals["pickup_discount_applied"] = True
 
-            totals["items"].append((item, calculation))
-
-        order.subtotal = totals["subtotal"]
-        order.discount_amount = totals["discount_amount"]
-        order.delivery_cost = totals["delivery_cost"]
-        order.total_price = totals["subtotal"] - totals["discount_amount"] + totals["delivery_cost"]
-        order.save()
+        totals["total_price"] = totals["subtotal"] - totals["discount_amount"] + totals["delivery_cost"]
 
         return totals
 
-    def _calculate_delivery_cost(self, order):
+    def _calculate_delivery_cost(self, order, item_calculations=None):
         """Динамический расчет стоимости доставки"""
         if order.delivery_type != "delivery":
             return Decimal("0.00")
 
-        items = order.items.all().select_related("product__category")
-        if not items:
+        if item_calculations is None:
+            item_calculations = [
+                (item, item.calculate_item_total())
+                for item in order.items.all().select_related("product__category")
+            ]
+
+        if not item_calculations:
             return Decimal("0.00")
 
         # Сумма товаров без учета доставки
-        subtotal = sum(item.calculate_item_total()["final_total"] for item in items)
+        subtotal = sum(calculation["final_total"] for _, calculation in item_calculations)
 
         # Проверяем, все ли товары в заказе относятся к фастфуду (за исключением "Напитки", "Соусы")
-        is_all_fastfood = True
-        for item in items:
-            if item.product.category.name not in ["Закуски", "Бургеры", "Соусы", "Напитки", "Горячие блюда", "Сеты"]:
-                is_all_fastfood = False
-                break
+        is_all_fastfood = all(
+            item.product.category.name in ["Закуски", "Бургеры", "Соусы", "Напитки", "Горячие блюда", "Сеты"]
+            for item, _ in item_calculations
+        )
 
         # Если все товары в заказе относятся к категории "Фастфуд" (за исключением "Напитки", "Соусы"),
         # применяем специальные правила расчета доставки
@@ -166,7 +210,15 @@ class Order(models.Model):
 
     def recalculate_totals(self):
         """Пересчитывает и сохраняет итоговые суммы заказа"""
-        Order.objects.get_order_totals(self.id)
+        totals = Order.objects.get_order_totals(self)
+
+        self.subtotal = totals["subtotal"]
+        self.discount_amount = totals["discount_amount"]
+        self.delivery_cost = totals["delivery_cost"]
+        self.total_price = totals["total_price"]
+        self.save()
+
+        return totals
 
     def is_editable(self):
         """Проверяет, можно ли редактировать заказ"""
@@ -195,8 +247,7 @@ class Order(models.Model):
     def has_pickup_discount(self):
         """Проверяет, применена ли скидка на самовывоз"""
         if not hasattr(self, "_pickup_discount"):
-            totals = Order.objects.get_order_totals(self.id)
-            self._pickup_discount = totals["pickup_discount_applied"]
+            self._pickup_discount = Order.objects.get_order_totals(self)["pickup_discount_applied"]
         return self._pickup_discount
         
     def add_item_from_cart(self, cart_item):
@@ -300,7 +351,21 @@ class OrderItem(models.Model):
 
         return result
 
-    def calculate_item_total(self):
+    def set_total_cache(self, calculation):
+        """Подставляет уже посчитанный результат, чтобы не считать его повторно."""
+        self._item_total_cache = calculation
+
+    def clear_total_cache(self):
+        self.__dict__.pop("_item_total_cache", None)
+
+    def calculate_item_total(self, discounts=None):
+        cached = getattr(self, "_item_total_cache", None)
+        if cached is not None:
+            return cached
+
+        if discounts is None:
+            discounts = DiscountCache()
+
         base_price = self.variant.price
         quantity = self.quantity
 
@@ -333,44 +398,26 @@ class OrderItem(models.Model):
                 # Скидка на самовывоз
                 if self.order.delivery_type == "pickup":
                     # Получаем скидку "Самовывоз" из базы данных
-                    try:
-                        pickup_discount = Discount.objects.get(slug="pickup")
-                        discount_percent = Decimal(str(pickup_discount.percent))
+                    pickup_percent = discounts.percent(slug="pickup")
+                    if pickup_percent is None:
+                        pickup_percent = discounts.percent(name="Самовывоз")
+                    if pickup_percent is not None:
+                        discount_percent = Decimal(str(pickup_percent))
                         discount_amount = (base_price * (discount_percent / Decimal("100"))) * quantity
                         is_pickup_discount = True
-                    except Discount.DoesNotExist:
-                        try:
-                            pickup_discount = Discount.objects.get(name="Самовывоз")
-                            discount_percent = Decimal(str(pickup_discount.percent))
-                            discount_amount = (base_price * (discount_percent / Decimal("100"))) * quantity
-                            is_pickup_discount = True
-                        except Discount.DoesNotExist:
-                            pass
 
                     # Дополнительная скидка на пиццу недели (только при самовывозе и только для размера "32")
                     if self.product.is_weekly_special and self.variant.size and self.variant.size.name == "32":
-                        try:
-                            weekly_pizza_discount = Discount.objects.get(slug="weekly-pizza")
-                            weekly_discount_percent = Decimal(str(weekly_pizza_discount.percent))
-                            weekly_discount_amount = (base_price * (weekly_discount_percent / Decimal("100"))) * quantity
-                            discount_amount = weekly_discount_amount
-                            discount_percent = weekly_discount_percent
-                            is_weekly_pizza_discount = True
-                        except Discount.DoesNotExist:
-                            try:
-                                weekly_pizza_discount = Discount.objects.get(name="Пицца недели")
-                                weekly_discount_percent = Decimal(str(weekly_pizza_discount.percent))
-                                weekly_discount_amount = (base_price * (weekly_discount_percent / Decimal("100"))) * quantity
-                                discount_amount = weekly_discount_amount
-                                discount_percent = weekly_discount_percent
-                                is_weekly_pizza_discount = True
-                            except Discount.DoesNotExist:
-                                # Если скидка не найдена, используем значение по умолчанию 20%
-                                weekly_discount_percent = Decimal("20")
-                                weekly_discount_amount = (base_price * (weekly_discount_percent / Decimal("100"))) * quantity
-                                discount_amount = weekly_discount_amount
-                                discount_percent = weekly_discount_percent
-                                is_weekly_pizza_discount = True
+                        weekly_percent = discounts.percent(slug="weekly-pizza")
+                        if weekly_percent is None:
+                            weekly_percent = discounts.percent(name="Пицца недели")
+                        if weekly_percent is None:
+                            # Если скидка не найдена, используем значение по умолчанию 20%
+                            weekly_percent = 20
+                        weekly_discount_percent = Decimal(str(weekly_percent))
+                        discount_amount = (base_price * (weekly_discount_percent / Decimal("100"))) * quantity
+                        discount_percent = weekly_discount_percent
+                        is_weekly_pizza_discount = True
 
         # Итоговые суммы
         original_total = (base_price + board1_price + board2_price + addons_price) * quantity
@@ -379,7 +426,7 @@ class OrderItem(models.Model):
         discounted_base_price = base_price * (1 - discount_percent / Decimal("100"))
         final_total = (discounted_base_price * quantity) + additions_total
 
-        return {
+        calculation = {
             "original_total": original_total.quantize(Decimal(".01")),
             "final_total": final_total.quantize(Decimal(".01")),
             "discount_amount": discount_amount.quantize(Decimal(".01")),
@@ -388,15 +435,24 @@ class OrderItem(models.Model):
             "is_pickup_discount": is_pickup_discount,
             "is_partner_discount": is_partner_discount,
         }
+        self.set_total_cache(calculation)
+
+        return calculation
 
 
 @receiver(post_save, sender=OrderItem)
 def update_order_on_item_change(sender, instance, **kwargs):
+    instance.clear_total_cache()
+    if order_recalculation_suspended():
+        return
     instance.order.update_order_items()
 
 
 @receiver(post_delete, sender=OrderItem)
 def update_order_on_item_delete(sender, instance, **kwargs):
+    instance.clear_total_cache()
+    if order_recalculation_suspended():
+        return
     instance.order.update_order_items()
 
 
@@ -404,6 +460,9 @@ def update_order_on_item_delete(sender, instance, **kwargs):
 def update_order_on_addons_change(sender, instance, action, **kwargs):
     """Обновляет итоги заказа при изменении добавок в позиции заказа"""
     if action in ['post_add', 'post_remove', 'post_clear']:
+        instance.clear_total_cache()
+        if order_recalculation_suspended():
+            return
         instance.order.update_order_items()
 
 

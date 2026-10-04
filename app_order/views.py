@@ -16,7 +16,7 @@ from app_cart.session_cart import SessionCart
 from app_cart.utils import validate_cart_items_for_branch
 from app_home.models import CafeBranch, WorkingHours
 from app_order.forms import CheckoutForm, OrderEditForm, OrderItemFormSet, AddToOrderForm
-from app_order.models import OrderItem, Order, OrderStatistic
+from app_order.models import OrderItem, Order, OrderStatistic, suspended_order_totals
 from app_home.models import OrderAvailability
 from decimal import Decimal, ROUND_HALF_UP
 from django.conf import settings
@@ -145,28 +145,29 @@ def checkout(request):
             order.branch = selected_branch
             order.save()
 
-            for item_data in cart_items:
-                # Retrieve actual model instances for product, variant, etc.
-                product = item_data["product"]
-                variant = item_data["variant"]
-                board1 = item_data["board1"]
-                board2 = item_data["board2"]
-                sauce = item_data["sauce"]
-                addons = item_data["addons"]
-                drink = item_data["drink"]
+            with suspended_order_totals():
+                for item_data in cart_items:
+                    # Retrieve actual model instances for product, variant, etc.
+                    product = item_data["product"]
+                    variant = item_data["variant"]
+                    board1 = item_data["board1"]
+                    board2 = item_data["board2"]
+                    sauce = item_data["sauce"]
+                    addons = item_data["addons"]
+                    drink = item_data["drink"]
 
-                order_item = OrderItem.objects.create(
-                    order=order,
-                    product=product,
-                    variant=variant,
-                    quantity=item_data["quantity"],
-                    board1=board1,
-                    board2=board2,
-                    sauce=sauce,
-                    drink=drink,
-                )
-                if addons:
-                    order_item.addons.set(addons)
+                    order_item = OrderItem.objects.create(
+                        order=order,
+                        product=product,
+                        variant=variant,
+                        quantity=item_data["quantity"],
+                        board1=board1,
+                        board2=board2,
+                        sauce=sauce,
+                        drink=drink,
+                    )
+                    if addons:
+                        order_item.addons.set(addons)
 
             # Пересчитываем итоги заказа после добавления всех товаров
             order.recalculate_totals()
@@ -210,16 +211,22 @@ def checkout(request):
     return render(request, "app_order/checkout.html", context)
 
 
+def _order_detail_queryset():
+    return Order.objects.select_related("user", "branch").prefetch_related(
+        "items__product__category",
+        "items__variant__size",
+        "items__board1__board",
+        "items__board2__board",
+        "items__sauce",
+        "items__addons__addon",
+    )
+
+
 def order_detail(request, order_id):
     # Если пользователь является персоналом, то он может видеть любой заказ
     # Иначе пользователь может видеть только свои заказы
     if request.user.is_staff or request.user.is_superuser:
-        order = get_object_or_404(
-            Order.objects.select_related("user", "branch").prefetch_related(
-                "items__product", "items__variant", "items__board1__board", "items__board2__board", "items__sauce", "items__addons__addon"
-            ),
-            id=order_id,
-        )
+        order = get_object_or_404(_order_detail_queryset(), id=order_id)
     else:
         # For non-staff/superuser users, try to find the order by user, guest_token, or session_key
         order_query_conditions = Q(id=order_id)
@@ -248,17 +255,20 @@ def order_detail(request, order_id):
                 # If no guest_token or session_key, it's an invalid request for unauthenticated user
                 raise Http404("Order not found with provided credentials.")
 
-        order = get_object_or_404(
-            Order.objects.select_related("user", "branch").prefetch_related(
-                "items__product", "items__variant", "items__board1__board", "items__board2__board", "items__sauce", "items__addons__addon"
-            ),
-            order_query_conditions,
-        )
-    totals = Order.objects.get_order_totals(order.id)  # Добавляем расчет сумм
+        order = get_object_or_404(_order_detail_queryset(), order_query_conditions)
+
+    totals = Order.objects.get_order_totals(order)
     is_editable = order.is_editable()
 
     order_form = OrderEditForm(instance=order)
     items_formset = OrderItemFormSet(instance=order)
+
+    # Формасет собирает позиции своим запросом, поэтому подкладываем в него уже посчитанные итоги
+    calculations_by_item = {item.pk: calculation for item, calculation in totals["items"]}
+    for form in items_formset.forms:
+        calculation = calculations_by_item.get(form.instance.pk)
+        if calculation is not None:
+            form.instance.set_total_cache(calculation)
 
     breadcrumbs = [{"title": _("Главная"), "url": "/"}, {"title": _("Мои заказы"), "url": reverse("app_order:order_list")}, {"title": _("Заказ #%(number)s") % {"number": order.print_number}, "url": "#"}]
 
@@ -319,7 +329,8 @@ def update_order_items(request, order_id):
     formset = OrderItemFormSet(request.POST, instance=order, form_kwargs={"request": request})  # Ключевое изменение - передаем request
 
     if formset.is_valid():
-        formset.save()
+        with suspended_order_totals():
+            formset.save()
         order.recalculate_totals()
         messages.success(request, "Изменения в товарах сохранены")
     else:
@@ -526,7 +537,7 @@ def print_check_non_fastfood(request, order_id):
     order = get_object_or_404(Order, id=order_id)
 
     # Получаем все позиции заказа
-    items = order.items.all().select_related("product__category", "variant__size", "board1__board", "board2__board", "sauce").prefetch_related("addons")
+    items = order.items.all().select_related("product__category", "variant__size", "board1__board", "board2__board", "sauce").prefetch_related("addons__addon")
 
     # Пересчитываем итоги только для этой части
     subtotal_part = Decimal("0.00")
@@ -593,11 +604,12 @@ def add_item_to_order(request, order_id):
             addons = form.cleaned_data.get("addons", [])
 
             # Создаем новый элемент заказа
-            order_item = OrderItem.objects.create(order=order, product=product, variant=variant, quantity=quantity, board1=board1, board2=board2, sauce=sauce)
+            with suspended_order_totals():
+                order_item = OrderItem.objects.create(order=order, product=product, variant=variant, quantity=quantity, board1=board1, board2=board2, sauce=sauce)
 
-            # Добавляем добавки, если они есть
-            if addons:
-                order_item.addons.set(addons)
+                # Добавляем добавки, если они есть
+                if addons:
+                    order_item.addons.set(addons)
 
             # Пересчитываем итоги заказа
             order.recalculate_totals()
@@ -633,7 +645,7 @@ def print_check_fastfood_only(request, order_id):
     items = (
         order.items.filter(product__category__name__in=["Закуски", "Бургеры", "Соусы", "Горячие блюда", "Сеты"])
         .select_related("product__category", "variant__size", "board1__board", "board2__board", "sauce")
-        .prefetch_related("addons")
+        .prefetch_related("addons__addon")
     )
 
     # Пересчитываем итоги только для этой части
