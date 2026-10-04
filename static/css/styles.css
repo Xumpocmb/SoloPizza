@@ -4157,13 +4157,6 @@ body.dark .snowflake,
 }
 
 
-:where(.s-catalog-category) .delivery-text {
-    font-size: 0.5em;
-    color: var(--text-color);
-    opacity: 0.8;
-}
-
-
 
 /* ==== catalog_page.css → s-catalog ==== */
 /* ==========================================================================
@@ -4177,7 +4170,8 @@ body.dark .snowflake,
 
 /* Ширину и боковые отступы повторяем у .hp-container, иначе на экранах шире
    1200px крошки и содержимое секций разъезжаются по горизонтали. */
-:where(.s-catalog) .catalog-page .breadcrumbs {
+:where(.s-catalog) .catalog-page .breadcrumbs,
+:where(.s-catalog-category) .category-page .breadcrumbs {
     max-width: var(--hp-container);
     margin: 0 auto;
     padding: 15px var(--hp-gutter);
@@ -4186,7 +4180,7 @@ body.dark .snowflake,
 
 /* --- Шапка -------------------------------------------------------------- */
 
-:where(.s-catalog) .cp-banner {
+:where(.s-catalog, .s-catalog-category) .cp-banner {
     position: relative;
     isolation: isolate;
     overflow: hidden;
@@ -4198,7 +4192,7 @@ body.dark .snowflake,
 }
 
 
-:where(.s-catalog) .cp-banner::after {
+:where(.s-catalog, .s-catalog-category) .cp-banner::after {
     content: "";
     position: absolute;
     inset: 0;
@@ -4210,7 +4204,7 @@ body.dark .snowflake,
 }
 
 
-:where(.s-catalog) .cp-banner__inner {
+:where(.s-catalog, .s-catalog-category) .cp-banner__inner {
     max-width: var(--hp-container);
     margin: 0 auto;
     padding: 0 var(--hp-gutter);
@@ -4221,7 +4215,7 @@ body.dark .snowflake,
 }
 
 
-:where(.s-catalog) .cp-banner__eyebrow {
+:where(.s-catalog, .s-catalog-category) .cp-banner__eyebrow {
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -4236,7 +4230,7 @@ body.dark .snowflake,
 }
 
 
-:where(.s-catalog) .cp-banner__title {
+:where(.s-catalog, .s-catalog-category) .cp-banner__title {
     margin: 0;
     max-width: 24ch;
     font-size: clamp(1.9rem, 4.4vw, 3.1rem);
@@ -4247,7 +4241,7 @@ body.dark .snowflake,
 }
 
 
-:where(.s-catalog) .cp-banner__lead {
+:where(.s-catalog, .s-catalog-category) .cp-banner__lead {
     margin: 0;
     max-width: 58ch;
     color: rgba(255, 255, 255, 0.9);
@@ -4256,7 +4250,7 @@ body.dark .snowflake,
 }
 
 
-:where(.s-catalog) .cp-banner__facts {
+:where(.s-catalog, .s-catalog-category) .cp-banner__facts {
     display: flex;
     flex-wrap: wrap;
     gap: 10px 28px;
@@ -4266,7 +4260,7 @@ body.dark .snowflake,
 }
 
 
-:where(.s-catalog) .cp-banner__facts li {
+:where(.s-catalog, .s-catalog-category) .cp-banner__facts li {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -4275,7 +4269,7 @@ body.dark .snowflake,
 }
 
 
-:where(.s-catalog) .cp-banner__facts i {
+:where(.s-catalog, .s-catalog-category) .cp-banner__facts i {
     color: rgba(255, 255, 255, 0.7);
     font-size: 0.9rem;
 }
@@ -4324,11 +4318,11 @@ body.dark .snowflake,
 
 
 /* ==== sections.css → s-home, s-catalog ==== */
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap'); /* ========================================================================== Solo Pizza — общие примитивы страниц Токены, контейнер, заголовок секции, кнопки и карточка категории. Подключается и главной (home_page.css), и каталогом (catalog_page.css), поэтому здесь не должно быть ничего, специфичного для одной страницы. Фирменный акцент (--accent-color #079b59) сохранён как основа палитры. Все поверхности берутся из тем, поэтому тёмная тема работает из коробки. ========================================================================== */ .home-page, .catalog-page{ --hp-accent: var(--accent-color); --hp-accent-strong: #068a50; --hp-accent-soft: rgba(7, 155, 89, 0.12); --hp-accent-line: rgba(7, 155, 89, 0.28); --hp-container: 1200px; --hp-gutter: clamp(16px, 4vw, 24px); --hp-section-gap: clamp(40px, 6vw, 72px); --hp-radius: 20px; --hp-radius-lg: 28px; --hp-radius-sm: 12px; --hp-shadow-sm: 0 2px 10px rgba(16, 40, 30, 0.06); --hp-shadow: 0 12px 32px rgba(16, 40, 30, 0.09); --hp-shadow-lg: 0 26px 64px rgba(4, 60, 38, 0.20); /* Фирменный фон для верхних блоков страниц: герой главной и шапка каталога */ --hp-brand-gradient: radial-gradient(120% 140% at 88% 6%, rgba(12, 190, 112, 0.55) 0%, rgba(12, 190, 112, 0) 55%), radial-gradient(90% 120% at 2% 98%, rgba(4, 84, 54, 0.95) 0%, rgba(4, 84, 54, 0) 62%), linear-gradient(150deg, #046b3c 0%, #079b59 52%, #0ab268 100%); --hp-brand-dots: radial-gradient(rgba(255, 255, 255, 0.16) 1px, transparent 1px); }
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap'); /* ========================================================================== Solo Pizza — общие примитивы страниц Токены, контейнер, заголовок секции, кнопки и карточка категории. Подключается и главной (home_page.css), и каталогом (catalog_page.css), поэтому здесь не должно быть ничего, специфичного для одной страницы. Фирменный акцент (--accent-color #079b59) сохранён как основа палитры. Все поверхности берутся из тем, поэтому тёмная тема работает из коробки. ========================================================================== */ .home-page, .catalog-page, .category-page{ --hp-accent: var(--accent-color); --hp-accent-strong: #068a50; --hp-accent-soft: rgba(7, 155, 89, 0.12); --hp-accent-line: rgba(7, 155, 89, 0.28); --hp-container: 1200px; --hp-gutter: clamp(16px, 4vw, 24px); --hp-section-gap: clamp(40px, 6vw, 72px); --hp-radius: 20px; --hp-radius-lg: 28px; --hp-radius-sm: 12px; --hp-shadow-sm: 0 2px 10px rgba(16, 40, 30, 0.06); --hp-shadow: 0 12px 32px rgba(16, 40, 30, 0.09); --hp-shadow-lg: 0 26px 64px rgba(4, 60, 38, 0.20); /* Фирменный фон для верхних блоков страниц: герой главной и шапка каталога */ --hp-brand-gradient: radial-gradient(120% 140% at 88% 6%, rgba(12, 190, 112, 0.55) 0%, rgba(12, 190, 112, 0) 55%), radial-gradient(90% 120% at 2% 98%, rgba(4, 84, 54, 0.95) 0%, rgba(4, 84, 54, 0) 62%), linear-gradient(150deg, #046b3c 0%, #079b59 52%, #0ab268 100%); --hp-brand-dots: radial-gradient(rgba(255, 255, 255, 0.16) 1px, transparent 1px); }
 
 /* --- Контейнер ---------------------------------------------------------- */
 
-:where(.s-home) .hp-container, :where(.s-catalog) .hp-container {
+:where(.s-home) .hp-container, :where(.s-catalog) .hp-container, :where(.s-catalog-category) .hp-container {
     width: 100%;
     max-width: var(--hp-container);
     margin: 0 auto;

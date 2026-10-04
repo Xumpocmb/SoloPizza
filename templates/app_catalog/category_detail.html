@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static i18n %}
 
 {% block meta_description %}{{ category.name }} в Барановичах - {{ category.description|default:"Вкусные блюда с доставкой от Solo Pizza" }}. Закажите онлайн с доставкой по городу.{% endblock %}
 {% block meta_keywords %}{{ category.name }} барановичи, заказать {{ category.name }} барановичи, доставка {{ category.name }} барановичи, {{ category.name }} с доставкой, Solo Pizza, заказать еду онлайн{% endblock %}
@@ -21,8 +21,7 @@
 {% block body_class %}s-catalog-category{% endblock %}
 
 {% block main %}
-    <main>
-    <div class="main-wrapper">
+    <main class="category-page">
         <div class="breadcrumbs">
             {% for crumb in breadcrumbs %}
                 <a href="{{ crumb.url }}" class="breadcrumb-link">{{ crumb.title }}</a>
@@ -31,50 +30,81 @@
                 {% endif %}
             {% endfor %}
         </div>
-        <section class="site-greetings">
-            <div class="page_title">
-                <h1>{{ category.name }} в Барановичах<br><span class="delivery-text">Закажите с доставкой от Solo Pizza</span></h1>
+
+        <section class="cp-banner">
+            <div class="cp-banner__inner">
+                <p class="cp-banner__eyebrow">
+                    <i class="fas fa-pizza-slice" aria-hidden="true"></i>
+                    {% trans "Меню Solo Pizza" %}
+                </p>
+                <h1 class="cp-banner__title">{{ category.name }} в Барановичах</h1>
+                <p class="cp-banner__lead">{% trans "Закажите с доставкой от Solo Pizza" %}</p>
+                {% if category.description %}
+                    <p class="cp-banner__lead">{{ category.description }}</p>
+                {% endif %}
+                <ul class="cp-banner__facts">
+                    {% if items %}
+                        {% with dishes=items|length %}
+                            <li>
+                                <i class="fas fa-layer-group" aria-hidden="true"></i>
+                                {% if dishes == 1 %}{{ dishes }} блюдо{% elif dishes < 5 %}{{ dishes }} блюда{% else %}{{ dishes }} блюд{% endif %}
+                            </li>
+                        {% endwith %}
+                    {% endif %}
+                    {% if selected_branch %}
+                        <li>
+                            <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
+                            {{ selected_branch.address }}
+                        </li>
+                    {% endif %}
+                    <li>
+                        <i class="fas fa-truck" aria-hidden="true"></i>
+                        {% trans "Доставка от 3 руб." %}
+                    </li>
+                </ul>
             </div>
         </section>
-        <section class="section_catalog">
-            {% if items %}
-                <div class="items-catalog">
-                    <!-- Карточка товара -->
-                    {% for item in items %}
-                        <div class="item-card">
-                            <a href="{% url 'app_catalog:item_detail' item.slug %}">
-                                {% if item.image %}
-                                <img src="{{ item.image.url }}" alt="{{ item.name }}">
-                                {% else %}
-                                <img src="{% static 'img/No-Image-Placeholder.svg' %}" alt="{{ item.name }}">
-                                {% endif %}
-                            </a>
-                            <h2>{{ item.name }}</h2>
-                            <p>{{ item.description }}</p>
-                            <div class="cart_price_section">
-                                {% if item.is_weekly_special %}
-                                    <span class="discount-badge">Пицца недели</span>
-                                {% endif %}
-                                <div class="price">
-                                    {% if item.min_price %}
-                                        от {{ item.min_price|floatformat:2 }} руб.
-                                    {% else %}
-                                        Цена не указана
-                                    {% endif %}
-                                </div>
-                                <a class="order-link" href="{% url 'app_catalog:item_detail' item.slug %}">Заказать</a>
-                            </div>
-                        </div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <div class="page_title">
-                    <h3>Упс.. Мы еще ничего не приготовили..</h3>
-                </div>
-            {% endif %}
 
-        </section>
-    </div>
+        <div class="hp-container">
+            <section class="section_catalog">
+                {% if items %}
+                    <div class="items-catalog">
+                        <!-- Карточка товара -->
+                        {% for item in items %}
+                            <div class="item-card">
+                                <a href="{% url 'app_catalog:item_detail' item.slug %}">
+                                    {% if item.image %}
+                                    <img src="{{ item.image.url }}" alt="{{ item.name }}">
+                                    {% else %}
+                                    <img src="{% static 'img/No-Image-Placeholder.svg' %}" alt="{{ item.name }}">
+                                    {% endif %}
+                                </a>
+                                <h2>{{ item.name }}</h2>
+                                <p>{{ item.description }}</p>
+                                <div class="cart_price_section">
+                                    {% if item.is_weekly_special %}
+                                        <span class="discount-badge">Пицца недели</span>
+                                    {% endif %}
+                                    <div class="price">
+                                        {% if item.min_price %}
+                                            от {{ item.min_price|floatformat:2 }} руб.
+                                        {% else %}
+                                            Цена не указана
+                                        {% endif %}
+                                    </div>
+                                    <a class="order-link" href="{% url 'app_catalog:item_detail' item.slug %}">Заказать</a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="page_title">
+                        <h3>Упс.. Мы еще ничего не приготовили..</h3>
+                    </div>
+                {% endif %}
+
+            </section>
+        </div>
     </main>
 {% endblock %}
 
