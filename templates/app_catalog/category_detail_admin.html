@@ -60,6 +60,7 @@
                                     <button class="toggle-form-btn" onclick="toggleForm('{{ item.slug }}')">Параметры</button>
                                 </div>
                             </div>
+                            {% endwith %}
 
                             <!-- Форма добавления в корзину -->
                             <form method="POST" action="{% url 'app_cart:add_to_cart' item.slug %}" class="add-to-cart-form-admin" id="add-to-cart-form-{{ item.slug }}">
