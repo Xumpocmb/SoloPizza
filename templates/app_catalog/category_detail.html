@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static i18n %}
+{% load static i18n plural %}
 
 {% block meta_description %}{{ category.name }} в Барановичах - {{ category.description|default:"Вкусные блюда с доставкой от Solo Pizza" }}. Закажите онлайн с доставкой по городу.{% endblock %}
 {% block meta_keywords %}{{ category.name }} барановичи, заказать {{ category.name }} барановичи, доставка {{ category.name }} барановичи, {{ category.name }} с доставкой, Solo Pizza, заказать еду онлайн{% endblock %}
@@ -44,12 +44,10 @@
                 {% endif %}
                 <ul class="cp-banner__facts">
                     {% if items %}
-                        {% with dishes=items|length %}
-                            <li>
-                                <i class="fas fa-layer-group" aria-hidden="true"></i>
-                                {% if dishes == 1 %}{{ dishes }} блюдо{% elif dishes < 5 %}{{ dishes }} блюда{% else %}{{ dishes }} блюд{% endif %}
-                            </li>
-                        {% endwith %}
+                        <li>
+                            <i class="fas fa-layer-group" aria-hidden="true"></i>
+                            {% plural_forms items|length "блюдо" "блюда" "блюд" %}
+                        </li>
                     {% endif %}
                     {% if selected_branch %}
                         <li>

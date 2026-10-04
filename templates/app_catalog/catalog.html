@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static i18n %}
+{% load static i18n plural %}
 
 {% block title %}{% trans "Каталог пиццы в Барановичах - Solo Pizza" %}{% endblock %}
 {% block meta_description %}Каталог пиццы и других блюд Solo Pizza в Барановичах. Закажите вкусную еду с доставкой по городу!{% endblock %}
@@ -57,7 +57,7 @@
                     {% if categories %}
                         <li>
                             <i class="fas fa-layer-group" aria-hidden="true"></i>
-                            {% blocktrans count counter=categories|length %}1 категория{% plural %}{{ counter }} категории{% endblocktrans %}
+                            {% plural_forms categories|length "категория" "категории" "категорий" %}
                         </li>
                     {% endif %}
                     {% if selected_branch %}

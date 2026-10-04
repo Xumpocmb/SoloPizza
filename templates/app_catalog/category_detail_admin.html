@@ -2,6 +2,7 @@
 {% load static %}
 
 {% block meta_description %}{{ category.name }} в Барановичах - {{ category.description|default:"Вкусные блюда с доставкой от Solo Pizza" }}. Закажите онлайн с доставкой по городу.{% endblock %}
+{% block robots_meta %}<meta name="robots" content="noindex, nofollow">{% endblock %}
 {% block meta_keywords %}{{ category.name }} барановичи, заказать {{ category.name }} барановичи, доставка {{ category.name }} барановичи, {{ category.name }} с доставкой, Solo Pizza, заказать еду онлайн{% endblock %}
 {% block og_description %}{{ category.name }} в Барановичах - {{ category.description|default:"Вкусные блюда с доставкой от Solo Pizza" }}. Закажите онлайн с доставкой по городу.{% endblock %}
 {% block twitter_description %}{{ category.name }} в Барановичах - {{ category.description|default:"Вкусные блюда с доставкой от Solo Pizza" }}. Закажите онлайн с доставкой по городу.{% endblock %}

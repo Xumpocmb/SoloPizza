@@ -574,11 +574,6 @@ msgstr ""
 msgid "Наш адрес"
 msgstr "Our address"
 
-#: templates/app_home/info.html:51
-msgid ""
-"Solo Pizza находится в центре города Барановичи по адресу: ул. Ленина, 9/1."
-msgstr "Solo Pizza is located in the center of Baranovichi at Lenin St., 9/1."
-
 #: templates/app_home/info.html:52
 msgid ""
 "Мы всегда рады видеть вас в нашей пиццерии, где вы можете насладиться не "
@@ -1289,3 +1284,37 @@ msgid ""
 msgstr ""
 "This location's menu is not filled in yet. Check back later or pick another "
 "location."
+
+#: templates/app_catalog/category_detail.html:41
+msgid "Закажите с доставкой от Solo Pizza"
+msgstr "Order with delivery from Solo Pizza"
+
+# Форма счётчика блюд: 1 блюдо / 2 блюда / 5 блюд
+#: templates/app_catalog/category_detail.html:49
+msgid "блюдо"
+msgstr "dish"
+
+# Форма счётчика блюд: 1 блюдо / 2 блюда / 5 блюд
+#: templates/app_catalog/category_detail.html:49
+msgid "блюда"
+msgstr "dishes"
+
+# Форма счётчика блюд: 1 блюдо / 2 блюда / 5 блюд
+#: templates/app_catalog/category_detail.html:49
+msgid "блюд"
+msgstr "dishes"
+
+# Форма счётчика категорий: 1 категория / 2 категории / 5 категорий
+#: templates/app_catalog/catalog.html:60
+msgid "категория"
+msgstr "category"
+
+# Форма счётчика категорий: 1 категория / 2 категории / 5 категорий
+#: templates/app_catalog/catalog.html:60
+msgid "категории"
+msgstr "categories"
+
+# Форма счётчика категорий: 1 категория / 2 категории / 5 категорий
+#: templates/app_catalog/catalog.html:60
+msgid "категорий"
+msgstr "categories"
