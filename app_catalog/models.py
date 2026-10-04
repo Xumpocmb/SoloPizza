@@ -20,6 +20,8 @@ class Category(models.Model):
     order = models.PositiveIntegerField('Порядок', default=0)
     is_fastfood = models.BooleanField(default=False, verbose_name='Чек фастфуда',
                                      help_text='Включать товары этой категории в чек "Только фастфуд" и учитывать в правиле доставки для фастфуда')
+    applies_pizza_discounts = models.BooleanField(default=False, verbose_name='Применять пиццные скидки',
+                                                 help_text='К товарам этой категории применяются скидки партнёра, самовывоза и пиццы недели')
 
     class Meta:
         db_table = 'categories'

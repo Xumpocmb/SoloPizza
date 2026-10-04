@@ -363,7 +363,7 @@ class OrderItem(models.Model):
         is_partner_discount = False
 
         # Проверяем условия для скидки
-        if self.product.category.name == "Пицца":
+        if getattr(self.product.category, 'applies_pizza_discounts', False):
             # Если активирована скидка партнера, применяем только её
             if self.order.is_partner:
                 # Используем значение процента скидки из заказа
@@ -384,7 +384,7 @@ class OrderItem(models.Model):
                         discount_amount = (base_price * (discount_percent / Decimal("100"))) * quantity
                         is_pickup_discount = True
 
-                    # Дополнительная скидка на пиццу недели (только при самовывозе и только для размера "32")
+                    # Дополнительная скидка на пицца недели (только при самовывозе и только для размера "32")
                     if self.product.is_weekly_special and self.variant.size and self.variant.size.name == "32":
                         weekly_percent = discounts.percent(slug="weekly-pizza")
                         if weekly_percent is None:
