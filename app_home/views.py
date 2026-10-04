@@ -11,7 +11,6 @@ from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from app_cart.models import CartItem
-from app_cart.utils import validate_cart_items_for_branch
 from app_catalog.models import Product
 from app_home.models import CafeBranch, Vacancy, Marquee
 from app_home.forms import VacancyApplicationForm, FeedbackForm
