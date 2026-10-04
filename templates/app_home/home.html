@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static i18n %}
+{% load static i18n restaurant_schema %}
 
 {% block title %}{% trans "Заказать пиццу в Барановичах с доставкой - Solo Pizza" %}{% endblock %}
 {% block meta_description %}{% trans "Закажите вкусную пиццу с доставкой в Барановичах! Solo Pizza предлагает свежие пиццы и другие блюда. Быстрая доставка, отличное обслуживание." %}{% endblock %}
@@ -10,65 +10,7 @@
     <link rel="stylesheet" href="{% static 'css/swiper-bundle.min.css' %}">
 {% endblock %}
 {% block schema_markup %}
-<script type="application/ld+json">
-    {
-    "@context": "http://schema.org",
-    "@type": "Restaurant",
-    "name": "SoloPizza",
-    "address": [
-        {
-        "@type": "PostalAddress",
-        "streetAddress": "ул. Ленина 9/1",
-        "addressLocality": "Барановичи",
-        "addressRegion": "Брестская область",
-        "postalCode": "225400",
-        "addressCountry": "BY"
-        },
-        {
-        "@type": "PostalAddress",
-        "streetAddress": "ул. Тексер, 4а",
-        "addressLocality": "Барановичи",
-        "addressRegion": "Брестская область",
-        "postalCode": "225400",
-        "addressCountry": "BY"
-        }
-    ],
-    "geo": {
-        "@type": "GeoCoordinates",
-        "latitude": "53.1333",
-        "longitude": "26.0167"
-    },
-    "url": "https://solopizza.by",
-    "telephone": "+375295555849",
-    "openingHoursSpecification": [
-        {
-        "@type": "OpeningHoursSpecification",
-        "dayOfWeek": [
-            "Monday",
-            "Tuesday",
-            "Wednesday",
-            "Thursday",
-            "Friday",
-            "Saturday",
-            "Sunday"
-        ],
-        "opens": "10:00",
-        "closes": "23:00"
-        }
-    ],
-    "servesCuisine": "Пицца",
-    "priceRange": "$$",
-    "hasMenu": {
-        "@type": "Menu",
-        "url": "https://solopizza.by/catalog/"
-    },
-    "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "4.8",
-        "reviewCount": "150"
-    }
-    }
-</script>
+<script type="application/ld+json">{% restaurant_json_ld %}</script>
 {% endblock %}
 {% block body_class %}s-home s-promo{% endblock %}
 
