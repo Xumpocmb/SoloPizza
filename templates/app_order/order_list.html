@@ -221,4 +221,22 @@
 
 {% block scripts %}
     <script src="{% static 'js/order_list.js' %}"></script>
+    {% if request.user.is_staff or request.user.is_superuser %}
+        {{ order_poll_config|json_script:"order-poll-config" }}
+        <script>
+            {% trans 'Новый заказ' as poll_new_order %}
+            {% trans 'Заказы' as poll_orders %}
+            {% trans 'Обновить' as poll_refresh %}
+            {% trans 'Открыть' as poll_open %}
+            {% trans 'Нажмите, чтобы включить звук уведомлений' as poll_sound_hint %}
+            window.ORDER_POLL_TRANSLATIONS = {
+                newOrder: "{{ poll_new_order|escapejs }}",
+                orders: "{{ poll_orders|escapejs }}",
+                refresh: "{{ poll_refresh|escapejs }}",
+                open: "{{ poll_open|escapejs }}",
+                soundHint: "{{ poll_sound_hint|escapejs }}"
+            };
+        </script>
+        <script src="{% static 'js/order_notifications.js' %}"></script>
+    {% endif %}
 {% endblock %}

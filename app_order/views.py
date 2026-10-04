@@ -3,13 +3,14 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Q
-from django.http import HttpResponseForbidden, Http404
+from django.http import HttpResponseForbidden, Http404, JsonResponse
 from django.shortcuts import redirect, render, get_object_or_404
 from django.urls import reverse
 from django.views.decorators.http import require_POST
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from datetime import time
+from datetime import time, datetime
+from functools import wraps
 from app_cart.models import CartItem
 from app_cart.session_cart import SessionCart
 from app_cart.utils import validate_cart_items_for_branch
@@ -410,8 +411,67 @@ def order_list(request):
         "debug_total_orders_for_session_key": debug_total_orders_for_session_key,
         "debug_total_orders_for_session_key_anon_only": debug_total_orders_for_session_key_anon_only,
         "debug_total_orders_for_user": debug_total_orders_for_user,
+        # Момент отрисовки страницы: по нему считаются заказы, созданные после открытия списка
+        "order_poll_config": {
+            "url": reverse("app_order:poll_new_orders"),
+            "since": timezone.now().timestamp(),
+        },
     }
     return render(request, "app_order/order_list.html", context)
+
+
+def _staff_required(view):
+    """Доступ только для сотрудников (is_staff или суперпользователь)."""
+
+    @login_required
+    @wraps(view)
+    def wrapper(request, *args, **kwargs):
+        if not (request.user.is_staff or request.user.is_superuser):
+            return JsonResponse({"error": "forbidden"}, status=403)
+        return view(request, *args, **kwargs)
+
+    return wrapper
+
+
+@_staff_required
+def poll_new_orders(request):
+    """
+    Возвращает заказы филиала, созданные после отметки времени, переданной в ?since=.
+    Нужен сотрудникам на странице списка заказов, чтобы узнавать о новых
+    заказах без перезагрузки страницы.
+    """
+    selected_branch_id = request.session.get("selected_branch_id", DEFAULT_BRANCH_ID)
+
+    # Отметку фиксируем до выборки, иначе заказ, созданный между запросом и ответом, потеряется
+    now = timezone.now()
+
+    try:
+        since = float(request.GET.get("since", 0))
+    except (TypeError, ValueError):
+        since = 0.0
+
+    # Заказы, оформленные из этой же сессии, сотруднику не показываем
+    orders = Order.objects.filter(branch_id=selected_branch_id).exclude(session_key=request.session.session_key).order_by("created_at")
+
+    if since:
+        orders = orders.filter(created_at__gt=datetime.fromtimestamp(since, tz=timezone.get_current_timezone()))
+
+    payload = [
+        {
+            "id": order.id,
+            "number": order.print_number,
+            "customer_name": order.customer_name,
+            "phone_number": order.phone_number or "",
+            "delivery_type": order.get_delivery_type_display(),
+            "payment_status": order.payment_status,
+            "total_price": str(order.total_price),
+            "created_at": timezone.localtime(order.created_at).strftime("%H:%M"),
+            "detail_url": reverse("app_order:order_detail", args=[order.id]),
+        }
+        for order in orders[:20]
+    ]
+
+    return JsonResponse({"orders": payload, "server_time": now.timestamp()})
 
 
 @require_POST

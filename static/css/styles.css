@@ -940,6 +940,78 @@ input[type="number"]:focus {
     opacity: 1;
 }
 
+/* Уведомление о новом заказе */
+.notification-new-order {
+    max-width: 100%;
+}
+
+.notification-new-order__body {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-right: 10px;
+}
+
+.notification-new-order__title {
+    font-size: 16px;
+}
+
+.notification-new-order__meta {
+    font-size: 13px;
+    opacity: 0.85;
+}
+
+.notification-new-order__link {
+    margin-left: 15px;
+    white-space: nowrap;
+    font-size: 14px;
+    color: inherit;
+    text-decoration: underline;
+}
+
+/* Панель непрочитанных заказов */
+.new-orders-bar {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    z-index: 1050;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 18px;
+    border-radius: 8px;
+    background-color: #e6f7ff;
+    color: #31708f;
+    border: 1px solid #bce8f1;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    font-size: 15px;
+}
+
+.new-orders-bar[hidden] {
+    display: none;
+}
+
+.new-orders-bar__label {
+    font-weight: bold;
+}
+
+.new-orders-bar__refresh,
+.new-orders-bar__sound {
+    padding: 6px 12px;
+    border: 1px solid #bce8f1;
+    border-radius: 6px;
+    background-color: #fff;
+    color: #31708f;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.new-orders-bar__refresh:hover,
+.new-orders-bar__sound:hover {
+    background-color: #f2fbff;
+}
+
 
 /* ==== snow.css (подключается глобально) ==== */
 /* Стили для падающих снежинок */
