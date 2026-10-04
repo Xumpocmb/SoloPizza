@@ -44,8 +44,7 @@
                                 </a>
                                 <p>{{ item.description }}</p>
                             </div>
-                            {% with params_flags=item.has_base_sauce|yesno:'true,false'|add:','|add:item.has_border|yesno:'true,false'|add:','|add:item.has_addons|yesno:'true,false'|add:','|add:item.has_drink|yesno:'true,false' %}
-                            {% with has_no_params=item.has_base_sauce is False and item.has_border is False and item.has_addons is False and item.has_drink is False %}
+                            {% with has_no_params=not item.has_base_sauce and not item.has_border and not item.has_addons and not item.has_drink %}
                             <div class="cart_price_section-admin">
                                 <div class="item-price-admin" id="item-price-{{ item.slug }}">
                                     {% if item.min_price %}
