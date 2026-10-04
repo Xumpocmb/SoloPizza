@@ -70,6 +70,17 @@ class CafeBranch(models.Model):
     def __str__(self):
         return f"Филиал: {self.name}"
 
+    @property
+    def first_phone(self):
+        """Первый телефон филиала или None.
+
+        Именно all()[0], а не .first(): без Meta.ordering .first() собирает
+        новый запрос (order_by("pk")) и не берёт prefetch_related, поэтому
+        шапка, подвал и микроразметка выбирали телефоны отдельно каждый раз.
+        """
+        phones = self.branch_phones.all()
+        return phones[0] if phones else None
+
 
 class CafeBranchPhone(models.Model):
     branch = models.ForeignKey(CafeBranch, on_delete=models.CASCADE, related_name="branch_phones", verbose_name="Филиал")

@@ -88,7 +88,7 @@
                 </div>
                 <div class="about-cta__actions">
                     {% if selected_branch %}
-                        {% with phone=selected_branch.branch_phones.first %}
+                        {% with phone=selected_branch.first_phone %}
                             {% if phone.dial %}
                                 <a class="btn btn-primary" href="tel:{{ phone.dial }}">
                                     <i class="fas fa-phone-alt" aria-hidden="true"></i>

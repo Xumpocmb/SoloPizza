@@ -8,8 +8,11 @@ DEFAULT_BRANCH_ID = 1
 
 
 def site_context_processor(request):
-    # Получаем филиалы из базы данных
-    branches = CafeBranch.objects.filter(is_active=True)
+    # Телефоны и график нужны шапке, подвалу, главной и микроразметке, поэтому
+    # забираем их одним запросом и делимся одними и теми же объектами: иначе
+    # branch_phones выбирается заново в каждом шаблоне, а branches — ещё раз
+    # в restaurant_schema.
+    branches = list(CafeBranch.objects.filter(is_active=True).prefetch_related("working_hours", "branch_phones"))
 
     # Initialize selected_branch_id with default value
     selected_branch_id = request.session.get("selected_branch_id", DEFAULT_BRANCH_ID)
@@ -18,10 +21,7 @@ def site_context_processor(request):
     except (ValueError, TypeError):
         selected_branch_id = DEFAULT_BRANCH_ID
 
-    try:
-        selected_branch = branches.get(id=selected_branch_id)
-    except CafeBranch.DoesNotExist:
-        selected_branch = branches.first()
+    selected_branch = next((branch for branch in branches if branch.id == selected_branch_id), None) or (branches[0] if branches else None)
 
     if not selected_branch:
         return {

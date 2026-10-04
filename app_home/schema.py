@@ -92,7 +92,7 @@ def restaurant_schema(branches, selected_branch):
     }
 
     if selected_branch:
-        phone = selected_branch.branch_phones.first()
+        phone = selected_branch.first_phone
         if phone:
             schema["telephone"] = phone.dial
         if selected_branch.latitude and selected_branch.longitude:
