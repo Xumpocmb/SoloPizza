@@ -361,24 +361,6 @@ def order_list(request):
                 session_key = request.session.session_key or request.session.create()
                 orders = Order.objects.filter(session_key=session_key, user__isnull=True, branch_id=selected_branch_id).select_related("branch").order_by("-created_at")
 
-    # Additional debug info for unauthenticated users
-    debug_total_orders_for_guest_token = 0
-    debug_total_orders_for_guest_token_anon_only = 0  # Orders with no user assigned
-    debug_total_orders_for_guest_token_all = 0  # All orders with this guest token
-    debug_total_orders_for_session_key = 0
-    debug_total_orders_for_session_key_anon_only = 0
-    debug_total_orders_for_user = 0
-
-    if not request.user.is_authenticated:
-        if current_guest_token:
-            debug_total_orders_for_guest_token_all = Order.objects.filter(guest_token=current_guest_token).count()
-            debug_total_orders_for_guest_token_anon_only = Order.objects.filter(guest_token=current_guest_token, user__isnull=True, branch_id=selected_branch_id).count()
-        if current_session_key:
-            debug_total_orders_for_session_key = Order.objects.filter(session_key=current_session_key).count()
-            debug_total_orders_for_session_key_anon_only = Order.objects.filter(session_key=current_session_key, user__isnull=True, branch_id=selected_branch_id).count()
-    elif request.user.is_authenticated:
-        debug_total_orders_for_user = Order.objects.filter(user=request.user).count()
-
     search_query = request.GET.get("search", "")
     status_filter = request.GET.get("status", "")
 
@@ -412,13 +394,8 @@ def order_list(request):
         "breadcrumbs": breadcrumbs,
         "selected_branch": selected_branch,
         "branches": branches,
-        "current_guest_token": current_guest_token,  # Debug information
+        "current_guest_token": current_guest_token,
         "current_session_key": current_session_key,
-        "debug_total_orders_for_guest_token_all": debug_total_orders_for_guest_token_all,
-        "debug_total_orders_for_guest_token_anon_only": debug_total_orders_for_guest_token_anon_only,
-        "debug_total_orders_for_session_key": debug_total_orders_for_session_key,
-        "debug_total_orders_for_session_key_anon_only": debug_total_orders_for_session_key_anon_only,
-        "debug_total_orders_for_user": debug_total_orders_for_user,
         # Момент отрисовки страницы: по нему считаются заказы, созданные после открытия списка
         "order_poll_config": {
             "url": reverse("app_order:poll_new_orders"),
@@ -459,7 +436,7 @@ def poll_new_orders(request):
         since = 0.0
 
     # Заказы, оформленные из этой же сессии, сотруднику не показываем
-    orders = Order.objects.filter(branch_id=selected_branch_id).exclude(session_key=request.session.session_key).order_by("created_at")
+    orders = Order.objects.filter(branch_id=selected_branch_id).exclude(session_key=request.session.session_key).select_related("branch").order_by("created_at")
 
     if since:
         orders = orders.filter(created_at__gt=datetime.fromtimestamp(since, tz=timezone.get_current_timezone()))
