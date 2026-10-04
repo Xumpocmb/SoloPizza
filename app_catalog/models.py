@@ -124,6 +124,11 @@ class ProductVariant(models.Model):
     class Meta:
         verbose_name = 'Вариант товара'
         verbose_name_plural = 'Варианты товаров'
+        # Порядок нужен, чтобы .first() на странице товара и в форме выбора
+        # размера не зависел от того, в каком порядке вернула база: дешевле
+        # всего — значит меньший размер, и его же показывает карточка
+        # товара с ценой «от». id страхует варианты с одинаковой ценой.
+        ordering = ['price', 'id']
 
     def __str__(self):
         return f"{self.product.name} - ({self.price}₽)"
