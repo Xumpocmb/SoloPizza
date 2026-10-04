@@ -58,7 +58,6 @@ class Product(models.Model):
     has_border = models.BooleanField('Наличие борта', default=False)
     has_addons = models.BooleanField('Наличие добавок', default=False)
     has_drink = models.BooleanField('Наличие напитка', default=False)
-    has_additional_sauces = models.BooleanField('Наличие дополнительных соусов', default=False)
 
     class Meta:
         db_table = 'products'

@@ -87,11 +87,6 @@ def item_detail(request, slug):
     if item.has_drink:
         drinks = list(ComboDrinks.objects.filter(is_active=True))
 
-    # Обработка дополнительных соусов
-    if item.has_additional_sauces:
-        additional_sauces = list(PizzaSauce.objects.filter(is_active=True))
-        sauces.extend(additional_sauces)
-
     # Обработка комбо-наборов
     if item.is_combo:
         size_32 = PizzaSizes.objects.filter(name="32").first()

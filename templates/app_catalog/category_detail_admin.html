@@ -64,8 +64,7 @@
                                        data-has-base-sauce="{{ item.has_base_sauce|yesno:'true,false' }}"
                                        data-has-border="{{ item.has_border|yesno:'true,false' }}"
                                        data-has-addons="{{ item.has_addons|yesno:'true,false' }}"
-                                       data-has-drink="{{ item.has_drink|yesno:'true,false' }}"
-                                       data-has-additional-sauces="{{ item.has_additional_sauces|yesno:'true,false' }}">
+                                       data-has-drink="{{ item.has_drink|yesno:'true,false' }}">
 
                                 <!-- Размер -->
                                 <div class="form-group-admin size-selector-admin">
@@ -97,7 +96,7 @@
                                 </div>
 
                                 <!-- Соус -->
-                                {% if item.has_base_sauce or item.has_additional_sauces %}
+                                {% if item.has_base_sauce %}
                                 <div class="form-group-admin option-selector-admin hidden" id="sauce-selector-{{ item.slug }}">
                                     <h3>Выберите соус:</h3>
                                     <ul class="custom-radio-list-admin" id="sauce-list-{{ item.slug }}">
@@ -214,7 +213,6 @@
                                 const hasBorder = paramsInput.dataset.hasBorder === 'true';
                                 const hasAddons = paramsInput.dataset.hasAddons === 'true';
                                 const hasDrink = paramsInput.dataset.hasDrink === 'true';
-                                const hasAdditionalSauces = paramsInput.dataset.hasAdditionalSauces === 'true';
 
                                 updateSauces(itemSlug, data.sauces, hasBaseSauce);
                                 updateBoards(itemSlug, data.boards, hasBorder);
