@@ -12,6 +12,10 @@ class SessionCart:
         if not cart:
             cart = self.session[CART_SESSION_ID] = {}
         self.cart = cart
+        # Позиции с подгруженными товарами держим только в памяти: писать объекты
+        # моделей в сессию нельзя, иначе любая запись сессии в этом же запросе
+        # падает на сериализации.
+        self._items = None
 
     def add(self, product_id, variant_id, quantity=1, board1_id=None, board2_id=None, sauce_id=None, addons_ids=None, drink=None, update_quantity=False):
         product_id_str = str(product_id)
@@ -51,13 +55,18 @@ class SessionCart:
 
     def save(self):
         self.session.modified = True
+        self._items = None
 
     def remove(self, item_key):
         if item_key in self.cart:
             del self.cart[item_key]
             self.save()
 
-    def __iter__(self):
+    def _load_items(self):
+        """Позиции корзины вместе с товарами, вариантами, бортами и добавками."""
+        if self._items is not None:
+            return self._items
+
         product_ids = [item["product_id"] for item in self.cart.values()]
         product_variants_ids = [item["variant_id"] for item in self.cart.values() if item["variant_id"]]
         board_ids = [item["board1_id"] for item in self.cart.values() if item["board1_id"]] + [item["board2_id"] for item in self.cart.values() if item["board2_id"]]
@@ -80,6 +89,7 @@ class SessionCart:
         sauce_map = {str(s.id): s for s in sauces}
         addon_map = {str(a.id): a for a in addons}
 
+        items = {}
         for item_key, item in self.cart.items():
             product = product_map.get(str(item["product_id"]))
             variant = variant_map.get(str(item["variant_id"])) if item["variant_id"] else None
@@ -97,22 +107,29 @@ class SessionCart:
 
                 total_price = (base_price + board1_price + board2_price + addons_price) * item["quantity"]
 
-            item["product"] = product
-            item["variant"] = variant
-            item["board1"] = board1
-            item["board2"] = board2
-            item["sauce"] = sauce
-            item["addons"] = item_addons
-            item["total_price"] = str(total_price.quantize(Decimal("0.01")))  # Store as string to be safe
-            item["item_key"] = item_key
-            yield item
+            enriched = dict(item)
+            enriched["product"] = product
+            enriched["variant"] = variant
+            enriched["board1"] = board1
+            enriched["board2"] = board2
+            enriched["sauce"] = sauce
+            enriched["addons"] = item_addons
+            enriched["total_price"] = str(total_price.quantize(Decimal("0.01")))  # Store as string to be safe
+            enriched["item_key"] = item_key
+            items[item_key] = enriched
+
+        self._items = items
+        return items
+
+    def __iter__(self):
+        return iter(self._load_items().values())
 
     def __len__(self):
         return sum(item["quantity"] for item in self.cart.values())
 
     def get_total_price(self):
-        total = Decimal("0")
-        for item in self.cart.values():
+        total = Decimal(0)
+        for item in self._load_items().values():
             price = item["total_price"]
             if isinstance(price, Decimal):
                 total += price
