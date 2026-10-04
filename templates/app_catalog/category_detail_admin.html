@@ -44,7 +44,6 @@
                                 </a>
                                 <p>{{ item.description }}</p>
                             </div>
-                            {% with has_no_params=not item.has_base_sauce and not item.has_border and not item.has_addons and not item.has_drink %}
                             <div class="cart_price_section-admin">
                                 <div class="item-price-admin" id="item-price-{{ item.slug }}">
                                     {% if item.min_price %}
@@ -54,13 +53,12 @@
                                     {% endif %}
                                 </div>
                                 <div class="admin-actions">
-                                    {% if has_no_params and item.variants.all %}
+                                    {% if not item.has_base_sauce and not item.has_border and not item.has_addons and not item.has_drink and item.variants.all %}
                                         <button type="button" class="quick-add-btn" title="Добавить в заказ" onclick="quickAdd('{{ item.slug }}', '{% if item.variants.all %}{{ item.variants.first.id }}{% endif %}')">+</button>
                                     {% endif %}
                                     <button class="toggle-form-btn" onclick="toggleForm('{{ item.slug }}')">Параметры</button>
                                 </div>
                             </div>
-                            {% endwith %}
 
                             <!-- Форма добавления в корзину -->
                             <form method="POST" action="{% url 'app_cart:add_to_cart' item.slug %}" class="add-to-cart-form-admin" id="add-to-cart-form-{{ item.slug }}">
