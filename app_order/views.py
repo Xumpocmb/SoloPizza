@@ -117,7 +117,7 @@ def checkout(request):
             unavailable_items = validate_cart_items_for_branch(cart_items, selected_branch)
 
             if unavailable_items:
-                messages.error(request, f"Некоторые товары недоступны в филиале '{selected_branch.name}': " f"{', '.join(item.item.name for item in unavailable_items)}")
+                messages.error(request, f"Некоторые товары недоступны в филиале '{selected_branch.name}': " f"{', '.join(item.name for item in unavailable_items)}")
                 return redirect("app_cart:view_cart")
 
             session_key = request.session.session_key or request.session.create()
