@@ -4078,14 +4078,6 @@ body.dark .snowflake,
 }
 
 
-:where(.s-catalog-category) .item-card p {
-    font-size: 16px;
-    margin: 0 15px 10px;
-    color: var(--text-color);
-    flex-grow: 1;
-}
-
-
 :where(.s-catalog-category) .cart_price_section .price {
     font-size: 18px;
     color: var(--accent-color);
@@ -4331,6 +4323,14 @@ body.dark .snowflake,
 
 
 :where(.s-home) .hp-section, :where(.s-catalog) .hp-section {
+    margin-top: var(--hp-section-gap);
+}
+
+
+/* На странице категории сетка идёт без обёртки .hp-section, поэтому отступ
+   от шапки задаём напрямую — с тем же --hp-section-gap, что на главной и
+   каталоге. */
+:where(.s-catalog-category) .section_catalog {
     margin-top: var(--hp-section-gap);
 }
 
