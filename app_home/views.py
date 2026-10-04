@@ -64,7 +64,7 @@ def select_branch(request):
             return redirect(request.META.get("HTTP_REFERER", "/"))
         else:
             messages.error(request, "Ошибка: филиал не выбран!", extra_tags="error")
-    except CafeBranch.DoesNotExist:
+    except (CafeBranch.DoesNotExist, TypeError, ValueError):
         messages.error(request, "Выбранный филиал не найден", extra_tags="error")
         return redirect("/")
     return redirect(request.META.get("HTTP_REFERER"))

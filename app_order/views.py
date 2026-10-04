@@ -14,7 +14,7 @@ from functools import wraps
 from app_cart.models import CartItem
 from app_cart.session_cart import SessionCart
 from app_cart.utils import validate_cart_items_for_branch
-from app_home.context_processors import get_active_branches
+from app_home.context_processors import get_active_branches, get_selected_branch_id
 from app_home.models import CafeBranch, WorkingHours
 from app_order.forms import CheckoutForm, OrderEditForm, OrderItemFormSet, AddToOrderForm
 from app_order.models import OrderItem, Order, OrderStatistic, suspended_order_totals
@@ -80,8 +80,8 @@ def checkout(request):
         return redirect("app_cart:view_cart")
 
     # Получаем выбранный филиал (объекты из контекстного процессора — с телефонами и графиком)
-    selected_branch_id = request.session.get("selected_branch_id", DEFAULT_BRANCH_ID)
-    selected_branch = next((branch for branch in get_active_branches(request) if str(branch.id) == str(selected_branch_id)), None)
+    selected_branch_id = get_selected_branch_id(request)
+    selected_branch = next((branch for branch in get_active_branches(request) if branch.id == selected_branch_id), None)
     if selected_branch is None:
         try:
             selected_branch = CafeBranch.objects.get(id=selected_branch_id)
@@ -337,7 +337,7 @@ def update_order_items(request, order_id):
 
 def order_list(request):
     # Получаем выбранный филиал из сессии
-    selected_branch_id = request.session.get("selected_branch_id", DEFAULT_BRANCH_ID)
+    selected_branch_id = get_selected_branch_id(request)
 
     # Debug: Get the current guest token value
     current_guest_token = request.COOKIES.get("guest_token")
@@ -396,8 +396,7 @@ def order_list(request):
 
     # Получаем информацию о выбранном филиале
     branches = get_active_branches(request)
-    # идентификатор приходит из сессии строкой, поэтому сравниваем как строки
-    selected_branch = next((branch for branch in branches if str(branch.id) == str(selected_branch_id)), None)
+    selected_branch = next((branch for branch in branches if branch.id == selected_branch_id), None)
     if selected_branch is None:
         # выбранный филиал мог быть отключён, тогда показываем именно его
         try:
@@ -449,7 +448,7 @@ def poll_new_orders(request):
     Нужен сотрудникам на странице списка заказов, чтобы узнавать о новых
     заказах без перезагрузки страницы.
     """
-    selected_branch_id = request.session.get("selected_branch_id", DEFAULT_BRANCH_ID)
+    selected_branch_id = get_selected_branch_id(request)
 
     # Отметку фиксируем до выборки, иначе заказ, созданный между запросом и ответом, потеряется
     now = timezone.now()

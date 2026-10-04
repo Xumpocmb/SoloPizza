@@ -21,6 +21,25 @@ def get_active_branches(request):
     return branches
 
 
+def get_selected_branch_id(request):
+    """Идентификатор выбранного филиала из сессии, всегда целое число.
+
+    В сессии значение лежит строкой и может быть испорчено, поэтому приводим его к
+    числу, а при неудаче возвращаем филиал по умолчанию и сразу чистим сессию.
+    """
+    raw_branch_id = request.session.get("selected_branch_id", DEFAULT_BRANCH_ID)
+
+    try:
+        selected_branch_id = int(raw_branch_id)
+    except (TypeError, ValueError):
+        selected_branch_id = DEFAULT_BRANCH_ID
+
+    if str(selected_branch_id) != str(raw_branch_id):
+        request.session["selected_branch_id"] = str(selected_branch_id)
+
+    return selected_branch_id
+
+
 def site_context_processor(request):
     # Телефоны и график нужны шапке, подвалу, главной и микроразметке, поэтому
     # забираем их одним запросом и делимся одними и теми же объектами: иначе
@@ -28,12 +47,7 @@ def site_context_processor(request):
     # в restaurant_schema.
     branches = get_active_branches(request)
 
-    # Initialize selected_branch_id with default value
-    selected_branch_id = request.session.get("selected_branch_id", DEFAULT_BRANCH_ID)
-    try:
-        selected_branch_id = int(selected_branch_id)
-    except (ValueError, TypeError):
-        selected_branch_id = DEFAULT_BRANCH_ID
+    selected_branch_id = get_selected_branch_id(request)
 
     selected_branch = next((branch for branch in branches if branch.id == selected_branch_id), None) or (branches[0] if branches else None)
 
