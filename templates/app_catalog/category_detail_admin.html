@@ -37,11 +37,9 @@
                 <div class="items-catalog-admin">
                     <!-- Компактная карточка товара для сотрудников с возможностью добавления в корзину -->
                     {% for item in items %}
-                        <div class="item-card-admin">
+                        <div class="item-card-admin" data-item-slug="{{ item.slug }}">
                             <div class="item-info-admin">
-                                <a href="#" onclick="toggleForm('{{ item.slug }}'); return false;">
-                                    <h2>{{ item.name }}</h2>
-                                </a>
+                                <h2>{{ item.name }}</h2>
                                 <p>{{ item.description }}</p>
                             </div>
                             <div class="cart_price_section-admin">
@@ -53,17 +51,24 @@
                                     {% endif %}
                                 </div>
                                 <div class="admin-actions">
-                                    {% if not item.has_base_sauce and not item.has_border and not item.has_addons and not item.has_drink and item.variants.all %}
-                                        <button type="button" class="quick-add-btn" title="Добавить в заказ" onclick="quickAdd('{{ item.slug }}', '{% if item.variants.all %}{{ item.variants.first.id }}{% endif %}')">+</button>
-                                    {% endif %}
-                                    <button class="toggle-form-btn" onclick="toggleForm('{{ item.slug }}')">Параметры</button>
+                                    <button type="button" class="toggle-form-btn" data-modal-open="params-modal-{{ item.slug }}">Параметры</button>
                                 </div>
                             </div>
+                        </div>
 
-                            <!-- Форма добавления в корзину -->
-                            <form method="POST" action="{% url 'app_cart:add_to_cart' item.slug %}" class="add-to-cart-form-admin" id="add-to-cart-form-{{ item.slug }}">
+                        <!-- Параметры товара открываются поверх списка, чтобы не растягивать страницу -->
+                        <div class="params-modal" id="params-modal-{{ item.slug }}" role="dialog" aria-modal="true" aria-label="{{ item.name }}">
+                            <div class="params-modal-backdrop" data-modal-close></div>
+                            <div class="params-modal-dialog">
+                                <div class="params-modal-header">
+                                    <h3>{{ item.name }}</h3>
+                                    <button type="button" class="params-modal-close" data-modal-close aria-label="Закрыть">&times;</button>
+                                </div>
+
+                                <form method="POST" action="{% url 'app_cart:add_to_cart' item.slug %}" class="add-to-cart-form-admin" id="add-to-cart-form-{{ item.slug }}">
                                 {% csrf_token %}
 
+                                <div class="params-modal-body">
                                 <!-- Скрытое поле для хранения информации о параметрах товара -->
                                 <input type="hidden" id="item-params-{{ item.slug }}"
                                        data-has-base-sauce="{{ item.has_base_sauce|yesno:'true,false' }}"
@@ -97,7 +102,11 @@
                                 <!-- Количество -->
                                 <div class="form-group-admin">
                                     <label for="quantity_{{ item.slug }}">Количество:</label>
-                                    <input type="number" id="quantity_{{ item.slug }}" name="quantity" value="1" min="1" max="10" class="quantity-input-admin">
+                                    <div class="quantity-stepper">
+                                        <button type="button" class="quantity-step" data-step="-1" aria-label="Меньше">&minus;</button>
+                                        <input type="number" id="quantity_{{ item.slug }}" name="quantity" value="1" min="1" max="10" class="quantity-input-admin">
+                                        <button type="button" class="quantity-step" data-step="1" aria-label="Больше">+</button>
+                                    </div>
                                 </div>
 
                                 <!-- Соус -->
@@ -150,19 +159,74 @@
                                     </ul>
                                 </div>
                                 {% endif %}
+                                </div>
 
-                                <button type="submit" class="add-to-cart-btn-admin">Добавить в заказ</button>
-                            </form>
+                                <div class="params-modal-footer">
+                                    <span class="params-modal-price" id="params-modal-price-{{ item.slug }}"></span>
+                                    <button type="submit" class="add-to-cart-btn-admin">Добавить в заказ</button>
+                                </div>
+                                </form>
+                            </div>
                         </div>
                     {% endfor %}
                 </div>
                 
                 <script>
-                    function toggleForm(itemSlug) {
-                        const form = document.getElementById(`add-to-cart-form-${itemSlug}`);
-                        form.classList.toggle('open');
+                    // Модальное окно параметров: открытие, закрытие, Esc
+                    function openModal(modal) {
+                        modal.classList.add('open');
+                        document.body.classList.add('params-modal-active');
                     }
-                    
+
+                    function closeModal(modal) {
+                        modal.classList.remove('open');
+                        if (!document.querySelector('.params-modal.open')) {
+                            document.body.classList.remove('params-modal-active');
+                        }
+                    }
+
+                    document.querySelectorAll('[data-modal-open]').forEach(trigger => {
+                        trigger.addEventListener('click', function() {
+                            const modal = document.getElementById(this.dataset.modalOpen);
+                            if (modal) openModal(modal);
+                        });
+                    });
+
+                    document.querySelectorAll('.params-modal').forEach(modal => {
+                        modal.querySelectorAll('[data-modal-close]').forEach(el => {
+                            el.addEventListener('click', () => closeModal(modal));
+                        });
+                    });
+
+                    document.addEventListener('keydown', function(event) {
+                        if (event.key !== 'Escape') return;
+                        document.querySelectorAll('.params-modal.open').forEach(closeModal);
+                    });
+
+                    // Клик по карточке открывает параметры, кроме кликов по интерактивным элементам
+                    document.querySelectorAll('.item-card-admin').forEach(card => {
+                        card.addEventListener('click', function(event) {
+                            if (event.target.closest('button, a, input, select, label, textarea')) {
+                                return;
+                            }
+                            const modal = document.getElementById(`params-modal-${this.dataset.itemSlug}`);
+                            if (modal) openModal(modal);
+                        });
+                    });
+
+                    // Счётчик количества
+                    document.querySelectorAll('.quantity-stepper').forEach(stepper => {
+                        stepper.querySelectorAll('.quantity-step').forEach(button => {
+                            button.addEventListener('click', function() {
+                                const input = stepper.querySelector('.quantity-input-admin');
+                                const step = parseInt(this.dataset.step, 10);
+                                let value = parseInt(input.value, 10) || 1;
+                                value = Math.min(parseInt(input.max, 10), Math.max(parseInt(input.min, 10), value + step));
+                                input.value = value;
+                            });
+                        });
+                    });
+
                     // Обработка изменения размера
                     document.querySelectorAll('.size-option-admin').forEach(button => {
                         button.addEventListener('click', function() {
@@ -189,6 +253,10 @@
                         const priceElement = document.getElementById(`item-price-${itemSlug}`);
                         if (priceElement) {
                             priceElement.innerHTML = `${price.toFixed(2)} руб.`;
+                        }
+                        const modalPrice = document.getElementById(`params-modal-price-${itemSlug}`);
+                        if (modalPrice) {
+                            modalPrice.textContent = `${price.toFixed(2)} руб.`;
                         }
                     }
 
@@ -349,28 +417,21 @@
                         }
                     }
 
-                    // Инициализируем параметры для первого варианта каждого товара при загрузке страницы
-                    document.addEventListener('DOMContentLoaded', function() {
-                        document.querySelectorAll('.size-option-admin.selected').forEach(button => {
-                            if(button.hasAttribute('data-variant-id')) {
-                                const itemSlug = button.getAttribute('data-item-slug');
-                                const itemCategory = button.getAttribute('data-item-category');
-                                const variantId = button.getAttribute('data-variant-id');
-                                loadVariantData(itemSlug, variantId, itemCategory);
-                            }
-                        });
+                    // Параметры первого варианта грузим при открытии модалки, а не все сразу на загрузке страницы
+                    document.querySelectorAll('.params-modal').forEach(modal => {
+                        if (modal.dataset.loaded) return;
+                        modal.dataset.loaded = 'true';
+                        const selected = modal.querySelector('.size-option-admin.selected');
+                        if (selected && selected.hasAttribute('data-variant-id')) {
+                            loadVariantData(
+                                selected.getAttribute('data-item-slug'),
+                                selected.getAttribute('data-variant-id'),
+                                selected.getAttribute('data-item-category')
+                            );
+                        }
                     });
 
-                    function quickAdd(itemSlug, variantId) {
-                        const form = document.getElementById(`add-to-cart-form-${itemSlug}`);
-                        if (!form) return;
-                        const variantInput = document.getElementById(`variant_id_${itemSlug}`);
-                        if (variantInput && variantId) {
-                            variantInput.value = variantId;
-                        }
-                        form.submit();
-                    }
-                </script>
+                    </script>
             {% else %}
                 <div class="page_title">
                     <h3>Упс.. Мы еще ничего не приготовили..</h3>
