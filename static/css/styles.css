@@ -3694,6 +3694,7 @@ body.dark .snowflake,
     align-items: center;
     padding: 10px;
     min-height: 80px;
+    cursor: pointer;
 }
 
 
@@ -3792,17 +3793,146 @@ body.dark .snowflake,
 
 /* Стили для формы добавления в корзину */
 :where(.s-catalog-admin) .add-to-cart-form-admin {
-    display: none;
-    background-color: var(--hover-bg);
-    padding: 10px;
-    margin-top: 10px;
-    border-radius: var(--border-radius);
-    border: 1px solid var(--divider-color);
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
 }
 
 
-:where(.s-catalog-admin) .add-to-cart-form-admin.open {
-    display: block;
+/* Модальное окно параметров товара */
+:where(.s-catalog-admin) .params-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+}
+
+
+:where(.s-catalog-admin) .params-modal.open {
+    display: flex;
+}
+
+
+body.params-modal-active {
+    overflow: hidden;
+}
+
+
+:where(.s-catalog-admin) .params-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+
+:where(.s-catalog-admin) .params-modal-dialog {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 440px;
+    max-height: calc(100vh - 32px);
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+}
+
+
+:where(.s-catalog-admin) .params-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 15px;
+    background-color: var(--accent-color);
+    color: white;
+    flex-shrink: 0;
+}
+
+
+:where(.s-catalog-admin) .params-modal-header h3 {
+    margin: 0;
+    font-size: 16px;
+    color: white;
+}
+
+
+:where(.s-catalog-admin) .params-modal-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 26px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0 4px;
+    opacity: 0.85;
+}
+
+
+:where(.s-catalog-admin) .params-modal-close:hover {
+    opacity: 1;
+}
+
+
+/* Тело прокручивается, футер с кнопкой всегда виден */
+:where(.s-catalog-admin) .params-modal-body {
+    padding: 15px;
+    overflow-y: auto;
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+
+:where(.s-catalog-admin) .params-modal-footer {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 15px;
+    border-top: 1px solid var(--divider-color);
+    background-color: var(--hover-bg);
+    flex-shrink: 0;
+}
+
+
+:where(.s-catalog-admin) .params-modal-price {
+    font-weight: bold;
+    font-size: 15px;
+    color: var(--text-color);
+    white-space: nowrap;
+}
+
+
+/* Счётчик количества */
+:where(.s-catalog-admin) .quantity-stepper {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+
+:where(.s-catalog-admin) .quantity-step {
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    border: 1px solid var(--divider-color);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+}
+
+
+:where(.s-catalog-admin) .quantity-step:hover {
+    background-color: var(--accent-color-rgba);
+    border-color: var(--accent-color);
 }
 
 
@@ -3932,6 +4062,18 @@ body.dark .snowflake,
     border: none;
     cursor: pointer;
     width: 100%;
+}
+
+
+:where(.s-catalog-admin) .params-modal-footer > .add-to-cart-btn-admin {
+    width: auto;
+    flex: 1;
+    order: 2;
+}
+
+
+:where(.s-catalog-admin) .params-modal-footer > .params-modal-price {
+    order: 1;
 }
 
 
@@ -6076,9 +6218,58 @@ body.dark .snowflake,
 }
 
 
+/* Сам инпут: без этих правил остаётся голым системным checkbox */
+:where(.s-checkout) .partner-checkbox {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    max-width: 20px;
+    margin: 0;
+    padding: 0;
+    flex: 0 0 20px;
+    border: 2px solid var(--hover-bg);
+    border-radius: 4px;
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    font-size: 0;
+    cursor: pointer;
+    position: relative;
+    transition: border-color 0.2s, background-color 0.2s;
+}
+
+
+:where(.s-checkout) .partner-checkbox:hover {
+    border-color: var(--accent-color);
+}
+
+
+:where(.s-checkout) .partner-checkbox:checked {
+    border-color: var(--accent-color);
+    background-color: var(--accent-color);
+}
+
+
+:where(.s-checkout) .partner-checkbox:checked::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(45deg);
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+}
+
+
 :where(.s-checkout) .partner-checkbox-container label {
+    display: inline-block;
     margin-left: 10px;
+    margin-bottom: 0;
     font-weight: 500;
+    cursor: pointer;
 }
 
 
