@@ -220,9 +220,6 @@
             function toggleAddressField() {
                 const selectedOption = document.querySelector('input[name="delivery_type"]:checked');
                 addressField.style.display = selectedOption && selectedOption.value === 'delivery' ? 'block' : 'none';
-                
-                // Обновляем итоги при изменении типа доставки
-                updateTotals();
             }
 
             deliveryOptions.forEach((option) => {
@@ -231,30 +228,21 @@
 
             toggleAddressField();
             
-            // Показываем/скрываем поле процента скидки партнера
+            // Показываем/скрываем поле процента скидки партнера.
+            // Блок рендерится только для сотрудников, поэтому у обычного
+            // покупателя этих элементов нет — без проверки ниже падало бы
+            // на addEventListener и весь остальной скрипт переставал работать.
             const partnerCheckbox = document.querySelector('input[name="is_partner"]');
             const partnerDiscountInput = document.querySelector('.partner-discount-input');
-            
+
             function togglePartnerDiscountField() {
                 partnerDiscountInput.style.display = partnerCheckbox.checked ? 'block' : 'none';
             }
-            
-            partnerCheckbox.addEventListener('change', togglePartnerDiscountField);
-            
-            togglePartnerDiscountField();
-            
-            // Функция для обновления итогов при изменении типа доставки
-            function updateTotals() {
-                const selectedOption = document.querySelector('input[name="delivery_type"]:checked');
-                const isPickup = selectedOption && selectedOption.value === 'pickup';
-                
-                // Обновляем цены товаров
-                // No dynamic price updates needed for now, as cart_totals is already the final price.
-                // The discount logic will be handled in the backend during order creation.
+
+            if (partnerCheckbox && partnerDiscountInput) {
+                partnerCheckbox.addEventListener('change', togglePartnerDiscountField);
+                togglePartnerDiscountField();
             }
-            
-            // Инициализируем итоги при загрузке страницы
-            updateTotals();
         });
     </script>
 {% endblock %}
