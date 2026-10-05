@@ -35,28 +35,13 @@
         <section class="section_catalog">
             {% if items %}
                 <div class="items-catalog-admin">
-                    <!-- Компактная карточка товара для сотрудников с возможностью добавления в корзину -->
+                    <!-- Плитка товара для сотрудников: только название, всё остальное в модалке -->
                     {% for item in items %}
                         <div class="item-card-admin" data-item-slug="{{ item.slug }}">
-                            <div class="item-info-admin">
-                                <h2>{{ item.name }}</h2>
-                                <p>{{ item.description }}</p>
-                            </div>
-                            <div class="cart_price_section-admin">
-                                <div class="item-price-admin" id="item-price-{{ item.slug }}">
-                                    {% if item.min_price %}
-                                        {{ item.min_price|floatformat:2 }} руб.
-                                    {% else %}
-                                        Цена не указана
-                                    {% endif %}
-                                </div>
-                                <div class="admin-actions">
-                                    <button type="button" class="toggle-form-btn" data-modal-open="params-modal-{{ item.slug }}">Параметры</button>
-                                </div>
-                            </div>
+                            <h2>{{ item.name }}</h2>
                         </div>
 
-                        <!-- Параметры товара открываются поверх списка, чтобы не растягивать страницу -->
+                        <!-- Параметры товара открываются поверх каталога, чтобы не растягивать страницу -->
                         <div class="params-modal" id="params-modal-{{ item.slug }}" role="dialog" aria-modal="true" aria-label="{{ item.name }}">
                             <div class="params-modal-backdrop" data-modal-close></div>
                             <div class="params-modal-dialog">
@@ -162,7 +147,9 @@
                                 </div>
 
                                 <div class="params-modal-footer">
-                                    <span class="params-modal-price" id="params-modal-price-{{ item.slug }}"></span>
+                                    <span class="params-modal-price" id="params-modal-price-{{ item.slug }}">
+                                        {% if item.min_price %}{{ item.min_price|floatformat:2 }} руб.{% endif %}
+                                    </span>
                                     <button type="submit" class="add-to-cart-btn-admin">Добавить в заказ</button>
                                 </div>
                                 </form>
@@ -251,10 +238,6 @@
 
                     // Функция обновления цены товара
                     function updatePriceElement(itemSlug, price) {
-                        const priceElement = document.getElementById(`item-price-${itemSlug}`);
-                        if (priceElement) {
-                            priceElement.innerHTML = `${price.toFixed(2)} руб.`;
-                        }
                         const modalPrice = document.getElementById(`params-modal-price-${itemSlug}`);
                         if (modalPrice) {
                             modalPrice.textContent = `${price.toFixed(2)} руб.`;

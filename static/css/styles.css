@@ -3676,8 +3676,8 @@ body.dark .snowflake,
     margin-top: 20px;
     width: auto;
     display: grid;
-    grid-template-columns: 1fr;
-    gap: 10px;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
     margin-bottom: 20px;
     padding: 10px;
 }
@@ -3690,10 +3690,12 @@ body.dark .snowflake,
     overflow: hidden;
     transition: transform 0.3s, box-shadow 0.3s;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     align-items: center;
-    padding: 10px;
-    min-height: 80px;
+    justify-content: center;
+    text-align: center;
+    padding: 15px;
+    min-height: 90px;
     cursor: pointer;
 }
 
@@ -3704,49 +3706,14 @@ body.dark .snowflake,
 }
 
 
-:where(.s-catalog-admin) .item-info-admin {
-    flex-grow: 1;
-    padding-right: 15px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-
-
-:where(.s-catalog-admin) .item-info-admin h2 {
-    font-size: 18px;
-    margin: 0 0 5px 0;
-    color: var(--text-color);
-}
-
-
-:where(.s-catalog-admin) .item-info-admin p {
-    font-size: 14px;
-    margin: 0 0 5px 0;
-    color: var(--text-muted);
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-
-
-:where(.s-catalog-admin) .item-price-admin {
-    font-size: 16px;
-    color: var(--accent-color);
-    font-weight: bold;
+/* Название — единственное содержимое карточки: цена и параметры видны в модалке */
+:where(.s-catalog-admin) .item-card-admin h2 {
+    font-size: 22px;
+    line-height: 1.3;
     margin: 0;
-    min-width: 80px;
-    text-align: right;
-}
-
-
-:where(.s-catalog-admin) .cart_price_section-admin {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 5px 0;
-    flex-shrink: 0;
+    color: var(--text-color);
+    overflow-wrap: break-word;
+    hyphens: auto;
 }
 
 
@@ -4103,27 +4070,6 @@ body.params-modal-active {
 
 
 @media (max-width: 768px){
-
-    :where(.s-catalog-admin) .item-card-admin {
-    flex-direction: column;
-    text-align: center;
-
-}
-
-
-    :where(.s-catalog-admin) .item-price-admin {
-    text-align: center;
-    margin-top: 5px;
-
-}
-
-
-    :where(.s-catalog-admin) .cart_price_section-admin {
-    flex-direction: column;
-    align-items: flex-start;
-
-}
-
 
     :where(.s-catalog-admin) .admin-controls {
     width: 100%;
