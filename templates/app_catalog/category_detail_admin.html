@@ -174,6 +174,7 @@
                 <script>
                     // Модальное окно параметров: открытие, закрытие, Esc
                     function openModal(modal) {
+                        loadModalParams(modal);
                         modal.classList.add('open');
                         document.body.classList.add('params-modal-active');
                     }
@@ -417,8 +418,8 @@
                         }
                     }
 
-                    // Параметры первого варианта грузим при открытии модалки, а не все сразу на загрузке страницы
-                    document.querySelectorAll('.params-modal').forEach(modal => {
+                    // Параметры первого варианта грузим при первом открытии модалки, а не все сразу на загрузке страницы
+                    function loadModalParams(modal) {
                         if (modal.dataset.loaded) return;
                         modal.dataset.loaded = 'true';
                         const selected = modal.querySelector('.size-option-admin.selected');
@@ -429,7 +430,7 @@
                                 selected.getAttribute('data-item-category')
                             );
                         }
-                    });
+                    }
 
                     </script>
             {% else %}
