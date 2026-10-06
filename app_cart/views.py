@@ -13,6 +13,7 @@ from django.views.decorators.http import require_POST
 
 from app_cart.forms import AddToCartForm
 from app_catalog.models import Product, ProductVariant, BoardParams, AddonParams, PizzaSauce
+from app_home.context_processors import get_selected_branch_id
 from app_home.models import OrderAvailability
 from .models import CartItem
 
@@ -123,6 +124,22 @@ def view_cart(request):
         "items": enriched_items,
         "subtotal": subtotal,
     }
+
+    # Сотруднику даём выбрать заказ текущего дня и филиала, в который добавить корзину
+    if request.user.is_staff or request.user.is_superuser:
+        from django.utils import timezone
+
+        from app_order.models import Order
+
+        context["staff_orders"] = (
+            Order.objects.filter(
+                branch_id=get_selected_branch_id(request),
+                created_at__date=timezone.localdate(),
+                status__in=Order.EDITABLE_STATUSES,
+            )
+            .select_related("branch")
+            .order_by("-created_at")
+        )
 
     return render(request, "app_cart/cart.html", context)
 

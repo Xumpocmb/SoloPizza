@@ -147,10 +147,27 @@
                                          <span class="summary-value">{{ subtotal|floatformat:2 }} руб.</span>
                                      </div>
                     {% are_orders_available as orders_available %}
-                    {% if orders_available %}
-                        <a href="{% url 'app_order:checkout' %}" class="checkout-btn">Оформить заказ</a>
-                    {% else %}
-                        <button class="checkout-btn disabled" disabled>Оформление заказов временно недоступно</button>
+                    <div class="cart-actions">
+                        {% if orders_available %}
+                            <a href="{% url 'app_order:checkout' %}" class="checkout-btn">Оформить заказ</a>
+                        {% else %}
+                            <button class="checkout-btn disabled" disabled>Оформление заказов временно недоступно</button>
+                        {% endif %}
+                        {% if request.user.is_staff or request.user.is_superuser %}
+                            <button type="button" class="checkout-btn add-to-order-btn" id="showAddToOrder">Добавить к заказу</button>
+                        {% endif %}
+                    </div>
+                    {% if request.user.is_staff or request.user.is_superuser %}
+                        <form method="post" action="{% url 'app_order:add_cart_to_order' %}" class="add-to-order-panel" id="addToOrderPanel" style="display: none;">
+                            {% csrf_token %}
+                            <select name="order_id" class="add-to-order-select" required>
+                                <option value="">— выберите заказ —</option>
+                                {% for staff_order in staff_orders %}
+                                    <option value="{{ staff_order.id }}">№{{ staff_order.print_number }} · {{ staff_order.customer_name }} · {{ staff_order.total_price|floatformat:2 }} руб.</option>
+                                {% endfor %}
+                            </select>
+                            <button type="submit" class="checkout-btn add-to-order-submit" {% if not staff_orders %}disabled{% endif %}>Добавить</button>
+                        </form>
                     {% endif %}
                 </div>
                     
@@ -169,4 +186,19 @@
             {% endif %}
         </div>
     </main>
+{% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const toggle = document.getElementById('showAddToOrder');
+            const panel = document.getElementById('addToOrderPanel');
+            if (toggle && panel) {
+                toggle.addEventListener('click', function () {
+                    panel.style.display = panel.style.display === 'none' ? 'flex' : 'none';
+                });
+            }
+        });
+    </script>
 {% endblock %}

@@ -47,13 +47,6 @@
                            title="{% trans "Скачать чек фастфуд" %}">
                             <i class="fas fa-file-pdf"></i>
                         </a>
-                        {% if is_editable %}
-                        <a href="{% url 'app_order:add_item_to_order' order.id %}" 
-                           class="add-item-button" 
-                           title="{% trans "Добавить товар" %}">
-                            <i class="fas fa-plus"></i> {% trans "Добавить товар" %}
-                        </a>
-                        {% endif %}
                     {% endif %}
                 </h1>
                 <div class="order-status {{ order.status }}">{{ order.get_status_display }}</div>

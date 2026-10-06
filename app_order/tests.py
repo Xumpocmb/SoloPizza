@@ -529,3 +529,117 @@ class StatisticsTests(TestCase):
         self.client.force_login(self.admin)
         response = self.client.get(reverse("app_order:detail_statistics", args=["not-a-date"]))
         self.assertEqual(response.status_code, 404)
+
+
+class AddCartToOrderTests(TestCase):
+    def setUp(self):
+        self.branch = CafeBranch.objects.create(name="Центральный", address="ул. Ленина, 1")
+        self.staff = User.objects.create_user("stats", password="pass", is_staff=True)
+        self.customer = User.objects.create_user("client", password="pass")
+
+        category = Category.objects.create(name="Напитки", slug="drinks")
+        self.product = Product.objects.create(name="Кола", slug="cola", category=category)
+        self.variant = ProductVariant.objects.create(product=self.product, value="0.5", unit="l", price="80.00")
+
+        self.url = reverse("app_order:add_cart_to_order")
+
+    def _create_order(self, status="new", branch=None):
+        return Order.objects.create(
+            branch=branch or self.branch,
+            customer_name="Иван",
+            phone_number="+375291112233",
+            delivery_type="delivery",
+            payment_method="cash",
+            status=status,
+        )
+
+    def _set_cart(self, quantity=2):
+        item_key = f"{self.product.id}-{self.variant.id}"
+        session = self.client.session
+        session["cart"] = {
+            item_key: {
+                "product_id": self.product.id,
+                "variant_id": self.variant.id,
+                "quantity": quantity,
+                "board1_id": None,
+                "board2_id": None,
+                "sauce_id": None,
+                "addons_ids": [],
+                "drink": None,
+            }
+        }
+        session.save()
+
+    def test_staff_adds_cart_items_to_order(self):
+        order = self._create_order()
+        self._set_cart(quantity=2)
+        self.client.force_login(self.staff)
+
+        response = self.client.post(self.url, {"order_id": order.id})
+
+        self.assertRedirects(response, reverse("app_order:order_detail", args=[order.id]))
+        self.assertEqual(order.items.count(), 1)
+        item = order.items.first()
+        self.assertEqual(item.product, self.product)
+        self.assertEqual(item.quantity, 2)
+        order.refresh_from_db()
+        self.assertEqual(order.total_price, Decimal("160.00"))
+
+    def test_cart_is_cleared_after_adding(self):
+        order = self._create_order()
+        self._set_cart()
+        self.client.force_login(self.staff)
+
+        self.client.post(self.url, {"order_id": order.id})
+
+        self.assertFalse(self.client.session.get("cart"))
+
+    def test_regular_user_is_forbidden(self):
+        order = self._create_order()
+        self._set_cart()
+        self.client.force_login(self.customer)
+
+        response = self.client.post(self.url, {"order_id": order.id})
+
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(order.items.count(), 0)
+
+    def test_non_editable_order_is_rejected(self):
+        order = self._create_order(status="completed")
+        self._set_cart()
+        self.client.force_login(self.staff)
+
+        response = self.client.post(self.url, {"order_id": order.id})
+
+        self.assertRedirects(response, reverse("app_cart:view_cart"))
+        self.assertEqual(order.items.count(), 0)
+
+    def test_empty_cart_does_nothing(self):
+        order = self._create_order()
+        self.client.force_login(self.staff)
+
+        response = self.client.post(self.url, {"order_id": order.id})
+
+        self.assertRedirects(response, reverse("app_cart:view_cart"))
+        self.assertEqual(order.items.count(), 0)
+
+    def test_get_is_not_allowed(self):
+        self.client.force_login(self.staff)
+        self.assertEqual(self.client.get(self.url).status_code, 405)
+
+    def test_cart_page_shows_order_selector_for_staff(self):
+        self._create_order()
+        self._set_cart()
+        self.client.force_login(self.staff)
+
+        response = self.client.get(reverse("app_cart:view_cart"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Добавить к заказу")
+        self.assertEqual(len(response.context["staff_orders"]), 1)
+
+    def test_cart_page_hides_order_selector_for_regular_user(self):
+        self._set_cart()
+        self.client.force_login(self.customer)
+        response = self.client.get(reverse("app_cart:view_cart"))
+        self.assertNotContains(response, "Добавить к заказу")

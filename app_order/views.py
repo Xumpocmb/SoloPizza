@@ -16,7 +16,7 @@ from app_cart.session_cart import SessionCart
 from app_cart.utils import validate_cart_items_for_branch
 from app_home.context_processors import get_active_branches, get_selected_branch_id
 from app_home.models import CafeBranch, WorkingHours
-from app_order.forms import CheckoutForm, OrderEditForm, OrderItemFormSet, AddToOrderForm
+from app_order.forms import CheckoutForm, OrderEditForm, OrderItemFormSet
 from app_order import statistics
 from app_order.models import OrderItem, Order, suspended_order_totals
 from app_home.models import OrderAvailability
@@ -571,54 +571,45 @@ def print_check_non_fastfood(request, order_id):
 
 
 @login_required
-def add_item_to_order(request, order_id):
-    """Добавление товара в существующий заказ"""
-    # Проверка прав доступа - только для администраторов и персонала
-    if not request.user.is_staff:
-        return redirect("app_order:order_list")
+@require_POST
+def add_cart_to_order(request):
+    """Добавляет товары из корзины в выбранный сотрудником заказ."""
+    if not (request.user.is_staff or request.user.is_superuser):
+        return HttpResponseForbidden("Доступ запрещен")
 
-    order = get_object_or_404(Order, id=order_id)
+    order = get_object_or_404(Order, id=request.POST.get("order_id"))
 
-    # Проверяем, можно ли редактировать заказ
     if not order.is_editable():
         messages.error(request, "Этот заказ нельзя редактировать")
-        return redirect("app_order:order_detail", order_id=order.id)
+        return redirect("app_cart:view_cart")
 
-    if request.method == "POST":
-        form = AddToOrderForm(request.POST, order=order)
-        if form.is_valid():
-            product = form.cleaned_data["product"]
-            variant = form.cleaned_data["variant"]
-            quantity = form.cleaned_data["quantity"]
-            board1 = form.cleaned_data.get("board1")
-            board2 = form.cleaned_data.get("board2")
-            sauce = form.cleaned_data.get("sauce")
-            addons = form.cleaned_data.get("addons", [])
+    session_cart = SessionCart(request)
+    cart_items = list(session_cart)
 
-            # Создаем новый элемент заказа
-            with suspended_order_totals():
-                order_item = OrderItem.objects.create(order=order, product=product, variant=variant, quantity=quantity, board1=board1, board2=board2, sauce=sauce)
+    if not cart_items:
+        messages.error(request, "Корзина пуста")
+        return redirect("app_cart:view_cart")
 
-                # Добавляем добавки, если они есть
-                if addons:
-                    order_item.addons.set(addons)
+    with suspended_order_totals():
+        for item_data in cart_items:
+            order_item = OrderItem.objects.create(
+                order=order,
+                product=item_data["product"],
+                variant=item_data["variant"],
+                quantity=item_data["quantity"],
+                board1=item_data["board1"],
+                board2=item_data["board2"],
+                sauce=item_data["sauce"],
+                drink=item_data["drink"],
+            )
+            if item_data["addons"]:
+                order_item.addons.set(item_data["addons"])
 
-            # Пересчитываем итоги заказа
-            order.recalculate_totals()
+    order.recalculate_totals()
+    session_cart.clear()
 
-            messages.success(request, f"Товар '{product.name}' добавлен в заказ")
-            return redirect("app_order:order_detail", order_id=order.id)
-    else:
-        form = AddToOrderForm(order=order)
-
-    return render(
-        request,
-        "app_order/add_item_to_order.html",
-        {
-            "form": form,
-            "order": order,
-        },
-    )
+    messages.success(request, f"Товары добавлены в заказ №{order.print_number}")
+    return redirect("app_order:order_detail", order_id=order.id)
 
 
 @login_required

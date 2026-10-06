@@ -5862,6 +5862,45 @@ body.params-modal-active {
 }
 
 
+:where(.s-cart) .cart-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+
+:where(.s-cart) .checkout-btn.add-to-order-btn {
+    background-color: #6c757d;
+}
+
+
+:where(.s-cart) .checkout-btn.add-to-order-btn:hover {
+    background-color: #5a6268;
+}
+
+
+:where(.s-cart) .add-to-order-panel {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+    margin-top: 12px;
+}
+
+
+:where(.s-cart) .add-to-order-select {
+    min-width: 320px;
+    max-width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+}
+
+
 /* Пустая корзина */
 :where(.s-cart) .empty-cart-message {
     text-align: center;
