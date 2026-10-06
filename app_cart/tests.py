@@ -104,17 +104,21 @@ class AddToCartViewTest(TestCase):
 
         board_params_cheese = BoardParams.objects.get(board=board_cheese, size=variant.size)
 
+        referer = "/catalog/admin-page/"
         response = self.client.post(
             reverse("app_cart:add_to_cart", args=[pizza.slug]),
             {
                 "variant_id": variant.id,
+                "quantity": 1,
                 "board1_id": board_params_cheese.id,
                 "board2_id": board_params_cheese.id,
             },
-            follow=True,
+            HTTP_REFERER=referer,
         )
 
-        messages = list(response.context["messages"])
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, referer)
+        messages = list(response.wsgi_request._messages)
         self.assertTrue(any("одинаковые борты" in m.message for m in messages))
 
     def test_adding_same_item_increases_quantity(self):
