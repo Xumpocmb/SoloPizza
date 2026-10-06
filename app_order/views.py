@@ -16,7 +16,7 @@ from app_cart.session_cart import SessionCart
 from app_cart.utils import validate_cart_items_for_branch
 from app_home.context_processors import get_active_branches, get_selected_branch_id
 from app_home.models import CafeBranch, WorkingHours
-from app_order.forms import CheckoutForm, OrderEditForm, OrderItemFormSet
+from app_order.forms import CheckoutForm, OrderEditForm
 from app_order import statistics
 from app_order.models import OrderItem, Order, suspended_order_totals
 from app_home.models import OrderAvailability
@@ -258,14 +258,10 @@ def order_detail(request, order_id):
     is_editable = order.is_editable()
 
     order_form = OrderEditForm(instance=order)
-    items_formset = OrderItemFormSet(instance=order)
 
-    # Формасет собирает позиции своим запросом, поэтому подкладываем в него уже посчитанные итоги
-    calculations_by_item = {item.pk: calculation for item, calculation in totals["items"]}
-    for form in items_formset.forms:
-        calculation = calculations_by_item.get(form.instance.pk)
-        if calculation is not None:
-            form.instance.set_total_cache(calculation)
+    items = [item for item, _ in totals["items"]]
+    for item, calculation in totals["items"]:
+        item.set_total_cache(calculation)
 
     breadcrumbs = [{"title": _("Главная"), "url": "/"}, {"title": _("Мои заказы"), "url": reverse("app_order:order_list")}, {"title": _("Заказ #%(number)s") % {"number": order.print_number}, "url": "#"}]
 
@@ -276,7 +272,7 @@ def order_detail(request, order_id):
             "order": order,
             "totals": totals,  # Передаем в контекст
             "form": order_form,
-            "item_formset": items_formset,
+            "items": items,
             "is_editable": is_editable,
             "breadcrumbs": breadcrumbs,
             "selected_branch": order.branch,  # Добавляем филиал в контекст
@@ -311,9 +307,9 @@ def update_order(request, order_id):
 
 @login_required
 @require_POST
-def update_order_items(request, order_id):
-    # Если пользователь является персоналом, то он может редактировать товары в любом заказе
-    # Иначе пользователь может редактировать товары только в своих заказах
+def delete_order_item(request, order_id, item_id):
+    # Если пользователь является персоналом, то он может удалять товары в любом заказе
+    # Иначе пользователь может удалять товары только в своих заказах
     if request.user.is_staff:
         order = get_object_or_404(Order, id=order_id)
     else:
@@ -323,15 +319,10 @@ def update_order_items(request, order_id):
     if not order.is_editable():
         return HttpResponseForbidden("Заказ нельзя редактировать")
 
-    formset = OrderItemFormSet(request.POST, instance=order, form_kwargs={"request": request})  # Ключевое изменение - передаем request
-
-    if formset.is_valid():
-        with suspended_order_totals():
-            formset.save()
-        order.recalculate_totals()
-        messages.success(request, "Изменения в товарах сохранены")
-    else:
-        messages.error(request, "Ошибка при сохранении товаров")
+    order_item = get_object_or_404(OrderItem, id=item_id, order=order)
+    order_item.delete()
+    order.recalculate_totals()
+    messages.success(request, "Товар удалён из заказа")
 
     return redirect("app_order:order_detail", order_id=order.id)
 

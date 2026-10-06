@@ -643,3 +643,101 @@ class AddCartToOrderTests(TestCase):
         self.client.force_login(self.customer)
         response = self.client.get(reverse("app_cart:view_cart"))
         self.assertNotContains(response, "Добавить к заказу")
+
+
+class DeleteOrderItemTests(TestCase):
+    def setUp(self):
+        self.branch = CafeBranch.objects.create(name="Центральный", address="ул. Ленина, 1")
+        self.staff = User.objects.create_user("staff", password="pass", is_staff=True)
+        self.customer = User.objects.create_user("client", password="pass")
+
+        category = Category.objects.create(name="Напитки", slug="drinks")
+        self.product = Product.objects.create(name="Кола", slug="cola", category=category)
+        self.variant = ProductVariant.objects.create(product=self.product, value="0.5", unit="l", price="80.00")
+
+    def _create_order(self, status="new", user=None):
+        return Order.objects.create(
+            branch=self.branch,
+            user=user,
+            customer_name="Иван",
+            phone_number="+375291112233",
+            delivery_type="delivery",
+            payment_method="cash",
+            status=status,
+        )
+
+    def _add_item(self, order, quantity=2):
+        return OrderItem.objects.create(order=order, product=self.product, variant=self.variant, quantity=quantity)
+
+    def _url(self, order, item):
+        return reverse("app_order:delete_order_item", args=[order.id, item.id])
+
+    def test_staff_deletes_item_and_recalculates_totals(self):
+        order = self._create_order()
+        item = self._add_item(order, quantity=2)
+        self.client.force_login(self.staff)
+
+        response = self.client.post(self._url(order, item))
+
+        self.assertRedirects(response, reverse("app_order:order_detail", args=[order.id]))
+        self.assertFalse(OrderItem.objects.filter(id=item.id).exists())
+        order.refresh_from_db()
+        self.assertEqual(order.total_price, Decimal("0.00"))
+
+    def test_non_editable_order_is_rejected(self):
+        order = self._create_order(status="canceled")
+        item = self._add_item(order)
+        self.client.force_login(self.staff)
+
+        response = self.client.post(self._url(order, item))
+
+        self.assertEqual(response.status_code, 403)
+        self.assertTrue(OrderItem.objects.filter(id=item.id).exists())
+
+    def test_regular_user_cannot_delete(self):
+        order = self._create_order()
+        item = self._add_item(order)
+        self.client.force_login(self.customer)
+
+        response = self.client.post(self._url(order, item))
+
+        self.assertEqual(response.status_code, 404)
+        self.assertTrue(OrderItem.objects.filter(id=item.id).exists())
+
+    def test_item_from_another_order_is_not_found(self):
+        order = self._create_order()
+        other_order = self._create_order()
+        item = self._add_item(other_order)
+        self.client.force_login(self.staff)
+
+        response = self.client.post(self._url(order, item))
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_get_is_not_allowed(self):
+        order = self._create_order()
+        item = self._add_item(order)
+        self.client.force_login(self.staff)
+
+        response = self.client.get(self._url(order, item))
+
+        self.assertEqual(response.status_code, 405)
+
+    def test_staff_sees_delete_button(self):
+        order = self._create_order()
+        item = self._add_item(order)
+        self.client.force_login(self.staff)
+
+        response = self.client.get(reverse("app_order:order_detail", args=[order.id]))
+
+        self.assertContains(response, self._url(order, item))
+
+    def test_regular_user_does_not_see_delete_button(self):
+        order = self._create_order(user=self.customer)
+        self._add_item(order)
+        self.client.force_login(self.customer)
+
+        response = self.client.get(reverse("app_order:order_detail", args=[order.id]))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "delete-item-btn")
