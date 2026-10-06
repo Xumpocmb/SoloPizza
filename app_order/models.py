@@ -1,6 +1,5 @@
 from decimal import Decimal
 from contextlib import contextmanager
-import json
 import threading
 from django.db import IntegrityError, models, transaction
 from django.db.models import F
@@ -14,13 +13,6 @@ from django.contrib.auth import get_user_model # Import get_user_model
 
 User = get_user_model() # Get the User model
 from app_home.models import CafeBranch, Discount
-
-
-class DecimalEncoder(json.JSONEncoder):
-    def default(self, o):
-        if isinstance(o, Decimal):
-            return str(o)
-        return super().default(o)
 
 
 class DiscountCache:
@@ -490,22 +482,3 @@ def update_order_on_addons_change(sender, instance, action, **kwargs):
         if order_recalculation_suspended():
             return
         instance.order.update_order_items()
-
-
-class OrderStatistic(models.Model):
-    """Модель для хранения статистики по заказам за день."""
-    date = models.DateField(unique=True, verbose_name="Дата")
-    orders_count = models.PositiveIntegerField(verbose_name="Количество заказов")
-    total_cash = models.DecimalField(max_digits=12, decimal_places=2, default=0, verbose_name="Сумма (наличные)")
-    total_card = models.DecimalField(max_digits=12, decimal_places=2, default=0, verbose_name="Сумма (карта)")
-    total_noname = models.DecimalField(max_digits=12, decimal_places=2, default=0, verbose_name="Сумма (безнал)")
-    total_amount = models.DecimalField(max_digits=12, decimal_places=2, verbose_name="Итоговая сумма")
-    sold_items = models.JSONField(default=dict, verbose_name="Проданные товары", encoder=DecimalEncoder)
-
-    class Meta:
-        verbose_name = "Статистика по заказам"
-        verbose_name_plural = "Статистика по заказам"
-        ordering = ['-date']
-
-    def __str__(self):
-        return f"Статистика за {self.date.strftime('%d.%m.%Y')}"

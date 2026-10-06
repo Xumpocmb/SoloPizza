@@ -124,7 +124,7 @@
                 <div class="table-cell" data-label="Сумма (безнал)">{{ stat.total_noname|format_price }}</div>
                 <div class="table-cell" data-label="Итоговая сумма">{{ stat.total_amount|format_price }}</div>
                 <div class="table-cell branch-stats-cell" data-label="Статистика по филиалам">
-                    {% if stat.sold_items %}
+                    {% if stat.orders_count %}
                         <a href="{% url 'app_order:detail_statistics' stat.date|date:'Y-m-d' %}" class="button-link">Подробнее</a>
                     {% else %}
                         Нет данных

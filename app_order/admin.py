@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib import admin
-from .models import Order, OrderItem, OrderStatistic
+from .models import Order, OrderItem
 
 
 class OrderAdminForm(forms.ModelForm):
@@ -126,34 +126,4 @@ class OrderAdmin(admin.ModelAdmin):
         return "\n".join(summary)
 
     display_order_summary.short_description = 'Состав заказа'
-
-
-@admin.register(OrderStatistic)
-class OrderStatisticAdmin(admin.ModelAdmin):
-    list_display = ('date', 'orders_count', 'total_cash', 'total_card', 'total_noname', 'total_amount')
-    list_filter = ('date',)
-    search_fields = ('date',)
-    date_hierarchy = 'date'
-    ordering = ('-date',)
-    readonly_fields = ('sold_items_display',)
-    fieldsets = (
-        ('Основная информация', {
-            'fields': ('date', 'orders_count', 'total_cash', 'total_card', 'total_noname', 'total_amount')
-        }),
-        ('Проданные товары', {
-            'fields': ('sold_items_display',),
-            'classes': ('collapse',)
-        }),
-    )
-
-    def sold_items_display(self, obj):
-        import json
-        from decimal import Decimal
-        class DecimalEncoder(json.JSONEncoder):
-            def default(self, o):
-                if isinstance(o, Decimal):
-                    return str(o)
-                return super().default(o)
-        return json.dumps(obj.sold_items, cls=DecimalEncoder, ensure_ascii=False, indent=2)
-    sold_items_display.short_description = 'Проданные товары'
 

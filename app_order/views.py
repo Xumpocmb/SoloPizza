@@ -17,7 +17,8 @@ from app_cart.utils import validate_cart_items_for_branch
 from app_home.context_processors import get_active_branches, get_selected_branch_id
 from app_home.models import CafeBranch, WorkingHours
 from app_order.forms import CheckoutForm, OrderEditForm, OrderItemFormSet, AddToOrderForm
-from app_order.models import OrderItem, Order, OrderStatistic, suspended_order_totals
+from app_order import statistics
+from app_order.models import OrderItem, Order, suspended_order_totals
 from app_home.models import OrderAvailability
 from decimal import Decimal, ROUND_HALF_UP
 from django.conf import settings
@@ -344,22 +345,39 @@ def order_list(request):
     current_session_key = request.session.session_key
 
     if request.user.is_staff:
-        orders = Order.objects.filter(branch_id=selected_branch_id).select_related("branch").order_by("-created_at")
+        orders = (
+            Order.objects.filter(branch_id=selected_branch_id, created_at__date=timezone.localdate())
+            .select_related("branch")
+            .order_by("-created_at")
+        )
     else:
         # Prioritize user's orders if authenticated
         if request.user.is_authenticated:
-            orders = Order.objects.filter(user=request.user, branch_id=selected_branch_id).select_related("branch").order_by("-created_at")
+            orders = Order.objects.filter(
+                user=request.user,
+                branch_id=selected_branch_id,
+                created_at__date=timezone.localdate(),
+            ).select_related("branch").order_by("-created_at")
         else:
             # For unauthenticated users, show orders that match their tokens
             # Since guest_token is a UUID4 (cryptographically secure), we can safely
             # allow access to orders that were created with this token, regardless of user assignment
             guest_token = request.COOKIES.get("guest_token")
             if guest_token:
-                orders = Order.objects.filter(guest_token=guest_token, branch_id=selected_branch_id).select_related("branch").order_by("-created_at")
+                orders = Order.objects.filter(
+                    guest_token=guest_token,
+                    branch_id=selected_branch_id,
+                    created_at__date=timezone.localdate(),
+                ).select_related("branch").order_by("-created_at")
             else:
                 # Fallback to session_key if no guest_token
                 session_key = request.session.session_key or request.session.create()
-                orders = Order.objects.filter(session_key=session_key, user__isnull=True, branch_id=selected_branch_id).select_related("branch").order_by("-created_at")
+                orders = Order.objects.filter(
+                    session_key=session_key,
+                    user__isnull=True,
+                    branch_id=selected_branch_id,
+                    created_at__date=timezone.localdate(),
+                ).select_related("branch").order_by("-created_at")
 
     search_query = request.GET.get("search", "")
     status_filter = request.GET.get("status", "")
@@ -657,34 +675,40 @@ def print_check_fastfood_only(request, order_id):
     return render(request, "app_order/print_check.html", context)
 
 
+def _parse_date(value):
+    """Разбирает дату из query/POST вида YYYY-MM-DD, возвращает None при пустом/неверном значении."""
+    if not value:
+        return None
+    try:
+        return datetime.strptime(value, "%Y-%m-%d").date()
+    except ValueError:
+        return None
+
+
+STATISTICS_SORT_FIELDS = {"date", "orders_count", "total_cash", "total_card", "total_noname", "total_amount"}
+
+
 @login_required
 def order_statistics_view(request):
-    if not request.user.is_staff:
+    if not request.user.is_superuser:
         return HttpResponseForbidden("Доступ запрещен")
 
-    statistics_list = OrderStatistic.objects.all()
+    start_date = request.GET.get("start_date", "")
+    end_date = request.GET.get("end_date", "")
 
-    # Filtering
-    start_date = request.GET.get("start_date")
-    end_date = request.GET.get("end_date")
+    rows = statistics.summarize_by_day(
+        statistics.get_orders(_parse_date(start_date), _parse_date(end_date))
+    )
 
-    if start_date:
-        statistics_list = statistics_list.filter(date__gte=start_date)
-    if end_date:
-        statistics_list = statistics_list.filter(date__lte=end_date)
-
-    # Sorting
     sort_by = request.GET.get("sort", "date")
+    if sort_by not in STATISTICS_SORT_FIELDS:
+        sort_by = "date"
     sort_dir = request.GET.get("dir", "desc")
 
-    if sort_dir == "asc":
-        statistics_list = statistics_list.order_by(sort_by)
-    else:
-        statistics_list = statistics_list.order_by(f"-{sort_by}")
+    rows.sort(key=lambda day: day[sort_by], reverse=sort_dir != "asc")
 
-    paginator = Paginator(statistics_list, 30)  # 30 записей на страницу
-    page_number = request.GET.get("page")
-    page_obj = paginator.get_page(page_number)
+    paginator = Paginator(rows, 30)
+    page_obj = paginator.get_page(request.GET.get("page"))
 
     context = {
         "page_obj": page_obj,
@@ -699,26 +723,16 @@ def order_statistics_view(request):
 
 @login_required
 def detail_statistics_view(request, date):
-    if not request.user.is_staff:
+    if not request.user.is_superuser:
         return HttpResponseForbidden("Доступ запрещен")
 
-    # Конвертируем строку даты в объект даты
-    from datetime import datetime
-
-    try:
-        selected_date = datetime.strptime(date, "%Y-%m-%d").date()
-    except ValueError:
-        # Если формат даты неверный, возвращаем ошибку
+    selected_date = _parse_date(date)
+    if selected_date is None:
         raise Http404("Неверный формат даты")
 
-    # Получаем статистику для выбранной даты
-    try:
-        statistic = OrderStatistic.objects.get(date=selected_date)
-    except OrderStatistic.DoesNotExist:
-        raise Http404("Статистика для указанной даты не найдена")
-
-    # Получаем структуру данных по филиалам
-    branch_statistics = statistic.sold_items
+    branch_statistics = statistics.build_branch_statistics(
+        statistics.get_orders(selected_date, selected_date)
+    )
 
     context = {
         "branch_statistics": branch_statistics,
@@ -735,107 +749,17 @@ def detail_statistics_view(request, date):
 @login_required
 def reports_view(request):
     """
-    Отображает статистику по заказам на текущий момент
+    Отображает статистику по заказам за текущий день.
+    Доступна сотрудникам и суперпользователю.
     """
-    # Проверка прав доступа - только для администраторов и персонала
     if not (request.user.is_staff or request.user.is_superuser):
         return redirect("app_order:order_list")
 
-    # Получаем дату за сегодня (по местному времени — как в нумерации заказов)
+    # Дата за сегодня по местному времени — как в нумерации заказов
     today = timezone.localdate()
+    orders_today = statistics.get_orders(today, today)
 
-    # Фильтруем заказы за сегодняшний день со статусом, не равным 'Отменен', и только оплаченные
-    orders_today = Order.objects.filter(created_at__date=today, payment_status=True).exclude(status="canceled")
-
-    # Сбор статистики по филиалам
-    branch_stats = {}
-
-    for order in orders_today.select_related("branch"):
-        branch_id = order.branch.id
-        branch_name = order.branch.name
-
-        if branch_id not in branch_stats:
-            branch_stats[branch_id] = {
-                "name": branch_name,
-                "orders_count": 0,
-                "total_cash": Decimal("0.00"),
-                "total_card": Decimal("0.00"),
-                "total_noname": Decimal("0.00"),
-                "sold_items": {},
-            }
-
-        # Увеличиваем количество заказов для филиала
-        branch_stats[branch_id]["orders_count"] += 1
-
-        # Добавляем сумму заказа к соответствующему методу оплаты
-        if order.payment_method == "split":
-            # Для раздельной оплаты используем сохраненные суммы
-            branch_stats[branch_id]["total_cash"] += order.cash_amount
-            branch_stats[branch_id]["total_card"] += order.card_amount
-            branch_stats[branch_id]["total_noname"] += order.noname_amount
-        elif order.payment_method == "cash":
-            branch_stats[branch_id]["total_cash"] += order.total_price
-        elif order.payment_method == "card":
-            branch_stats[branch_id]["total_card"] += order.total_price
-        elif order.payment_method == "noname":
-            branch_stats[branch_id]["total_noname"] += order.total_price
-
-    # Обработка позиций заказов для статистики по товарам
-    order_items = OrderItem.objects.filter(order__in=orders_today).select_related("product", "variant", "order__branch")
-
-    for item in order_items:
-        branch_id = item.order.branch.id
-        item_name = f"{item.product.name} ({item.get_size_display()})"
-
-        if item_name not in branch_stats[branch_id]["sold_items"]:
-            branch_stats[branch_id]["sold_items"][item_name] = {"quantity": 0, "payment_methods": {}}
-
-        branch_stats[branch_id]["sold_items"][item_name]["quantity"] += item.quantity
-        order_payment_method = item.order.payment_method
-
-        # Get the final total for the item
-        item_calculation = item.calculate_item_total()
-        item_final_total = item_calculation["final_total"]
-
-        # Handle payment method distribution for split payments
-        if order_payment_method == "split":
-            # Calculate proportional amounts based on the split payment
-            total_order = item.order.total_price
-            if total_order > 0:
-                cash_ratio = item.order.cash_amount / total_order
-                card_ratio = item.order.card_amount / total_order
-                noname_ratio = item.order.noname_amount / total_order
-
-                cash_amount = item_final_total * cash_ratio
-                card_amount = item_final_total * card_ratio
-                noname_amount = item_final_total * noname_ratio
-
-                # Add to respective payment methods
-                cash_payment_method = "Наличные (раздельно)"
-                card_payment_method = "Карта (раздельно)"
-                noname_payment_method = "Безналичный (раздельно)"
-
-                if cash_payment_method not in branch_stats[branch_id]["sold_items"][item_name]["payment_methods"]:
-                    branch_stats[branch_id]["sold_items"][item_name]["payment_methods"][cash_payment_method] = Decimal("0.00")
-                branch_stats[branch_id]["sold_items"][item_name]["payment_methods"][cash_payment_method] += cash_amount
-
-                if card_payment_method not in branch_stats[branch_id]["sold_items"][item_name]["payment_methods"]:
-                    branch_stats[branch_id]["sold_items"][item_name]["payment_methods"][card_payment_method] = Decimal("0.00")
-                branch_stats[branch_id]["sold_items"][item_name]["payment_methods"][card_payment_method] += card_amount
-
-                if noname_payment_method not in branch_stats[branch_id]["sold_items"][item_name]["payment_methods"]:
-                    branch_stats[branch_id]["sold_items"][item_name]["payment_methods"][noname_payment_method] = Decimal("0.00")
-                branch_stats[branch_id]["sold_items"][item_name]["payment_methods"][noname_payment_method] += noname_amount
-        else:
-            payment_method = item.order.get_payment_method_display()
-
-            if payment_method not in branch_stats[branch_id]["sold_items"][item_name]["payment_methods"]:
-                branch_stats[branch_id]["sold_items"][item_name]["payment_methods"][payment_method] = Decimal("0.00")
-            branch_stats[branch_id]["sold_items"][item_name]["payment_methods"][payment_method] += item_final_total
-
-    # Добавляем итоговую сумму для каждого филиала
-    for branch_id in branch_stats:
-        branch_stats[branch_id]["total_amount"] = branch_stats[branch_id]["total_cash"] + branch_stats[branch_id]["total_card"] + branch_stats[branch_id]["total_noname"]
+    branch_stats = statistics.build_branch_statistics(orders_today)
 
     # Подсчет общих сумм для всех филиалов
     total_orders_count = sum(branch["orders_count"] for branch in branch_stats.values())
@@ -846,19 +770,13 @@ def reports_view(request):
 
     # Статистика по сотрудникам (is_staff=True)
     employee_stats = {}
-    orders_with_user = orders_today.filter(user__is_staff=True).select_related("user")
-    
-    for order in orders_with_user:
+    for order in orders_today.filter(user__is_staff=True).select_related("user"):
         user = order.user
         if user not in employee_stats:
-            employee_stats[user] = {
-                "orders_count": 0,
-                "total_amount": Decimal("0.00"),
-            }
+            employee_stats[user] = {"orders_count": 0, "total_amount": Decimal("0.00")}
         employee_stats[user]["orders_count"] += 1
         employee_stats[user]["total_amount"] += order.total_price
 
-    # Преобразуем в список для удобного отображения в шаблоне
     employee_statistics = [
         {
             "user": user,
@@ -867,10 +785,8 @@ def reports_view(request):
         }
         for user, data in employee_stats.items()
     ]
-    # Сортируем по сумме заказов (по убыванию)
     employee_statistics.sort(key=lambda x: x["total_amount"], reverse=True)
 
-    # Формируем контекст
     context = {
         "branch_statistics": branch_stats,
         "selected_date": today,
@@ -890,37 +806,29 @@ def reports_view(request):
 @require_POST
 def send_detail_statistics_email(request):
     """
-    Отправляет детальную статистику по филиалам за выбранный день на email
+    Отправляет детальную статистику по филиалам за выбранный день на email.
+    Считает данные по заказам в реальном времени.
     """
-    if not request.user.is_staff:
+    if not request.user.is_superuser:
         return HttpResponseForbidden("Доступ запрещен")
 
     from django.core.mail import send_mail
     from django.template.loader import render_to_string
     from django.conf import settings
-    from datetime import datetime
-    from .models import OrderStatistic
 
-    # Получаем дату из POST-запроса
-    date_str = request.POST.get("date")
-    try:
-        selected_date = datetime.strptime(date_str, "%Y-%m-%d").date()
-    except ValueError:
+    selected_date = _parse_date(request.POST.get("date"))
+    if selected_date is None:
         messages.error(request, "Неверный формат даты")
         return redirect(request.META.get("HTTP_REFERER", "app_order:order_list"))
 
-    # Получаем статистику для выбранной даты
-    try:
-        statistic = OrderStatistic.objects.get(date=selected_date)
-    except OrderStatistic.DoesNotExist:
-        messages.error(request, "Статистика для указанной даты не найдена")
+    branch_statistics = statistics.build_branch_statistics(
+        statistics.get_orders(selected_date, selected_date)
+    )
+
+    if not branch_statistics:
+        messages.warning(request, f"Нет данных за {selected_date.strftime('%d.%m.%Y')}")
         return redirect(request.META.get("HTTP_REFERER", "app_order:order_list"))
 
-    # Получаем структуру данных по филиалам
-    branch_statistics = statistic.sold_items
-
-    # Отправка email отчета
-    email_status = ""
     try:
         recipient_emails = get_recipient_emails()
 
@@ -947,93 +855,35 @@ def send_detail_statistics_email(request):
 
     return redirect(request.META.get("HTTP_REFERER", "app_order:order_list"))
 
+
 @login_required
 def send_order_statistics_email(request):
     """
     Отправляет статистику заказов за выбранный период на email.
-    Агрегирует готовые данные из модели OrderStatistic.
+    Считает данные по заказам в реальном времени.
     """
-    if not request.user.is_staff:
+    if not request.user.is_superuser:
         return HttpResponseForbidden("Доступ запрещен")
 
     from django.core.mail import send_mail
     from django.template.loader import render_to_string
     from django.conf import settings
-    from datetime import datetime
-    from decimal import Decimal
-    from .models import OrderStatistic
 
-    # Получаем даты из POST-запроса
-    start_date_str = request.POST.get("start_date")
-    end_date_str = request.POST.get("end_date")
+    start_date = _parse_date(request.POST.get("start_date"))
+    end_date = _parse_date(request.POST.get("end_date"))
 
-    try:
-        start_date = datetime.strptime(start_date_str, "%Y-%m-%d").date()
-        end_date = datetime.strptime(end_date_str, "%Y-%m-%d").date()
-    except (ValueError, TypeError):
+    if start_date is None or end_date is None:
         messages.error(request, "Неверный формат даты")
         return redirect(request.META.get("HTTP_REFERER", "app_order:order_statistics"))
 
-    # Получаем статистику за указанный период
-    statistics = OrderStatistic.objects.filter(
-        date__gte=start_date,
-        date__lte=end_date
-    ).order_by('date')
+    branch_stats = statistics.build_branch_statistics(
+        statistics.get_orders(start_date, end_date)
+    )
 
-    if not statistics:
-        messages.warning(request, f"Нет данных статистики за период с {start_date.strftime('%d.%m.%Y')} по {end_date.strftime('%d.%m.%Y')}")
+    if not branch_stats:
+        messages.warning(request, f"Нет данных за период с {start_date.strftime('%d.%m.%Y')} по {end_date.strftime('%d.%m.%Y')}")
         return redirect(request.META.get("HTTP_REFERER", "app_order:order_statistics"))
 
-    # Агрегируем данные по филиалам за весь период
-    branch_stats = {}
-
-    for stat in statistics:
-        # sold_items имеет структуру: {branch_id: {name, orders_count, total_cash, total_card, total_noname, sold_items}}
-        for branch_id, branch_data in stat.sold_items.items():
-            branch_id = str(branch_id)  # JSON ключи всегда строки
-            
-            if branch_id not in branch_stats:
-                branch_stats[branch_id] = {
-                    "name": branch_data.get("name", "Неизвестно"),
-                    "orders_count": 0,
-                    "total_cash": Decimal("0.00"),
-                    "total_card": Decimal("0.00"),
-                    "total_noname": Decimal("0.00"),
-                    "sold_items": {},
-                }
-
-            # Суммируем показатели филиала
-            branch_stats[branch_id]["orders_count"] += branch_data.get("orders_count", 0)
-            branch_stats[branch_id]["total_cash"] += Decimal(str(branch_data.get("total_cash", 0)))
-            branch_stats[branch_id]["total_card"] += Decimal(str(branch_data.get("total_card", 0)))
-            branch_stats[branch_id]["total_noname"] += Decimal(str(branch_data.get("total_noname", 0)))
-
-            # Агрегируем проданные товары
-            for item_name, item_data in branch_data.get("sold_items", {}).items():
-                if item_name not in branch_stats[branch_id]["sold_items"]:
-                    branch_stats[branch_id]["sold_items"][item_name] = {
-                        "quantity": 0,
-                        "payment_methods": {}
-                    }
-                
-                # Суммируем количество
-                branch_stats[branch_id]["sold_items"][item_name]["quantity"] += item_data.get("quantity", 0)
-                
-                # Суммируем суммы по методам оплаты
-                for method, amount in item_data.get("payment_methods", {}).items():
-                    if method not in branch_stats[branch_id]["sold_items"][item_name]["payment_methods"]:
-                        branch_stats[branch_id]["sold_items"][item_name]["payment_methods"][method] = Decimal("0.00")
-                    branch_stats[branch_id]["sold_items"][item_name]["payment_methods"][method] += Decimal(str(amount))
-
-    # Добавляем итоговую сумму для каждого филиала
-    for branch_id in branch_stats:
-        branch_stats[branch_id]["total_amount"] = (
-            branch_stats[branch_id]["total_cash"] + 
-            branch_stats[branch_id]["total_card"] + 
-            branch_stats[branch_id]["total_noname"]
-        )
-
-    # Отправка email отчета
     try:
         recipient_emails = get_recipient_emails()
 
