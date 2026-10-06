@@ -1,40 +1,9 @@
 from celery import shared_task
 from django.utils import timezone
-from django.db import connection
 from .models import Order, OrderStatistic, OrderItem
-from django.db import models
-from django.db.models import Sum, Q, F, DecimalField
-from django.db.models.functions import Coalesce
 from decimal import Decimal
 import requests
 from django.conf import settings
-
-
-@shared_task
-def clear_orders():
-    """
-    Задача для очистки списка заказов.
-    Удаляет все заказы из базы данных и сбрасывает счетчик ID.
-    Запускается ежедневно в 08:00.
-    """
-    # Получаем и удаляем все заказы
-    all_orders = Order.objects.all()
-    count = all_orders.count()
-    all_orders.delete()
-
-    # Сбрасываем счетчик ID для таблицы заказов
-    with connection.cursor() as cursor:
-        # Определяем имя таблицы заказов
-        table_name = Order._meta.db_table
-
-        # Для SQLite
-        if connection.vendor == "sqlite":
-            cursor.execute(f"DELETE FROM sqlite_sequence WHERE name='{table_name}';")
-        # Для PostgreSQL (закомментировано, но оставлено для будущего использования)
-        # elif connection.vendor == 'postgresql':
-        #     cursor.execute(f"ALTER SEQUENCE {table_name}_id_seq RESTART WITH 1;")
-
-    return f"Удалено {count} заказов. Счетчик ID сброшен."
 
 
 @shared_task
@@ -88,7 +57,7 @@ def collect_order_statistics():
     Собирает статистику по заказам за текущий день и сохраняет ее в БД.
     Запускается ежедневно.
     """
-    today = timezone.now().date()
+    today = timezone.localdate()
 
     # Фильтруем заказы за сегодняшний день со статусом, не равным 'Отменен', и только оплаченные
     orders_today = Order.objects.filter(created_at__date=today, payment_status=True).exclude(status="canceled")

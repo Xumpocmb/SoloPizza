@@ -741,8 +741,8 @@ def reports_view(request):
     if not (request.user.is_staff or request.user.is_superuser):
         return redirect("app_order:order_list")
 
-    # Получаем дату за сегодня
-    today = timezone.now().date()
+    # Получаем дату за сегодня (по местному времени — как в нумерации заказов)
+    today = timezone.localdate()
 
     # Фильтруем заказы за сегодняшний день со статусом, не равным 'Отменен', и только оплаченные
     orders_today = Order.objects.filter(created_at__date=today, payment_status=True).exclude(status="canceled")

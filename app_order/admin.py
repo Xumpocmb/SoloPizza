@@ -49,7 +49,7 @@ class OrderItemInline(admin.TabularInline):
 class OrderAdmin(admin.ModelAdmin):
     form = OrderAdminForm
     list_display = [
-        'id',
+        'print_number',
         'user',
         'session_key',
         'guest_token',
@@ -68,7 +68,7 @@ class OrderAdmin(admin.ModelAdmin):
         'user',
     ]
     search_fields = [
-        'id',
+        'daily_number',
         'user__username',
         'session_key',
         'guest_token',

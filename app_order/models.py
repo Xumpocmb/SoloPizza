@@ -2,8 +2,10 @@ from decimal import Decimal
 from contextlib import contextmanager
 import json
 import threading
-from django.db import models
+from django.db import IntegrityError, models, transaction
+from django.db.models import F
 from django.conf import settings
+from django.utils import timezone
 from django.db.models.signals import post_save, post_delete, m2m_changed
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
@@ -60,6 +62,20 @@ def suspended_order_totals():
 
 def order_recalculation_suspended():
     return getattr(_recalculation_state, "suspended", False)
+
+
+class DailyOrderNumber(models.Model):
+    """Счётчик порядковых номеров заказов за день: новый день начинает нумерацию с 1."""
+
+    date = models.DateField(unique=True, verbose_name="Дата")
+    last_number = models.PositiveIntegerField(default=0, verbose_name="Последний номер")
+
+    class Meta:
+        verbose_name = "Счётчик номеров заказов"
+        verbose_name_plural = "Счётчики номеров заказов"
+
+    def __str__(self):
+        return f"Счётчик на {self.date.strftime('%d.%m.%Y')}: {self.last_number}"
 
 
 class OrderManager(models.Manager):
@@ -164,6 +180,8 @@ class Order(models.Model):
     session_key = models.CharField(max_length=40, verbose_name="Ключ сессии", db_index=True, null=True, blank=True)
     guest_token = models.CharField(max_length=40, verbose_name="Гостевой токен", db_index=True, null=True, blank=True)
     branch = models.ForeignKey(CafeBranch, on_delete=models.SET_NULL, verbose_name="Филиал", null=True)
+    daily_number = models.PositiveIntegerField(verbose_name="Порядковый номер за день")
+    number_date = models.DateField(verbose_name="Дата номера")
     customer_name = models.CharField(max_length=255, verbose_name="Имя заказчика")
     phone_number = models.CharField(max_length=20, verbose_name="Номер телефона", null=True, blank=True)
     address = models.TextField(verbose_name="Адрес доставки", null=True, blank=True)
@@ -199,20 +217,50 @@ class Order(models.Model):
         verbose_name = "Заказ"
         verbose_name_plural = "Заказы"
         ordering = ["-created_at"]
+        constraints = [
+            models.UniqueConstraint(fields=["number_date", "daily_number"], name="unique_order_number_per_day"),
+        ]
 
     def save(self, *args, **kwargs):
-        if self.pk and any(field in kwargs.get("update_fields", []) for field in ["delivery_type", "status"]):
+        creating = self.pk is None
+        auto_numbered = creating and getattr(self, "daily_number", None) is None
+
+        if auto_numbered:
+            self._assign_daily_number()
+
+        if self.pk and any(field in (kwargs.get("update_fields") or []) for field in ["delivery_type", "status"]):
             self.recalculate_totals()
 
-        super().save(*args, **kwargs)
+        # Номер мог пересечься с чужой транзакцией — тогда берём следующий и повторяем вставку
+        attempts = 5 if auto_numbered else 1
+        for attempt in range(attempts):
+            try:
+                with transaction.atomic():
+                    super().save(*args, **kwargs)
+                return
+            except IntegrityError:
+                if attempt == attempts - 1:
+                    raise
+                self._assign_daily_number()
+
+    def _assign_daily_number(self):
+        """Атомарно резервирует следующий порядковый номер за сегодняшним днём."""
+        today = timezone.localdate()
+        with transaction.atomic():
+            counter, _ = DailyOrderNumber.objects.get_or_create(date=today)
+            DailyOrderNumber.objects.filter(pk=counter.pk).update(last_number=F("last_number") + 1)
+            counter.refresh_from_db()
+        self.number_date = today
+        self.daily_number = counter.last_number
 
     def __str__(self):
         return f"Заказ #{self.print_number} от {self.created_at.strftime('%d.%m.%Y')}"
 
     @property
     def print_number(self):
-        """Номер заказа для печати чека: цифра в чеке филиала + id заказа (3 цифры)."""
-        order_part = f"{self.id:03d}"
+        """Номер заказа для печати чека: цифра в чеке филиала + порядковый номер за день (3 цифры)."""
+        daily_number = getattr(self, "daily_number", None)
+        order_part = f"{daily_number or 0:03d}"
         branch = self.branch
         branch_part = branch.check_digit if branch is not None and branch.check_digit is not None else 0
         return f"{branch_part}{order_part}"
