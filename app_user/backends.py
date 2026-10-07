@@ -29,9 +29,13 @@ class PhoneNumberAuthBackend(BaseBackend):
     Кастомный бэкенд аутентификации, использующий phone вместо username.
     """
     def authenticate(self, request, phone=None, password=None, **kwargs):
+        if not phone or password is None:
+            return None
         try:
             # Ищем пользователя по phone
-            user = User.objects.get(phone=phone)
+            user = User.objects.filter(phone=phone).first()
+            if user is None:
+                return None
             # Проверяем пароль
             if user.check_password(password):
                 return user
