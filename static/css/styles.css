@@ -3959,6 +3959,15 @@ body.params-modal-active {
 }
 
 
+:where(.s-catalog-admin) .item-description-admin {
+    font-size: 14px;
+    line-height: 1.4;
+    color: var(--text-color);
+    padding-bottom: 5px;
+    border-bottom: 1px solid var(--divider-color);
+}
+
+
 :where(.s-catalog-admin) .quantity-input-admin {
     width: 60px;
     padding: 5px;

@@ -61,6 +61,13 @@
                                        data-has-addons="{{ item.has_addons|yesno:'true,false' }}"
                                        data-has-drink="{{ item.has_drink|yesno:'true,false' }}">
 
+                                {% if item.description %}
+                                <!-- Описание товара -->
+                                <div class="form-group-admin item-description-admin">
+                                    {{ item.description|linebreaksbr }}
+                                </div>
+                                {% endif %}
+
                                 <!-- Размер -->
                                 <div class="form-group-admin size-selector-admin">
                                     <h3>Выберите размер:</h3>
