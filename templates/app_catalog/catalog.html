@@ -45,6 +45,7 @@
             {% endfor %}
         </div>
 
+        {% if not request.user.is_staff and not request.user.is_superuser %}
         <section class="cp-banner">
             <div class="cp-banner__inner">
                 <p class="cp-banner__eyebrow">
@@ -73,6 +74,7 @@
                 </ul>
             </div>
         </section>
+        {% endif %}
 
         <div class="hp-container">
             <section class="hp-section" id="hp-menu">
