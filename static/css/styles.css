@@ -4888,58 +4888,37 @@ body.params-modal-active {
 }
 
 
-/* --- Бегущая строка ----------------------------------------------------- */
+/* --- Объявления ---------------------------------------------------------- */
 
-:where(.s-home) .hp-marquee {
-    overflow: hidden;
+:where(.s-home) .hp-announcement {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
     margin-top: clamp(16px, 3vw, 28px);
-    padding: 14px 0;
+}
+
+:where(.s-home) .hp-announcement__item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 12px;
+    padding: 16px 24px;
     border-radius: var(--hp-radius-sm);
     background: linear-gradient(90deg, var(--hp-accent-strong), var(--hp-accent) 45%, #0ab268);
     color: #fff;
     box-shadow: var(--hp-shadow-sm);
-    -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
-    mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
-}
-
-
-:where(.s-home) .hp-marquee__track {
-    display: flex;
-    width: max-content;
-    animation: hp-marquee-scroll 28s linear infinite;
-}
-
-
-:where(.s-home) .hp-marquee:hover .hp-marquee__track {
-    animation-play-state: paused;
-}
-
-
-:where(.s-home) .hp-marquee__group {
-    display: flex;
-    align-items: center;
-    gap: 2.5rem;
-    padding-right: 2.5rem;
-}
-
-
-:where(.s-home) .hp-marquee__item {
-    font-weight: 500;
+    font-weight: 600;
+    font-size: clamp(1rem, 2.2vw, 1.25rem);
     letter-spacing: 0.01em;
-    white-space: nowrap;
+    line-height: 1.5;
 }
 
-
-:where(.s-home) .hp-marquee__dot {
+:where(.s-home) .hp-announcement__item i {
+    color: rgba(255, 255, 255, 0.9);
     flex: none;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.7);
+    font-size: 1.1em;
 }
-
-
-@keyframes hp-marquee-scroll{ from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
 /* --- Слайдер ------------------------------------------------------------ */
 
@@ -5329,20 +5308,6 @@ body.params-modal-active {
 
 
 @media (prefers-reduced-motion: reduce){
-
-
-    :where(.s-home) .hp-marquee {
-    -webkit-mask-image: none;
-    mask-image: none;
-
-}
-
-
-    :where(.s-home) .hp-marquee__track {
-    animation: none;
-
-}
-
 
     :where(.s-home) .hp-card, :where(.s-home) .hp-card__media img {
     transition: none;

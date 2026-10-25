@@ -61,21 +61,13 @@
     </section>
 
     {% if marquees %}
-        <section class="hp-marquee" aria-label="{% trans 'Актуальные акции' %}">
-            <div class="hp-marquee__track">
-                <div class="hp-marquee__group">
-                    {% for marquee in marquees %}
-                        <span class="hp-marquee__item">{{ marquee.text }}</span>
-                        <span class="hp-marquee__dot" aria-hidden="true"></span>
-                    {% endfor %}
+        <section class="hp-announcement" aria-label="{% trans 'Актуальные акции' %}">
+            {% for marquee in marquees %}
+                <div class="hp-announcement__item">
+                    <i class="fas fa-bullhorn" aria-hidden="true"></i>
+                    <span>{{ marquee.text }}</span>
                 </div>
-                <div class="hp-marquee__group" aria-hidden="true">
-                    {% for marquee in marquees %}
-                        <span class="hp-marquee__item">{{ marquee.text }}</span>
-                        <span class="hp-marquee__dot" aria-hidden="true"></span>
-                    {% endfor %}
-                </div>
-            </div>
+            {% endfor %}
         </section>
     {% endif %}
 
