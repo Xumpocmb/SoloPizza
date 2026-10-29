@@ -506,6 +506,16 @@ class StatisticsTests(TestCase):
         self.assertEqual(len(response.context["page_obj"].object_list), 1)
         self.assertEqual(response.context["page_obj"].object_list[0]["total_amount"], Decimal("100.00"))
 
+    def test_order_statistics_view_excludes_noname_from_total(self):
+        self._create_order(total_price="100.00", payment_method="cash")
+        self._create_order(total_price="50.00", payment_method="noname")
+        self.client.force_login(self.admin)
+
+        response = self.client.get(reverse("app_order:order_statistics"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["page_obj"].object_list[0]["total_amount"], Decimal("100.00"))
+
     def test_order_statistics_view_ignores_invalid_sort(self):
         self._create_order()
         self.client.force_login(self.admin)
@@ -517,6 +527,17 @@ class StatisticsTests(TestCase):
 
     def test_detail_statistics_view_computes_live(self):
         self._create_order(total_price="100.00")
+        self.client.force_login(self.admin)
+        today = timezone.localdate().isoformat()
+
+        response = self.client.get(reverse("app_order:detail_statistics", args=[today]))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["branch_statistics"][self.branch.id]["total_amount"], Decimal("100.00"))
+
+    def test_detail_statistics_view_excludes_noname_from_total(self):
+        self._create_order(total_price="100.00", payment_method="cash")
+        self._create_order(total_price="50.00", payment_method="noname")
         self.client.force_login(self.admin)
         today = timezone.localdate().isoformat()
 

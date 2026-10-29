@@ -51,7 +51,15 @@ def _add_order_payment(branch_data, order):
         branch_data["total_noname"] += order.total_price
 
 
-def summarize_by_day(orders):
+def _total_amount(data, include_noname=True):
+    """Итог по заказу: наличные + карта (+ безнал, если он учитывается)."""
+    total = data["total_cash"] + data["total_card"]
+    if include_noname:
+        total += data["total_noname"]
+    return total
+
+
+def summarize_by_day(orders, include_noname=True):
     """Сводка по каждому дню периода: количество заказов и суммы по оплатам."""
     days = {}
 
@@ -72,12 +80,12 @@ def summarize_by_day(orders):
         _add_order_payment(days[day], order)
 
     for day in days.values():
-        day["total_amount"] = day["total_cash"] + day["total_card"] + day["total_noname"]
+        day["total_amount"] = _total_amount(day, include_noname)
 
     return sorted(days.values(), key=lambda day: day["date"], reverse=True)
 
 
-def build_branch_statistics(orders):
+def build_branch_statistics(orders, include_noname=True):
     """Детальная статистика по филиалам за период, включая проданные товары."""
     branch_stats = {}
 
@@ -127,8 +135,6 @@ def build_branch_statistics(orders):
             item_data["payment_methods"][payment_method] = item_data["payment_methods"].get(payment_method, Decimal("0.00")) + item_final_total
 
     for branch_data in branch_stats.values():
-        branch_data["total_amount"] = (
-            branch_data["total_cash"] + branch_data["total_card"] + branch_data["total_noname"]
-        )
+        branch_data["total_amount"] = _total_amount(branch_data, include_noname)
 
     return branch_stats

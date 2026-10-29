@@ -679,7 +679,8 @@ def order_statistics_view(request):
     end_date = request.GET.get("end_date", "")
 
     rows = statistics.summarize_by_day(
-        statistics.get_orders(_parse_date(start_date), _parse_date(end_date))
+        statistics.get_orders(_parse_date(start_date), _parse_date(end_date)),
+        include_noname=False,
     )
 
     sort_by = request.GET.get("sort", "date")
@@ -713,7 +714,8 @@ def detail_statistics_view(request, date):
         raise Http404("Неверный формат даты")
 
     branch_statistics = statistics.build_branch_statistics(
-        statistics.get_orders(selected_date, selected_date)
+        statistics.get_orders(selected_date, selected_date),
+        include_noname=False,
     )
 
     context = {
@@ -804,7 +806,8 @@ def send_detail_statistics_email(request):
         return redirect(request.META.get("HTTP_REFERER", "app_order:order_list"))
 
     branch_statistics = statistics.build_branch_statistics(
-        statistics.get_orders(selected_date, selected_date)
+        statistics.get_orders(selected_date, selected_date),
+        include_noname=False,
     )
 
     if not branch_statistics:
@@ -859,7 +862,8 @@ def send_order_statistics_email(request):
         return redirect(request.META.get("HTTP_REFERER", "app_order:order_statistics"))
 
     branch_stats = statistics.build_branch_statistics(
-        statistics.get_orders(start_date, end_date)
+        statistics.get_orders(start_date, end_date),
+        include_noname=False,
     )
 
     if not branch_stats:

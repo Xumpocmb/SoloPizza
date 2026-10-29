@@ -8433,8 +8433,8 @@ body.params-modal-active {
 
 :where(.s-order-stats) .statistics-table .table-header, :where(.s-order-stats) .statistics-table .table-row {
     display: grid;
-    /* 7 колонок для новой структуры */
-    grid-template-columns: 10% 10% 12% 12% 12% 14% 30%;
+    /* 6 колонок для новой структуры */
+    grid-template-columns: 10% 10% 14% 14% 16% 36%;
     padding: 12px 15px;
     align-items: center;
     border-bottom: 1px solid var(--hover-bg);
@@ -8476,7 +8476,7 @@ body.params-modal-active {
     text-align: center;
 }
 
-:where(.s-order-stats) .header-cell.cash-col, :where(.s-order-stats) .header-cell.card-col, :where(.s-order-stats) .header-cell.noname-col, :where(.s-order-stats) .header-cell.total-col {
+:where(.s-order-stats) .header-cell.cash-col, :where(.s-order-stats) .header-cell.card-col, :where(.s-order-stats) .header-cell.total-col {
     text-align: right;
 }
 
@@ -8486,7 +8486,7 @@ body.params-modal-active {
     text-align: center;
 }
 
-:where(.s-order-stats) .table-cell.cash-col, :where(.s-order-stats) .table-cell.card-col, :where(.s-order-stats) .table-cell.noname-col, :where(.s-order-stats) .table-cell.total-col {
+:where(.s-order-stats) .table-cell.cash-col, :where(.s-order-stats) .table-cell.card-col, :where(.s-order-stats) .table-cell.total-col {
     font-family: monospace; /* Моноширинный шрифт для цифр */
     text-align: right;
 }

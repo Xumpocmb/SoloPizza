@@ -188,11 +188,6 @@
                     </div>
                     
                     <div class="summary-card">
-                        <div class="summary-title">Безнал</div>
-                        <div class="summary-value">{{ branch_data.total_noname|format_price }}</div>
-                    </div>
-                    
-                    <div class="summary-card">
                         <div class="summary-title">Итого</div>
                         <div class="summary-value">{{ branch_data.total_amount|format_price }}</div>
                     </div>
@@ -210,17 +205,17 @@
                             </div>
                             <div class="payment-methods">
                                 {% for method, amount in item_data.payment_methods.items %}
+                                    {% if method != "Безналичный (раздельно)" and method != "Безналичный расчет" %}
                                     <span class="method-item">
                                         {% if method == "Наличные (раздельно)" %}
                                             Наличные (разд.): {{ amount|format_price }}
                                         {% elif method == "Карта (раздельно)" %}
                                             Карта (разд.): {{ amount|format_price }}
-                                        {% elif method == "Безналичный (раздельно)" %}
-                                            Безнал (разд.): {{ amount|format_price }}
                                         {% else %}
                                             {{ method }}: {{ amount|format_price }}
                                         {% endif %}
                                     </span>
+                                    {% endif %}
                                 {% endfor %}
                             </div>
                         </div>

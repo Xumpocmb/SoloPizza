@@ -100,12 +100,6 @@
                         {% if sort_by == 'total_card' %}{% if sort_dir == 'asc' %}▲{% else %}▼{% endif %}{% endif %}
                     </a>
                 </div>
-                <div class="header-cell noname-col">
-                    <a href="?sort=total_noname&dir={% if sort_by == 'total_noname' and sort_dir == 'asc' %}desc{% else %}asc{% endif %}&start_date={{ start_date|default:'' }}&end_date={{ end_date|default:'' }}">
-                        Сумма (безнал)
-                        {% if sort_by == 'total_noname' %}{% if sort_dir == 'asc' %}▲{% else %}▼{% endif %}{% endif %}
-                    </a>
-                </div>
                 <div class="header-cell actions-col">
                     <a href="?sort=total_amount&dir={% if sort_by == 'total_amount' and sort_dir == 'asc' %}desc{% else %}asc{% endif %}&start_date={{ start_date|default:'' }}&end_date={{ end_date|default:'' }}">
                         Итоговая сумма
@@ -121,7 +115,6 @@
                 <div class="table-cell" data-label="Кол-во заказов">{{ stat.orders_count }}</div>
                 <div class="table-cell" data-label="Сумма (наличные)">{{ stat.total_cash|format_price }}</div>
                 <div class="table-cell" data-label="Сумма (карта)">{{ stat.total_card|format_price }}</div>
-                <div class="table-cell" data-label="Сумма (безнал)">{{ stat.total_noname|format_price }}</div>
                 <div class="table-cell" data-label="Итоговая сумма">{{ stat.total_amount|format_price }}</div>
                 <div class="table-cell branch-stats-cell" data-label="Статистика по филиалам">
                     {% if stat.orders_count %}
