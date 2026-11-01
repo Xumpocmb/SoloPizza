@@ -104,9 +104,15 @@ class OrderManager(models.Manager):
     def _order_items(self, order):
         """Позиции заказа вместе со всем, что нужно расчёту, если они не загружены заранее."""
         if "items" in getattr(order, "_prefetched_objects_cache", {}):
-            return order.items.all()
+            items = order.items.all()
+        else:
+            items = order.items.select_related("product__category", "variant__size", "board1", "board2").prefetch_related("addons")
 
-        return order.items.select_related("product__category", "variant__size", "board1", "board2").prefetch_related("addons")
+        # Расчёт должен видеть незаписанные изменения переданного заказа,
+        # а не его копию с сохранёнными значениями из select_related
+        for item in items:
+            item.order = order
+        return items
 
     def _calculate_delivery_cost(self, order, item_calculations=None):
         """Динамический расчет стоимости доставки"""
@@ -164,6 +170,9 @@ class Order(models.Model):
         ("delivery", _("Доставка")),
         ("cafe", _("Зал"))
     ]
+
+    # Допусок несовпадения сумм раздельной оплаты с итогом: копейки теряются при округлении
+    SPLIT_PAYMENT_TOLERANCE = Decimal("0.01")
 
     EDITABLE_STATUSES = ["new", "confirmed"]
     
@@ -282,7 +291,7 @@ class Order(models.Model):
     def is_split_payment_valid(self):
         """Проверяет, совпадает ли сумма раздельной оплаты с итоговой суммой заказа"""
         if self.payment_method == 'split':
-            return abs(self.get_split_payment_total() - self.total_price) < Decimal('0.01')
+            return abs(self.get_split_payment_total() - self.total_price) < self.SPLIT_PAYMENT_TOLERANCE
         return True
 
     def get_payment_method_display(self):

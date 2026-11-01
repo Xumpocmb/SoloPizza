@@ -11,9 +11,10 @@ from django.urls import reverse
 from django.utils import timezone
 
 from app_home.models import CafeBranch
-from app_catalog.models import Category, Product, ProductVariant
+from app_catalog.models import Category, PizzaSizes, Product, ProductVariant
 from app_order import statistics
 from app_order.models import DailyOrderNumber, Order, OrderItem
+from app_order.forms import CheckoutForm, OrderEditForm
 from app_order.pricing import calculate_line_total, line_totals
 
 
@@ -240,4 +241,93 @@ class LineTotalsTests(SimpleTestCase):
         self.assertTrue(calculation["is_weekly_pizza"])
         self.assertTrue(calculation["is_pickup_discount"])
         self.assertFalse(calculation["is_partner_discount"])
+
+
+class OrderFormValidationTests(TestCase):
+    """Общие правила адреса/телефона и проверка раздельной оплаты при правке заказа."""
+
+    def setUp(self):
+        self.branch = CafeBranch.objects.create(name="Центральный", address="ул. Ленина, 1", check_digit=7)
+        self.size = PizzaSizes.objects.create(name="32")
+        self.category = Category.objects.create(name="Пицца", slug="pizza", applies_pizza_discounts=True)
+        self.product = Product.objects.create(name="Пепперони", slug="pepperoni", category=self.category)
+        self.variant = ProductVariant.objects.create(product=self.product, size=self.size, price=Decimal("25.00"))
+        self.order = Order.objects.create(
+            branch=self.branch,
+            customer_name="Иван",
+            phone_number="+375291112233",
+            delivery_type="pickup",
+            payment_method="cash",
+        )
+        # Сумма заказа считается из позиций: 25.00 × 2 = 50.00, пересчёт идёт в сигнале OrderItem
+        OrderItem.objects.create(order=self.order, product=self.product, variant=self.variant, quantity=2)
+
+    def edit_data(self, **overrides):
+        data = {
+            "customer_name": "Иван",
+            "phone_number": "+375291112233",
+            "delivery_type": "pickup",
+            "payment_method": "split",
+            "partner_discount_percent": 10,
+            "cash_amount": "30.00",
+            "card_amount": "20.00",
+            "noname_amount": "0.00",
+        }
+        data.update(overrides)
+        return data
+
+    def test_split_payment_matching_total_is_accepted(self):
+        form = OrderEditForm(self.edit_data(), instance=self.order)
+        self.assertTrue(form.is_valid(), form.errors)
+
+    def test_split_payment_mismatch_is_rejected(self):
+        form = OrderEditForm(self.edit_data(card_amount="10.00"), instance=self.order)
+        self.assertFalse(form.is_valid())
+        self.assertIn("Сумма раздельной оплаты", form.non_field_errors()[0])
+
+    def test_split_checked_against_new_total_after_partner_toggle(self):
+        """Флажок партнёра меняет итог (50.00 → 40.00 при скидке 20%): суммы сверяются с новым итогом."""
+        form = OrderEditForm(self.edit_data(is_partner="on", partner_discount_percent=20), instance=self.order)
+        self.assertFalse(form.is_valid())
+        self.assertIn("Сумма раздельной оплаты", form.non_field_errors()[0])
+
+        form = OrderEditForm(
+            self.edit_data(is_partner="on", partner_discount_percent=20, cash_amount="25.00", card_amount="15.00"),
+            instance=self.order,
+        )
+        self.assertTrue(form.is_valid(), form.errors)
+
+    def test_difference_of_one_kopeyka_is_rejected(self):
+        """При двух знаках после запятой допуск 0.01 означает фактическое требование точного совпадения."""
+        form = OrderEditForm(self.edit_data(card_amount="19.99"), instance=self.order)
+        self.assertFalse(form.is_valid())
+
+    def test_split_mismatch_does_not_hide_other_errors(self):
+        form = OrderEditForm(self.edit_data(card_amount="10.00", delivery_type="delivery", address=""), instance=self.order)
+        self.assertFalse(form.is_valid())
+        self.assertIn("address", form.errors)
+        self.assertIn("Сумма раздельной оплаты", form.non_field_errors()[0])
+
+    def test_pickup_fills_address_placeholder(self):
+        form = OrderEditForm(self.edit_data(payment_method="cash", address=""), instance=self.order)
+        self.assertTrue(form.is_valid(), form.errors)
+        self.assertEqual(form.cleaned_data["address"], "Самовывоз")
+
+    def test_delivery_requires_address(self):
+        form = OrderEditForm(self.edit_data(payment_method="cash", delivery_type="delivery", address=""), instance=self.order)
+        self.assertFalse(form.is_valid())
+        self.assertIn("address", form.errors)
+
+    def test_hall_allows_empty_phone(self):
+        form = OrderEditForm(self.edit_data(payment_method="cash", delivery_type="cafe", phone_number=""), instance=self.order)
+        self.assertTrue(form.is_valid(), form.errors)
+
+    def test_checkout_form_uses_the_same_rules(self):
+        form = CheckoutForm({"customer_name": "Иван", "phone_number": "", "delivery_type": "cafe", "payment_method": "cash"})
+        self.assertTrue(form.is_valid(), form.errors)
+
+        form = CheckoutForm({"customer_name": "Иван", "phone_number": "", "delivery_type": "delivery", "payment_method": "cash"})
+        self.assertFalse(form.is_valid())
+        self.assertIn("address", form.errors)
+        self.assertIn("phone_number", form.errors)
 

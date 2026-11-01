@@ -1,10 +1,32 @@
+from decimal import Decimal
+
 from django import forms
 from django.utils import timezone
 from app_order.models import Order
 from app_home.models import Discount
 
 
-class CheckoutForm(forms.ModelForm):
+def validate_delivery_requirements(form):
+    """Общие для оформления и правки правила: адрес при доставке, телефон везде, кроме зала."""
+    delivery_type = form.cleaned_data.get("delivery_type")
+
+    if delivery_type == "delivery" and not form.cleaned_data.get("address"):
+        form.add_error("address", "Укажите адрес для доставки")
+
+    if delivery_type != "cafe" and not form.cleaned_data.get("phone_number"):
+        form.add_error("phone_number", "Укажите номер телефона")
+
+
+class DeliveryValidationMixin:
+    """Подмешивает общие правила доставки/телефона в clean() формы."""
+
+    def clean(self):
+        cleaned_data = super().clean()
+        validate_delivery_requirements(self)
+        return cleaned_data
+
+
+class CheckoutForm(DeliveryValidationMixin, forms.ModelForm):
     DELIVERY_CHOICES = Order.DELIVERY_CHOICES
     PAYMENT_CHOICES = Order.PAYMENT_CHOICES
 
@@ -62,25 +84,6 @@ class CheckoutForm(forms.ModelForm):
         del self.fields["name"]
         del self.fields["phone"]
 
-    def clean(self):
-        cleaned_data = super().clean()
-        delivery_type = cleaned_data.get("delivery_type")
-        address = cleaned_data.get("address")
-        phone = cleaned_data.get("phone_number")
-
-        if delivery_type == "delivery" and not address:
-            self.add_error("address", "Укажите адрес для доставки")
-            
-        # Делаем поле телефона необязательным для заказов "на месте"
-        if delivery_type == "cafe" and not phone:
-            # Если телефон не указан для заказа "на месте", это допустимо
-            pass
-        elif not phone:
-            # Для других типов доставки телефон обязателен
-            self.add_error("phone_number", "Укажите номер телефона")
-
-        return cleaned_data
-
     def save(self, commit=True, user=None, session_key=None):
         order = super().save(commit=False)
         if session_key:
@@ -101,7 +104,7 @@ class CheckoutForm(forms.ModelForm):
         return order
 
 
-class OrderEditForm(forms.ModelForm):
+class OrderEditForm(DeliveryValidationMixin, forms.ModelForm):
     # Split payment fields
     cash_amount = forms.DecimalField(
         max_digits=10,
@@ -169,22 +172,31 @@ class OrderEditForm(forms.ModelForm):
 
 
     def clean(self):
-        cleaned_data = super().clean()
-        payment_method = cleaned_data.get("payment_method")
-        total_price = self.instance.total_price if self.instance else 0
+        cleaned_data = super().clean()  # включает validate_delivery_requirements
 
-        if payment_method == 'split':
-            cash_amount = cleaned_data.get('cash_amount', 0) or 0
-            card_amount = cleaned_data.get('card_amount', 0) or 0
-            noname_amount = cleaned_data.get('noname_amount', 0) or 0
+        if cleaned_data.get("delivery_type") == "pickup":
+            cleaned_data["address"] = "Самовывоз"
 
-            split_total = cash_amount + card_amount + noname_amount
+        # Суммы раздельной оплаты сверяются с новым итогом заказа:
+        # delivery_type и партнёрские поля меняют сумму после пересчёта
+        if self.instance.pk and cleaned_data.get("payment_method") == "split":
+            split_total = sum(
+                (cleaned_data.get(field) or Decimal("0.00") for field in ("cash_amount", "card_amount", "noname_amount")),
+                Decimal("0.00"),
+            )
 
-            # Check if the split payment total matches the order total
-            if abs(split_total - total_price) >= 0.01:
-                raise forms.ValidationError(
-                    f'Сумма раздельной оплаты ({split_total:.2f} руб.) '
-                    f'не совпадает с итоговой суммой заказа ({total_price:.2f} руб.).'
+            for field in ("delivery_type", "is_partner", "partner_discount_percent"):
+                value = cleaned_data.get(field)
+                if value is not None:
+                    setattr(self.instance, field, value)
+
+            total_price = Order.objects.get_order_totals(self.instance)["total_price"]
+
+            if abs(split_total - total_price) >= Order.SPLIT_PAYMENT_TOLERANCE:
+                self.add_error(
+                    None,
+                    f"Сумма раздельной оплаты ({split_total:.2f} руб.) "
+                    f"не совпадает с итоговой суммой заказа ({total_price:.2f} руб.).",
                 )
 
         return cleaned_data
@@ -207,27 +219,3 @@ class OrderEditForm(forms.ModelForm):
         if commit:
             order.save()
         return order
-
-    def clean(self):
-        cleaned_data = super().clean()
-        delivery_type = cleaned_data.get("delivery_type")
-        address = cleaned_data.get("address")
-        phone = cleaned_data.get("phone_number")
-
-        if delivery_type == "delivery" and not address:
-            self.add_error("address", "Укажите адрес для доставки")
-        elif delivery_type == "pickup":
-            cleaned_data["address"] = "Самовывоз"
-            
-        # Делаем поле телефона необязательным для заказов "на месте"
-        if delivery_type == "cafe" and not phone:
-            # Если телефон не указан для заказа "на месте", это допустимо
-            pass
-        elif not phone:
-            # Для других типов доставки телефон обязателен
-            self.add_error("phone_number", "Укажите номер телефона")
-
-        return cleaned_data
-
-
-
