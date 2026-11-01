@@ -13,6 +13,7 @@ from django.contrib.auth import get_user_model # Import get_user_model
 
 User = get_user_model() # Get the User model
 from app_home.models import CafeBranch, Discount
+from app_order.pricing import calculate_line_total
 
 
 class DiscountCache:
@@ -385,75 +386,19 @@ class OrderItem(models.Model):
         if discounts is None:
             discounts = DiscountCache()
 
-        base_price = self.variant.price
-        quantity = self.quantity
-
-        # Рассчитываем стоимость допов (бортов и добавок)
-        board1_price = self.board1.price if self.board1 else Decimal("0")
-        board2_price = self.board2.price if self.board2 else Decimal("0")
-        addons_price = sum(addon.price for addon in self.addons.all()) if self.addons.exists() else Decimal("0")
-
-        # Стоимость дополнений (не участвует в скидке)
-        additions_total = (board1_price + board2_price + addons_price) * quantity
-
-        # Изначально скидка 0
-        discount_amount = Decimal("0")
-        discount_percent = Decimal("0")
-        is_pickup_discount = False
-        is_weekly_pizza_discount = False
-        is_partner_discount = False
-
-        # Проверяем условия для скидки
-        if getattr(self.product.category, 'applies_pizza_discounts', False):
-            # Если активирована скидка партнера, применяем только её
-            if self.order.is_partner:
-                # Используем значение процента скидки из заказа
-                discount_percent = Decimal(str(self.order.partner_discount_percent))
-                # Скидка применяется только к базовой цене товара
-                discount_amount = (base_price * (discount_percent / Decimal("100"))) * quantity
-                is_partner_discount = True
-            # Иначе применяем обычные скидки
-            else:
-                # Скидка на самовывоз
-                if self.order.delivery_type == "pickup":
-                    # Получаем скидку "Самовывоз" из базы данных
-                    pickup_percent = discounts.percent(slug="pickup")
-                    if pickup_percent is None:
-                        pickup_percent = discounts.percent(name="Самовывоз")
-                    if pickup_percent is not None:
-                        discount_percent = Decimal(str(pickup_percent))
-                        discount_amount = (base_price * (discount_percent / Decimal("100"))) * quantity
-                        is_pickup_discount = True
-
-                    # Дополнительная скидка на пицца недели (только при самовывозе и только для размера "32")
-                    if self.product.is_weekly_special and self.variant.size and self.variant.size.name == "32":
-                        weekly_percent = discounts.percent(slug="weekly-pizza")
-                        if weekly_percent is None:
-                            weekly_percent = discounts.percent(name="Пицца недели")
-                        if weekly_percent is None:
-                            # Если скидка не найдена, используем значение по умолчанию 20%
-                            weekly_percent = 20
-                        weekly_discount_percent = Decimal(str(weekly_percent))
-                        discount_amount = (base_price * (weekly_discount_percent / Decimal("100"))) * quantity
-                        discount_percent = weekly_discount_percent
-                        is_weekly_pizza_discount = True
-
-        # Итоговые суммы
-        original_total = (base_price + board1_price + board2_price + addons_price) * quantity
-        # Скидка применяется только к базовой цене товара, не к бортам и добавкам
-        # При партнерской скидке используется значение из заказа (partner_discount_percent)
-        discounted_base_price = base_price * (1 - discount_percent / Decimal("100"))
-        final_total = (discounted_base_price * quantity) + additions_total
-
-        calculation = {
-            "original_total": original_total.quantize(Decimal(".01")),
-            "final_total": final_total.quantize(Decimal(".01")),
-            "discount_amount": discount_amount.quantize(Decimal(".01")),
-            "discount_percent": discount_percent,
-            "is_weekly_pizza": is_weekly_pizza_discount,
-            "is_pickup_discount": is_pickup_discount,
-            "is_partner_discount": is_partner_discount,
-        }
+        calculation = calculate_line_total(
+            base_price=self.variant.price,
+            quantity=self.quantity,
+            board_prices=[board.price for board in (self.board1, self.board2) if board is not None],
+            addon_prices=[addon.price for addon in self.addons.all()],
+            applies_pizza_discounts=getattr(self.product.category, "applies_pizza_discounts", False),
+            delivery_type=self.order.delivery_type,
+            is_partner=self.order.is_partner,
+            partner_discount_percent=self.order.partner_discount_percent,
+            is_weekly_special=self.product.is_weekly_special,
+            size_name=self.variant.size.name if self.variant.size else None,
+            percent_lookup=discounts.percent,
+        )
         self.set_total_cache(calculation)
 
         return calculation

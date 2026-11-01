@@ -6,7 +6,7 @@ from unittest.mock import patch
 
 from django.contrib.auth.models import User
 from django.db import IntegrityError, transaction
-from django.test import TestCase
+from django.test import TestCase, SimpleTestCase
 from django.urls import reverse
 from django.utils import timezone
 
@@ -14,6 +14,7 @@ from app_home.models import CafeBranch
 from app_catalog.models import Category, Product, ProductVariant
 from app_order import statistics
 from app_order.models import DailyOrderNumber, Order, OrderItem
+from app_order.pricing import calculate_line_total
 
 
 class DailyNumberingTests(TestCase):
@@ -85,4 +86,115 @@ class DailyNumberingTests(TestCase):
                     daily_number=first.daily_number,
                     number_date=first.number_date,
                 )
+
+
+class PricingTests(SimpleTestCase):
+    """Расчёт позиции без БД: чистая функция получает все данные аргументами."""
+
+    @staticmethod
+    def lookup(**percents):
+        def percent_lookup(slug=None, name=None):
+            return percents.get(slug or name)
+
+        return percent_lookup
+
+    @staticmethod
+    def line(**overrides):
+        params = {
+            "base_price": Decimal("30.00"),
+            "quantity": 1,
+            "board_prices": [],
+            "addon_prices": [],
+            "applies_pizza_discounts": True,
+            "delivery_type": "delivery",
+            "is_partner": False,
+            "partner_discount_percent": Decimal("0"),
+            "is_weekly_special": False,
+            "size_name": None,
+            "percent_lookup": PricingTests.lookup(pickup=10, **{"weekly-pizza": 20}),
+        }
+        params.update(overrides)
+        return calculate_line_total(**params)
+
+    def test_no_discount_when_category_excluded(self):
+        calculation = self.line(
+            applies_pizza_discounts=False,
+            delivery_type="pickup",
+            is_weekly_special=True,
+            size_name="32",
+        )
+        self.assertEqual(calculation["discount_percent"], Decimal("0"))
+        self.assertEqual(calculation["final_total"], Decimal("30.00"))
+        self.assertEqual(calculation["discount_amount"], Decimal("0.00"))
+
+    def test_boards_and_addons_are_not_discounted(self):
+        calculation = self.line(
+            quantity=2,
+            board_prices=[Decimal("5.00")],
+            addon_prices=[Decimal("3.00"), Decimal("2.00")],
+            delivery_type="pickup",
+        )
+        # Скидка 10% только с базы 30.00 * 2, борты и добавки идут полной суммой
+        self.assertEqual(calculation["original_total"], Decimal("80.00"))
+        self.assertEqual(calculation["discount_amount"], Decimal("6.00"))
+        self.assertEqual(calculation["final_total"], Decimal("74.00"))
+
+    def test_pickup_discount_by_slug(self):
+        calculation = self.line(delivery_type="pickup")
+        self.assertEqual(calculation["discount_percent"], Decimal("10"))
+        self.assertTrue(calculation["is_pickup_discount"])
+        self.assertFalse(calculation["is_weekly_pizza"])
+
+    def test_pickup_discount_by_name_when_slug_missing(self):
+        calculation = self.line(
+            delivery_type="pickup",
+            percent_lookup=self.lookup(**{"Самовывоз": 7}),
+        )
+        self.assertEqual(calculation["discount_percent"], Decimal("7"))
+        self.assertTrue(calculation["is_pickup_discount"])
+
+    def test_weekly_pizza_32_replaces_amount_and_keeps_pickup_flag(self):
+        calculation = self.line(delivery_type="pickup", is_weekly_special=True, size_name="32")
+        self.assertTrue(calculation["is_pickup_discount"])
+        self.assertTrue(calculation["is_weekly_pizza"])
+        self.assertEqual(calculation["discount_percent"], Decimal("20"))
+
+    def test_weekly_pizza_other_size_keeps_pickup_only(self):
+        calculation = self.line(delivery_type="pickup", is_weekly_special=True, size_name="26")
+        self.assertTrue(calculation["is_pickup_discount"])
+        self.assertFalse(calculation["is_weekly_pizza"])
+        self.assertEqual(calculation["discount_percent"], Decimal("10"))
+
+    def test_weekly_pizza_default_twenty_when_no_discount_rows(self):
+        calculation = self.line(
+            delivery_type="pickup",
+            is_weekly_special=True,
+            size_name="32",
+            percent_lookup=self.lookup(),
+        )
+        self.assertEqual(calculation["discount_percent"], Decimal("20"))
+
+    def test_weekly_pizza_needs_pickup(self):
+        calculation = self.line(delivery_type="delivery", is_weekly_special=True, size_name="32")
+        self.assertEqual(calculation["discount_percent"], Decimal("0"))
+        self.assertFalse(calculation["is_weekly_pizza"])
+
+    def test_partner_discount_wins_over_pickup_and_weekly(self):
+        calculation = self.line(
+            delivery_type="pickup",
+            is_weekly_special=True,
+            size_name="32",
+            is_partner=True,
+            partner_discount_percent=Decimal("15.5"),
+        )
+        self.assertTrue(calculation["is_partner_discount"])
+        self.assertFalse(calculation["is_pickup_discount"])
+        self.assertFalse(calculation["is_weekly_pizza"])
+        self.assertEqual(calculation["discount_amount"], Decimal("4.65"))
+        self.assertEqual(calculation["final_total"], Decimal("25.35"))
+
+    def test_quantity_multiplies_everything(self):
+        calculation = self.line(quantity=3, addon_prices=[Decimal("4.00")], delivery_type="pickup")
+        self.assertEqual(calculation["original_total"], Decimal("102.00"))
+        self.assertEqual(calculation["final_total"], Decimal("93.00"))
 
