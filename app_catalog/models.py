@@ -134,7 +134,7 @@ class ProductVariant(models.Model):
         ordering = ['price', 'id']
 
     def __str__(self):
-        return f"{self.product.name} - ({self.price}₽)"
+        return f"{self.product.name} - ({self.price:.2f} ₽)"
 
 
 class PizzaBoard(models.Model):
