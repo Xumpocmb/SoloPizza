@@ -2,7 +2,7 @@
 {% load static i18n %}
 {% load tag_split %}
 
-{% block title %}{{ title }}{% endblock %}
+{% block title %}{{ title }} - Solo Pizza{% endblock %}
 
 {% block meta_description %}{% blocktrans with v_title=vacancy.title v_desc=vacancy.description|truncatechars:100 %}Вакансия {{ v_title }} в Solo Pizza - {{ v_desc }}{% endblocktrans %}{% endblock %}
 {% block meta_keywords %}{% blocktrans with v_title=vacancy.title %}вакансия {{ v_title }}, работа в пиццерии, карьера в Solo Pizza, {{ v_title }} в ресторане{% endblocktrans %}{% endblock %}

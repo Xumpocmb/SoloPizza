@@ -17,7 +17,7 @@ def category_detail(request, slug):
         {"title": category.name, "url": category.get_absolute_url()},
     ]
     context = {
-        "title": f"Solo Pizza | Категория: {category.name}",
+        "title": f"{category.name} — заказать с доставкой в Барановичах - Solo Pizza",
         "category": category,
         "items": items,
         "breadcrumbs": breadcrumbs,
@@ -103,6 +103,7 @@ def item_detail(request, slug):
 
     # Формируем контекст
     context = {
+        "title": f"{item.name} — заказать с доставкой в Барановичах - Solo Pizza",
         "item": item,
         "variants": variants,
         "selected_variant": selected_variant,
