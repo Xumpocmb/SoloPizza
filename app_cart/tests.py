@@ -1,7 +1,11 @@
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth import get_user_model
+from decimal import Decimal
 from app_catalog.models import Category, PizzaAddon, PizzaBoard, PizzaSizes, Product, ProductVariant, BoardParams, PizzaSauce, AddonParams
+from app_cart.models import CartItem
+from app_home.models import CafeBranch, Discount
+from app_order.models import Order, OrderItem
 
 User = get_user_model()
 
@@ -149,3 +153,61 @@ class AddToCartViewTest(TestCase):
         self.assertIsNone(cart_item.board2)
         self.assertIsNone(cart_item.sauce)
         self.assertEqual(cart_item.addons.count(), 0)
+
+class CartWeeklyPizzaDiscountTests(TestCase):
+    """Процент скидки «Пицца недели» корзина берёт из строки Discount, а не из кода."""
+
+    def setUp(self):
+        self.size = PizzaSizes.objects.create(name="32")
+        self.category = Category.objects.create(name="Пицца", slug="pizza", applies_pizza_discounts=True)
+        self.product = Product.objects.create(
+            name="Пепперони", slug="pepperoni", category=self.category, is_weekly_special=True
+        )
+        self.variant = ProductVariant.objects.create(product=self.product, size=self.size, price=Decimal("40.00"))
+        self.cart_item = CartItem.objects.create(session_key="s1", item=self.product, item_variant=self.variant, quantity=1)
+
+    def test_percent_read_from_production_shaped_row(self):
+        """Боевая запись: название «Акция "Пицца недели"», slug weekly-pizza — по имени она не найдётся."""
+        Discount.objects.create(name='Акция "Пицца недели"', slug="weekly-pizza", percent=30)
+
+        calculation = self.cart_item.calculate_cart_item_total()
+
+        self.assertEqual(calculation["discount_percent"], Decimal("30"))
+        self.assertEqual(calculation["final_total"], Decimal("28.00"))
+
+    def test_percent_read_from_discount_row(self):
+        Discount.objects.create(name="Пицца недели", slug="weekly-pizza", percent=25)
+
+        calculation = self.cart_item.calculate_cart_item_total()
+
+        self.assertEqual(calculation["discount_percent"], Decimal("25"))
+        self.assertEqual(calculation["discount_amount"], Decimal("10.00"))
+        self.assertEqual(calculation["final_total"], Decimal("30.00"))
+
+    def test_percent_found_by_name_when_slug_other(self):
+        Discount.objects.create(name="Пицца недели", slug="nedelhnaya-picca", percent=30)
+
+        self.assertEqual(self.cart_item.calculate_cart_item_total()["discount_percent"], Decimal("30"))
+
+    def test_default_percent_when_no_discount_row(self):
+        self.assertEqual(self.cart_item.calculate_cart_item_total()["discount_percent"], Decimal("20"))
+
+    def test_cart_and_order_read_the_same_percent(self):
+        Discount.objects.create(name="Пицца недели", slug="weekly-pizza", percent=25)
+        branch = CafeBranch.objects.create(name="Центральный", address="ул. Ленина, 1", check_digit=7)
+        order = Order.objects.create(
+            branch=branch,
+            customer_name="Иван",
+            phone_number="+375291112233",
+            delivery_type="pickup",
+            payment_method="cash",
+        )
+        order_item = OrderItem.objects.create(order=order, product=self.product, variant=self.variant, quantity=1)
+
+        cart_calculation = self.cart_item.calculate_cart_item_total()
+        order_calculation = order_item.calculate_item_total()
+
+        self.assertEqual(cart_calculation["discount_percent"], order_calculation["discount_percent"])
+        self.assertEqual(cart_calculation["discount_amount"], order_calculation["discount_amount"])
+        self.assertEqual(cart_calculation["final_total"], order_calculation["final_total"])
+

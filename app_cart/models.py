@@ -4,7 +4,7 @@ from django.conf import settings
 from django.utils import timezone
 from django.db.models import Sum
 from app_catalog.models import Product, ProductVariant, BoardParams, AddonParams, PizzaSauce
-from app_order.pricing import line_totals
+from app_order.pricing import line_totals, weekly_pizza_percent
 
 
 class CartItemManager(models.Manager):
@@ -14,10 +14,13 @@ class CartItemManager(models.Manager):
     def get_cart_totals(self, session_key):
         cart_items = self.filter(session_key=session_key).select_related("item", "item_variant", "sauce", "board1", "board2").prefetch_related("addons")
 
+        from app_order.models import DiscountCache
+
         totals = {"total_price": Decimal("0.00"), "total_original_price": Decimal("0.00"), "total_discount": Decimal("0.00"), "items": []}
+        discounts = DiscountCache()
 
         for item in cart_items:
-            calculation = item.calculate_cart_item_total()
+            calculation = item.calculate_cart_item_total(discounts=discounts)
             totals["total_price"] += calculation["final_total"]
             totals["total_original_price"] += calculation["original_total"]
             totals["total_discount"] += calculation["discount_amount"]
@@ -102,7 +105,7 @@ class CartItem(models.Model):
 
         return " | ".join(desc)
 
-    def calculate_cart_item_total(self):
+    def calculate_cart_item_total(self, discounts=None):
         board1_price = self.board1.price if self.board1 else Decimal("0")
         board2_price = self.board2.price if self.board2 else Decimal("0")
         addons_price = sum(addon.price for addon in self.addons.all()) if self.addons.exists() else Decimal("0")
@@ -113,12 +116,11 @@ class CartItem(models.Model):
         discount_percent = Decimal("0")
         if is_weekly_pizza:
             # Получаем процент скидки из базы данных
-            from app_home.models import Discount
+            from app_order.models import DiscountCache
 
-            try:
-                discount_percent = Decimal(str(Discount.objects.get(slug="picca-nedeli").percent))
-            except Discount.DoesNotExist:
-                discount_percent = Decimal("20")  # 20% по умолчанию
+            if discounts is None:
+                discounts = DiscountCache()
+            discount_percent = weekly_pizza_percent(discounts.percent)
 
         return line_totals(
             base_price=self.item_variant.price,

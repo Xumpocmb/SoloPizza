@@ -7,7 +7,19 @@
 from decimal import Decimal
 
 
+WEEKLY_PIZZA_SLUG = "weekly-pizza"
+WEEKLY_PIZZA_NAME = "Пицца недели"
 WEEKLY_PIZZA_DEFAULT_PERCENT = 20
+
+
+def weekly_pizza_percent(percent_lookup):
+    """Процент скидки «Пицца недели» из базы: по слагу, затем по названию, иначе 20 по умолчанию."""
+    percent = percent_lookup(slug=WEEKLY_PIZZA_SLUG)
+    if percent is None:
+        percent = percent_lookup(name=WEEKLY_PIZZA_NAME)
+    if percent is None:
+        percent = WEEKLY_PIZZA_DEFAULT_PERCENT
+    return Decimal(str(percent))
 
 
 def resolve_discount(*, applies_pizza_discounts, delivery_type, is_partner,
@@ -39,13 +51,7 @@ def resolve_discount(*, applies_pizza_discounts, delivery_type, is_partner,
 
                 # Дополнительная скидка на пицца недели (только при самовывозе и только для размера "32")
                 if is_weekly_special and size_name == "32":
-                    weekly_percent = percent_lookup(slug="weekly-pizza")
-                    if weekly_percent is None:
-                        weekly_percent = percent_lookup(name="Пицца недели")
-                    if weekly_percent is None:
-                        # Если скидка не найдена, используем значение по умолчанию 20%
-                        weekly_percent = WEEKLY_PIZZA_DEFAULT_PERCENT
-                    percent = Decimal(str(weekly_percent))
+                    percent = weekly_pizza_percent(percent_lookup)
                     is_weekly = True
 
     return {
