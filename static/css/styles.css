@@ -134,6 +134,10 @@ footer {
     text-decoration: underline;
 }
 
+.footer-column ul li a .fa-instagram {
+    margin-right: 6px;
+}
+
 .footer-contacts {
     display: flex;
     justify-content: center;
@@ -792,6 +796,26 @@ a:hover {
 .sidebar-phone--empty {
     font-weight: 400;
     color: var(--text-muted);
+}
+
+.sidebar .sidebar-instagram {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.35rem;
+    padding: 0.5rem 0.65rem;
+    border-radius: 8px;
+    font-weight: 600;
+    color: var(--accent-color);
+}
+
+.sidebar .sidebar-instagram:hover {
+    background-color: var(--hover-bg);
+    color: var(--accent-color);
+}
+
+.sidebar-instagram i {
+    font-size: 15px;
 }
 
 body.menu-open {
@@ -2080,6 +2104,20 @@ body.dark .snowflake,
 :where(.s-promo) .phone-list li:hover {
     padding-left: 5px;
     color: var(--accent-color);
+}
+
+
+:where(.s-promo) .social-list a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--accent-color);
+    text-decoration: none;
+}
+
+
+:where(.s-promo) .social-list a:hover {
+    text-decoration: underline;
 }
 
 
