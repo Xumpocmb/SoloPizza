@@ -4,7 +4,7 @@ from django.conf import settings
 from django.utils import timezone
 from django.db.models import Sum
 from app_catalog.models import Product, ProductVariant, BoardParams, AddonParams, PizzaSauce
-from app_order.pricing import line_totals, weekly_pizza_percent
+from app_order.pricing import line_totals
 
 
 class CartItemManager(models.Manager):
@@ -14,13 +14,10 @@ class CartItemManager(models.Manager):
     def get_cart_totals(self, session_key):
         cart_items = self.filter(session_key=session_key).select_related("item", "item_variant", "sauce", "board1", "board2").prefetch_related("addons")
 
-        from app_order.models import DiscountCache
-
         totals = {"total_price": Decimal("0.00"), "total_original_price": Decimal("0.00"), "total_discount": Decimal("0.00"), "items": []}
-        discounts = DiscountCache()
 
         for item in cart_items:
-            calculation = item.calculate_cart_item_total(discounts=discounts)
+            calculation = item.calculate_cart_item_total()
             totals["total_price"] += calculation["final_total"]
             totals["total_original_price"] += calculation["original_total"]
             totals["total_discount"] += calculation["discount_amount"]
@@ -105,29 +102,18 @@ class CartItem(models.Model):
 
         return " | ".join(desc)
 
-    def calculate_cart_item_total(self, discounts=None):
+    def calculate_cart_item_total(self):
         board1_price = self.board1.price if self.board1 else Decimal("0")
         board2_price = self.board2.price if self.board2 else Decimal("0")
         addons_price = sum(addon.price for addon in self.addons.all()) if self.addons.exists() else Decimal("0")
 
-        # В корзине скидка одна: "Пицца недели", и она не зависит от способа получения
-        is_weekly_pizza = bool(self.item.is_weekly_special and self.item_variant.size and self.item_variant.size.name == "32")
-
-        discount_percent = Decimal("0")
-        if is_weekly_pizza:
-            # Получаем процент скидки из базы данных
-            from app_order.models import DiscountCache
-
-            if discounts is None:
-                discounts = DiscountCache()
-            discount_percent = weekly_pizza_percent(discounts.percent)
-
+        # Скидок в корзине нет: способ получения выбирается только при оформлении,
+        # а «Пицца недели» и самовывозная скидка зависят от него.
         return line_totals(
             base_price=self.item_variant.price,
             quantity=self.quantity,
             additions_price=board1_price + board2_price + addons_price,
-            discount_percent=discount_percent,
-            is_weekly_pizza=is_weekly_pizza,
+            discount_percent=Decimal("0"),
         )
 
     def is_available_in_branch(self, branch):
