@@ -138,15 +138,12 @@
                 </div>
 
                 <!-- Итоговая сумма -->
-                                 <div class="cart-summary">
-                                     <div class="summary-row">
-                                         <span class="summary-label">Сумма без скидки:</span>
-                                         <span class="summary-value">{{ subtotal|floatformat:2 }} руб.</span>
-                                     </div>
-                                     <div class="summary-row total-row">
-                                         <span class="summary-label">Итого к оплате:</span>
-                                         <span class="summary-value">{{ subtotal|floatformat:2 }} руб.</span>
-                                     </div>
+                <div class="cart-summary">
+                    <div class="summary-row total-row">
+                        <span class="summary-label">Итого к оплате:</span>
+                        <span class="summary-value">{{ subtotal|floatformat:2 }} руб.</span>
+                    </div>
+                </div>
                     {% are_orders_available as orders_available %}
                     <div class="cart-actions">
                         {% if orders_available %}
