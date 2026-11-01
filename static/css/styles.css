@@ -500,8 +500,28 @@ a:hover {
     line-height: 0;
 }
 
+.header-catalog-link {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    border-radius: 8px;
+    color: var(--accent-color);
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.2;
+    white-space: nowrap;
+    text-decoration: none;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.header-catalog-link:hover {
+    background-color: var(--hover-bg);
+    color: var(--accent-color);
+}
+
 @media (max-width: 992px) {
-    .site-logo {
+    .site-logo,
+    .header-catalog-link {
         display: none;
     }
 }
