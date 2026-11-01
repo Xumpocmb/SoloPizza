@@ -1,4 +1,4 @@
-"""Расчёт стоимости позиции заказа.
+"""Расчёт стоимости позиции (заказа и корзины).
 
 Модуль не знает о моделях и БД: все входные данные передаются значениями,
 чтобы формулу можно было вычислить для несохранённой позиции и проверить тестами.
@@ -10,23 +10,20 @@ from decimal import Decimal
 WEEKLY_PIZZA_DEFAULT_PERCENT = 20
 
 
-def resolve_discount(base_price, quantity, *, applies_pizza_discounts, delivery_type, is_partner,
+def resolve_discount(*, applies_pizza_discounts, delivery_type, is_partner,
                      partner_discount_percent, is_weekly_special, size_name, percent_lookup):
-    """Скидка на базовую цену позиции.
+    """Скидка на базовую цену позиции заказа.
 
     Флаги независимы: при самовывозе пиццы недели размера "32" истинны и pickup, и weekly.
     """
     percent = Decimal("0")
-    amount = Decimal("0")
     is_pickup = is_weekly = is_partner_discount = False
 
     if applies_pizza_discounts:
         # Если активирована скидка партнера, применяем только её
         if is_partner:
             # Используем значение процента скидки из заказа
-            # Скидка применяется только к базовой цене товара
             percent = Decimal(str(partner_discount_percent))
-            amount = (base_price * (percent / Decimal("100"))) * quantity
             is_partner_discount = True
         # Иначе применяем обычные скидки
         else:
@@ -38,7 +35,6 @@ def resolve_discount(base_price, quantity, *, applies_pizza_discounts, delivery_
                     pickup_percent = percent_lookup(name="Самовывоз")
                 if pickup_percent is not None:
                     percent = Decimal(str(pickup_percent))
-                    amount = (base_price * (percent / Decimal("100"))) * quantity
                     is_pickup = True
 
                 # Дополнительная скидка на пицца недели (только при самовывозе и только для размера "32")
@@ -50,12 +46,10 @@ def resolve_discount(base_price, quantity, *, applies_pizza_discounts, delivery_
                         # Если скидка не найдена, используем значение по умолчанию 20%
                         weekly_percent = WEEKLY_PIZZA_DEFAULT_PERCENT
                     percent = Decimal(str(weekly_percent))
-                    amount = (base_price * (percent / Decimal("100"))) * quantity
                     is_weekly = True
 
     return {
         "discount_percent": percent,
-        "discount_amount": amount,
         "is_pickup_discount": is_pickup,
         "is_weekly_pizza": is_weekly,
         "is_partner_discount": is_partner_discount,
@@ -65,13 +59,8 @@ def resolve_discount(base_price, quantity, *, applies_pizza_discounts, delivery_
 def calculate_line_total(*, base_price, quantity, board_prices, addon_prices, applies_pizza_discounts,
                          delivery_type, is_partner, partner_discount_percent, is_weekly_special,
                          size_name, percent_lookup):
-    """Итог по позиции заказа: базовая цена, дополнения и скидка."""
-    boards_price = sum(board_prices, Decimal("0"))
-    addons_price = sum(addon_prices, Decimal("0"))
-
+    """Итог по позиции заказа: скидку разрешает resolve_discount, суммы считает line_totals."""
     discount = resolve_discount(
-        base_price,
-        quantity,
         applies_pizza_discounts=applies_pizza_discounts,
         delivery_type=delivery_type,
         is_partner=is_partner,
@@ -80,23 +69,36 @@ def calculate_line_total(*, base_price, quantity, board_prices, addon_prices, ap
         size_name=size_name,
         percent_lookup=percent_lookup,
     )
-    discount_percent = discount["discount_percent"]
 
-    # Стоимость дополнений (не участвует в скидке)
-    additions_total = (boards_price + addons_price) * quantity
-    original_total = (base_price + boards_price + addons_price) * quantity
+    return line_totals(
+        base_price=base_price,
+        quantity=quantity,
+        additions_price=sum(board_prices, Decimal("0")) + sum(addon_prices, Decimal("0")),
+        discount_percent=discount["discount_percent"],
+        is_pickup_discount=discount["is_pickup_discount"],
+        is_weekly_pizza=discount["is_weekly_pizza"],
+        is_partner_discount=discount["is_partner_discount"],
+    )
 
-    # Скидка применяется только к базовой цене товара, не к бортам и добавкам
-    # При партнерской скидке используется значение из заказа (partner_discount_percent)
+
+def line_totals(*, base_price, quantity, additions_price, discount_percent,
+                is_pickup_discount=False, is_weekly_pizza=False, is_partner_discount=False):
+    """Суммы позиции по уже известному проценту скидки.
+
+    Скидка берётся только с базовой цены: борты, добавки и другие дополнения
+    всегда идут в итог полной стоимостью.
+    """
+    discount_amount = (base_price * (discount_percent / Decimal("100"))) * quantity
+    original_total = (base_price + additions_price) * quantity
     discounted_base_price = base_price * (1 - discount_percent / Decimal("100"))
-    final_total = (discounted_base_price * quantity) + additions_total
+    final_total = (discounted_base_price * quantity) + additions_price * quantity
 
     return {
         "original_total": original_total.quantize(Decimal(".01")),
         "final_total": final_total.quantize(Decimal(".01")),
-        "discount_amount": discount["discount_amount"].quantize(Decimal(".01")),
+        "discount_amount": discount_amount.quantize(Decimal(".01")),
         "discount_percent": discount_percent,
-        "is_weekly_pizza": discount["is_weekly_pizza"],
-        "is_pickup_discount": discount["is_pickup_discount"],
-        "is_partner_discount": discount["is_partner_discount"],
+        "is_weekly_pizza": is_weekly_pizza,
+        "is_pickup_discount": is_pickup_discount,
+        "is_partner_discount": is_partner_discount,
     }

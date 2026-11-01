@@ -14,7 +14,7 @@ from app_home.models import CafeBranch
 from app_catalog.models import Category, Product, ProductVariant
 from app_order import statistics
 from app_order.models import DailyOrderNumber, Order, OrderItem
-from app_order.pricing import calculate_line_total
+from app_order.pricing import calculate_line_total, line_totals
 
 
 class DailyNumberingTests(TestCase):
@@ -197,4 +197,47 @@ class PricingTests(SimpleTestCase):
         calculation = self.line(quantity=3, addon_prices=[Decimal("4.00")], delivery_type="pickup")
         self.assertEqual(calculation["original_total"], Decimal("102.00"))
         self.assertEqual(calculation["final_total"], Decimal("93.00"))
+
+
+class LineTotalsTests(SimpleTestCase):
+    """Общая арифметика позиции — её считают и заказ, и корзина."""
+
+    @staticmethod
+    def totals(**overrides):
+        params = {
+            "base_price": Decimal("30.00"),
+            "quantity": 1,
+            "additions_price": Decimal("0"),
+            "discount_percent": Decimal("0"),
+        }
+        params.update(overrides)
+        return line_totals(**params)
+
+    def test_without_discount(self):
+        calculation = self.totals(base_price=Decimal("25.05"), quantity=2, additions_price=Decimal("42.50"))
+        self.assertEqual(calculation["original_total"], Decimal("135.10"))
+        self.assertEqual(calculation["final_total"], Decimal("135.10"))
+        self.assertEqual(calculation["discount_amount"], Decimal("0.00"))
+
+    def test_discount_touches_only_base_price(self):
+        calculation = self.totals(additions_price=Decimal("10.00"), discount_percent=Decimal("20"))
+        self.assertEqual(calculation["original_total"], Decimal("40.00"))
+        self.assertEqual(calculation["discount_amount"], Decimal("6.00"))
+        self.assertEqual(calculation["final_total"], Decimal("34.00"))
+
+    def test_rounded_values_stay_consistent(self):
+        calculation = self.totals(base_price=Decimal("199.99"), quantity=3, discount_percent=Decimal("15"))
+        self.assertEqual(calculation["original_total"], Decimal("599.97"))
+        self.assertEqual(calculation["discount_amount"], Decimal("90.00"))
+        self.assertEqual(calculation["final_total"], Decimal("509.97"))
+        self.assertEqual(
+            calculation["final_total"],
+            calculation["original_total"] - calculation["discount_amount"],
+        )
+
+    def test_flags_are_passed_through(self):
+        calculation = self.totals(discount_percent=Decimal("20"), is_weekly_pizza=True, is_pickup_discount=True)
+        self.assertTrue(calculation["is_weekly_pizza"])
+        self.assertTrue(calculation["is_pickup_discount"])
+        self.assertFalse(calculation["is_partner_discount"])
 

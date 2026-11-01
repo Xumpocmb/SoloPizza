@@ -4,6 +4,7 @@ from django.conf import settings
 from django.utils import timezone
 from django.db.models import Sum
 from app_catalog.models import Product, ProductVariant, BoardParams, AddonParams, PizzaSauce
+from app_order.pricing import line_totals
 
 
 class CartItemManager(models.Manager):
@@ -102,38 +103,30 @@ class CartItem(models.Model):
         return " | ".join(desc)
 
     def calculate_cart_item_total(self):
-        base_price = self.item_variant.price
-        quantity = self.quantity
-
         board1_price = self.board1.price if self.board1 else Decimal("0")
         board2_price = self.board2.price if self.board2 else Decimal("0")
         addons_price = sum(addon.price for addon in self.addons.all()) if self.addons.exists() else Decimal("0")
 
-        original_total = (base_price + board1_price + board2_price + addons_price) * quantity
+        # В корзине скидка одна: "Пицца недели", и она не зависит от способа получения
+        is_weekly_pizza = bool(self.item.is_weekly_special and self.item_variant.size and self.item_variant.size.name == "32")
 
-        # Применяем скидку "Пицца недели" только для пицц размера "32"
-        is_weekly_pizza = self.item.is_weekly_special and self.item_variant.size and self.item_variant.size.name == "32"
-        
         discount_percent = Decimal("0")
         if is_weekly_pizza:
             # Получаем процент скидки из базы данных
             from app_home.models import Discount
+
             try:
-                discount = Discount.objects.get(slug='picca-nedeli')
-                discount_percent = Decimal(str(discount.percent)) / Decimal("100")
+                discount_percent = Decimal(str(Discount.objects.get(slug="picca-nedeli").percent))
             except Discount.DoesNotExist:
-                discount_percent = Decimal("0.2")  # 20% по умолчанию
-        
-        discount_amount = (base_price * quantity * discount_percent) if is_weekly_pizza else Decimal("0")
+                discount_percent = Decimal("20")  # 20% по умолчанию
 
-        final_total = original_total - discount_amount
-
-        return {
-            "original_total": original_total.quantize(Decimal(".01")),
-            "final_total": final_total.quantize(Decimal(".01")),
-            "discount_amount": discount_amount.quantize(Decimal(".01")),
-            "is_weekly_pizza": is_weekly_pizza,
-        }
+        return line_totals(
+            base_price=self.item_variant.price,
+            quantity=self.quantity,
+            additions_price=board1_price + board2_price + addons_price,
+            discount_percent=discount_percent,
+            is_weekly_pizza=is_weekly_pizza,
+        )
 
     def is_available_in_branch(self, branch):
         """Проверяет, доступен ли товар в указанном филиале"""
