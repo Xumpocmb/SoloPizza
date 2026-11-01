@@ -3,11 +3,18 @@
 <header>
     <div class="header-container">
         <div class="header-menu">
-            <div class="burger" onclick="toggleSidebar()">
+            <button type="button"
+                    class="burger"
+                    onclick="toggleSidebar()"
+                    aria-label="{% trans 'Открыть меню' %}"
+                    data-label-open="{% trans 'Открыть меню' %}"
+                    data-label-close="{% trans 'Закрыть меню' %}"
+                    aria-controls="sidebar"
+                    aria-expanded="false">
                 <span></span>
                 <span></span>
                 <span></span>
-            </div>
+            </button>
             <div class="site-logo">
                 <a href="{% url 'app_home:home' %}">
                     <img src="{% static 'img/sp.png' %}" alt="site logo" class="img-site-logo">
@@ -60,54 +67,87 @@
     </div>
 </header>
 <!-- Sidebar -->
-<div class="sidebar" id="sidebar">
-    <a href="{% url 'app_home:home' %}">{% trans "Главная" %}</a>
-
-    <div class="has-submenu">
-        <button onclick="toggleSubmenu('catalogSub')">{% trans "Каталог" %} ▾</button>
-        <div class="submenu" id="catalogSub">
-            {% for category in categories %}
-                <a href="{% url 'app_catalog:category_detail' category.slug %}">{{ category.name }}</a>
-            {% endfor %}
-        </div>
-    </div>
-    
-    <div class="has-submenu">
-        <button onclick="toggleSubmenu('aboutSub')">{% trans "О нас" %} ▾</button>
-        <div class="submenu" id="aboutSub">
-            <a href="{% url 'app_home:discounts' %}">{% trans "Акции" %}</a>
-            <a href="{% url 'app_home:info' %}">{% trans "Информация" %}</a>
-            <a href="{% url 'app_home:contacts' %}">{% trans "Контакты" %}</a>
-            <a href="{% url 'app_home:delivery' %}">{% trans "Доставка" %}</a>
-            <a href="{% url 'app_reviews:review_list' %}">{% trans "Отзывы" %}</a>
-            <a href="{% url 'app_home:vacancy_list' %}">{% trans "Вакансии" %}</a>
-        </div>
+<div class="sidebar" id="sidebar" aria-hidden="true">
+    <div class="sidebar-head">
+        <span class="sidebar-title">{% trans "Меню" %}</span>
+        <button type="button"
+                class="sidebar-close"
+                onclick="toggleSidebar()"
+                aria-label="{% trans 'Закрыть меню' %}">
+            <i class="fas fa-times" aria-hidden="true"></i>
+        </button>
     </div>
 
-    <div class="has-submenu">
-        <button onclick="toggleSubmenu('profileSub')">{% if user.is_authenticated %}{{ user.username }}{% else %}{% trans "Профиль" %}{% endif %} ▾</button>
-        <div class="submenu" id="profileSub">
-            {% if user.is_authenticated %}
-                {% if user.is_superuser %}
-                    <a href="{% url 'admin:index' %}" target="_blank">{% trans "Админ-панель" %}</a>
-                    <a href="{% url 'socialaccount_connections' %}">{% trans "Управление социальными аккаунтами" %}</a>
-                    <a href="{% url 'app_reviews:moderation_list' %}">{% trans "Модерация" %}</a>
-                    <a href="{% url 'app_order:order_statistics' %}">{% trans "Статистика" %}</a>
-                    <a href="{% url 'app_order:reports' %}">{% trans "Отчеты" %}</a>
-                    <a href="{% url 'app_home:certificate_sell' %}">{% trans "Продажа сертификатов" %}</a>
-                {% elif user.is_staff %}
-                    <a href="{% url 'app_order:reports' %}">{% trans "Отчеты" %}</a>
-                    <a href="{% url 'app_home:certificate_sell' %}">{% trans "Продажа сертификатов" %}</a>
+    <nav class="sidebar-nav" aria-label="{% trans 'Основное меню' %}">
+        <a href="{% url 'app_home:home' %}">{% trans "Главная" %}</a>
+
+        <div class="has-submenu">
+            <button type="button"
+                    onclick="toggleSubmenu('catalogSub', this)"
+                    aria-expanded="false"
+                    aria-controls="catalogSub">{% trans "Каталог" %}</button>
+            <div class="submenu" id="catalogSub">
+                {% for category in categories %}
+                    <a href="{% url 'app_catalog:category_detail' category.slug %}">{{ category.name }}</a>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="has-submenu">
+            <button type="button"
+                    onclick="toggleSubmenu('aboutSub', this)"
+                    aria-expanded="false"
+                    aria-controls="aboutSub">{% trans "О нас" %}</button>
+            <div class="submenu" id="aboutSub">
+                <a href="{% url 'app_home:discounts' %}">{% trans "Акции" %}</a>
+                <a href="{% url 'app_home:info' %}">{% trans "Информация" %}</a>
+                <a href="{% url 'app_home:contacts' %}">{% trans "Контакты" %}</a>
+                <a href="{% url 'app_home:delivery' %}">{% trans "Доставка" %}</a>
+                <a href="{% url 'app_reviews:review_list' %}">{% trans "Отзывы" %}</a>
+                <a href="{% url 'app_home:vacancy_list' %}">{% trans "Вакансии" %}</a>
+            </div>
+        </div>
+
+        <div class="has-submenu">
+            <button type="button"
+                    onclick="toggleSubmenu('profileSub', this)"
+                    aria-expanded="false"
+                    aria-controls="profileSub">{% if user.is_authenticated %}{{ user.username }}{% else %}{% trans "Профиль" %}{% endif %}</button>
+            <div class="submenu" id="profileSub">
+                {% if user.is_authenticated %}
+                    {% if user.is_superuser %}
+                        <a href="{% url 'admin:index' %}" target="_blank">{% trans "Админ-панель" %}</a>
+                        <a href="{% url 'socialaccount_connections' %}">{% trans "Управление социальными аккаунтами" %}</a>
+                        <a href="{% url 'app_reviews:moderation_list' %}">{% trans "Модерация" %}</a>
+                        <a href="{% url 'app_order:order_statistics' %}">{% trans "Статистика" %}</a>
+                        <a href="{% url 'app_order:reports' %}">{% trans "Отчеты" %}</a>
+                        <a href="{% url 'app_home:certificate_sell' %}">{% trans "Продажа сертификатов" %}</a>
+                    {% elif user.is_staff %}
+                        <a href="{% url 'app_order:reports' %}">{% trans "Отчеты" %}</a>
+                        <a href="{% url 'app_home:certificate_sell' %}">{% trans "Продажа сертификатов" %}</a>
+                    {% endif %}
+                    <a href="{% url 'app_cart:view_cart' %}">{% trans "Корзина" %}</a>
+                    <a href="{% url 'app_order:order_list' %}">{% trans "Заказы" %}</a>
+                    <a href="{% url 'app_user:logout' %}">{% trans "Выход" %}</a>
+                {% else %}
+                    <a href="{% url 'app_user:login' %}">{% trans "Вход" %}</a>
+                    <a href="{% url 'app_cart:view_cart' %}">{% trans "Корзина" %}</a>
+                    <a href="{% url 'app_order:order_list' %}">{% trans "Заказы" %}</a>
                 {% endif %}
-                <a href="{% url 'app_cart:view_cart' %}">{% trans "Корзина" %}</a>
-                <a href="{% url 'app_order:order_list' %}">{% trans "Заказы" %}</a>
-                <a href="{% url 'app_user:logout' %}">{% trans "Выход" %}</a>
-            {% else %}
-                <a href="{% url 'app_user:login' %}">{% trans "Вход" %}</a>
-                <a href="{% url 'app_cart:view_cart' %}">{% trans "Корзина" %}</a>
-                <a href="{% url 'app_order:order_list' %}">{% trans "Заказы" %}</a>
-            {% endif %}
+            </div>
         </div>
+    </nav>
+
+    <div class="sidebar-phones">
+        <span class="sidebar-phones__label">{% trans "Телефоны" %}</span>
+        {% for phone in selected_branch.branch_phones.all %}
+            <a class="sidebar-phone" href="tel:{{ phone.dial }}">
+                <i class="fas fa-phone-alt" aria-hidden="true"></i>
+                <span>{{ phone.phone }}</span>
+            </a>
+        {% empty %}
+            <span class="sidebar-phone sidebar-phone--empty">{% trans "Нет телефонов" %}</span>
+        {% endfor %}
     </div>
 </div>
 <!-- Overlay -->

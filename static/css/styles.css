@@ -427,20 +427,62 @@ a:hover {
 }
 
 .burger {
-    width: 28px;
-    height: 24px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+    position: relative;
+    flex: 0 0 auto;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: none;
+    border-radius: 10px;
+    background: none;
     cursor: pointer;
     z-index: 1002;
+    transition: background-color 0.2s ease;
 }
 
 .burger span {
+    position: absolute;
+    left: 9px;
+    width: 26px;
     height: 3px;
-    background: #333;
+    background: var(--text-color);
     border-radius: 2px;
-    transition: 0.3s;
+    transition: top 0.3s ease, transform 0.3s ease, opacity 0.2s ease, background-color 0.3s ease;
+}
+
+.burger span:nth-child(1) {
+    top: 7px;
+}
+
+.burger span:nth-child(2) {
+    top: 19px;
+}
+
+.burger span:nth-child(3) {
+    top: 31px;
+}
+
+.burger:hover {
+    background-color: var(--hover-bg);
+}
+
+.burger:focus-visible {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
+}
+
+.burger.active span:nth-child(1) {
+    top: 19px;
+    transform: rotate(45deg);
+}
+
+.burger.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.burger.active span:nth-child(3) {
+    top: 19px;
+    transform: rotate(-45deg);
 }
 
 .site-logo {
@@ -578,67 +620,182 @@ a:hover {
 .sidebar {
     position: fixed;
     top: 60px;
-    left: -260px;
-    width: 240px;
-    /*height: 100%;*/
+    bottom: 0;
+    left: -300px;
+    width: 280px;
+    max-height: calc(100vh - 60px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
     background-color: var(--card-bg);
-    border-radius: var(--border-radius);
-    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
-    padding: 2rem 1rem 1rem 1rem;
-    transition: left 0.3s ease, background-color 0.3s ease;
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    box-shadow: 2px 0 12px rgba(0, 0, 0, 0.15);
+    padding: 1rem 1rem 1.25rem;
+    transition: left 0.3s ease, background-color 0.3s ease, visibility 0.3s ease;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    visibility: hidden;
     z-index: 1000;
 }
 
 .sidebar.open {
     left: 0;
+    visibility: visible;
 }
 
-.sidebar a {
-    text-decoration: none;
+.sidebar-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: 0.75rem;
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid var(--divider-color);
+}
+
+.sidebar-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--accent-color);
+}
+
+.sidebar-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 50%;
+    background: none;
     color: var(--text-color);
-    /* Цвет текста из темы */
     font-size: 16px;
-    padding: 6px 10px;
-    border-radius: 4px;
-    transition: background-color 0.2s ease;
-    display: block;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-.sidebar a:hover {
+.sidebar-close:hover {
     background-color: var(--hover-bg);
-    /* Цвет при ховере из темы */
+    color: var(--accent-color);
+}
+
+.sidebar a:focus-visible,
+.has-submenu>button:focus-visible,
+.sidebar-close:focus-visible {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 1px;
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.sidebar a,
+.has-submenu>button {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 0.55rem 0.65rem;
+    border: none;
+    border-radius: 8px;
+    background: none;
+    color: var(--text-color);
+    font: inherit;
+    font-size: 15px;
+    line-height: 1.3;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.sidebar a:hover,
+.has-submenu>button:hover {
+    background-color: var(--hover-bg);
+    color: var(--accent-color);
+}
+
+.has-submenu>button::after {
+    content: "▾";
+    margin-left: auto;
+    font-size: 12px;
+    line-height: 1;
+    transition: transform 0.2s ease;
+}
+
+.has-submenu>button[aria-expanded="true"]::after {
+    transform: rotate(180deg);
 }
 
 .submenu {
     display: none;
     flex-direction: column;
-    margin-left: 1rem;
-    gap: 0.5rem;
+    gap: 0.1rem;
+    margin: 0.1rem 0 0.25rem 0.75rem;
+    padding-left: 0.5rem;
+    border-left: 1px solid var(--divider-color);
 }
 
 .submenu.open {
     display: flex;
 }
 
-.has-submenu>button {
-    background: none;
-    border: none;
-    font-size: 16px;
-    padding: 6px 10px;
-    text-align: left;
-    width: 100%;
-    color: var(--text-color);
-    /* Цвет текста кнопки из темы */
-    cursor: pointer;
-    transition: background-color 0.2s ease;
+.submenu a {
+    padding: 0.45rem 0.6rem;
+    font-size: 14px;
+    color: var(--text-muted);
 }
 
-.has-submenu>button:hover {
+.submenu a:hover {
+    color: var(--accent-color);
+}
+
+.sidebar-phones {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    margin-top: auto;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--divider-color);
+}
+
+.sidebar-phones__label {
+    padding: 0.25rem 0.65rem 0.35rem;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+.sidebar .sidebar-phone {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.65rem;
+    font-weight: 600;
+    color: var(--accent-color);
+    white-space: nowrap;
+}
+
+.sidebar .sidebar-phone:hover {
     background-color: var(--hover-bg);
-    /* Цвет при ховере из темы */
+    color: var(--accent-color);
+}
+
+.sidebar-phone i {
+    font-size: 13px;
+    opacity: 0.8;
+}
+
+.sidebar-phone--empty {
+    font-weight: 400;
+    color: var(--text-muted);
+}
+
+body.menu-open {
+    overflow: hidden;
 }
 
 
