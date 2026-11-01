@@ -45,12 +45,15 @@ INSTALLED_APPS = [
     "django_celery_results",
     "django_celery_beat",
     "debug_toolbar",
+    "rest_framework",
+    "drf_spectacular",
     "app_home.apps.AppHomeConfig",
     "app_catalog.apps.AppCatalogConfig",
     "app_user.apps.AppUserConfig",
     "app_cart.apps.AppCartConfig",
     "app_order.apps.AppOrderConfig",
     "app_reviews.apps.AppReviewsConfig",
+    "app_api.apps.AppApiConfig",
 ]
 
 MIDDLEWARE = [
@@ -148,6 +151,20 @@ MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# constants for the mobile app API
+CURRENCY = "BYN"
+
+REST_FRAMEWORK = {
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "SoloPizza mobile API",
+    "DESCRIPTION": "Публичный read-only API каталога для мобильного приложения",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+}
 
 LOGIN_URL = "/user/login/"
 
