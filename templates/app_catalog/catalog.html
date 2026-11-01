@@ -13,7 +13,7 @@
   "@type": "WebPage",
   "name": "Каталог - Solo Pizza",
   "description": "Каталог пиццы, фастфуд и других блюд Solo Pizza в Барановичах. Закажите вкусную еду с доставкой по городу!",
-  "url": "{{ request.build_absolute_uri }}",
+  "url": "{{ canonical_url }}",
   "breadcrumb": {
     "@type": "BreadcrumbList",
     "itemListElement": [
@@ -27,7 +27,7 @@
         "@type": "ListItem",
         "position": 2,
         "name": "Каталог",
-        "item": "{{ request.build_absolute_uri }}"
+        "item": "{{ canonical_url }}"
       }
     ]
   }

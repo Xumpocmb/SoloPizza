@@ -79,6 +79,21 @@ def site_context_processor(request):
     }
 
 
+def canonical_context(request):
+    """Канонический URL страницы без GET-параметров.
+
+    Параметры вроде ``utm_*``, ``yclid`` или ``size`` не создают отдельного
+    содержимого, поэтому все их варианты должны указывать на один адрес.
+    Домен берём из настроек, чтобы canonical всегда был с нужным протоколом
+    и без ``www``, даже если запрос пришёл через прокси.
+    """
+    base_url = (getattr(settings, "DOMAIN_NAME", "") or "").rstrip("/")
+    if not base_url:
+        base_url = f"{request.scheme}://{request.get_host()}"
+
+    return {"canonical_url": f"{base_url}{request.path}"}
+
+
 def cart_context(request):
     session_cart = SessionCart(request)
     cart_total_quantity = len(session_cart)  # SessionCart has __len__ method

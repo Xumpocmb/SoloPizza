@@ -1,7 +1,8 @@
-from django.test import TestCase, Client
+from django.test import TestCase, Client, RequestFactory, override_settings
 from django.urls import reverse
 from django.contrib.messages import get_messages
 
+from app_home.context_processors import canonical_context
 from app_home.forms import FeedbackForm, VacancyApplicationForm
 from app_home.models import Feedback, Vacancy, VacancyApplication
 
@@ -456,3 +457,23 @@ class FeedbackViewTests(TestCase):
         messages = list(get_messages(response.wsgi_request))
         self.assertEqual(len(messages), 1)
         self.assertEqual(str(messages[0]), 'Пожалуйста, исправьте ошибки в форме.')
+
+
+class SeoCanonicalTests(TestCase):
+    """Канонические URL и правила для поисковых роботов."""
+
+    def test_canonical_url_ignores_query_string(self):
+        request = RequestFactory().get("/catalog/item/picca/?size=1&utm_source=yandex")
+        with override_settings(DOMAIN_NAME="https://solo-pizza.by"):
+            canonical_url = canonical_context(request)["canonical_url"]
+
+        self.assertEqual(canonical_url, "https://solo-pizza.by/catalog/item/picca/")
+
+    def test_robots_txt_has_clean_param_directives(self):
+        response = self.client.get("/robots.txt")
+
+        self.assertEqual(response.status_code, 200)
+        content = response.content.decode()
+        self.assertIn("Clean-param:", content)
+        self.assertIn("utm_source", content)
+        self.assertIn("size /catalog/item/", content)

@@ -15,4 +15,10 @@ Disallow: /order/statistics/
 Disallow: /order/reports/
 Disallow: /certificates/sell/
 
+# Рекламные и служебные GET-параметры не создают новых страниц
+Clean-param: utm_source&utm_medium&utm_campaign&utm_term&utm_content&utm_id&utm_source_type&utm_referrer&utm_placement&yclid&ysclid&gclid&fbclid&msclkid&dclid&wbraid&gbraid&_openstat&erid&mc_cid&mc_eid&igshid&ref&source&from /
+
+# Выбор размера на карточке товара не является отдельной страницей
+Clean-param: size /catalog/item/
+
 Sitemap: https://solo-pizza.by/sitemap.xml

@@ -13,7 +13,7 @@
   "name": "{{ category.name }}",
   "category": "{{ category.name }}",
   "description": "{{ category.description|default:"Вкусные блюда с доставкой от Solo Pizza" }}",
-  "url": "{{ request.build_absolute_uri }}"
+  "url": "{{ canonical_url }}"
 }
 </script>
 {% endblock %}
