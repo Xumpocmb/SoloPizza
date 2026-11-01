@@ -50,11 +50,7 @@ class OrderAdmin(admin.ModelAdmin):
     form = OrderAdminForm
     list_display = [
         'order_number',
-        'user',
-        'customer_name',
         'phone_number',
-        'order_status',
-        'delivery_type_display',
         'created_at'
     ]
     list_filter = [
@@ -84,18 +80,6 @@ class OrderAdmin(admin.ModelAdmin):
 
     order_number.admin_order_field = "daily_number"
     order_number.short_description = "Номер"
-
-    def order_status(self, obj):
-        return obj.get_status_display()
-
-    order_status.admin_order_field = "status"
-    order_status.short_description = "Статус"
-
-    def delivery_type_display(self, obj):
-        return obj.get_delivery_type_display()
-
-    delivery_type_display.admin_order_field = "delivery_type"
-    delivery_type_display.short_description = "Способ получения"
 
     fieldsets = (
         ('Основная информация', {
