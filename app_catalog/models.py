@@ -83,18 +83,19 @@ class Product(models.Model):
     def is_available_in_branch(self, branch):
         """Доступен ли товар в указанном филиале.
 
-        Пустой список филиалов у категории означает «доступен везде». Список
-        кэшируется на инстансе, а all() берёт данные из prefetch, поэтому на
-        странице корзины проверка не ходит в базу: SessionCart подтягивает
+        Категория без привязки к филиалам недоступна нигде — как is_active=False:
+        так же её трактует меню (filter branch=selected_branch) и CartItem.
+        Список кэшируется на инстансе, а all() берёт данные из prefetch, поэтому
+        на странице корзины проверка не ходит в базу: SessionCart подтягивает
         категорию и её филиалы одним запросом.
         """
-        if branch is None:
-            return True
-
         if not hasattr(self, "_category_branch_ids"):
             self._category_branch_ids = frozenset(b.pk for b in self.category.branch.all())
 
-        return not self._category_branch_ids or branch.pk in self._category_branch_ids
+        if not self._category_branch_ids:
+            return False
+
+        return branch is None or branch.pk in self._category_branch_ids
 
 
 class PizzaSizes(models.Model):
