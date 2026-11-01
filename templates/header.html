@@ -17,7 +17,7 @@
         <div class="header-content">
             <div class="header-phone">
                 {% for phone in selected_branch.branch_phones.all %}
-                    <div class="phone-text">{{ phone.phone }}</div>
+                    <a class="phone-text" href="tel:{{ phone.dial }}">{{ phone.phone }}</a>
                 {% empty %}
                     <div class="phone-text">{% trans "Нет телефонов" %}</div>
                 {% endfor %}
