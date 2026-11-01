@@ -34,14 +34,14 @@ def get_recipient_emails():
     return [email.strip() for email in settings.EMAIL_RECIPIENTS_LIST if email.strip()]
 
 
-def is_order_time_allowed(user):
+def is_order_time_allowed(branch, user=None):
     """
-    Проверяет, разрешено ли пользователю делать заказ в текущее время.
+    Проверяет, разрешено ли оформлять заказы в текущее время.
     Администраторы и сотрудники могут делать заказы в любое время.
     Обычные пользователи могут делать заказы в соответствии с графиком работы филиала.
     """
     # Администраторы и сотрудники могут делать заказы в любое время
-    if user.is_superuser or user.is_staff or settings.DEBUG:
+    if user is not None and (user.is_superuser or user.is_staff):
         return True
 
     # Получаем текущее время в часовом поясе проекта
@@ -49,8 +49,8 @@ def is_order_time_allowed(user):
     current_day_of_week = current_time.isoweekday()  # 1 - понедельник, 7 - воскресенье
     current_time_only = current_time.time()
 
-    # Получаем ID выбранного филиала из сессии
-    selected_branch_id = user.profile.selected_branch_id if hasattr(user, "profile") and user.profile.selected_branch_id else DEFAULT_BRANCH_ID
+    # Получаем ID филиала, для которого проверяем график работы
+    selected_branch_id = branch.id if branch else DEFAULT_BRANCH_ID
 
     # Получаем график работы для выбранного филиала в текущий день недели
     try:
@@ -89,8 +89,8 @@ def checkout(request):
         except CafeBranch.DoesNotExist:
             selected_branch = CafeBranch.objects.get(id=DEFAULT_BRANCH_ID)
 
-    # Проверяем, разрешено ли пользователю делать заказ в текущее время
-    if not is_order_time_allowed(request.user):
+    # Проверяем, разрешено ли оформлять заказ в текущее время
+    if not is_order_time_allowed(selected_branch, request.user):
         # Получаем график работы для выбранного филиала в текущий день недели
         from datetime import datetime
 
