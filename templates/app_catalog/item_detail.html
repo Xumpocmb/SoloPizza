@@ -22,7 +22,7 @@
     {% else %}
     "price": "0",
     {% endif %}
-    "priceCurrency": "RUB",
+    "priceCurrency": "BYN",
     "seller": {
       "@type": "Organization",
       "name": "Solo Pizza"
@@ -66,7 +66,7 @@
                     <!-- Цена -->
                     <div class="item-price" id="item-price">
                         {% if min_price %}
-                            <span>Цена: {{ min_price }} руб.</span>
+                            <span>Цена: <span class="nbrb-icon">BYN</span> {{ min_price }}</span>
                         {% else %}
                             <span>Цена не указана</span>
                         {% endif %}
@@ -136,7 +136,7 @@
                                     <option value="">Не выбран</option>
                                     {% for board in boards %}
                                         <option value="{{ board.id }}">
-                                            {{ board.board.name }} (+{{ board.price }} руб.)
+                                            {{ board.board.name }} (+<span class="nbrb-icon">BYN</span> {{ board.price }})
                                         </option>
                                     {% endfor %}
                                 </select>
@@ -148,7 +148,7 @@
                                     <option value="">Не выбран</option>
                                     {% for board in boards %}
                                         <option value="{{ board.id }}">
-                                            {{ board.board.name }} (+{{ board.price }} руб.)
+                                            {{ board.board.name }} (+<span class="nbrb-icon">BYN</span> {{ board.price }})
                                         </option>
                                     {% endfor %}
                                 </select>
@@ -165,7 +165,7 @@
                                             <input type="checkbox" name="addons" value="{{ addon.id }}"
                                                    style="display: none;">
                                             <span class="checkbox-icon"></span>
-                                            {{ addon.addon.name }} (+{{ addon.price }} руб.)
+                                            {{ addon.addon.name }} (+<span class="nbrb-icon">BYN</span> {{ addon.price }})
                                         </label>
                                     </li>
                                 {% empty %}
@@ -243,7 +243,7 @@ function changeSizeVariant(variantId) {
         .then(response => response.json())
         .then(data => {
             // Обновляем цену
-            priceElement.innerHTML = `<span>Цена: ${data.price} руб.</span>`;
+            priceElement.innerHTML = `<span>Цена: <span class="nbrb-icon">BYN</span> ${data.price}</span>`;
             
             // Обновляем соусы
             updateSauces(data.sauces);
@@ -327,12 +327,12 @@ function updateBoards(boards) {
         boards.forEach(board => {
             const option1 = document.createElement('option');
             option1.value = board.id;
-            option1.textContent = `${board.name} (+${board.price} руб.)`;
+            option1.textContent = `${board.name} (+<span class="nbrb-icon">BYN</span> ${board.price})`;
             board1Select.appendChild(option1);
 
             const option2 = document.createElement('option');
             option2.value = board.id;
-            option2.textContent = `${board.name} (+${board.price} руб.)`;
+            option2.textContent = `${board.name} (+<span class="nbrb-icon">BYN</span> ${board.price})`;
             board2Select.appendChild(option2);
         });
     } else {
@@ -364,7 +364,7 @@ function updateAddons(addons) {
                     <input type="checkbox" name="addons" value="${addon.id}"
                            id="id_addons_${addon.id}" style="display: none;">
                     <span class="checkbox-icon"></span>
-                    ${addon.name} (+${addon.price} руб.)
+                    ${addon.name} (+<span class="nbrb-icon">BYN</span> ${addon.price})
                 </label>
             `;
             addonList.appendChild(li);
