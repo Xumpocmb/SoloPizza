@@ -183,7 +183,8 @@ class Order(models.Model):
 
     delivery_type = models.CharField(max_length=20, choices=DELIVERY_CHOICES, verbose_name="Способ получения")
     payment_method = models.CharField(max_length=20, choices=PAYMENT_CHOICES, verbose_name="Способ оплаты")
-    payment_status = models.BooleanField(default=True, verbose_name="Оплачено")
+    # Новые заказы по умолчанию не оплачены; оплаченный заказ создаёт staff напрямую
+    payment_status = models.BooleanField(default=False, verbose_name="Оплачено")
 
     # Fields for split payment
     cash_amount = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal("0.00"), verbose_name="Сумма наличными", blank=True)
