@@ -157,6 +157,8 @@ CURRENCY = "BYN"
 
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    # Публичные POST-эндпоинты ограничиваются по IP: read-only каталог не троттлится.
+    "DEFAULT_THROTTLE_RATES": {"anon": "10/min"},
 }
 
 SPECTACULAR_SETTINGS = {

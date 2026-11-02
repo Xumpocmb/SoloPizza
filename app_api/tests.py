@@ -1,6 +1,8 @@
 from decimal import Decimal
 from unittest import mock
 
+from django.conf import settings
+from django.core.cache import cache
 from django.test import TestCase, override_settings
 
 from rest_framework.test import APIClient
@@ -183,6 +185,12 @@ class CatalogApiTests(TestCase):
         self.assertEqual(data["timezone"], "Europe/Minsk")
 
 
+# DEBUG=False включает отправку уведомления об отклике, а троттлинг пишет историю
+# в кэш — в проде это Redis, в тестах локальный memory backend.
+@override_settings(
+    DEBUG=False,
+    CACHES={"default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"}},
+)
 class VacancyApiTests(TestCase):
     payload = {
         "name": "Иван Иванов",
@@ -194,6 +202,7 @@ class VacancyApiTests(TestCase):
 
     def setUp(self):
         self.client = APIClient()
+        cache.clear()  # locmem живёт весь прогон, счётчик троттлинга нужен с нуля
         self.courier = Vacancy.objects.create(
             title="Курьер",
             description="Доставка заказов",
@@ -252,3 +261,12 @@ class VacancyApiTests(TestCase):
             self.client.post(url, {**self.payload, "experience_years": 51}, format="json").json(),
         )
         self.assertEqual(VacancyApplication.objects.count(), 0)
+
+    def test_application_is_throttled_per_ip(self):
+        url = f"/api/v1/vacancies/{self.courier.pk}/applications/"
+        limit = int(settings.REST_FRAMEWORK["DEFAULT_THROTTLE_RATES"]["anon"].split("/")[0])
+
+        with mock.patch("app_home.tasks.send_vacancy_application_notification"):
+            for _ in range(limit):
+                self.assertEqual(self.client.post(url, self.payload, format="json").status_code, 201)
+            self.assertEqual(self.client.post(url, self.payload, format="json").status_code, 429)

@@ -6,6 +6,7 @@ from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from rest_framework.throttling import AnonRateThrottle
 from rest_framework.views import APIView
 
 from app_api import serializers as api_serializers
@@ -151,6 +152,8 @@ class VacancyDetailView(PublicViewMixin, RetrieveAPIView):
 
 class VacancyApplicationView(PublicViewMixin, APIView):
     """Отклик на вакансию. CSRF не нужен: эндпоинт без сессий, аутентификации и cookies."""
+
+    throttle_classes = [AnonRateThrottle]
 
     @extend_schema(
         request=api_serializers.VacancyApplicationSerializer,
