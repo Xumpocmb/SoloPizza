@@ -11,7 +11,7 @@ from app_catalog.models import (
     PizzaSizes,
     Product,
 )
-from app_home.models import CafeBranch
+from app_home.models import CafeBranch, Vacancy, VacancyApplication
 
 IMAGE_SCHEMA = {"type": "string", "format": "uri", "nullable": True}
 
@@ -163,3 +163,44 @@ class ProductDetailSerializer(ProductListItemSerializer):
         if not obj.has_drink:
             return []
         return NamedOptionSerializer(ComboDrinks.objects.filter(is_active=True), many=True).data
+
+
+class VacancyListItemSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+    benefits = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Vacancy
+        fields = ["id", "title", "salary", "benefits", "image"]
+
+    @extend_schema_field(IMAGE_SCHEMA)
+    def get_image(self, obj):
+        return _media_url(self.context.get("request"), obj.image)
+
+    @extend_schema_field(list[str])
+    def get_benefits(self, obj):
+        # Преимущества хранятся одной строкой через запятую — режем их, как в web-шаблоне.
+        return [benefit.strip() for benefit in (obj.benefits or "").split(",") if benefit.strip()]
+
+
+class VacancyDetailSerializer(VacancyListItemSerializer):
+    class Meta(VacancyListItemSerializer.Meta):
+        fields = VacancyListItemSerializer.Meta.fields + ["description"]
+
+
+class VacancyApplicationSerializer(serializers.ModelSerializer):
+    """Отклик на вакансию — те же поля и правила, что у web-формы VacancyApplicationForm."""
+
+    # Модельный RegexValidator и max_length=17 требуют уже очищённые цифры, а
+    # пользователь вводит «+375 (29) 123-45-67», поэтому валидатор поля свой.
+    phone = serializers.CharField(max_length=32)
+
+    class Meta:
+        model = VacancyApplication
+        fields = ["name", "age", "phone", "experience_years", "work_experience"]
+
+    def validate_phone(self, value):
+        digits = "".join(char for char in value if char.isdigit())
+        if not 12 <= len(digits) <= 17:
+            raise serializers.ValidationError("Номер телефона должен содержать от 12 до 17 цифр.")
+        return digits

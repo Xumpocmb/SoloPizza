@@ -14,5 +14,13 @@ urlpatterns = [
     path("categories/<slug:slug>/", views.CategoryDetailView.as_view(), name="category-detail"),
     path("products/", views.ProductListView.as_view(), name="products"),
     path("products/featured/", views.FeaturedProductListView.as_view(), name="featured-products"),
+    path("products/weekly-special/", views.WeeklySpecialProductView.as_view(), name="weekly-special-product"),
     path("products/<slug:slug>/", views.ProductDetailView.as_view(), name="product-detail"),
+    path("vacancies/", views.VacancyListView.as_view(), name="vacancies"),
+    path("vacancies/<int:pk>/", views.VacancyDetailView.as_view(), name="vacancy-detail"),
+    path(
+        "vacancies/<int:vacancy_pk>/applications/",
+        views.VacancyApplicationView.as_view(),
+        name="vacancy-applications",
+    ),
 ]

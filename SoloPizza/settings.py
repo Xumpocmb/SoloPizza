@@ -161,7 +161,7 @@ REST_FRAMEWORK = {
 
 SPECTACULAR_SETTINGS = {
     "TITLE": "SoloPizza mobile API",
-    "DESCRIPTION": "Публичный read-only API каталога для мобильного приложения",
+    "DESCRIPTION": "Публичный API каталога и вакансий для мобильного приложения",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
 }

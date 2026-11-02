@@ -1,6 +1,7 @@
 from decimal import Decimal
+from unittest import mock
 
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
 from rest_framework.test import APIClient
 
@@ -16,7 +17,7 @@ from app_catalog.models import (
     Product,
     ProductVariant,
 )
-from app_home.models import CafeBranch, CafeBranchPhone
+from app_home.models import CafeBranch, CafeBranchPhone, Vacancy, VacancyApplication
 
 
 class CatalogApiTests(TestCase):
@@ -149,6 +150,23 @@ class CatalogApiTests(TestCase):
         self.assertEqual(self.client.get(f"/api/v1/products/featured/?branch_id={self.branch_b.pk}").json(), [])
         self.assertEqual(self.client.get("/api/v1/products/featured/").status_code, 400)
 
+    def test_weekly_special_returns_single_product(self):
+        Product.objects.filter(pk=self.pepperoni.pk).update(is_weekly_special=True)
+        response = self.client.get(f"/api/v1/products/weekly-special/?branch_id={self.branch_a.pk}")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["slug"], "pepperoni")
+        self.assertTrue(data["is_weekly_special"])
+        self.assertEqual([v["size"] for v in data["variants"]], ["25", "32"])
+
+    def test_weekly_special_absent_or_invisible_is_404(self):
+        response = self.client.get(f"/api/v1/products/weekly-special/?branch_id={self.branch_a.pk}")
+        self.assertEqual(response.status_code, 404)
+
+        Product.objects.filter(pk=self.pepperoni.pk).update(is_weekly_special=True)
+        self.assertEqual(self.client.get(f"/api/v1/products/weekly-special/?branch_id={self.branch_b.pk}").status_code, 404)
+        self.assertEqual(self.client.get("/api/v1/products/weekly-special/").status_code, 400)
+
     def test_branches_list_active_only_with_phones(self):
         response = self.client.get("/api/v1/branches/")
         self.assertEqual(response.status_code, 200)
@@ -163,3 +181,74 @@ class CatalogApiTests(TestCase):
         data = response.json()
         self.assertEqual(data["currency"], "BYN")
         self.assertEqual(data["timezone"], "Europe/Minsk")
+
+
+class VacancyApiTests(TestCase):
+    payload = {
+        "name": "Иван Иванов",
+        "age": 24,
+        "phone": "+375 (29) 123-45-67",
+        "experience_years": 3,
+        "work_experience": "Три года службы доставки",
+    }
+
+    def setUp(self):
+        self.client = APIClient()
+        self.courier = Vacancy.objects.create(
+            title="Курьер",
+            description="Доставка заказов",
+            salary="от 1200 руб",
+            benefits="Гибкий график, компенсация связи",
+            is_active=True,
+        )
+        self.closed = Vacancy.objects.create(title="Повар", description="Горячий цех", is_active=False)
+
+    def test_vacancies_active_only(self):
+        response = self.client.get("/api/v1/vacancies/")
+        self.assertEqual(response.status_code, 200)
+        titles = [v["title"] for v in response.json()]
+        self.assertEqual(titles, ["Курьер"])
+
+    def test_vacancy_detail_splits_benefits(self):
+        response = self.client.get(f"/api/v1/vacancies/{self.courier.pk}/")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["description"], "Доставка заказов")
+        self.assertEqual(data["benefits"], ["Гибкий график", "компенсация связи"])
+
+    def test_inactive_vacancy_is_404(self):
+        self.assertEqual(self.client.get(f"/api/v1/vacancies/{self.closed.pk}/").status_code, 404)
+        self.assertEqual(
+            self.client.post(f"/api/v1/vacancies/{self.closed.pk}/applications/", self.payload, format="json").status_code,
+            404,
+        )
+
+    @override_settings(DEBUG=False)
+    def test_application_is_created_with_cleaned_phone(self):
+        # Как и web-вьюха, уведомление в Telegram уходит только вне DEBUG.
+        with mock.patch("app_home.tasks.send_vacancy_application_notification") as notify:
+            response = self.client.post(f"/api/v1/vacancies/{self.courier.pk}/applications/", self.payload, format="json")
+        self.assertEqual(response.status_code, 201, response.json())
+
+        application = VacancyApplication.objects.get()
+        self.assertEqual(application.vacancy, self.courier)
+        self.assertEqual(application.phone, "375291234567")
+        self.assertEqual(response.json()["phone"], "375291234567")
+        notify.delay.assert_called_once_with(application.pk)
+
+    def test_application_validation(self):
+        url = f"/api/v1/vacancies/{self.courier.pk}/applications/"
+        self.assertEqual(self.client.post(url, {}, format="json").status_code, 400)
+
+        too_short = {**self.payload, "phone": "+375 29 123"}
+        self.assertIn("phone", self.client.post(url, too_short, format="json").json())
+        too_long = {**self.payload, "phone": "8" * 18}
+        self.assertIn("phone", self.client.post(url, too_long, format="json").json())
+
+        for age in (15, 101):
+            self.assertIn("age", self.client.post(url, {**self.payload, "age": age}, format="json").json())
+        self.assertIn(
+            "experience_years",
+            self.client.post(url, {**self.payload, "experience_years": 51}, format="json").json(),
+        )
+        self.assertEqual(VacancyApplication.objects.count(), 0)

@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.shortcuts import get_object_or_404
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework.exceptions import NotFound, ValidationError
@@ -10,7 +11,7 @@ from rest_framework.views import APIView
 from app_api import serializers as api_serializers
 from app_api.filters import branch_or_none, catalog_products, visible_categories
 from app_home.context_processors import DEFAULT_BRANCH_ID
-from app_home.models import CafeBranch
+from app_home.models import CafeBranch, Vacancy
 
 BRANCH_ID_PARAM = OpenApiParameter(
     "branch_id",
@@ -21,11 +22,15 @@ BRANCH_ID_PARAM = OpenApiParameter(
 )
 
 
-class CatalogViewMixin:
-    """Каталог публичный и только для чтения: ни аутентификации, ни прав."""
+class PublicViewMixin:
+    """Публичные эндпоинты приложения: ни аутентификации, ни прав."""
 
     permission_classes = [AllowAny]
     authentication_classes = []
+
+
+class CatalogViewMixin(PublicViewMixin):
+    """Каталог требует выбранный филиал — он задаёт видимый набор товаров и категорий."""
 
     def get_branch_id(self):
         raw = self.request.query_params.get("branch_id")
@@ -39,17 +44,12 @@ class CatalogViewMixin:
         return branch.pk
 
 
-class BranchListView(ListAPIView):
+class BranchListView(PublicViewMixin, ListAPIView):
     serializer_class = api_serializers.BranchSerializer
-    permission_classes = [AllowAny]
-    authentication_classes = []
     queryset = CafeBranch.objects.filter(is_active=True).prefetch_related("branch_phones").order_by("id")
 
 
-class MetaView(APIView):
-    permission_classes = [AllowAny]
-    authentication_classes = []
-
+class MetaView(PublicViewMixin, APIView):
     @extend_schema(responses=OpenApiTypes.OBJECT)
     def get(self, request):
         return Response(
@@ -113,9 +113,58 @@ class FeaturedProductListView(CatalogViewMixin, ListAPIView):
 
 
 @extend_schema(parameters=[BRANCH_ID_PARAM], responses=api_serializers.ProductDetailSerializer)
+class WeeklySpecialProductView(CatalogViewMixin, RetrieveAPIView):
+    """Текущая «Пицца недели» — один товар, как на web-странице акций."""
+
+    serializer_class = api_serializers.ProductDetailSerializer
+
+    def get_queryset(self):
+        return catalog_products(self.get_branch_id()).filter(is_weekly_special=True).order_by("category__order", "name")
+
+    def get_object(self, queryset=None):
+        product = self.get_queryset().first()
+        if product is None:
+            raise NotFound("Акция «Пицца недели» сейчас не проводится")
+        return product
+
+
+@extend_schema(parameters=[BRANCH_ID_PARAM], responses=api_serializers.ProductDetailSerializer)
 class ProductDetailView(CatalogViewMixin, RetrieveAPIView):
     serializer_class = api_serializers.ProductDetailSerializer
     lookup_field = "slug"
 
     def get_queryset(self):
         return catalog_products(self.get_branch_id())
+
+
+class VacancyListView(PublicViewMixin, ListAPIView):
+    serializer_class = api_serializers.VacancyListItemSerializer
+    queryset = Vacancy.objects.filter(is_active=True)
+
+
+class VacancyDetailView(PublicViewMixin, RetrieveAPIView):
+    serializer_class = api_serializers.VacancyDetailSerializer
+
+    def get_queryset(self):
+        return Vacancy.objects.filter(is_active=True)
+
+
+class VacancyApplicationView(PublicViewMixin, APIView):
+    """Отклик на вакансию. CSRF не нужен: эндпоинт без сессий, аутентификации и cookies."""
+
+    @extend_schema(
+        request=api_serializers.VacancyApplicationSerializer,
+        responses={201: api_serializers.VacancyApplicationSerializer},
+    )
+    def post(self, request, vacancy_pk):
+        vacancy = get_object_or_404(Vacancy, pk=vacancy_pk, is_active=True)
+        serializer = api_serializers.VacancyApplicationSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        application = serializer.save(vacancy=vacancy)
+
+        if not settings.DEBUG:
+            from app_home.tasks import send_vacancy_application_notification
+
+            send_vacancy_application_notification.delay(application.pk)
+
+        return Response(serializer.data, status=201)
