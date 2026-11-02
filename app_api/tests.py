@@ -133,6 +133,22 @@ class CatalogApiTests(TestCase):
         boards = data["variants"][0]["boards"]
         self.assertEqual([b["id"] for b in boards], [board_32.pk])
 
+    def test_featured_products_only_display_on_main(self):
+        Product.objects.filter(pk=self.pepperoni.pk).update(display_on_main=True)
+        response = self.client.get(f"/api/v1/products/featured/?branch_id={self.branch_a.pk}")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual([p["slug"] for p in response.json()], ["pepperoni"])
+        self.assertEqual(Decimal(str(response.json()[0]["min_price"])), Decimal("30.00"))
+
+    def test_featured_respects_branch_and_visibility(self):
+        Product.objects.update(display_on_main=True)
+
+        response = self.client.get(f"/api/v1/products/featured/?branch_id={self.branch_a.pk}")
+        self.assertEqual([p["slug"] for p in response.json()], ["pepperoni"])
+
+        self.assertEqual(self.client.get(f"/api/v1/products/featured/?branch_id={self.branch_b.pk}").json(), [])
+        self.assertEqual(self.client.get("/api/v1/products/featured/").status_code, 400)
+
     def test_branches_list_active_only_with_phones(self):
         response = self.client.get("/api/v1/branches/")
         self.assertEqual(response.status_code, 200)

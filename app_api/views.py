@@ -102,6 +102,16 @@ class ProductListView(CatalogViewMixin, ListAPIView):
         return products.order_by("category__order", "name")
 
 
+@extend_schema(parameters=[BRANCH_ID_PARAM], responses=api_serializers.ProductListItemSerializer(many=True))
+class FeaturedProductListView(CatalogViewMixin, ListAPIView):
+    """Товары с флагом display_on_main — аналог блока «на главной» в web-меню."""
+
+    serializer_class = api_serializers.ProductListItemSerializer
+
+    def get_queryset(self):
+        return catalog_products(self.get_branch_id()).filter(display_on_main=True).order_by("category__order", "name")
+
+
 @extend_schema(parameters=[BRANCH_ID_PARAM], responses=api_serializers.ProductDetailSerializer)
 class ProductDetailView(CatalogViewMixin, RetrieveAPIView):
     serializer_class = api_serializers.ProductDetailSerializer
