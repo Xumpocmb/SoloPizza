@@ -4,7 +4,7 @@ from django.contrib.messages import get_messages
 
 from app_home.context_processors import canonical_context
 from app_home.forms import FeedbackForm, VacancyApplicationForm
-from app_home.models import Feedback, Vacancy, VacancyApplication
+from app_home.models import CafeBranch, Feedback, Vacancy, VacancyApplication, InfoPage
 
 
 class VacancyApplyViewTests(TestCase):
@@ -477,3 +477,76 @@ class SeoCanonicalTests(TestCase):
         self.assertIn("Clean-param:", content)
         self.assertIn("utm_source", content)
         self.assertIn("size /catalog/item/", content)
+
+
+class InfoPageModelTests(TestCase):
+    """Тесты модели контента страницы «Информация»."""
+
+    def test_get_solo_returns_singleton(self):
+        """Единая запись контента создаётся один раз и переиспользуется."""
+        first = InfoPage.get_solo()
+        second = InfoPage.get_solo()
+
+        self.assertEqual(first.pk, second.pk)
+        self.assertEqual(InfoPage.objects.count(), 1)
+
+    def test_get_solo_creates_default_record(self):
+        """При первом обращении создаётся запись с настройками по умолчанию."""
+        InfoPage.objects.all().delete()
+        info = InfoPage.get_solo()
+
+        self.assertTrue(InfoPage.objects.filter(pk=info.pk).exists())
+
+
+class InfoViewTests(TestCase):
+    """Тесты страницы информации о компании."""
+
+    def setUp(self):
+        self.url = reverse("app_home:info")
+
+    def test_info_view_get(self):
+        """GET-запрос к странице информации о компании."""
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "app_home/info.html")
+        self.assertIn("info", response.context)
+
+    def test_info_content_rendered_from_db(self):
+        """Текст страницы берётся из модели InfoPage, а не из шаблона."""
+        info = InfoPage.objects.create(
+            promo_heading="О компании Solo Pizza",
+            promo_description="Описание компании из базы",
+            philosophy_title="Наша философия",
+            philosophy_text="Миссия компании из базы",
+            quality_title="Контроль качества",
+            quality_text="Текст о качестве из базы",
+            quality_training_text="Текст об обучении из базы",
+            delivery_title="Доставка",
+            delivery_text="Текст о доставке из базы",
+            delivery_app_text="Текст об приложении из базы",
+            address_title="Наш адрес",
+            address_text="Текст об адресе из базы",
+            steps_title="Оформление заказа",
+            step_1_text="Шаг 1 из базы",
+            step_2_text="Шаг 2 из базы",
+            step_3_text="Шаг 3 из базы",
+            contacts_title="Связаться с нами",
+            contacts_text="Текст связи из базы",
+            contacts_text_2="Дополнительный текст связи из базы",
+        )
+        branch = CafeBranch.objects.create(name="Тестовый филиал", address="ул. Тестовая, 1")
+
+        response = self.client.get(self.url)
+
+        self.assertContains(response, "Описание компании из базы")
+        self.assertContains(response, "Миссия компании из базы")
+        self.assertContains(response, "Текст о качестве из базы")
+        self.assertContains(response, "Текст об обучении из базы")
+        self.assertContains(response, "Текст о доставке из базы")
+        self.assertContains(response, "Текст об приложении из базы")
+        self.assertContains(response, "Текст об адресе из базы")
+        self.assertContains(response, "Шаг 1 из базы")
+        self.assertContains(response, "Шаг 3 из базы")
+        self.assertContains(response, "Текст связи из базы")
+        self.assertContains(response, "Дополнительный текст связи из базы")

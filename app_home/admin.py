@@ -1,7 +1,7 @@
 from django.contrib import admin
 from modeltranslation.admin import TabbedTranslationAdmin
 
-from app_home.models import CafeBranch, CafeBranchPhone, Vacancy, VacancyApplication, Feedback, Discount, OrderAvailability, WorkingHours, Partner, SnowSettings, Marquee, Certificate
+from app_home.models import CafeBranch, CafeBranchPhone, Vacancy, VacancyApplication, Feedback, Discount, OrderAvailability, WorkingHours, Partner, SnowSettings, Marquee, Certificate, InfoPage
 
 
 @admin.register(SnowSettings)
@@ -123,6 +123,18 @@ class MarqueeAdmin(admin.ModelAdmin):
     list_editable = ("is_active",)
     search_fields = ("text",)
     list_per_page = 20
+
+
+@admin.register(InfoPage)
+class InfoPageAdmin(TabbedTranslationAdmin):
+    list_display = ("promo_heading", "steps_title")
+    search_fields = ("promo_heading", "steps_title")
+
+    def has_add_permission(self, request):
+        # Контент страницы «Информация» хранится в единственной записи.
+        if InfoPage.objects.exists():
+            return False
+        return True
 
 
 @admin.register(Certificate)

@@ -12,7 +12,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from app_cart.models import CartItem
 from app_catalog.models import Product
-from app_home.models import CafeBranch, Vacancy, Marquee
+from app_home.models import CafeBranch, Vacancy, Marquee, InfoPage
 from app_home.forms import VacancyApplicationForm, FeedbackForm
 from app_cart.session_cart import SessionCart  # Import SessionCart
 
@@ -180,7 +180,9 @@ def info_view(request):
 
     breadcrumbs = [{"title": _("Главная"), "url": "/"}, {"title": _("Информация"), "url": reverse("app_home:info")}]
 
-    context = {"breadcrumbs": breadcrumbs, "title": _("Информация о компании")}
+    info = InfoPage.get_solo()
+
+    context = {"breadcrumbs": breadcrumbs, "title": _("Информация о компании"), "info": info, "promo_heading": info.promo_heading}
 
     return render(request, "app_home/info.html", context=context)
 

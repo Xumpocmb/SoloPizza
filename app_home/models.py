@@ -231,6 +231,46 @@ class Marquee(models.Model):
         return self.text
 
 
+class InfoPage(models.Model):
+    """Контент страницы «Информация» (информация о компании)."""
+
+    promo_heading = models.CharField(max_length=255, verbose_name="Заголовок промо-блока", default="О компании Solo Pizza")
+    promo_description = models.TextField(verbose_name="Описание компании", blank=True, default="Solo Pizza - это не просто пиццерия, это место, где традиции итальянской кухни встречаются с современными технологиями и высоким уровнем сервиса. Мы стремимся создать для наших гостей атмосферу уюта и комфорта, где каждый может насладиться настоящей итальянской пиццей.")
+
+    philosophy_title = models.CharField(max_length=255, verbose_name="Название карточки «Наша философия»", default="Наша философия")
+    philosophy_text = models.TextField(verbose_name="Текст карточки «Наша философия»", blank=True, default="Наша миссия - делать вкусную пиццу доступной для каждого жителя Барановичей, сохраняя при этом высокое качество продукции и обслуживания.")
+
+    quality_title = models.CharField(max_length=255, verbose_name="Название карточки «Контроль качества»", default="Контроль качества")
+    quality_text = models.TextField(verbose_name="Текст карточки «Контроль качества»", blank=True, default="В Solo Pizza мы уделяем особое внимание качеству используемых продуктов. Мы тщательно отбираем поставщиков и ингредиенты, чтобы наша пицца всегда была вкусной и полезной.")
+    quality_training_text = models.TextField(verbose_name="Текст о повышении квалификации поваров", blank=True, default="Наши повара регулярно проходят обучение и совершенствуют свои навыки, чтобы радить вас новыми вкусами и блюдами. Каждая пицца готовится с любовью и вниманием к деталям.")
+
+    delivery_title = models.CharField(max_length=255, verbose_name="Название карточки «Доставка»", default="Доставка")
+    delivery_text = models.TextField(verbose_name="Текст карточки «Доставка»", blank=True, default="Мы понимаем, как важно получить заказ вовремя и в идеальном состоянии. Поэтому наша служба доставки работает быстро и эффективно, чтобы ваша пицца приехала к вам горячей и аппетитной.")
+    delivery_app_text = models.TextField(verbose_name="Текст о мобильном приложении", blank=True, default="Для удобства наших клиентов мы разработали мобильное приложение, которое можно скачать в Google Play. С его помощью вы можете легко сделать заказ, отследить его статус и получить доступ к специальным предложениям и акциям.")
+
+    address_title = models.CharField(max_length=255, verbose_name="Название карточки «Наш адрес»", default="Наш адрес")
+    address_text = models.TextField(verbose_name="Текст карточки «Наш адрес»", blank=True, default="Мы всегда рады видеть вас в нашей пиццерии, где вы можете насладиться не только вкусной едой, но и приятной атмосферой.")
+
+    steps_title = models.CharField(max_length=255, verbose_name="Заголовок блока «Оформление заказа»", default="Оформление заказа")
+    step_1_text = models.TextField(verbose_name="Текст шага 1", blank=True, default="После оформления заказа с Вами свяжется оператор для подтверждения заказа.")
+    step_2_text = models.TextField(verbose_name="Текст шага 2", blank=True, default="Если заказ не будет подтвержден, он будет отменен.")
+    step_3_text = models.TextField(verbose_name="Текст шага 3", blank=True, default="В случае, если с Вами не связались в течении 15ти минут, пожалуйста, перезвоните нам по нашим номерам и сообщите Ваш номер заказа.")
+
+    contacts_title = models.CharField(max_length=255, verbose_name="Заголовок блока «Связаться с нами»", default="Связаться с нами")
+    contacts_text = models.TextField(verbose_name="Основной текст блока «Связаться с нами»", blank=True, default="Вы можете связаться с нами по телефонам, указанным на странице контактов, или посетить нашу страницу в Instagram, где мы регулярно публикуем новости, акции и специальные предложения.")
+    contacts_text_2 = models.TextField(verbose_name="Дополнительный текст блока «Связаться с нами»", blank=True, default="Также вы можете оставить свой отзыв или предложение на странице обратной связи. Мы ценим мнение каждого клиента и стремимся становиться лучше с каждым днем.")
+
+    class Meta:
+        verbose_name = "Информация"
+        verbose_name_plural = "Информация"
+
+    @classmethod
+    def get_solo(cls):
+        """Единая запись контента страницы «Информация»."""
+        info, created = cls.objects.get_or_create(pk=1)
+        return info
+
+
 def generate_unique_code():
     """Generate a unique certificate code"""
     while True:

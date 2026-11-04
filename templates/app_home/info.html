@@ -15,10 +15,10 @@
     <section class="promo-section">
         <div class="container">
             {% trans "О компании Solo Pizza" as promo_heading %}
-            {% include "app_home/_promo_header.html" with heading=promo_heading %}
+            {% include "app_home/_promo_header.html" with heading=info.promo_heading %}
 
             <div class="promo-description">
-                <p>{% trans "Solo Pizza - это не просто пиццерия, это место, где традиции итальянской кухни встречаются с современными технологиями и высоким уровнем сервиса. Мы стремимся создать для наших гостей атмосферу уюта и комфорта, где каждый может насладиться настоящей итальянской пиццей." %}</p>
+                <p>{{ info.promo_description }}</p>
             </div>
 
             <div class="about-cards">
@@ -26,36 +26,36 @@
                     <span class="about-card__icon" aria-hidden="true">
                         <i class="fas fa-heart"></i>
                     </span>
-                    <h2 class="about-card__title">{% trans "Наша философия" %}</h2>
-                    <p>{% trans "Наша миссия - делать вкусную пиццу доступной для каждого жителя Барановичей, сохраняя при этом высокое качество продукции и обслуживания." %}</p>
+                    <h2 class="about-card__title">{{ info.philosophy_title }}</h2>
+                    <p>{{ info.philosophy_text }}</p>
                 </article>
 
                 <article class="about-card">
                     <span class="about-card__icon" aria-hidden="true">
                         <i class="fas fa-award"></i>
                     </span>
-                    <h2 class="about-card__title">{% trans "Контроль качества" %}</h2>
-                    <p>{% trans "В Solo Pizza мы уделяем особое внимание качеству используемых продуктов. Мы тщательно отбираем поставщиков и ингредиенты, чтобы наша пицца всегда была вкусной и полезной." %}</p>
-                    <p>{% trans "Наши повара регулярно проходят обучение и совершенствуют свои навыки, чтобы радить вас новыми вкусами и блюдами. Каждая пицца готовится с любовью и вниманием к деталям." %}</p>
+                    <h2 class="about-card__title">{{ info.quality_title }}</h2>
+                    <p>{{ info.quality_text }}</p>
+                    <p>{{ info.quality_training_text }}</p>
                 </article>
 
                 <article class="about-card">
                     <span class="about-card__icon" aria-hidden="true">
                         <i class="fas fa-truck"></i>
                     </span>
-                    <h2 class="about-card__title">{% trans "Доставка" %}</h2>
-                    <p>{% trans "Мы понимаем, как важно получить заказ вовремя и в идеальном состоянии. Поэтому наша служба доставки работает быстро и эффективно, чтобы ваша пицца приехала к вам горячей и аппетитной." %}</p>
-                    <p>{% trans "Для удобства наших клиентов мы разработали мобильное приложение, которое можно скачать в Google Play. С его помощью вы можете легко сделать заказ, отследить его статус и получить доступ к специальным предложениям и акциям." %}</p>
+                    <h2 class="about-card__title">{{ info.delivery_title }}</h2>
+                    <p>{{ info.delivery_text }}</p>
+                    <p>{{ info.delivery_app_text }}</p>
                 </article>
 
                 <article class="about-card">
                     <span class="about-card__icon" aria-hidden="true">
                         <i class="fas fa-map-marker-alt"></i>
                     </span>
-                    <h2 class="about-card__title">{% trans "Наш адрес" %}</h2>
+                    <h2 class="about-card__title">{{ info.address_title }}</h2>
                     {% if selected_branch %}
                         <p class="about-card__address">{{ selected_branch.address }}</p>
-                        <p>{% trans "Мы всегда рады видеть вас в нашей пиццерии, где вы можете насладиться не только вкусной едой, но и приятной атмосферой." %}</p>
+                        <p>{{ info.address_text }}</p>
                     {% else %}
                         <p>{% trans "Сейчас нет доступных филиалов." %}</p>
                     {% endif %}
@@ -63,28 +63,28 @@
             </div>
 
             <div class="about-steps">
-                <h2 class="about-steps__title">{% trans "Оформление заказа" %}</h2>
+                <h2 class="about-steps__title">{{ info.steps_title }}</h2>
                 <ol class="about-steps__list">
                     <li class="about-step">
                         <span class="about-step__num" aria-hidden="true">1</span>
-                        <p>{% trans "После оформления заказа с Вами свяжется оператор для подтверждения заказа." %}</p>
+                        <p>{{ info.step_1_text }}</p>
                     </li>
                     <li class="about-step">
                         <span class="about-step__num" aria-hidden="true">2</span>
-                        <p>{% trans "Если заказ не будет подтвержден, он будет отменен." %}</p>
+                        <p>{{ info.step_2_text }}</p>
                     </li>
                     <li class="about-step">
                         <span class="about-step__num" aria-hidden="true">3</span>
-                        <p>{% trans "В случае, если с Вами не связались в течении 15ти минут, пожалуйста, перезвоните нам по нашим номерам и сообщите Ваш номер заказа" %}</p>
+                        <p>{{ info.step_3_text }}</p>
                     </li>
                 </ol>
             </div>
 
             <div class="about-cta">
                 <div class="about-cta__text">
-                    <h2 class="about-cta__title">{% trans "Связаться с нами" %}</h2>
-                    <p>{% trans "Вы можете связаться с нами по телефонам, указанным на странице контактов, или посетить нашу страницу в Instagram, где мы регулярно публикуем новости, акции и специальные предложения." %}</p>
-                    <p>{% trans "Также вы можете оставить свой отзыв или предложение на странице обратной связи. Мы ценим мнение каждого клиента и стремимся становиться лучше с каждым днем." %}</p>
+                    <h2 class="about-cta__title">{{ info.contacts_title }}</h2>
+                    <p>{{ info.contacts_text }}</p>
+                    <p>{{ info.contacts_text_2 }}</p>
                 </div>
                 <div class="about-cta__actions">
                     {% if selected_branch %}
