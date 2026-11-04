@@ -14,7 +14,7 @@ from django.views.decorators.http import require_POST
 from app_cart.forms import AddToCartForm
 from app_catalog.models import Product, ProductVariant, BoardParams, AddonParams, PizzaSauce
 from app_home.context_processors import get_selected_branch_id
-from app_home.models import OrderAvailability
+from app_home.models import SiteSettings
 from .models import CartItem
 
 
@@ -87,7 +87,7 @@ def add_to_cart(request, slug):
 
 def view_cart(request):
     # Проверяем, доступно ли оформление заказов
-    if not OrderAvailability.is_orders_available():
+    if not SiteSettings.is_orders_available():
         messages.warning(request, "В настоящий момент оформление новых заказов недоступно. Приносим свои извинения за доставленные неудобства.")
 
     enriched_items = []

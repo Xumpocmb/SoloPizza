@@ -19,7 +19,7 @@ from app_home.models import CafeBranch, WorkingHours
 from app_order.forms import CheckoutForm, OrderEditForm
 from app_order import statistics
 from app_order.models import OrderItem, Order, suspended_order_totals
-from app_home.models import OrderAvailability
+from app_home.models import SiteSettings
 from decimal import Decimal, ROUND_HALF_UP
 from django.conf import settings
 import requests
@@ -69,7 +69,7 @@ def is_order_time_allowed(branch, user=None):
 
 def checkout(request):
     # Проверяем, доступно ли оформление заказов
-    if not OrderAvailability.is_orders_available():
+    if not SiteSettings.is_orders_available():
         messages.error(request, "В настоящий момент оформление новых заказов недоступно. Приносим свои извинения за доставленные неудобства.")
         return redirect("app_cart:view_cart")
 

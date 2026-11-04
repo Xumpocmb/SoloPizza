@@ -556,7 +556,7 @@ class InfoViewTests(TestCase):
 
 
 class SiteSettingsTests(TestCase):
-    """Тесты настроек сайта: логотип в шапке из админки."""
+    """Тесты настроек сайта: логотип в шапке и доступность заказов."""
 
     def setUp(self):
         self.client = Client()
@@ -594,3 +594,31 @@ class SiteSettingsTests(TestCase):
             self.assertContains(response, settings_obj.logo.url)
             self.assertContains(response, 'alt="Логотип Solo Pizza"')
             self.assertNotContains(response, "static/img/sp.png")
+
+    def test_orders_are_available_by_default(self):
+        self.assertTrue(SiteSettings.is_orders_available())
+
+    def test_orders_can_be_disabled_through_site_settings(self):
+        settings_obj = SiteSettings.get_solo()
+        settings_obj.orders_available = False
+        settings_obj.save()
+
+        self.assertFalse(SiteSettings.is_orders_available())
+
+    def test_cart_blocks_checkout_when_orders_disabled(self):
+        settings_obj = SiteSettings.get_solo()
+        settings_obj.orders_available = False
+        settings_obj.save()
+
+        response = self.client.get(reverse("app_cart:view_cart"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "В настоящий момент оформление новых заказов недоступно")
+
+    def test_cart_allows_checkout_when_orders_enabled(self):
+        SiteSettings.get_solo()
+
+        response = self.client.get(reverse("app_cart:view_cart"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "В настоящий момент оформление новых заказов недоступно")
