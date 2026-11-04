@@ -2,7 +2,8 @@ from django.contrib import admin
 from django.urls import path
 from django.urls import include
 from django.contrib.sitemaps.views import sitemap
-from django.views.generic import TemplateView
+from django.templatetags.static import static as static_url
+from django.views.generic import RedirectView, TemplateView
 from django.conf import settings
 from django.conf.urls.static import static
 from debug_toolbar.toolbar import debug_toolbar_urls
@@ -31,6 +32,12 @@ urlpatterns = [
     # SEO URLs
     path("sitemap.xml", sitemap, {"sitemaps": sitemaps}, name="django.contrib.sitemaps.views.sitemap"),
     path("robots.txt", TemplateView.as_view(template_name="robots.txt", content_type="text/plain")),
+    # Браузеры и поисковые роботы запрашивают favicon.ico из корня сайта.
+    path(
+        "favicon.ico",
+        RedirectView.as_view(url=static_url("favicon/favicon.ico"), permanent=True),
+        name="favicon",
+    ),
 ]
 
 if settings.DEBUG:
