@@ -12,14 +12,14 @@ from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from app_cart.models import CartItem
 from app_catalog.models import Product
-from app_home.models import CafeBranch, Vacancy, Marquee, InfoPage
+from app_home.models import CafeBranch, Vacancy, Announcement, InfoPage
 from app_home.forms import VacancyApplicationForm, FeedbackForm
 from app_cart.session_cart import SessionCart  # Import SessionCart
 
 
 def home_page(request):
     active_vacancies = Vacancy.objects.filter(is_active=True)
-    active_marquees = Marquee.objects.filter(is_active=True)
+    active_announcements = Announcement.objects.filter(is_active=True)
     featured_products = (
         Product.objects.filter(is_active=True, display_on_main=True)
         .annotate(min_price=Min("variants__price"))[:8]
@@ -40,7 +40,7 @@ def home_page(request):
     ]
     context = {
         "vacancies": active_vacancies,
-        "marquees": active_marquees,
+        "announcements": active_announcements,
         "featured_products": featured_products,
         "slides": slides,
     }

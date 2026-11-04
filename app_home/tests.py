@@ -9,7 +9,7 @@ from django.contrib.messages import get_messages
 
 from app_home.context_processors import canonical_context
 from app_home.forms import FeedbackForm, VacancyApplicationForm
-from app_home.models import CafeBranch, Feedback, Vacancy, VacancyApplication, InfoPage, SiteSettings
+from app_home.models import CafeBranch, Feedback, Vacancy, VacancyApplication, InfoPage, SiteSettings, Announcement
 from app_home.templatetags.static_version import static_v
 
 
@@ -675,3 +675,16 @@ class StaticVersionTests(TestCase):
             response.content.decode(),
             r'href="(?:/)?static/css/styles\.css\?v=\d+"',
         )
+
+
+class AnnouncementTests(TestCase):
+    """Блок объявлений на главной странице."""
+
+    def test_home_shows_only_active_announcements(self):
+        Announcement.objects.create(text="Активное объявление", is_active=True)
+        Announcement.objects.create(text="Скрытое объявление", is_active=False)
+
+        response = self.client.get(reverse("app_home:home"))
+
+        self.assertContains(response, "Активное объявление")
+        self.assertNotContains(response, "Скрытое объявление")

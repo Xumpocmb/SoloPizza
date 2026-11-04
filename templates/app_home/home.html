@@ -60,12 +60,12 @@
         </div>
     </section>
 
-    {% if marquees %}
+    {% if announcements %}
         <section class="hp-announcement" aria-label="{% trans 'Актуальные акции' %}">
-            {% for marquee in marquees %}
+            {% for announcement in announcements %}
                 <div class="hp-announcement__item">
                     <i class="fas fa-bullhorn" aria-hidden="true"></i>
-                    <span>{{ marquee.text }}</span>
+                    <span>{{ announcement.text }}</span>
                 </div>
             {% endfor %}
         </section>

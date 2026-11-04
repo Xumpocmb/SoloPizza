@@ -19,7 +19,7 @@ from app_catalog.models import (
     Product,
     ProductVariant,
 )
-from app_home.models import CafeBranch, CafeBranchPhone, Vacancy, VacancyApplication
+from app_home.models import Announcement, CafeBranch, CafeBranchPhone, Vacancy, VacancyApplication
 
 
 class CatalogApiTests(TestCase):
@@ -325,3 +325,34 @@ class ContactsApiTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["branches"], [])
+
+
+class AnnouncementApiTests(TestCase):
+    """Публичный эндпоинт объявлений отдаёт только активные записи."""
+
+    def setUp(self):
+        self.client = APIClient()
+        self.url = "/api/v1/announcements/"
+        self.active = Announcement.objects.create(text="Акция действует", is_active=True)
+        Announcement.objects.create(text="Акция закончилась", is_active=False)
+
+    def test_returns_only_active_announcements(self):
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), [{"id": self.active.pk, "text": "Акция действует"}])
+
+    def test_returns_empty_list_without_active_announcements(self):
+        Announcement.objects.update(is_active=False)
+
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), [])
+
+    def test_announcements_are_ordered_by_id(self):
+        second = Announcement.objects.create(text="Второе объявление", is_active=True)
+
+        response = self.client.get(self.url)
+
+        self.assertEqual([item["id"] for item in response.json()], [self.active.pk, second.pk])

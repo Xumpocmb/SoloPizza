@@ -11,7 +11,7 @@ from app_catalog.models import (
     PizzaSizes,
     Product,
 )
-from app_home.models import CafeBranch, CafeBranchPhone, Vacancy, VacancyApplication
+from app_home.models import CafeBranch, CafeBranchPhone, Vacancy, VacancyApplication, Announcement
 
 IMAGE_SCHEMA = {"type": "string", "format": "uri", "nullable": True}
 
@@ -216,6 +216,14 @@ class VacancyListItemSerializer(serializers.ModelSerializer):
 class VacancyDetailSerializer(VacancyListItemSerializer):
     class Meta(VacancyListItemSerializer.Meta):
         fields = VacancyListItemSerializer.Meta.fields + ["description"]
+
+
+class AnnouncementSerializer(serializers.ModelSerializer):
+    """Объявление: только id и текст (эндпоинт отдаёт лишь активные)."""
+
+    class Meta:
+        model = Announcement
+        fields = ["id", "text"]
 
 
 class VacancyApplicationSerializer(serializers.ModelSerializer):

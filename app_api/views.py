@@ -12,7 +12,7 @@ from rest_framework.views import APIView
 from app_api import serializers as api_serializers
 from app_api.filters import branch_or_none, catalog_products, visible_categories
 from app_home.context_processors import DEFAULT_BRANCH_ID
-from app_home.models import CafeBranch, Vacancy
+from app_home.models import Announcement, CafeBranch, Vacancy
 
 BRANCH_ID_PARAM = OpenApiParameter(
     "branch_id",
@@ -153,6 +153,13 @@ class ProductDetailView(CatalogViewMixin, RetrieveAPIView):
 
     def get_queryset(self):
         return catalog_products(self.get_branch_id())
+
+
+class AnnouncementListView(PublicViewMixin, ListAPIView):
+    """Активные объявления (бывшая «бегущая строка») для главной и приложения."""
+
+    serializer_class = api_serializers.AnnouncementSerializer
+    queryset = Announcement.objects.filter(is_active=True).order_by("id")
 
 
 class VacancyListView(PublicViewMixin, ListAPIView):

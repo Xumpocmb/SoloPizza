@@ -221,13 +221,13 @@ class SiteSettings(models.Model):
         return cls.get_solo().orders_available
 
 
-class Marquee(models.Model):
-    text = models.CharField(max_length=500, verbose_name="Текст бегущей строки")
-    is_active = models.BooleanField(default=True, verbose_name="Активна")
+class Announcement(models.Model):
+    text = models.CharField(max_length=500, verbose_name="Текст объявления")
+    is_active = models.BooleanField(default=True, verbose_name="Активно")
 
     class Meta:
-        verbose_name = "Бегущая строка"
-        verbose_name_plural = "Бегущие строки"
+        verbose_name = "Объявление"
+        verbose_name_plural = "Объявления"
 
     def __str__(self):
         return self.text

@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.utils.html import format_html
 from modeltranslation.admin import TabbedTranslationAdmin
 
-from app_home.models import CafeBranch, CafeBranchPhone, Vacancy, VacancyApplication, Feedback, Discount, WorkingHours, Partner, Marquee, Certificate, InfoPage, SiteSettings
+from app_home.models import CafeBranch, CafeBranchPhone, Vacancy, VacancyApplication, Feedback, Discount, WorkingHours, Partner, Announcement, Certificate, InfoPage, SiteSettings
 
 
 @admin.register(Discount)
@@ -89,8 +89,8 @@ class PartnerAdmin(TabbedTranslationAdmin):
     list_per_page = 20
 
 
-@admin.register(Marquee)
-class MarqueeAdmin(admin.ModelAdmin):
+@admin.register(Announcement)
+class AnnouncementAdmin(admin.ModelAdmin):
     list_display = ("text", "is_active")
     list_editable = ("is_active",)
     search_fields = ("text",)

@@ -11,6 +11,7 @@ urlpatterns = [
     path("meta/", views.MetaView.as_view(), name="meta"),
     path("branches/", views.BranchListView.as_view(), name="branches"),
     path("contacts/", views.ContactsView.as_view(), name="contacts"),
+    path("announcements/", views.AnnouncementListView.as_view(), name="announcements"),
     path("categories/", views.CategoryListView.as_view(), name="categories"),
     path("categories/<slug:slug>/", views.CategoryDetailView.as_view(), name="category-detail"),
     path("products/", views.ProductListView.as_view(), name="products"),
