@@ -270,3 +270,58 @@ class VacancyApiTests(TestCase):
             for _ in range(limit):
                 self.assertEqual(self.client.post(url, self.payload, format="json").status_code, 201)
             self.assertEqual(self.client.post(url, self.payload, format="json").status_code, 429)
+
+
+class ContactsApiTests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.url = "/api/v1/contacts/"
+        self.branch_a = CafeBranch.objects.create(name="Центральный", address="ул. Ленина, 1", is_active=True)
+        self.branch_b = CafeBranch.objects.create(name="Северный", address="ул. Советская, 2", is_active=True)
+        self.closed = CafeBranch.objects.create(name="Закрытый", address="ул. Мира, 3", is_active=False)
+
+        CafeBranchPhone.objects.create(branch=self.branch_a, phone="+375 (29) 123-45-67")
+        CafeBranchPhone.objects.create(branch=self.branch_b, phone="+375 (44) 765-43-21")
+        CafeBranchPhone.objects.create(branch=self.branch_b, phone="")
+        CafeBranchPhone.objects.create(branch=self.closed, phone="+375 (29) 000-00-00")
+
+    def test_returns_active_branches_with_phones_and_addresses(self):
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        self.assertEqual([branch["id"] for branch in payload["branches"]], [self.branch_a.pk, self.branch_b.pk])
+        self.assertEqual(payload["branches"][0]["name"], "Центральный")
+        self.assertEqual(payload["branches"][0]["address"], "ул. Ленина, 1")
+
+    def test_phone_has_display_number_and_dial_value(self):
+        response = self.client.get(self.url)
+
+        phones = response.json()["branches"][0]["phones"]
+        self.assertEqual(phones, [{"number": "+375 (29) 123-45-67", "dial": "+375291234567"}])
+
+    def test_empty_phones_are_skipped(self):
+        response = self.client.get(self.url)
+
+        phones = response.json()["branches"][1]["phones"]
+        self.assertEqual(len(phones), 1)
+        self.assertEqual(phones[0]["number"], "+375 (44) 765-43-21")
+
+    def test_returns_instagram_url_from_settings(self):
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.json()["instagram_url"], settings.INSTAGRAM_URL)
+
+    @override_settings(INSTAGRAM_URL="https://www.instagram.com/other_profile/")
+    def test_instagram_url_is_configurable(self):
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.json()["instagram_url"], "https://www.instagram.com/other_profile/")
+
+    def test_without_branches_returns_empty_list(self):
+        CafeBranch.objects.all().delete()
+
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["branches"], [])

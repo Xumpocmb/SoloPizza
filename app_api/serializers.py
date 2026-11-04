@@ -11,7 +11,7 @@ from app_catalog.models import (
     PizzaSizes,
     Product,
 )
-from app_home.models import CafeBranch, Vacancy, VacancyApplication
+from app_home.models import CafeBranch, CafeBranchPhone, Vacancy, VacancyApplication
 
 IMAGE_SCHEMA = {"type": "string", "format": "uri", "nullable": True}
 
@@ -51,6 +51,36 @@ class BranchSerializer(serializers.ModelSerializer):
     @extend_schema_field(list[str])
     def get_phones(self, obj):
         return [phone.dial for phone in obj.branch_phones.all()]
+
+
+class ContactPhoneSerializer(serializers.ModelSerializer):
+    """Телефон филиала: номер для показа и номер для ссылки tel:."""
+
+    number = serializers.CharField(source="phone")
+    dial = serializers.CharField(read_only=True)
+
+    class Meta:
+        model = CafeBranchPhone
+        fields = ["number", "dial"]
+
+
+class ContactBranchSerializer(serializers.ModelSerializer):
+    phones = serializers.SerializerMethodField()
+
+    class Meta:
+        model = CafeBranch
+        fields = ["id", "name", "address", "phones"]
+
+    @extend_schema_field(ContactPhoneSerializer(many=True))
+    def get_phones(self, obj):
+        # Пустые телефоны в админке возможны — в контакты они не попадают.
+        phones = [phone for phone in obj.branch_phones.all() if phone.phone]
+        return ContactPhoneSerializer(phones, many=True).data
+
+
+class ContactsSerializer(serializers.Serializer):
+    instagram_url = serializers.URLField()
+    branches = ContactBranchSerializer(many=True)
 
 
 class CategorySerializer(serializers.ModelSerializer):

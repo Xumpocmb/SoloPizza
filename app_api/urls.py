@@ -10,6 +10,7 @@ urlpatterns = [
     path("docs/", SpectacularSwaggerView.as_view(url_name="app_api:schema"), name="swagger-ui"),
     path("meta/", views.MetaView.as_view(), name="meta"),
     path("branches/", views.BranchListView.as_view(), name="branches"),
+    path("contacts/", views.ContactsView.as_view(), name="contacts"),
     path("categories/", views.CategoryListView.as_view(), name="categories"),
     path("categories/<slug:slug>/", views.CategoryDetailView.as_view(), name="category-detail"),
     path("products/", views.ProductListView.as_view(), name="products"),

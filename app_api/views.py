@@ -50,6 +50,23 @@ class BranchListView(PublicViewMixin, ListAPIView):
     queryset = CafeBranch.objects.filter(is_active=True).prefetch_related("branch_phones").order_by("id")
 
 
+@extend_schema(responses=api_serializers.ContactsSerializer)
+class ContactsView(PublicViewMixin, APIView):
+    """Контакты для мобильного приложения: филиалы, телефоны, адреса и Instagram."""
+
+    def get(self, request):
+        branches = (
+            CafeBranch.objects.filter(is_active=True)
+            .prefetch_related("branch_phones")
+            .order_by("id")
+        )
+        serializer = api_serializers.ContactsSerializer(
+            {"instagram_url": settings.INSTAGRAM_URL, "branches": branches},
+            context={"request": request},
+        )
+        return Response(serializer.data)
+
+
 class MetaView(PublicViewMixin, APIView):
     @extend_schema(responses=OpenApiTypes.OBJECT)
     def get(self, request):

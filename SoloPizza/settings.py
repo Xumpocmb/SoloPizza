@@ -21,6 +21,7 @@ SITEMAP_URLS = [
 SITE_ID = 1
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 CHAT_ID = os.getenv("CHAT_ID")
+INSTAGRAM_URL = os.getenv("INSTAGRAM_URL", "https://www.instagram.com/solo_pizza_bar/")
 
 
 INTERNAL_IPS = [
@@ -163,7 +164,7 @@ REST_FRAMEWORK = {
 
 SPECTACULAR_SETTINGS = {
     "TITLE": "SoloPizza mobile API",
-    "DESCRIPTION": "Публичный API каталога и вакансий для мобильного приложения",
+    "DESCRIPTION": "Публичный API каталога, вакансий и контактов для мобильного приложения",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
 }
