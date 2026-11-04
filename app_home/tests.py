@@ -1,10 +1,13 @@
+import tempfile
+
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, Client, RequestFactory, override_settings
 from django.urls import reverse
 from django.contrib.messages import get_messages
 
 from app_home.context_processors import canonical_context
 from app_home.forms import FeedbackForm, VacancyApplicationForm
-from app_home.models import CafeBranch, Feedback, Vacancy, VacancyApplication, InfoPage
+from app_home.models import CafeBranch, Feedback, Vacancy, VacancyApplication, InfoPage, SiteSettings
 
 
 class VacancyApplyViewTests(TestCase):
@@ -550,3 +553,44 @@ class InfoViewTests(TestCase):
         self.assertContains(response, "Шаг 3 из базы")
         self.assertContains(response, "Текст связи из базы")
         self.assertContains(response, "Дополнительный текст связи из базы")
+
+
+class SiteSettingsTests(TestCase):
+    """Тесты настроек сайта: логотип в шапке из админки."""
+
+    def setUp(self):
+        self.client = Client()
+        self.home_url = reverse("app_home:home")
+
+    def test_get_solo_returns_singleton(self):
+        first = SiteSettings.get_solo()
+        second = SiteSettings.get_solo()
+
+        self.assertEqual(first.pk, second.pk)
+        self.assertEqual(SiteSettings.objects.count(), 1)
+
+    def test_header_uses_default_logo_without_upload(self):
+        SiteSettings.objects.all().delete()
+
+        response = self.client.get(self.home_url)
+
+        self.assertContains(response, "static/img/sp.png")
+
+    def test_header_uses_uploaded_logo(self):
+        image = SimpleUploadedFile(
+            "logo.png",
+            b"\x89PNG\r\n\x1a\n" + b"0" * 64,
+            content_type="image/png",
+        )
+
+        with tempfile.TemporaryDirectory() as media_root, override_settings(MEDIA_ROOT=media_root):
+            settings_obj = SiteSettings.get_solo()
+            settings_obj.logo = image
+            settings_obj.logo_alt = "Логотип Solo Pizza"
+            settings_obj.save()
+
+            response = self.client.get(self.home_url)
+
+            self.assertContains(response, settings_obj.logo.url)
+            self.assertContains(response, 'alt="Логотип Solo Pizza"')
+            self.assertNotContains(response, "static/img/sp.png")

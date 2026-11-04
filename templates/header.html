@@ -17,7 +17,11 @@
             </button>
             <div class="site-logo">
                 <a href="{% url 'app_home:home' %}">
-                    <img src="{% static 'img/sp.png' %}" alt="site logo" class="img-site-logo">
+                    {% if site_settings.logo %}
+                        <img src="{{ site_settings.logo.url }}" alt="{{ site_settings.logo_alt }}" class="img-site-logo">
+                    {% else %}
+                        <img src="{% static 'img/sp.png' %}" alt="{{ site_settings.logo_alt|default:'Solo Pizza' }}" class="img-site-logo">
+                    {% endif %}
                 </a>
             </div>
             <a class="header-catalog-link" href="{% url 'app_catalog:catalog' %}">{% trans "Каталог" %}</a>

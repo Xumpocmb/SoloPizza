@@ -219,6 +219,33 @@ class SnowSettings(models.Model):
         return "Снег включен" if self.is_enabled else "Снег выключен"
 
 
+class SiteSettings(models.Model):
+    """Внешний вид сайта: логотип в шапке и его alt-текст."""
+
+    logo = models.ImageField(
+        "Логотип сайта",
+        upload_to="site/",
+        blank=True,
+        null=True,
+        help_text="Показывается в шапке сайта. Если не загружен — используется стандартный логотип.",
+    )
+    logo_alt = models.CharField("Alt-текст логотипа", max_length=100, default="Solo Pizza")
+    updated_at = models.DateTimeField("Дата изменения", auto_now=True)
+
+    class Meta:
+        verbose_name = "Настройки сайта"
+        verbose_name_plural = "Настройки сайта"
+
+    def __str__(self):
+        return "Настройки сайта"
+
+    @classmethod
+    def get_solo(cls):
+        """Единственная запись настроек сайта."""
+        obj, created = cls.objects.get_or_create(pk=1)
+        return obj
+
+
 class Marquee(models.Model):
     text = models.CharField(max_length=500, verbose_name="Текст бегущей строки")
     is_active = models.BooleanField(default=True, verbose_name="Активна")

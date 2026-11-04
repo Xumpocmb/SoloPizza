@@ -1,7 +1,8 @@
 from django.contrib import admin
+from django.utils.html import format_html
 from modeltranslation.admin import TabbedTranslationAdmin
 
-from app_home.models import CafeBranch, CafeBranchPhone, Vacancy, VacancyApplication, Feedback, Discount, OrderAvailability, WorkingHours, Partner, SnowSettings, Marquee, Certificate, InfoPage
+from app_home.models import CafeBranch, CafeBranchPhone, Vacancy, VacancyApplication, Feedback, Discount, OrderAvailability, WorkingHours, Partner, SnowSettings, Marquee, Certificate, InfoPage, SiteSettings
 
 
 @admin.register(SnowSettings)
@@ -135,6 +136,35 @@ class InfoPageAdmin(TabbedTranslationAdmin):
         if InfoPage.objects.exists():
             return False
         return True
+
+
+@admin.register(SiteSettings)
+class SiteSettingsAdmin(admin.ModelAdmin):
+    fieldsets = (
+        (None, {"fields": ("logo", "logo_alt")}),
+        ("Предпросмотр", {"fields": ("logo_preview", "updated_at"), "classes": ("collapse",)}),
+    )
+    readonly_fields = ("logo_preview", "updated_at")
+
+    @admin.display(description="Текущий логотип")
+    def logo_preview(self, obj):
+        if not obj or not obj.logo:
+            return "Логотип не загружен — используется стандартный"
+        return format_html(
+            '<img src="{}" alt="{}" style="max-height: 80px; width: auto;">',
+            obj.logo.url,
+            obj.logo_alt,
+        )
+
+    def has_add_permission(self, request):
+        # Настройки сайта хранятся в единственной записи.
+        if SiteSettings.objects.exists():
+            return False
+        return True
+
+    def has_delete_permission(self, request, obj=None):
+        # Удаление ломает singleton: запись пересоздастся с настройками по умолчанию.
+        return False
 
 
 @admin.register(Certificate)
