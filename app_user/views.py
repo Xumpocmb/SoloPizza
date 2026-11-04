@@ -49,7 +49,6 @@ def login_view(request):
 
                 # Do not clear guest_token cookie to allow user to access unauthenticated orders after logout
                 next_url = request.GET.get('next')
-                print(next_url)
                 if next_url:
                     response = redirect(next_url)
                 else:

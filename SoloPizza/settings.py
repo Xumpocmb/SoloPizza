@@ -115,7 +115,6 @@ DATABASES = {
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
     "allauth.account.auth_backends.AuthenticationBackend",
-    "app_user.backends.PhoneNumberAuthBackend",
 ]
 
 AUTH_PASSWORD_VALIDATORS = [
