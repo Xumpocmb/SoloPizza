@@ -1,6 +1,8 @@
 import tempfile
+from unittest import mock
 
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.templatetags.static import static
 from django.test import TestCase, Client, RequestFactory, override_settings
 from django.urls import reverse
 from django.contrib.messages import get_messages
@@ -8,6 +10,7 @@ from django.contrib.messages import get_messages
 from app_home.context_processors import canonical_context
 from app_home.forms import FeedbackForm, VacancyApplicationForm
 from app_home.models import CafeBranch, Feedback, Vacancy, VacancyApplication, InfoPage, SiteSettings
+from app_home.templatetags.static_version import static_v
 
 
 class VacancyApplyViewTests(TestCase):
@@ -622,3 +625,36 @@ class SiteSettingsTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, "В настоящий момент оформление новых заказов недоступно")
+
+
+class StaticVersionTests(TestCase):
+    """Тесты версионирования статики для сброса кеша браузера."""
+
+    def test_static_v_adds_version_from_mtime(self):
+        with tempfile.NamedTemporaryFile(suffix=".css") as tmp:
+            with mock.patch(
+                "app_home.templatetags.static_version.finders.find",
+                return_value=tmp.name,
+            ):
+                rendered = static_v("css/styles.css")
+
+        self.assertTrue(rendered.startswith(static("css/styles.css") + "?v="))
+        self.assertRegex(rendered, r"\?v=\d+$")
+
+    def test_static_v_falls_back_when_file_missing(self):
+        with mock.patch(
+            "app_home.templatetags.static_version.finders.find",
+            return_value=None,
+        ), override_settings(STATIC_ROOT=None):
+            rendered = static_v("css/styles.css")
+
+        self.assertEqual(rendered, static("css/styles.css"))
+
+    def test_base_template_uses_versioned_stylesheet(self):
+        response = self.client.get(reverse("app_home:home"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertRegex(
+            response.content.decode(),
+            r'href="(?:/)?static/css/styles\.css\?v=\d+"',
+        )

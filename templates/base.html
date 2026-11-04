@@ -1,5 +1,6 @@
 {% load static %}
 {% load i18n %}
+{% load static_version %}
 
 <!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE }}">
@@ -29,7 +30,7 @@
     <meta name="theme-color" content="#068a50">
     <title>{% block title %}{{ title|default:"Solo Pizza" }}{% endblock %}</title>
     {% block vendor_styles %}{% endblock %}
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="{% static_v 'css/styles.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     {% block styles %}
     {% endblock %}
