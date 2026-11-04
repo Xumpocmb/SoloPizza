@@ -1,5 +1,5 @@
 from app_cart.models import CartItem
-from app_home.models import CafeBranch, Discount, SiteSettings, SnowSettings
+from app_home.models import CafeBranch, Discount, SiteSettings
 from app_catalog.models import Category
 from django.conf import settings
 from app_cart.session_cart import SessionCart  # Import SessionCart
@@ -104,12 +104,9 @@ def cart_context(request):
 
 
 def site_settings_context_processor(request):
-    """Логотип и его alt-текст для шапки сайта."""
-    return {"site_settings": SiteSettings.get_solo()}
-
-
-def snow_context_processor(request):
-    snow_settings, created = SnowSettings.objects.get_or_create(pk=1)
+    """Настройки сайта: логотип, доступность заказов и снег."""
+    site_settings = SiteSettings.get_solo()
     return {
-        "SNOW_ENABLED": snow_settings.is_enabled,
+        "site_settings": site_settings,
+        "SNOW_ENABLED": site_settings.snow_enabled,
     }

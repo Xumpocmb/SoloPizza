@@ -2,18 +2,7 @@ from django.contrib import admin
 from django.utils.html import format_html
 from modeltranslation.admin import TabbedTranslationAdmin
 
-from app_home.models import CafeBranch, CafeBranchPhone, Vacancy, VacancyApplication, Feedback, Discount, WorkingHours, Partner, SnowSettings, Marquee, Certificate, InfoPage, SiteSettings
-
-
-@admin.register(SnowSettings)
-class SnowSettingsAdmin(admin.ModelAdmin):
-    list_display = ("is_enabled",)
-
-    def has_add_permission(self, request):
-        # Only allow one instance of SnowSettings
-        if SnowSettings.objects.exists():
-            return False
-        return True
+from app_home.models import CafeBranch, CafeBranchPhone, Vacancy, VacancyApplication, Feedback, Discount, WorkingHours, Partner, Marquee, Certificate, InfoPage, SiteSettings
 
 
 @admin.register(Discount)
@@ -125,6 +114,7 @@ class SiteSettingsAdmin(admin.ModelAdmin):
     fieldsets = (
         ("Логотип", {"fields": ("logo", "logo_alt")}),
         ("Оформление заказов", {"fields": ("orders_available",)}),
+        ("Снег", {"fields": ("snow_enabled",)}),
         ("Предпросмотр", {"fields": ("logo_preview", "updated_at"), "classes": ("collapse",)}),
     )
     readonly_fields = ("logo_preview", "updated_at")

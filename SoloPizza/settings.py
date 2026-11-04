@@ -87,7 +87,6 @@ TEMPLATES = [
                 "app_home.context_processors.site_settings_context_processor",
                 "app_home.context_processors.canonical_context",
                 "app_home.context_processors.cart_context",
-                "app_home.context_processors.snow_context_processor",
             ],
         },
     },

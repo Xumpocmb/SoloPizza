@@ -626,6 +626,23 @@ class SiteSettingsTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, "В настоящий момент оформление новых заказов недоступно")
 
+    def test_snow_disabled_by_default(self):
+        self.assertFalse(SiteSettings.get_solo().snow_enabled)
+
+    def test_snow_script_absent_when_disabled(self):
+        response = self.client.get(self.home_url)
+
+        self.assertNotContains(response, "js/snow.js")
+
+    def test_snow_script_included_when_enabled(self):
+        settings_obj = SiteSettings.get_solo()
+        settings_obj.snow_enabled = True
+        settings_obj.save()
+
+        response = self.client.get(self.home_url)
+
+        self.assertContains(response, "js/snow.js")
+
 
 class StaticVersionTests(TestCase):
     """Тесты версионирования статики для сброса кеша браузера."""

@@ -179,19 +179,8 @@ class Partner(models.Model):
         return self.name
 
 
-class SnowSettings(models.Model):
-    is_enabled = models.BooleanField(default=False, verbose_name="Включить снег на сайте")
-
-    class Meta:
-        verbose_name = "Настройка снега"
-        verbose_name_plural = "Настройки снега"
-
-    def __str__(self):
-        return "Снег включен" if self.is_enabled else "Снег выключен"
-
-
 class SiteSettings(models.Model):
-    """Настройки сайта: логотип в шапке и доступность оформления заказов."""
+    """Настройки сайта: логотип, доступность заказов и снег."""
 
     logo = models.ImageField(
         "Логотип сайта",
@@ -205,6 +194,11 @@ class SiteSettings(models.Model):
         "Доступность оформления заказов",
         default=True,
         help_text="Если отключено, пользователи не смогут оформлять новые заказы.",
+    )
+    snow_enabled = models.BooleanField(
+        "Включить снег на сайте",
+        default=False,
+        help_text="Показывает падающий снег на страницах сайта.",
     )
     updated_at = models.DateTimeField("Дата изменения", auto_now=True)
 
