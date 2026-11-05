@@ -8895,3 +8895,9 @@ body.params-modal-active {
     font-weight: 600;
     cursor: pointer;
 }
+
+.cookie-consent__link {
+    color: var(--accent-color, #079b59);
+    font-weight: 600;
+    text-decoration: underline;
+}

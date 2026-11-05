@@ -59,6 +59,7 @@
     <div class="cookie-consent__content">
         <p class="cookie-consent__text">
             {% trans "Мы используем cookie-файлы и аналогичные технологии для работы сайта (корзина, сессия, выбор филиала) и аналитики. Подробнее в нашей Политике обработки персональных данных." %}
+            <a href="{% url 'app_home:privacy' %}" class="cookie-consent__link">{% trans "Политика обработки персональных данных" %}</a>
         </p>
         <button type="button" class="cookie-consent__accept" id="cookie-consent-accept">{% trans "Принять" %}</button>
     </div>
