@@ -57,6 +57,15 @@ def company_context(request):
     return {"company": get_company(request)}
 
 
+COOKIE_CONSENT_KEY = "sp_cookie_consent"
+
+
+def cookie_consent_context(request):
+    """Cookie-баннер: согласие запоминается в cookie ``sp_cookie_consent``."""
+    accepted = request.COOKIES.get(COOKIE_CONSENT_KEY) == "1"
+    return {"show_cookie_consent": not accepted}
+
+
 def site_context_processor(request):
     # Телефоны и график нужны шапке, подвалу, главной и микроразметке, поэтому
     # забираем их одним запросом и делимся одними и теми же объектами: иначе

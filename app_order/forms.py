@@ -65,7 +65,13 @@ class CheckoutForm(DeliveryValidationMixin, forms.ModelForm):
 
     comment = forms.CharField(label="Комментарий к заказу", required=False, widget=forms.Textarea(
         attrs={"class": "form-textarea", "placeholder": "Ваши пожелания...", "rows": 3}))
-        
+
+    consent = forms.BooleanField(
+        label="Согласие на обработку персональных данных",
+        required=True,
+        widget=forms.CheckboxInput(attrs={"class": "consent-checkbox"}),
+    )
+
     ready_by = forms.DateTimeField(label="Готов к", required=False, 
                                  widget=forms.DateTimeInput(attrs={"class": "form-input", "type": "datetime-local", "format": "%Y-%m-%dT%H:%M"}))
     
@@ -83,6 +89,15 @@ class CheckoutForm(DeliveryValidationMixin, forms.ModelForm):
         self.fields["phone_number"].widget = self.fields["phone"].widget
         del self.fields["name"]
         del self.fields["phone"]
+
+    def clean(self):
+        cleaned_data = super().clean()
+        validate_delivery_requirements(self)
+
+        if not cleaned_data.get("consent"):
+            self.add_error("consent", "Необходимо дать согласие на обработку персональных данных")
+
+        return cleaned_data
 
     def save(self, commit=True, user=None, session_key=None):
         order = super().save(commit=False)

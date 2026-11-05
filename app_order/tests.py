@@ -324,13 +324,19 @@ class OrderFormValidationTests(TestCase):
         self.assertTrue(form.is_valid(), form.errors)
 
     def test_checkout_form_uses_the_same_rules(self):
-        form = CheckoutForm({"customer_name": "Иван", "phone_number": "", "delivery_type": "cafe", "payment_method": "cash"})
+        form = CheckoutForm({"customer_name": "Иван", "phone_number": "", "delivery_type": "cafe", "payment_method": "cash", "consent": "on"})
         self.assertTrue(form.is_valid(), form.errors)
 
-        form = CheckoutForm({"customer_name": "Иван", "phone_number": "", "delivery_type": "delivery", "payment_method": "cash"})
+        form = CheckoutForm({"customer_name": "Иван", "phone_number": "", "delivery_type": "delivery", "payment_method": "cash", "consent": "on"})
         self.assertFalse(form.is_valid())
         self.assertIn("address", form.errors)
         self.assertIn("phone_number", form.errors)
+
+    def test_checkout_requires_personal_data_consent(self):
+        """Согласие на обработку персональных данных обязательно для оформления заказа."""
+        form = CheckoutForm({"customer_name": "Иван", "phone_number": "", "delivery_type": "cafe", "payment_method": "cash"})
+        self.assertFalse(form.is_valid())
+        self.assertIn("consent", form.errors)
 
 
 

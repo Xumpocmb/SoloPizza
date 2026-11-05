@@ -11,7 +11,7 @@ from django.urls import reverse
 from django.contrib.messages import get_messages
 from django.utils import timezone
 
-from app_home.context_processors import canonical_context
+from app_home.context_processors import canonical_context, cookie_consent_context
 from app_home.forms import FeedbackForm, VacancyApplicationForm
 from app_home.models import CafeBranch, Feedback, Vacancy, VacancyApplication, InfoPage, SiteSettings, Announcement, WorkingHours
 from app_home.templatetags.static_version import static_v
@@ -51,7 +51,8 @@ class VacancyApplyViewTests(TestCase):
             'age': 25,
             'phone': '375291234567',
             'experience_years': 3,
-            'work_experience': 'Опыт работы тестового кандидата'
+            'work_experience': 'Опыт работы тестового кандидата',
+            'consent': 'on',
         }
         response = self.client.post(self.url, form_data, follow=True)
         self.assertEqual(response.status_code, 200)
@@ -138,7 +139,8 @@ class FeedbackFormTests(TestCase):
         form_data = {
             'name': 'Тестовый Пользователь',
             'phone': '375291234567',
-            'message': 'Тестовое сообщение'
+            'message': 'Тестовое сообщение',
+            'consent': 'on',
         }
         form = FeedbackForm(data=form_data)
         self.assertTrue(form.is_valid())
@@ -148,7 +150,8 @@ class FeedbackFormTests(TestCase):
         form_data = {
             'name': 'Тестовый Пользователь',
             'phone': '+375291234567',
-            'message': 'Тестовое сообщение'
+            'message': 'Тестовое сообщение',
+            'consent': 'on',
         }
         form = FeedbackForm(data=form_data)
         self.assertTrue(form.is_valid())
@@ -160,7 +163,8 @@ class FeedbackFormTests(TestCase):
         form_data = {
             'name': 'Тестовый Пользователь',
             'phone': '375 29 123 45 67',
-            'message': 'Тестовое сообщение'
+            'message': 'Тестовое сообщение',
+            'consent': 'on',
         }
         form = FeedbackForm(data=form_data)
         self.assertTrue(form.is_valid())
@@ -172,7 +176,8 @@ class FeedbackFormTests(TestCase):
         form_data = {
             'name': 'Тестовый Пользователь',
             'phone': '375-29-123-45-67',
-            'message': 'Тестовое сообщение'
+            'message': 'Тестовое сообщение',
+            'consent': 'on',
         }
         form = FeedbackForm(data=form_data)
         self.assertTrue(form.is_valid())
@@ -184,7 +189,8 @@ class FeedbackFormTests(TestCase):
         form_data = {
             'name': 'Тестовый Пользователь',
             'phone': '+375(29)1234567',
-            'message': 'Тестовое сообщение'
+            'message': 'Тестовое сообщение',
+            'consent': 'on',
         }
         form = FeedbackForm(data=form_data)
         self.assertTrue(form.is_valid())
@@ -207,7 +213,8 @@ class FeedbackFormTests(TestCase):
         form_data = {
             'name': 'Тестовый Пользователь',
             'phone': '375abc123456789',
-            'message': 'Тестовое сообщение'
+            'message': 'Тестовое сообщение',
+            'consent': 'on',
         }
         form = FeedbackForm(data=form_data)
         # Форма должна быть валидной, так как буквы будут удалены, а оставшиеся цифры >= 12
@@ -232,7 +239,8 @@ class FeedbackFormTests(TestCase):
         form_data = {
             'name': 'Тестовый Пользователь',
             'phone': '375@#$123456789',
-            'message': 'Тестовое сообщение'
+            'message': 'Тестовое сообщение',
+            'consent': 'on',
         }
         form = FeedbackForm(data=form_data)
         # Выводим ошибки формы для отладки
@@ -264,7 +272,8 @@ class VacancyApplicationFormTests(TestCase):
             'age': 25,
             'phone': '375291234567',
             'experience_years': 3,
-            'work_experience': 'Опыт работы тестового кандидата'
+            'work_experience': 'Опыт работы тестового кандидата',
+            'consent': 'on',
         }
         form = VacancyApplicationForm(data=form_data)
         self.assertTrue(form.is_valid())
@@ -276,7 +285,8 @@ class VacancyApplicationFormTests(TestCase):
             'age': 25,
             'phone': '+375291234567',
             'experience_years': 3,
-            'work_experience': 'Опыт работы тестового кандидата'
+            'work_experience': 'Опыт работы тестового кандидата',
+            'consent': 'on',
         }
         form = VacancyApplicationForm(data=form_data)
         self.assertTrue(form.is_valid())
@@ -290,7 +300,8 @@ class VacancyApplicationFormTests(TestCase):
             'age': 25,
             'phone': '375 29 123 45 67',
             'experience_years': 3,
-            'work_experience': 'Опыт работы тестового кандидата'
+            'work_experience': 'Опыт работы тестового кандидата',
+            'consent': 'on',
         }
         form = VacancyApplicationForm(data=form_data)
         self.assertTrue(form.is_valid())
@@ -304,7 +315,8 @@ class VacancyApplicationFormTests(TestCase):
             'age': 25,
             'phone': '375-29-123-45-67',
             'experience_years': 3,
-            'work_experience': 'Опыт работы тестового кандидата'
+            'work_experience': 'Опыт работы тестового кандидата',
+            'consent': 'on',
         }
         form = VacancyApplicationForm(data=form_data)
         self.assertTrue(form.is_valid())
@@ -318,7 +330,8 @@ class VacancyApplicationFormTests(TestCase):
             'age': 25,
             'phone': '+375(29)1234567',
             'experience_years': 3,
-            'work_experience': 'Опыт работы тестового кандидата'
+            'work_experience': 'Опыт работы тестового кандидата',
+            'consent': 'on',
         }
         form = VacancyApplicationForm(data=form_data)
         self.assertTrue(form.is_valid())
@@ -345,7 +358,8 @@ class VacancyApplicationFormTests(TestCase):
             'age': 25,
             'phone': '375abc123456789',
             'experience_years': 3,
-            'work_experience': 'Опыт работы тестового кандидата'
+            'work_experience': 'Опыт работы тестового кандидата',
+            'consent': 'on',
         }
         form = VacancyApplicationForm(data=form_data)
         # Форма должна быть валидной, так как буквы будут удалены, а оставшиеся цифры >= 12
@@ -375,7 +389,8 @@ class VacancyApplicationFormTests(TestCase):
             'age': 25,
             'phone': '375@#$123456789',
             'experience_years': 3,
-            'work_experience': 'Опыт работы тестового кандидата'
+            'work_experience': 'Опыт работы тестового кандидата',
+            'consent': 'on',
         }
         form = VacancyApplicationForm(data=form_data)
         # Выводим ошибки формы для отладки
@@ -407,7 +422,8 @@ class FeedbackViewTests(TestCase):
         form_data = {
             'name': 'Тестовый Пользователь',
             'phone': '375291234567',
-            'message': 'Тестовое сообщение'
+            'message': 'Тестовое сообщение',
+            'consent': 'on',
         }
         response = self.client.post(self.url, form_data, follow=True)
         self.assertEqual(response.status_code, 200)
@@ -488,6 +504,36 @@ class OfferViewTests(TestCase):
         self.assertTemplateUsed(response, 'app_home/offer.html')
         self.assertEqual(response.context['title'], 'Публичная оферта')
         self.assertContains(response, '1. Предмет оферты')
+
+
+class PrivacyViewTests(TestCase):
+    """Тесты для публичной политики обработки персональных данных"""
+
+    def setUp(self):
+        self.client = Client()
+        self.url = reverse('app_home:privacy')
+
+    def test_privacy_view_get(self):
+        """Тест GET-запроса к странице политики обработки персональных данных"""
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'app_home/privacy.html')
+        self.assertEqual(response.context['title'], 'Политика обработки персональных данных')
+        self.assertContains(response, '1. Общие положения')
+
+
+class CookieConsentContextTests(TestCase):
+    """Cookie-баннер: показывается без согласия, скрывается после принятия."""
+
+    def test_cookie_consent_shown_by_default(self):
+        request = RequestFactory().get("/")
+        request.COOKIES = {}
+        self.assertTrue(cookie_consent_context(request)["show_cookie_consent"])
+
+    def test_cookie_consent_hidden_after_accept(self):
+        request = RequestFactory().get("/")
+        request.COOKIES = {"sp_cookie_consent": "1"}
+        self.assertFalse(cookie_consent_context(request)["show_cookie_consent"])
 
 
 class SeoCanonicalTests(TestCase):

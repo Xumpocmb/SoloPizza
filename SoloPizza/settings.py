@@ -88,6 +88,7 @@ TEMPLATES = [
                 "app_home.context_processors.canonical_context",
                 "app_home.context_processors.cart_context",
                 "app_home.context_processors.company_context",
+                "app_home.context_processors.cookie_consent_context",
             ],
         },
     },

@@ -6,6 +6,11 @@ from .models import VacancyApplication, Feedback
 class FeedbackForm(forms.ModelForm):
     """Форма для вопросов и предложений"""
     
+    consent = forms.BooleanField(
+        required=True,
+        label=_("Согласие на обработку персональных данных"),
+    )
+
     class Meta:
         model = Feedback
         fields = ['name', 'phone', 'message']
@@ -19,7 +24,14 @@ class FeedbackForm(forms.ModelForm):
             'phone': forms.TextInput(attrs={'class': 'form-control', 'placeholder': _('375XXXXXXXXXXXX (минимум 12 цифр)')}),
             'message': forms.Textarea(attrs={'class': 'form-control', 'placeholder': _('Введите ваш вопрос или предложение'), 'rows': 5}),
         }
-        
+
+    def clean_consent(self):
+        """Согласие на обработку персональных данных обязательно для отправки формы."""
+        consent = self.cleaned_data.get('consent')
+        if not consent:
+            raise forms.ValidationError(_('Необходимо дать согласие на обработку персональных данных'))
+        return consent
+
     def clean_phone(self):
         """Валидация номера телефона"""
         phone = self.cleaned_data.get('phone')
@@ -37,6 +49,11 @@ class FeedbackForm(forms.ModelForm):
 class VacancyApplicationForm(forms.ModelForm):
     """Форма для отклика на вакансию"""
     
+    consent = forms.BooleanField(
+        required=True,
+        label=_("Согласие на обработку персональных данных"),
+    )
+
     class Meta:
         model = VacancyApplication
         fields = ['name', 'age', 'phone', 'experience_years', 'work_experience']

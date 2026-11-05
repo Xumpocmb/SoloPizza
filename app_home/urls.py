@@ -16,6 +16,7 @@ from app_home.views import (
     certificate_use,
     certificate_search,
     offer_page,
+    privacy_page,
 )
 
 app_name = "app_home"
@@ -27,6 +28,7 @@ urlpatterns = [
     path("info/", info_view, name="info"),
     path("contacts/", contacts_view, name="contacts"),
     path("offer/", offer_page, name="offer"),
+    path("privacy/", privacy_page, name="privacy"),
     path("feedback/", feedback_view, name="feedback"),  # URL остается тем же, но функциональность переименована в "Вопросы и предложения"
     path("vacancies/", vacancy_list, name="vacancy_list"),
     path("vacancies/<int:vacancy_id>/", vacancy_detail, name="vacancy_detail"),

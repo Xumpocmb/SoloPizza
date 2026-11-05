@@ -13,6 +13,8 @@ class StaticViewSitemap(Sitemap):
             "app_home:home",
             "app_home:info",
             "app_home:contacts",
+            "app_home:offer",
+            "app_home:privacy",
             "app_home:vacancy_list",
         ]
 

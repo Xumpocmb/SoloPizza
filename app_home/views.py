@@ -333,6 +333,20 @@ def certificate_search(request):
     return JsonResponse({'success': False})
 
 
+def privacy_page(request):
+    """Публичная политика обработки персональных данных Solo Pizza."""
+    breadcrumbs = [
+        {"title": _("Главная"), "url": "/"},
+        {"title": _("Политика обработки персональных данных"), "url": reverse("app_home:privacy")},
+    ]
+
+    return render(
+        request,
+        "app_home/privacy.html",
+        {"title": _("Политика обработки персональных данных"), "breadcrumbs": breadcrumbs},
+    )
+
+
 def offer_page(request):
     """Публичная оферта Solo Pizza.
 

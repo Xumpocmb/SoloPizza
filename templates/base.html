@@ -54,6 +54,17 @@
 {% include 'header.html' %}
 {% include 'notifications.html' %}
 
+{% if show_cookie_consent %}
+<div class="cookie-consent" id="cookie-consent" role="dialog" aria-live="polite" aria-label="Передача данных через cookie">
+    <div class="cookie-consent__content">
+        <p class="cookie-consent__text">
+            {% trans "Мы используем cookie-файлы и аналогичные технологии для работы сайта (корзина, сессия, выбор филиала) и аналитики. Подробнее в нашей Политике обработки персональных данных." %}
+        </p>
+        <button type="button" class="cookie-consent__accept" id="cookie-consent-accept">{% trans "Принять" %}</button>
+    </div>
+</div>
+{% endif %}
+
 {% block main %}
 
 {% endblock %}
