@@ -73,7 +73,16 @@ class WorkingHoursAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (None, {"fields": ("branch", "day_of_week")}),
-        ("Время работы", {"fields": ("opening_time", "closing_time", "is_closed"), "classes": ("collapse",) if False else ()}),
+        (
+            "Время работы",
+            {
+                "fields": ("opening_time", "closing_time", "is_closed"),
+                "description": (
+                    "Заказы от пользователей принимаются только в рабочее время и прекращаются "
+                    "за 30 минут до закрытия. Сотрудники и суперпользователи не ограничены графиком."
+                ),
+            },
+        ),
     )
 
     def get_day_of_week_display(self, obj):

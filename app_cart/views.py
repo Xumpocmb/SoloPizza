@@ -13,8 +13,9 @@ from django.views.decorators.http import require_POST
 
 from app_cart.forms import AddToCartForm
 from app_catalog.models import Product, ProductVariant, BoardParams, AddonParams, PizzaSauce
-from app_home.context_processors import get_selected_branch_id
+from app_home.context_processors import get_active_branches, get_selected_branch_id
 from app_home.models import SiteSettings
+from app_home.working_hours import is_order_time_allowed, order_time_restriction_message
 from .models import CartItem
 
 
@@ -87,7 +88,8 @@ def add_to_cart(request, slug):
 
 def view_cart(request):
     # Проверяем, доступно ли оформление заказов
-    if not SiteSettings.is_orders_available():
+    orders_available = SiteSettings.is_orders_available()
+    if not orders_available:
         messages.warning(request, "В настоящий момент оформление новых заказов недоступно. Приносим свои извинения за доставленные неудобства.")
 
     enriched_items = []
@@ -114,6 +116,14 @@ def view_cart(request):
             }
         )
         subtotal += Decimal(item["total_price"])
+
+    if enriched_items and orders_available:
+        selected_branch = next(
+            (branch for branch in get_active_branches(request) if branch.id == get_selected_branch_id(request)),
+            None,
+        )
+        if not is_order_time_allowed(selected_branch, request.user):
+            messages.warning(request, order_time_restriction_message(selected_branch))
 
     context = {
         "items": enriched_items,

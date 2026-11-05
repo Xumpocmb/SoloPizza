@@ -9,13 +9,14 @@ from django.urls import reverse
 from django.views.decorators.http import require_POST
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from datetime import time, datetime
+from datetime import datetime
 from functools import wraps
 from app_cart.models import CartItem
 from app_cart.session_cart import SessionCart
 from app_cart.utils import validate_cart_items_for_branch
 from app_home.context_processors import get_active_branches, get_selected_branch_id
-from app_home.models import CafeBranch, WorkingHours
+from app_home.models import CafeBranch
+from app_home.working_hours import is_order_time_allowed, order_time_restriction_message
 from app_order.forms import CheckoutForm, OrderEditForm
 from app_order import statistics
 from app_order.models import OrderItem, Order, suspended_order_totals
@@ -32,39 +33,6 @@ DEFAULT_BRANCH_ID = 1
 def get_recipient_emails():
     """Возвращает список email-адресов получателей из настроек."""
     return [email.strip() for email in settings.EMAIL_RECIPIENTS_LIST if email.strip()]
-
-
-def is_order_time_allowed(branch, user=None):
-    """
-    Проверяет, разрешено ли оформлять заказы в текущее время.
-    Администраторы и сотрудники могут делать заказы в любое время.
-    Обычные пользователи могут делать заказы в соответствии с графиком работы филиала.
-    """
-    # Администраторы и сотрудники могут делать заказы в любое время
-    if user is not None and (user.is_superuser or user.is_staff):
-        return True
-
-    # Получаем текущее время в часовом поясе проекта
-    current_time = timezone.localtime()
-    current_day_of_week = current_time.isoweekday()  # 1 - понедельник, 7 - воскресенье
-    current_time_only = current_time.time()
-
-    # Получаем ID филиала, для которого проверяем график работы
-    selected_branch_id = branch.id if branch else DEFAULT_BRANCH_ID
-
-    # Получаем график работы для выбранного филиала в текущий день недели
-    try:
-        working_hours = WorkingHours.objects.get(branch_id=selected_branch_id, day_of_week=current_day_of_week)
-    except WorkingHours.DoesNotExist:
-        # Если для текущего дня не установлен график, считаем, что филиал закрыт
-        return False
-
-    # Если филиал закрыт в этот день, заказы не принимаются
-    if working_hours.is_closed:
-        return False
-
-    # Проверяем, находится ли текущее время в рабочем интервале филиала
-    return working_hours.opening_time <= current_time_only <= working_hours.closing_time
 
 
 def checkout(request):
@@ -91,20 +59,7 @@ def checkout(request):
 
     # Проверяем, разрешено ли оформлять заказ в текущее время
     if not is_order_time_allowed(selected_branch, request.user):
-        # Получаем график работы для выбранного филиала в текущий день недели
-        from datetime import datetime
-
-        current_day_of_week = datetime.now().isoweekday()
-        try:
-            working_hours = WorkingHours.objects.get(branch=selected_branch, day_of_week=current_day_of_week)
-            if working_hours.is_closed:
-                time_info = "закрыто"
-            else:
-                time_info = f"с {working_hours.opening_time.strftime('%H:%M')} до {working_hours.closing_time.strftime('%H:%M')}"
-        except WorkingHours.DoesNotExist:
-            time_info = "график работы не установлен"
-
-        messages.error(request, f"Заказы принимаются в соответствии с графиком работы филиала: {time_info}.")
+        messages.error(request, order_time_restriction_message(selected_branch))
         return redirect("app_cart:view_cart")
 
     if request.method == "POST":

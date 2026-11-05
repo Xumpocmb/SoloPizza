@@ -1,9 +1,19 @@
 from django import template
+
 from app_home.models import SiteSettings
+from app_home.working_hours import is_order_time_allowed
 
 register = template.Library()
 
-@register.simple_tag
-def are_orders_available():
-    """Проверить, доступно ли оформление заказов"""
-    return SiteSettings.is_orders_available()
+
+@register.simple_tag(takes_context=True)
+def are_orders_available(context):
+    """Доступно ли оформление заказов с учётом настроек сайта и графика филиала."""
+    if not SiteSettings.is_orders_available():
+        return False
+
+    request = context.get("request")
+    user = getattr(request, "user", None)
+    branch = context.get("selected_branch")
+
+    return is_order_time_allowed(branch, user)

@@ -1,16 +1,16 @@
 import json
 import re
-from datetime import timedelta
+from datetime import date, datetime, time, timedelta
 from decimal import Decimal
 from unittest.mock import patch
 
 from django.contrib.auth.models import User
 from django.db import IntegrityError, transaction
-from django.test import TestCase, SimpleTestCase
+from django.test import Client, TestCase, SimpleTestCase
 from django.urls import reverse
 from django.utils import timezone
 
-from app_home.models import CafeBranch
+from app_home.models import CafeBranch, WorkingHours
 from app_catalog.models import Category, PizzaSizes, Product, ProductVariant
 from app_order import statistics
 from app_order.models import DailyOrderNumber, Order, OrderItem
@@ -331,3 +331,79 @@ class OrderFormValidationTests(TestCase):
         self.assertIn("address", form.errors)
         self.assertIn("phone_number", form.errors)
 
+
+
+class CheckoutWorkingHoursTests(TestCase):
+    """Оформление заказа учитывает график филиала и отсечку за 30 минут."""
+
+    THURSDAY = date(2026, 11, 5)
+
+    def setUp(self):
+        self.client = Client()
+        self.branch = CafeBranch.objects.create(name="Центральный", address="ул. Ленина, 1", check_digit=7)
+        self.category = Category.objects.create(name="Пицца", slug="pizza")
+        self.category.branch.add(self.branch)
+        self.size = PizzaSizes.objects.create(name="32")
+        self.product = Product.objects.create(name="Пепперони", slug="pepperoni", category=self.category)
+        self.variant = ProductVariant.objects.create(product=self.product, size=self.size, price=Decimal("25.00"))
+        self.working_hours = WorkingHours.objects.create(
+            branch=self.branch,
+            day_of_week=self.THURSDAY.isoweekday(),
+            opening_time=time(11),
+            closing_time=time(23),
+        )
+
+        session = self.client.session
+        session["selected_branch_id"] = str(self.branch.id)
+        session["cart"] = {
+            f"{self.product.id}-{self.variant.id}": {
+                "product_id": self.product.id,
+                "variant_id": self.variant.id,
+                "quantity": 1,
+                "board1_id": None,
+                "board2_id": None,
+                "sauce_id": None,
+                "addons_ids": [],
+                "drink": None,
+            }
+        }
+        session.save()
+
+    def at(self, hour, minute=0):
+        return timezone.make_aware(datetime.combine(self.THURSDAY, time(hour, minute)))
+
+    def get_checkout(self, hour, minute=0):
+        with patch("app_home.working_hours._now", return_value=self.at(hour, minute)):
+            return self.client.get(reverse("app_order:checkout"), follow=True)
+
+    def test_user_can_checkout_before_cutoff(self):
+        response = self.get_checkout(22, 29)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "app_order/checkout.html")
+
+    def test_user_cannot_checkout_thirty_minutes_before_closing(self):
+        response = self.get_checkout(22, 30)
+
+        self.assertRedirects(response, reverse("app_cart:view_cart"))
+        self.assertContains(response, "Приём заказов прекращается за 30 минут")
+
+    def test_staff_can_checkout_outside_working_hours(self):
+        staff = User.objects.create_user(username="staff", password="Sup3r-secret", is_staff=True)
+        self.client.force_login(staff)
+
+        response = self.get_checkout(23, 30)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "app_order/checkout.html")
+
+    def test_superuser_can_checkout_when_branch_is_closed(self):
+        self.working_hours.is_closed = True
+        self.working_hours.save()
+        admin = User.objects.create_superuser(username="admin", password="Sup3r-secret")
+        self.client.force_login(admin)
+
+        response = self.get_checkout(12, 0)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "app_order/checkout.html")

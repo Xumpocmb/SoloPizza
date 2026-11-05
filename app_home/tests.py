@@ -1,16 +1,25 @@
 import tempfile
+from datetime import date, datetime, time
 from unittest import mock
 
+from django.contrib.auth.models import AnonymousUser, User
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.template import Context, Template
 from django.templatetags.static import static
 from django.test import TestCase, Client, RequestFactory, override_settings
 from django.urls import reverse
 from django.contrib.messages import get_messages
+from django.utils import timezone
 
 from app_home.context_processors import canonical_context
 from app_home.forms import FeedbackForm, VacancyApplicationForm
-from app_home.models import CafeBranch, Feedback, Vacancy, VacancyApplication, InfoPage, SiteSettings, Announcement
+from app_home.models import CafeBranch, Feedback, Vacancy, VacancyApplication, InfoPage, SiteSettings, Announcement, WorkingHours
 from app_home.templatetags.static_version import static_v
+from app_home.working_hours import (
+    get_current_shift,
+    is_order_time_allowed,
+    order_time_restriction_message,
+)
 
 
 class VacancyApplyViewTests(TestCase):
@@ -688,3 +697,127 @@ class AnnouncementTests(TestCase):
 
         self.assertContains(response, "Активное объявление")
         self.assertNotContains(response, "Скрытое объявление")
+
+
+class WorkingHoursTests(TestCase):
+    """Приём заказов по графику филиала с отсечкой за 30 минут до закрытия."""
+
+    THURSDAY = date(2026, 11, 5)
+    FRIDAY = date(2026, 11, 6)
+
+    def setUp(self):
+        self.branch = CafeBranch.objects.create(name="Центральный", address="ул. Ленина, 1")
+        self.other_branch = CafeBranch.objects.create(name="Северный", address="ул. Мира, 2")
+
+    def add_schedule(self, branch, opening, closing, day_of_week=4, is_closed=False):
+        return WorkingHours.objects.create(
+            branch=branch,
+            day_of_week=day_of_week,
+            opening_time=opening,
+            closing_time=closing,
+            is_closed=is_closed,
+        )
+
+    def at(self, day, hour, minute=0):
+        return timezone.make_aware(datetime.combine(day, time(hour, minute)))
+
+    def test_orders_stop_thirty_minutes_before_closing(self):
+        self.add_schedule(self.branch, time(11), time(23))
+
+        self.assertTrue(is_order_time_allowed(self.branch, at=self.at(self.THURSDAY, 22, 29)))
+        self.assertFalse(is_order_time_allowed(self.branch, at=self.at(self.THURSDAY, 22, 30)))
+        self.assertFalse(is_order_time_allowed(self.branch, at=self.at(self.THURSDAY, 23, 0)))
+
+    def test_orders_start_at_opening_time(self):
+        self.add_schedule(self.branch, time(11), time(23))
+
+        self.assertFalse(is_order_time_allowed(self.branch, at=self.at(self.THURSDAY, 10, 59)))
+        self.assertTrue(is_order_time_allowed(self.branch, at=self.at(self.THURSDAY, 11, 0)))
+
+    def test_closed_day_blocks_orders(self):
+        self.add_schedule(self.branch, time(11), time(23), is_closed=True)
+
+        self.assertFalse(is_order_time_allowed(self.branch, at=self.at(self.THURSDAY, 12, 0)))
+
+    def test_day_without_schedule_blocks_orders(self):
+        self.assertFalse(is_order_time_allowed(self.branch, at=self.at(self.THURSDAY, 12, 0)))
+
+    def test_staff_and_superuser_can_order_at_any_time(self):
+        self.add_schedule(self.branch, time(11), time(23), is_closed=True)
+        late = self.at(self.THURSDAY, 23, 30)
+        staff = User.objects.create_user(username="staff", password="Sup3r-secret", is_staff=True)
+        superuser = User.objects.create_superuser(username="admin", password="Sup3r-secret")
+
+        self.assertTrue(is_order_time_allowed(self.branch, staff, at=late))
+        self.assertTrue(is_order_time_allowed(self.branch, superuser, at=late))
+
+    def test_each_branch_uses_its_own_schedule(self):
+        self.add_schedule(self.branch, time(11), time(23))
+        self.add_schedule(self.other_branch, time(11), time(20))
+        moment = self.at(self.THURSDAY, 20, 30)
+
+        self.assertTrue(is_order_time_allowed(self.branch, at=moment))
+        self.assertFalse(is_order_time_allowed(self.other_branch, at=moment))
+
+    def test_overnight_shift_uses_previous_day_schedule(self):
+        self.add_schedule(self.branch, time(22), time(2))
+
+        self.assertFalse(is_order_time_allowed(self.branch, at=self.at(self.THURSDAY, 21, 59)))
+        self.assertTrue(is_order_time_allowed(self.branch, at=self.at(self.FRIDAY, 1, 29)))
+        self.assertFalse(is_order_time_allowed(self.branch, at=self.at(self.FRIDAY, 1, 30)))
+
+    def test_current_shift_is_found_after_midnight(self):
+        schedule = self.add_schedule(self.branch, time(22), time(2))
+
+        shift = get_current_shift(self.branch, at=self.at(self.FRIDAY, 1, 0))
+
+        self.assertIsNotNone(shift)
+        self.assertEqual(shift.schedule, schedule)
+        self.assertEqual(shift.closes_at, self.at(self.FRIDAY, 2, 0))
+
+    def test_restriction_message_explains_cutoff(self):
+        self.add_schedule(self.branch, time(11), time(23))
+
+        message = order_time_restriction_message(self.branch, at=self.at(self.THURSDAY, 22, 45))
+
+        self.assertIn("11:00", message)
+        self.assertIn("23:00", message)
+        self.assertIn("за 30 минут", message)
+
+
+class OrderAvailabilityTagTests(TestCase):
+    """Шаблонный тег учитывает график выбранного филиала и роль пользователя."""
+
+    THURSDAY = date(2026, 11, 5)
+
+    def setUp(self):
+        self.branch = CafeBranch.objects.create(name="Центральный", address="ул. Ленина, 1")
+        WorkingHours.objects.create(
+            branch=self.branch,
+            day_of_week=4,
+            opening_time=time(11),
+            closing_time=time(23),
+        )
+        self.template = Template(
+            "{% load order_availability %}{% are_orders_available as available %}{{ available }}"
+        )
+
+    def render_tag(self, at, user=None):
+        request = RequestFactory().get("/")
+        request.user = user or AnonymousUser()
+        with mock.patch("app_home.working_hours._now", return_value=at):
+            return self.template.render(Context({"request": request, "selected_branch": self.branch}))
+
+    def at(self, hour, minute=0):
+        return timezone.make_aware(datetime.combine(self.THURSDAY, time(hour, minute)))
+
+    def test_tag_allows_checkout_during_working_hours(self):
+        self.assertEqual(self.render_tag(self.at(12, 0)), "True")
+
+    def test_tag_disables_checkout_during_last_thirty_minutes(self):
+        self.assertEqual(self.render_tag(self.at(22, 45)), "False")
+
+    def test_tag_allows_staff_outside_working_hours(self):
+        staff = User.objects.create_user(username="staff", password="Sup3r-secret", is_staff=True)
+
+        self.assertEqual(self.render_tag(self.at(23, 30), user=staff), "True")
