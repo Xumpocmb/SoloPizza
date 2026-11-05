@@ -177,6 +177,10 @@ footer {
     font-size: 0.9rem;
 }
 
+.company-legal-info {
+    margin-bottom: 15px;
+}
+
 .language-switcher {
     display: flex;
     align-items: center;
