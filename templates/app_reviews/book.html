@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}Книга замечаний и предложений - Solo Pizza{% endblock %}
+{% block meta_description %}Книга замечаний и предложений Solo Pizza - публичная книга наших клиентов: отзывы, вопросы и предложения.{% endblock %}
+{% block meta_keywords %}книга замечаний, предложения, вопросы, Solo Pizza, отзывы{% endblock %}
+{% block og_description %}Книга замечаний и предложений Solo Pizza - публичная книга наших клиентов: отзывы, вопросы и предложения.{% endblock %}
+{% block twitter_description %}Книга замечаний и предложений Solo Pizza - публичная книга наших клиентов: отзывы, вопросы и предложения.{% endblock %}
+
+
+{% block body_class %}s-reviews{% endblock %}
+
+{% block main %}
+
+<main>
+    <div class="reviews-container">
+        <div class="reviews-header">
+            <h1 class="review-title">{% trans "Книга замечаний и предложений" %}</h1>
+            <p>{% trans "Опубликованные нами отзывы, вопросы и предложения наших клиентов. Если у вас есть замечания или предложения — оставьте их через страницу обратной связи." %}</p>
+            <a href="{% url 'app_home:feedback' %}" class="btn btn-primary">
+                {% trans "Оставить замечание" %}
+            </a>
+        </div>
+        
+        <div class="reviews-list">
+            {% for comment in comments %}
+                <div class="review-card {% if comment.user == request.user %}your-review{% endif %}">
+                    <div class="review-card">
+                        <div class="review-header">
+                            <span class="review-author">{{ comment.user.username }}</span>
+                            <span class="review-date">{{ comment.created_at|date:"d.m.Y" }}</span>
+                            <div class="review-rating">
+                                {% for i in "12345" %}
+                                    <span class="star{% if forloop.counter <= comment.rating %} filled{% endif %}">★</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="review-text">{{ comment.text }}</div>
+                        <a href="{% url 'app_reviews:review_detail' comment.pk %}" class="read-more">
+                            {% trans "Подробнее" %}
+                        </a>
+                    </div>
+                    {% if comment.user == request.user %}
+                        <div class="review-status">
+                            {% trans "Статус:" %} {{ comment.get_status_display }}
+                            {% if comment.status == 'rejected' and comment.moderation_comment %}
+                                ({{ comment.moderation_comment }})
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            {% empty %}
+            <p>{% trans "Пока нет замечаний. Будьте первым!" %}</p>
+            {% endfor %}
+        </div>
+    </div>
+</main>
+{% endblock %}

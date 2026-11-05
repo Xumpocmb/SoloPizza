@@ -8,6 +8,12 @@ from .models import Review
 from .forms import ReviewForm, ReviewModerationForm
 
 
+def book(request):
+    """Книга замечаний и предложений: публичный список опубликованных комментариев."""
+    comments = Review.objects.filter(is_published=True, status="approved").select_related("user")
+    return render(request, "app_reviews/book.html", {"comments": comments})
+
+
 def review_list(request):
     reviews = Review.objects.filter(is_published=True, status="approved").select_related("user")
     return render(request, "app_reviews/review_list.html", {"reviews": reviews})
