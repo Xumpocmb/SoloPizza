@@ -28,6 +28,10 @@
                 <li>
                     <a href="{% url 'app_home:partners' %}">{% trans "Партнеры" %}</a>
                 </li>
+
+                <li>
+                    <a href="{% url 'app_home:offer' %}">{% trans "Оферта" %}</a>
+                </li>
             </ul>
         </div>
         <div class="footer-column">
@@ -66,6 +70,18 @@
         </div>
     </div>
     <div class="company-info">
+        {% if company %}
+        <div class="company-legal-info">
+            <p>{{ company.legal_name }}</p>
+            {% if company.unpp %}<p>{% trans "УНП" %}: {{ company.unpp }}</p>{% endif %}
+            {% if company.address %}<p>{{ company.address }}</p>{% endif %}
+            {% if company.bank_name %}
+            <p>
+                {% trans "Банк" %}: {{ company.bank_name }}{% if company.bank_bik %} (БИК: {{ company.bank_bik }}){% endif %}{% if company.account_number %} / Р/с: {{ company.account_number }}{% endif %}
+            </p>
+            {% endif %}
+        </div>
+        {% endif %}
         <form action="{% url 'set_language' %}" method="post" class="language-switcher">
             {% csrf_token %}
             <input name="next" type="hidden" value="{{ request.path }}">

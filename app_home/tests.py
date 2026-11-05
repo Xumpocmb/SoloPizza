@@ -474,6 +474,22 @@ class FeedbackViewTests(TestCase):
         self.assertEqual(str(messages[0]), 'Пожалуйста, исправьте ошибки в форме.')
 
 
+class OfferViewTests(TestCase):
+    """Тесты для публичной оферты"""
+
+    def setUp(self):
+        self.client = Client()
+        self.url = reverse('app_home:offer')
+
+    def test_offer_view_get(self):
+        """Тест GET-запроса к странице публичной оферты"""
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'app_home/offer.html')
+        self.assertEqual(response.context['title'], 'Публичная оферта')
+        self.assertContains(response, '1. Предмет оферты')
+
+
 class SeoCanonicalTests(TestCase):
     """Канонические URL и правила для поисковых роботов."""
 

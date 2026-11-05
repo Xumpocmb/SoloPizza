@@ -1,5 +1,5 @@
 from app_cart.models import CartItem
-from app_home.models import CafeBranch, Discount, SiteSettings
+from app_home.models import CafeBranch, Company, Discount, SiteSettings
 from app_catalog.models import Category
 from django.conf import settings
 from app_cart.session_cart import SessionCart  # Import SessionCart
@@ -40,6 +40,23 @@ def get_selected_branch_id(request):
     return selected_branch_id
 
 
+def get_company(request):
+    """Юридическое лицо продавца: реквизиты, банк, адрес. Единая запись.
+
+    Оставляем на request, чтобы не ходить в БД на каждый рендер футера.
+    """
+    company = getattr(request, "_company", None)
+    if company is None:
+        company = Company.objects.filter(is_active=True).order_by("pk").first()
+        request._company = company
+    return company
+
+
+def company_context(request):
+    """Контекст шаблонов: юридическое лицо продавца для футера и страниц."""
+    return {"company": get_company(request)}
+
+
 def site_context_processor(request):
     # Телефоны и график нужны шапке, подвалу, главной и микроразметке, поэтому
     # забираем их одним запросом и делимся одними и теми же объектами: иначе
@@ -57,6 +74,7 @@ def site_context_processor(request):
             "categories": [],
             "selected_branch_id": None,
             "selected_branch": None,
+            "company": get_company(request),
         }
 
     if str(selected_branch_id) != str(selected_branch.id):
@@ -76,6 +94,7 @@ def site_context_processor(request):
         "categories": categories,
         "selected_branch_id": str(selected_branch.id),
         "selected_branch": selected_branch,
+        "company": get_company(request),
     }
 
 

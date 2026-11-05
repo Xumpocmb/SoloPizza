@@ -333,6 +333,26 @@ def certificate_search(request):
     return JsonResponse({'success': False})
 
 
+def offer_page(request):
+    """Публичная оферта Solo Pizza.
+
+    Предложение о продаже оформляется через сайт (корзина -> заявка/заказ),
+    оплата и фактическое получение происходят в кафе. Страница публичной
+    оферты обязательна для дистанционной/интернет-торговли и должна быть
+    доступна до оформления заказа.
+    """
+    breadcrumbs = [
+        {"title": _("Главная"), "url": "/"},
+        {"title": _("Публичная оферта"), "url": reverse("app_home:offer")},
+    ]
+
+    return render(
+        request,
+        "app_home/offer.html",
+        {"title": _("Публичная оферта"), "breadcrumbs": breadcrumbs},
+    )
+
+
 def handler404(request, exception):
     """
     Custom 404 handler to serve a styled 404 page.

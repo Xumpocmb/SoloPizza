@@ -2,13 +2,33 @@ from django.contrib import admin
 from django.utils.html import format_html
 from modeltranslation.admin import TabbedTranslationAdmin
 
-from app_home.models import CafeBranch, CafeBranchPhone, Vacancy, VacancyApplication, Feedback, Discount, WorkingHours, Partner, Announcement, Certificate, InfoPage, SiteSettings
+from app_home.models import CafeBranch, CafeBranchPhone, Vacancy, VacancyApplication, Feedback, Discount, WorkingHours, Partner, Announcement, Certificate, InfoPage, SiteSettings, Company
 
 
 @admin.register(Discount)
 class DiscountAdmin(TabbedTranslationAdmin):
     list_display = ["name", "percent"]
     search_fields = ["name"]
+
+
+@admin.register(Company)
+class CompanyAdmin(admin.ModelAdmin):
+    list_display = ("legal_name", "short_name", "unpp", "address", "bank_name", "is_active")
+    search_fields = ("legal_name", "short_name", "unpp", "address", "bank_name")
+    list_per_page = 20
+    fieldsets = (
+        ("Юридическое лицо", {"fields": ("legal_name", "short_name", "unpp", "address")}),
+        ("Банковские реквизиты", {"fields": ("bank_name", "bank_bik", "account_number")}),
+        ("Статус", {"fields": ("is_active",)}),
+    )
+
+    def has_add_permission(self, request):
+        # Юридическое лицо хранится в единственной записи.
+        return not Company.objects.exists()
+
+    def has_delete_permission(self, request, obj=None):
+        # Удаление ломает singleton: запись пересоздастся с данными по умолчанию.
+        return False
 
 
 class CafeBranchPhoneAdmin(admin.TabularInline):

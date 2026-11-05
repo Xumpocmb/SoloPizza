@@ -51,6 +51,32 @@ class Feedback(models.Model):
         return f"Вопрос/предложение от {self.name}"
 
 
+class Company(models.Model):
+    """Юридическое лицо продавца: данные для закупок, рекламы и законодательства.
+
+    Единая запись о компании для всей сети пиццерий: полное юридическое
+    наименование, УНП, юридический адрес, банковские реквизиты. Фактические
+    адреса филиалов хранятся отдельно в CafeBranch.
+    """
+
+    legal_name = models.CharField("Полное юридическое наименование", max_length=255)
+    short_name = models.CharField("Бренд", max_length=100, default="Solo Pizza")
+    unpp = models.CharField("УНП", max_length=20, blank=True, help_text="Учётный номер предприятия")
+    address = models.CharField("Юридический адрес", max_length=255, blank=True)
+    bank_name = models.CharField("Наименование банка", max_length=255, blank=True)
+    bank_bik = models.CharField("БИК банка", max_length=20, blank=True)
+    account_number = models.CharField("Р/с счета", max_length=34, blank=True)
+
+    is_active = models.BooleanField("Активно", default=True)
+
+    class Meta:
+        verbose_name = "Юридическое лицо"
+        verbose_name_plural = "Юридические лица"
+
+    def __str__(self):
+        return self.legal_name
+
+
 class CafeBranch(models.Model):
     name = models.CharField(max_length=100, verbose_name="Название филиала")
     address = models.CharField(max_length=200, verbose_name="Адрес")
