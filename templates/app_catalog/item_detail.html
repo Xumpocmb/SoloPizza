@@ -66,7 +66,7 @@
                     <!-- Цена -->
                     <div class="item-price" id="item-price">
                         {% if min_price %}
-                            <span>Цена: <span class="nbrb-icon">BYN</span> {{ min_price }}</span>
+                            <span>Цена: {{ min_price }} <span class="nbrb-icon">BYN</span></span>
                         {% else %}
                             <span>Цена не указана</span>
                         {% endif %}
@@ -132,11 +132,11 @@
 
                             <div class="board-pair">
                                 <label for="board1">Первый борт:</label>
-                                <select name="board1_id" id="board1" class="custom-select">
+                                <select name="board1_id" id="board1" class="custom-select nbrb-sign">
                                     <option value="">Не выбран</option>
                                     {% for board in boards %}
                                         <option value="{{ board.id }}">
-                                            {{ board.board.name }} (+<span class="nbrb-icon">BYN</span> {{ board.price }})
+                                            {{ board.board.name }} (+{{ board.price }} &#xE901;)
                                         </option>
                                     {% endfor %}
                                 </select>
@@ -144,11 +144,11 @@
 
                             <div class="board-pair">
                                 <label for="board2">Второй борт:</label>
-                                <select name="board2_id" id="board2" class="custom-select">
+                                <select name="board2_id" id="board2" class="custom-select nbrb-sign">
                                     <option value="">Не выбран</option>
                                     {% for board in boards %}
                                         <option value="{{ board.id }}">
-                                            {{ board.board.name }} (+<span class="nbrb-icon">BYN</span> {{ board.price }})
+                                            {{ board.board.name }} (+{{ board.price }} &#xE901;)
                                         </option>
                                     {% endfor %}
                                 </select>
@@ -165,7 +165,7 @@
                                             <input type="checkbox" name="addons" value="{{ addon.id }}"
                                                    style="display: none;">
                                             <span class="checkbox-icon"></span>
-                                            {{ addon.addon.name }} (+<span class="nbrb-icon">BYN</span> {{ addon.price }})
+                                            {{ addon.addon.name }} (+{{ addon.price }} <span class="nbrb-icon">BYN</span>)
                                         </label>
                                     </li>
                                 {% empty %}
@@ -243,7 +243,7 @@ function changeSizeVariant(variantId) {
         .then(response => response.json())
         .then(data => {
             // Обновляем цену
-            priceElement.innerHTML = `<span>Цена: <span class="nbrb-icon">BYN</span> ${data.price}</span>`;
+            priceElement.innerHTML = `<span>Цена: ${data.price} <span class="nbrb-icon">BYN</span></span>`;
             
             // Обновляем соусы
             updateSauces(data.sauces);
@@ -327,12 +327,12 @@ function updateBoards(boards) {
         boards.forEach(board => {
             const option1 = document.createElement('option');
             option1.value = board.id;
-            option1.textContent = `${board.name} (+<span class="nbrb-icon">BYN</span> ${board.price})`;
+            option1.textContent = `${board.name} (+${board.price} \uE901)`;
             board1Select.appendChild(option1);
 
             const option2 = document.createElement('option');
             option2.value = board.id;
-            option2.textContent = `${board.name} (+<span class="nbrb-icon">BYN</span> ${board.price})`;
+            option2.textContent = `${board.name} (+${board.price} \uE901)`;
             board2Select.appendChild(option2);
         });
     } else {
@@ -364,7 +364,7 @@ function updateAddons(addons) {
                     <input type="checkbox" name="addons" value="${addon.id}"
                            id="id_addons_${addon.id}" style="display: none;">
                     <span class="checkbox-icon"></span>
-                    ${addon.name} (+<span class="nbrb-icon">BYN</span> ${addon.price})
+                    ${addon.name} (+${addon.price} <span class="nbrb-icon">BYN</span>)
                 </label>
             `;
             addonList.appendChild(li);

@@ -118,14 +118,14 @@
                                     <h3>Выберите борт:</h3>
                                     <div class="board-pair-admin">
                                         <label for="board1_{{ item.slug }}">Первый борт:</label>
-                                        <select name="board1_id" id="board1_{{ item.slug }}" class="custom-select-admin">
+                                        <select name="board1_id" id="board1_{{ item.slug }}" class="custom-select-admin nbrb-sign">
                                             <option value="">Не выбран</option>
                                             <!-- Будет заполнено динамически -->
                                         </select>
                                     </div>
                                     <div class="board-pair-admin">
                                         <label for="board2_{{ item.slug }}">Второй борт:</label>
-                                        <select name="board2_id" id="board2_{{ item.slug }}" class="custom-select-admin">
+                                        <select name="board2_id" id="board2_{{ item.slug }}" class="custom-select-admin nbrb-sign">
                                             <option value="">Не выбран</option>
                                             <!-- Будет заполнено динамически -->
                                         </select>
@@ -156,7 +156,7 @@
 
                                 <div class="params-modal-footer">
                                     <span class="params-modal-price" id="params-modal-price-{{ item.slug }}">
-                                        {% if item.min_price %}{{ item.min_price|floatformat:2 }} руб.{% endif %}
+                                        {% if item.min_price %}{{ item.min_price|floatformat:2 }} <span class="nbrb-icon">BYN</span>{% endif %}
                                     </span>
                                     <button type="submit" class="add-to-cart-btn-admin">Добавить в заказ</button>
                                 </div>
@@ -248,7 +248,7 @@
                     function updatePriceElement(itemSlug, price) {
                         const modalPrice = document.getElementById(`params-modal-price-${itemSlug}`);
                         if (modalPrice) {
-                            modalPrice.textContent = `${price.toFixed(2)} руб.`;
+                            modalPrice.innerHTML = `${price.toFixed(2)} <span class="nbrb-icon">BYN</span>`;
                         }
                     }
 
@@ -333,12 +333,12 @@
                             boards.forEach(board => {
                                 const option1 = document.createElement('option');
                                 option1.value = board.id;
-                                option1.textContent = `${board.name} (+${board.price} руб.)`;
+                                option1.textContent = `${board.name} (+${board.price} \uE901)`;
                                 board1Select.appendChild(option1);
 
                                 const option2 = document.createElement('option');
                                 option2.value = board.id;
-                                option2.textContent = `${board.name} (+${board.price} руб.)`;
+                                option2.textContent = `${board.name} (+${board.price} \uE901)`;
                                 board2Select.appendChild(option2);
                             });
                         } else {
@@ -367,7 +367,7 @@
                                         <input type="checkbox" name="addons" value="${addon.id}"
                                                id="id_addons_${addon.id}" style="display: none;">
                                         <span class="checkbox-icon"></span>
-                                        ${addon.name} (+${addon.price} руб.)
+                                        ${addon.name} (+${addon.price} <span class="nbrb-icon">BYN</span>)
                                     </label>
                                 `;
                                 addonList.appendChild(li);

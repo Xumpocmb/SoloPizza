@@ -8835,3 +8835,18 @@ body.params-modal-active {
 .nbrb-icon-byn:before {
     content: "\e901";
 }
+
+/* Знак BYN для нативных <option>: внутрь option нельзя вложить span,
+   поэтому используем сам символ шрифта и отдельный unicode-range. */
+@font-face {
+    font-family: "nbrb-sign";
+    src: url("/static/nbrb_font/nbrb.woff2") format("woff2"), url("/static/nbrb_font/nbrb.ttf") format("truetype"), url("/static/nbrb_font/nbrb.woff") format("woff");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+    unicode-range: U+E901;
+}
+
+.nbrb-sign {
+    font-family: "nbrb-sign", 'Roboto', sans-serif;
+}
