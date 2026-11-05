@@ -1,5 +1,5 @@
 from django.contrib.auth import authenticate, get_user_model
-from django.test import TestCase
+from django.test import TestCase, Client
 from django.urls import reverse
 
 
@@ -21,11 +21,27 @@ class RegistrationTests(TestCase):
                 "username": "newuser",
                 "password1": "Sup3r-secret",
                 "password2": "Sup3r-secret",
+                "consent": "on",
             },
         )
 
         self.assertRedirects(response, reverse("app_user:login"))
         self.assertTrue(get_user_model().objects.filter(username="newuser").exists())
+
+    def test_registration_requires_personal_data_consent(self):
+        """Регистрация без согласия на обработку персональных данных не проходит."""
+        response = self.client.post(
+            reverse("app_user:register"),
+            {
+                "username": "newuser",
+                "password1": "Sup3r-secret",
+                "password2": "Sup3r-secret",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(get_user_model().objects.filter(username="newuser").exists())
+        self.assertContains(response, "Согласие на обработку персональных данных")
 
 
 class LoginTests(TestCase):

@@ -59,6 +59,17 @@
                         </div>
                     {% endif %}
 
+                    <!-- Согласие на обработку персональных данных -->
+                    <div class="form-group">
+                        <label for="{{ form.consent.id_for_label }}">{{ form.consent.label }}</label>
+                        {{ form.consent }}
+                        {% if form.consent.errors %}
+                            <div class="error">
+                                {{ form.consent.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+
                     <!-- Кнопка отправки -->
                     <button class="register-button btn-primary" type="submit">Зарегистрироваться</button>
                 </form>

@@ -1,7 +1,8 @@
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import logout
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm
+from app_user.forms import ConsentUserCreationForm
 from django.shortcuts import redirect, render
 
 from app_cart.models import CartItem
@@ -11,13 +12,13 @@ from app_catalog.models import Product, ProductVariant, BoardParams, AddonParams
 
 def register_view(request):
     if request.method == "POST":
-        form = UserCreationForm(request.POST)
+        form = ConsentUserCreationForm(request.POST)
         if form.is_valid():
             form.save()
             messages.success(request, "Вы успешно зарегистрировались!")
             return redirect("app_user:login")
     else:
-        form = UserCreationForm()
+        form = ConsentUserCreationForm()
     return render(request, "app_user/register.html", {"form": form})
 
 

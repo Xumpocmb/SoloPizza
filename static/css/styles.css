@@ -8917,3 +8917,14 @@ body.params-modal-active {
     padding: 0;
     accent-color: var(--accent-color, #079b59);
 }
+
+/* Чекбоксы и радио в формах авторизации/регистрации тоже не должны растягиваться. */
+:where(.s-auth) .form-group input[type="checkbox"],
+:where(.s-auth) .form-group input[type="radio"] {
+    width: auto;
+    min-width: 20px;
+    height: 20px;
+    margin-right: 8px;
+    padding: 0;
+    accent-color: var(--accent-color, #079b59);
+}
