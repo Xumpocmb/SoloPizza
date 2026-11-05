@@ -19,6 +19,7 @@ from app_home.models import CafeBranch
 from app_home.working_hours import is_order_time_allowed, order_time_restriction_message
 from app_order.forms import CheckoutForm, OrderEditForm
 from app_order import statistics
+from app_order.dashboard import build_dashboard, resolve_period
 from app_order.models import OrderItem, Order, suspended_order_totals
 from app_home.models import SiteSettings
 from decimal import Decimal, ROUND_HALF_UP
@@ -620,6 +621,25 @@ def _parse_date(value):
         return datetime.strptime(value, "%Y-%m-%d").date()
     except ValueError:
         return None
+
+
+@login_required
+def dashboard_view(request):
+    """Отдельная страница-дашборд для суперпользователя."""
+    if not request.user.is_superuser:
+        return HttpResponseForbidden("Доступ запрещен")
+
+    dashboard = build_dashboard(request.GET.get("period"))
+
+    context = {
+        "dashboard": dashboard,
+        "period": resolve_period(request.GET.get("period")),
+        "breadcrumbs": [
+            {"title": _("Главная"), "url": "/"},
+            {"title": _("Дашборд"), "url": "#"},
+        ],
+    }
+    return render(request, "app_order/dashboard.html", context)
 
 
 STATISTICS_SORT_FIELDS = {"date", "orders_count", "total_cash", "total_card", "total_noname", "total_amount"}

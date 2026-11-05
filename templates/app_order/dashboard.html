@@ -1,0 +1,660 @@
+{% extends 'base.html' %}
+{% load static i18n %}
+
+{% block title %}Дашборд - Solo Pizza{% endblock %}
+
+{% block meta_description %}Дашборд Solo Pizza: выручка, заказы, средний чек, время покупок, популярные товары и категории.{% endblock %}
+{% block meta_keywords %}дашборд, аналитика заказов, Solo Pizza{% endblock %}
+{% block og_description %}Дашборд Solo Pizza: выручка, заказы и популярные товары.{% endblock %}
+{% block twitter_description %}Дашборд Solo Pizza: выручка, заказы и популярные товары.{% endblock %}
+
+{% block body_class %}s-order-list s-dashboard{% endblock %}
+
+{% block styles %}
+    <style>
+        .s-dashboard .order-list-page {
+            max-width: 1280px;
+        }
+
+        .dashboard-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 22px;
+        }
+
+        .dashboard-head .page-title {
+            margin-bottom: 6px;
+        }
+
+        .dashboard-range {
+            margin: 0;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .dashboard-periods {
+            display: inline-flex;
+            gap: 4px;
+            padding: 4px;
+            background-color: var(--bg-color);
+            border: 1px solid var(--divider-color);
+            border-radius: 999px;
+        }
+
+        .dashboard-periods a {
+            padding: 8px 20px;
+            border-radius: 999px;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-decoration: none;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        .dashboard-periods a:hover {
+            color: var(--text-color);
+        }
+
+        .dashboard-periods a.is-active {
+            background-color: var(--accent-color);
+            color: #fff;
+        }
+
+        .dashboard-summary {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .dashboard-stat {
+            padding: 18px 20px;
+            background-color: var(--bg-color);
+            border: 1px solid var(--divider-color);
+            border-radius: 12px;
+        }
+
+        .dashboard-stat__label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .dashboard-stat__value {
+            color: var(--text-color);
+            font-size: 1.9rem;
+            font-weight: 700;
+            line-height: 1.15;
+        }
+
+        .dashboard-stat__value small {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .dashboard-card {
+            margin-bottom: 20px;
+            padding: 22px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--divider-color);
+            border-radius: 12px;
+        }
+
+        .dashboard-card h2 {
+            margin: 0 0 6px;
+            color: var(--text-color);
+            font-size: 1.25rem;
+        }
+
+        .dashboard-card__hint {
+            margin: 0 0 18px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .dashboard-chart {
+            position: relative;
+            width: 100%;
+            height: 380px;
+        }
+
+        .dashboard-chart--heatmap {
+            height: 420px;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        .dashboard-grid .dashboard-card {
+            margin-bottom: 0;
+        }
+
+        .dashboard-grid .dashboard-chart {
+            height: 320px;
+        }
+
+        .dashboard-empty {
+            margin-bottom: 20px;
+            padding: 16px 20px;
+            background-color: var(--bg-color);
+            border: 1px dashed var(--divider-color);
+            border-radius: 12px;
+            color: var(--text-muted);
+        }
+
+        @media screen and (max-width: 900px) {
+            .dashboard-summary {
+                grid-template-columns: 1fr;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .dashboard-grid .dashboard-card {
+                margin-bottom: 20px;
+            }
+
+            .dashboard-chart {
+                height: 320px;
+            }
+
+            .dashboard-chart--heatmap {
+                height: 380px;
+            }
+        }
+
+        @media screen and (max-width: 560px) {
+            .dashboard-card {
+                padding: 16px;
+            }
+
+            .dashboard-chart,
+            .dashboard-chart--heatmap {
+                height: 290px;
+            }
+
+            .dashboard-periods a {
+                padding: 7px 14px;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block main %}
+<main class="order-list-page">
+    {% if breadcrumbs %}
+        <div class="breadcrumbs">
+            {% for crumb in breadcrumbs %}
+                {% if crumb.url != '#' %}
+                    <a href="{{ crumb.url }}" class="breadcrumb-link">{{ crumb.title }}</a>
+                {% else %}
+                    <span class="breadcrumb-current">{{ crumb.title }}</span>
+                {% endif %}
+                {% if not forloop.last %}
+                    <span class="breadcrumb-separator">›</span>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="order-list-container">
+        <div class="dashboard-head">
+            <div>
+                <h1 class="page-title">Дашборд</h1>
+                <p class="dashboard-range">
+                    Период: {{ dashboard.start_label }} — {{ dashboard.end_label }}
+                </p>
+            </div>
+            <nav class="dashboard-periods" aria-label="Период дашборда">
+                <a href="?period=week"
+                   class="{% if period == 'week' %}is-active{% endif %}"
+                   {% if period == 'week' %}aria-current="page"{% endif %}>Неделя</a>
+                <a href="?period=month"
+                   class="{% if period == 'month' %}is-active{% endif %}"
+                   {% if period == 'month' %}aria-current="page"{% endif %}>Месяц</a>
+            </nav>
+        </div>
+
+        <div class="dashboard-summary">
+            <div class="dashboard-stat">
+                <div class="dashboard-stat__label">
+                    <span class="nbrb-icon" aria-hidden="true">BYN</span>
+                    Выручка
+                </div>
+                <div class="dashboard-stat__value">
+                    {{ dashboard.summary.revenue|floatformat:2 }} <small>руб.</small>
+                </div>
+            </div>
+            <div class="dashboard-stat">
+                <div class="dashboard-stat__label">
+                    <i class="fas fa-receipt" aria-hidden="true"></i>
+                    Заказы
+                </div>
+                <div class="dashboard-stat__value">{{ dashboard.summary.orders }}</div>
+            </div>
+            <div class="dashboard-stat">
+                <div class="dashboard-stat__label">
+                    <i class="fas fa-chart-line" aria-hidden="true"></i>
+                    Средний чек
+                </div>
+                <div class="dashboard-stat__value">
+                    {{ dashboard.summary.average_check|floatformat:2 }} <small>руб.</small>
+                </div>
+            </div>
+        </div>
+
+        {% if not dashboard.summary.orders %}
+            <div class="dashboard-empty">
+                За выбранный период оплаченных заказов нет — графики появятся, когда появятся данные.
+            </div>
+        {% endif %}
+
+        <section class="dashboard-card" aria-labelledby="revenue-title">
+            <h2 id="revenue-title">Выручка и заказы</h2>
+            <p class="dashboard-card__hint">
+                Наложенная диаграмма областей. Выручка и средний чек — по левой оси, количество заказов — по правой.
+            </p>
+            <div class="dashboard-chart">
+                <canvas id="revenueChart" aria-label="Выручка, заказы и средний чек по дням" role="img"></canvas>
+            </div>
+        </section>
+
+        <section class="dashboard-card" aria-labelledby="purchases-title">
+            <h2 id="purchases-title">Когда покупают</h2>
+            <p class="dashboard-card__hint">
+                Ось X — часы, ось Y — дни недели. Чем больше точка, тем больше заказов в этот час.
+            </p>
+            <div class="dashboard-chart dashboard-chart--heatmap">
+                <canvas id="purchasesChart" aria-label="Распределение заказов по часам и дням недели" role="img"></canvas>
+            </div>
+        </section>
+
+        <div class="dashboard-grid">
+            <section class="dashboard-card" aria-labelledby="products-title">
+                <h2 id="products-title">Товары</h2>
+                <p class="dashboard-card__hint">Топ-9 товаров по проданному количеству и все остальные.</p>
+                <div class="dashboard-chart">
+                    <canvas id="productsChart" aria-label="Доля проданных товаров" role="img"></canvas>
+                </div>
+            </section>
+
+            <section class="dashboard-card" aria-labelledby="categories-title">
+                <h2 id="categories-title">Категории</h2>
+                <p class="dashboard-card__hint">Распределение проданного количества по категориям.</p>
+                <div class="dashboard-chart">
+                    <canvas id="categoriesChart" aria-label="Доля категорий товаров" role="img"></canvas>
+                </div>
+            </section>
+        </div>
+    </div>
+</main>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static 'js/chart.umd.min.js' %}"></script>
+    {{ dashboard|json_script:"dashboard-data" }}
+    <script>
+        (function () {
+            function start() {
+            var element = document.getElementById("dashboard-data");
+            if (!element || typeof window.Chart === "undefined") {
+                return;
+            }
+
+            var data = JSON.parse(element.textContent);
+            var textColor;
+            var mutedColor;
+            var gridColor;
+            var accentColor;
+            var cardColor;
+            var chartInstances = [];
+
+            function readThemeColors() {
+                // Тема хранится классом .dark на <html>, поэтому читаем переменные оттуда.
+                var styles = getComputedStyle(document.documentElement);
+                textColor = styles.getPropertyValue("--text-color").trim() || "#333";
+                mutedColor = styles.getPropertyValue("--text-muted").trim() || "#6c757d";
+                gridColor = styles.getPropertyValue("--divider-color").trim() || "#e0e0e0";
+                accentColor = styles.getPropertyValue("--accent-color").trim() || "#079b59";
+                cardColor = styles.getPropertyValue("--card-bg").trim() || "#ffffff";
+            }
+
+            readThemeColors();
+
+            var palette = [
+                "#079b59", "#f59e0b", "#3b82f6", "#ef4444", "#8b5cf6",
+                "#14b8a6", "#ec4899", "#84cc16", "#f97316", "#64748b"
+            ];
+
+            Chart.defaults.color = textColor;
+            Chart.defaults.borderColor = gridColor;
+
+            function money(value) {
+                return new Intl.NumberFormat("ru-RU", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }).format(value) + " руб.";
+            }
+
+            function emptyStatePlugin(message) {
+                return {
+                    id: "emptyState",
+                    afterDraw: function (chart) {
+                        var total = chart.data.datasets.reduce(function (sum, dataset) {
+                            return sum + dataset.data.reduce(function (inner, point) {
+                                if (typeof point === "number") {
+                                    return inner + point;
+                                }
+                                return inner + (point.count || 0);
+                            }, 0);
+                        }, 0);
+
+                        if (total > 0) {
+                            return;
+                        }
+
+                        var ctx = chart.ctx;
+                        var area = chart.chartArea;
+                        ctx.save();
+                        ctx.fillStyle = mutedColor;
+                        ctx.font = "600 14px sans-serif";
+                        ctx.textAlign = "center";
+                        ctx.textBaseline = "middle";
+                        ctx.fillText(message, (area.left + area.right) / 2, (area.top + area.bottom) / 2);
+                        ctx.restore();
+                    }
+                };
+            }
+
+            var revenueCanvas = document.getElementById("revenueChart");
+            if (revenueCanvas) {
+                chartInstances.push(new Chart(revenueCanvas, {
+                    type: "line",
+                    data: {
+                        labels: data.revenue.labels,
+                        datasets: [
+                            {
+                                label: "Выручка",
+                                data: data.revenue.revenue,
+                                borderColor: accentColor,
+                                backgroundColor: "rgba(7, 155, 89, 0.22)",
+                                fill: true,
+                                tension: 0.35,
+                                pointRadius: 2,
+                                pointHoverRadius: 4,
+                                yAxisID: "y"
+                            },
+                            {
+                                label: "Средний чек",
+                                data: data.revenue.average_check,
+                                borderColor: "#3b82f6",
+                                backgroundColor: "rgba(59, 130, 246, 0.12)",
+                                borderDash: [6, 4],
+                                fill: false,
+                                tension: 0.35,
+                                pointRadius: 2,
+                                pointHoverRadius: 4,
+                                yAxisID: "y"
+                            },
+                            {
+                                label: "Заказы",
+                                data: data.revenue.orders,
+                                borderColor: "#f59e0b",
+                                backgroundColor: "rgba(245, 158, 11, 0.18)",
+                                fill: true,
+                                tension: 0.35,
+                                pointRadius: 2,
+                                pointHoverRadius: 4,
+                                yAxisID: "y1"
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: { mode: "index", intersect: false },
+                        plugins: {
+                            legend: { position: "bottom" },
+                            tooltip: {
+                                callbacks: {
+                                    label: function (context) {
+                                        if (context.dataset.yAxisID === "y1") {
+                                            return context.dataset.label + ": " + context.parsed.y;
+                                        }
+                                        return context.dataset.label + ": " + money(context.parsed.y);
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { color: gridColor },
+                                ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 10 }
+                            },
+                            y: {
+                                position: "left",
+                                beginAtZero: true,
+                                grid: { color: gridColor },
+                                title: { display: true, text: "Сумма, руб." }
+                            },
+                            y1: {
+                                position: "right",
+                                beginAtZero: true,
+                                grid: { drawOnChartArea: false },
+                                title: { display: true, text: "Заказы" },
+                                ticks: { precision: 0 }
+                            }
+                        }
+                    },
+                    plugins: [emptyStatePlugin("Нет данных за период")]
+                }));
+            }
+
+            var purchasesCanvas = document.getElementById("purchasesChart");
+            if (purchasesCanvas) {
+                var maxCount = data.purchases.max || 1;
+                var points = [];
+
+                data.purchases.matrix.forEach(function (row, dayIndex) {
+                    row.forEach(function (count, hour) {
+                        if (count > 0) {
+                            points.push({
+                                x: hour,
+                                y: dayIndex,
+                                count: count,
+                                r: 7 + 20 * Math.sqrt(count / maxCount)
+                            });
+                        }
+                    });
+                });
+
+                chartInstances.push(new Chart(purchasesCanvas, {
+                    type: "bubble",
+                    data: {
+                        datasets: [{
+                            label: "Заказы",
+                            data: points,
+                            backgroundColor: "rgba(7, 155, 89, 0.55)",
+                            borderColor: accentColor,
+                            borderWidth: 1,
+                            hoverBackgroundColor: "rgba(7, 155, 89, 0.8)"
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    title: function (items) {
+                                        var point = items[0].raw;
+                                        return data.purchases.weekdays[point.y] + ", " +
+                                            String(point.x).padStart(2, "0") + ":00";
+                                    },
+                                    label: function (context) {
+                                        var count = context.raw.count;
+                                        return count + " " + (count === 1 ? "заказ" : "заказов");
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                min: -0.5,
+                                max: 23.5,
+                                grid: { color: gridColor },
+                                ticks: {
+                                    stepSize: 1,
+                                    autoSkip: false,
+                                    maxRotation: 0,
+                                    callback: function (value) {
+                                        // Подписываем каждый второй час, чтобы ось оставалась читаемой.
+                                        return value % 2 === 0
+                                            ? String(value).padStart(2, "0") + ":00"
+                                            : "";
+                                    }
+                                },
+                                title: { display: true, text: "Час" }
+                            },
+                            y: {
+                                min: -0.5,
+                                max: 6.5,
+                                grid: { color: gridColor },
+                                ticks: {
+                                    stepSize: 1,
+                                    callback: function (value) {
+                                        return data.purchases.weekdays[value] || "";
+                                    }
+                                },
+                                title: { display: true, text: "День недели" }
+                            }
+                        }
+                    },
+                    plugins: [emptyStatePlugin("Нет данных за период")]
+                }));
+            }
+
+            function pieChart(canvasId, labels, values, emptyMessage) {
+                var canvas = document.getElementById(canvasId);
+                if (!canvas) {
+                    return;
+                }
+
+                var total = values.reduce(function (sum, value) { return sum + value; }, 0);
+                var colors = labels.map(function (_, index) {
+                    return palette[index % palette.length];
+                });
+
+                chartInstances.push(new Chart(canvas, {
+                    type: "pie",
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: values,
+                            backgroundColor: colors,
+                            borderColor: cardColor,
+                            borderWidth: 2,
+                            __pie: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: "bottom",
+                                labels: {
+                                    boxWidth: 12,
+                                    boxHeight: 12,
+                                    padding: 14,
+                                    usePointStyle: true
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function (context) {
+                                        var value = context.parsed;
+                                        var share = total ? Math.round((value / total) * 100) : 0;
+                                        return context.label + ": " + value + " шт. (" + share + "%)";
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    plugins: [emptyStatePlugin(emptyMessage)]
+                }));
+            }
+
+            function applyTheme() {
+                readThemeColors();
+                Chart.defaults.color = textColor;
+                Chart.defaults.borderColor = gridColor;
+
+                chartInstances.forEach(function (chart) {
+                    chart.options.color = textColor;
+
+                    if (chart.options.plugins && chart.options.plugins.legend &&
+                        chart.options.plugins.legend.labels) {
+                        chart.options.plugins.legend.labels.color = textColor;
+                    }
+
+                    if (chart.options.scales) {
+                        Object.keys(chart.options.scales).forEach(function (key) {
+                            var scale = chart.options.scales[key];
+                            if (!scale) {
+                                return;
+                            }
+                            if (scale.grid && typeof scale.grid === "object") {
+                                scale.grid.color = gridColor;
+                            }
+                            if (scale.ticks && typeof scale.ticks === "object") {
+                                scale.ticks.color = textColor;
+                            }
+                            if (scale.title && typeof scale.title === "object") {
+                                scale.title.color = textColor;
+                            }
+                        });
+                    }
+
+                    chart.data.datasets.forEach(function (dataset) {
+                        if (dataset.__pie) {
+                            dataset.borderColor = cardColor;
+                        }
+                    });
+
+                    chart.update("none");
+                });
+            }
+
+            var themeToggle = document.getElementById("themeToggle");
+            if (themeToggle) {
+                themeToggle.addEventListener("change", function () {
+                    // Класс темы навешивает burger_menu.js, поэтому перекрашиваем после него.
+                    setTimeout(applyTheme, 0);
+                });
+            }
+
+            pieChart("productsChart", data.products.labels, data.products.values, "Нет проданных товаров");
+            pieChart("categoriesChart", data.categories.labels, data.categories.values, "Нет проданных категорий");
+            }
+
+            if (document.readyState === "loading") {
+                document.addEventListener("DOMContentLoaded", start);
+            } else {
+                start();
+            }
+        })();
+    </script>
+{% endblock %}

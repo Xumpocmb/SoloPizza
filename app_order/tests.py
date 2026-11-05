@@ -11,6 +11,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from app_home.models import CafeBranch, SiteSettings, WorkingHours
+from app_order.dashboard import build_dashboard
 from app_catalog.models import Category, PizzaSizes, Product, ProductVariant
 from app_order import statistics
 from app_order.models import DailyOrderNumber, Order, OrderItem
@@ -429,3 +430,156 @@ class CheckoutWorkingHoursTests(TestCase):
 
         self.assertRedirects(response, reverse("app_cart:view_cart"))
         self.assertContains(response, "В настоящий момент оформление новых заказов недоступно")
+
+
+class DashboardAccessTests(TestCase):
+    """Отдельный дашборд доступен только суперпользователю."""
+
+    def setUp(self):
+        self.url = reverse("app_order:dashboard")
+
+    def test_anonymous_is_redirected_to_login(self):
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/user/login/", response["Location"])
+
+    def test_staff_without_superuser_is_forbidden(self):
+        staff = User.objects.create_user(username="staff", password="Sup3r-secret", is_staff=True)
+        self.client.force_login(staff)
+
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_superuser_sees_dashboard(self):
+        admin = User.objects.create_superuser(username="admin", password="Sup3r-secret")
+        self.client.force_login(admin)
+
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "app_order/dashboard.html")
+        self.assertContains(response, "Выручка и заказы")
+        self.assertContains(response, "Когда покупают")
+        self.assertContains(response, "Товары")
+        self.assertContains(response, "Категории")
+        # Символ белорусского рубля берётся из подключённого шрифта nbrb.
+        self.assertContains(response, "nbrb-icon")
+        self.assertNotContains(response, "fa-ruble-sign")
+
+
+class DashboardDataTests(TestCase):
+    """Расчёты дашборда: выручка, средний чек, товары, категории и время покупок."""
+
+    def setUp(self):
+        self.branch = CafeBranch.objects.create(name="Центральный", address="ул. Ленина, 1", check_digit=7)
+        self.pizza = Category.objects.create(name="Пицца", slug="pizza")
+        self.drinks = Category.objects.create(name="Напитки", slug="drinks")
+        self.size = PizzaSizes.objects.create(name="32")
+
+    def make_product(self, name, category, price):
+        product = Product.objects.create(name=name, slug=name.lower(), category=category)
+        variant = ProductVariant.objects.create(product=product, size=self.size, price=Decimal(price))
+        return product, variant
+
+    def make_order(self, when, items, status="completed"):
+        order = Order.objects.create(
+            branch=self.branch,
+            customer_name="Иван",
+            phone_number="+375291112233",
+            delivery_type="pickup",
+            payment_method="cash",
+            payment_status=True,
+            status=status,
+        )
+        for product, variant, quantity in items:
+            OrderItem.objects.create(order=order, product=product, variant=variant, quantity=quantity)
+
+        Order.objects.filter(pk=order.pk).update(created_at=when)
+        order.refresh_from_db()
+        return order
+
+    def at(self, days_ago, hour):
+        day = timezone.localdate() - timedelta(days=days_ago)
+        return timezone.make_aware(datetime.combine(day, time(hour, 0)))
+
+    def test_revenue_orders_and_average_check_are_grouped_by_day(self):
+        product, variant = self.make_product("Маргарита", self.pizza, "25.00")
+        self.make_order(self.at(0, 12), [(product, variant, 2)])
+        self.make_order(self.at(0, 18), [(product, variant, 1)])
+
+        dashboard = build_dashboard("week")
+        series = dashboard["revenue"]
+
+        self.assertEqual(series["revenue"][-1], 75.0)
+        self.assertEqual(series["orders"][-1], 2)
+        self.assertEqual(series["average_check"][-1], 37.5)
+        self.assertEqual(dashboard["summary"]["revenue"], 75.0)
+        self.assertEqual(dashboard["summary"]["orders"], 2)
+        self.assertEqual(dashboard["summary"]["average_check"], 37.5)
+
+    def test_week_and_month_periods_differ(self):
+        product, variant = self.make_product("Маргарита", self.pizza, "25.00")
+        self.make_order(self.at(3, 12), [(product, variant, 1)])
+        self.make_order(self.at(10, 12), [(product, variant, 1)])
+
+        week = build_dashboard("week")
+        month = build_dashboard("month")
+
+        self.assertEqual(week["summary"]["orders"], 1)
+        self.assertEqual(month["summary"]["orders"], 2)
+        self.assertEqual(len(week["revenue"]["labels"]), 7)
+        self.assertEqual(len(month["revenue"]["labels"]), 30)
+
+    def test_cancelled_and_unpaid_orders_are_ignored(self):
+        product, variant = self.make_product("Маргарита", self.pizza, "25.00")
+        self.make_order(self.at(0, 12), [(product, variant, 1)], status="canceled")
+        unpaid = self.make_order(self.at(0, 12), [(product, variant, 1)])
+        Order.objects.filter(pk=unpaid.pk).update(payment_status=False)
+
+        dashboard = build_dashboard("week")
+
+        self.assertEqual(dashboard["summary"]["orders"], 0)
+        self.assertEqual(dashboard["products"]["labels"], [])
+        self.assertEqual(dashboard["categories"]["labels"], [])
+
+    def test_top_products_is_nine_items_plus_the_rest(self):
+        items = []
+        for index in range(11):
+            product, variant = self.make_product(f"Товар {index:02d}", self.pizza, "10.00")
+            items.append((product, variant, 11 - index))
+        self.make_order(self.at(0, 12), items)
+
+        products = build_dashboard("week")["products"]
+
+        self.assertEqual(len(products["labels"]), 10)
+        self.assertEqual(products["labels"][:9], [f"Товар {index:02d}" for index in range(9)])
+        self.assertEqual(products["labels"][-1], "Остальные")
+        self.assertEqual(products["values"][:9], [11, 10, 9, 8, 7, 6, 5, 4, 3])
+        self.assertEqual(products["values"][-1], 3)
+
+    def test_categories_share_counts_quantities(self):
+        pizza_product, pizza_variant = self.make_product("Маргарита", self.pizza, "25.00")
+        drink_product, drink_variant = self.make_product("Кола", self.drinks, "5.00")
+        self.make_order(
+            self.at(0, 12),
+            [(pizza_product, pizza_variant, 2), (drink_product, drink_variant, 5)],
+        )
+
+        categories = build_dashboard("week")["categories"]
+
+        self.assertEqual(categories["labels"], ["Напитки", "Пицца"])
+        self.assertEqual(categories["values"], [5, 2])
+
+    def test_purchases_matrix_uses_local_weekday_and_hour(self):
+        product, variant = self.make_product("Маргарита", self.pizza, "25.00")
+        moment = self.at(0, 18)
+        self.make_order(moment, [(product, variant, 1)])
+
+        purchases = build_dashboard("week")["purchases"]
+        weekday_index = timezone.localtime(moment).isoweekday() - 1
+
+        self.assertEqual(purchases["matrix"][weekday_index][18], 1)
+        self.assertEqual(purchases["max"], 1)
+        self.assertEqual(purchases["weekdays"][weekday_index], ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"][weekday_index])
