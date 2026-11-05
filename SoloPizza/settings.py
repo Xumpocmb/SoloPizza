@@ -184,6 +184,14 @@ ACCOUNT_SESSION_REMEMBER = None
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
+# HTTPS и защищённые cookie: в продакшене (за TLS терминалом / reverse proxy) включаем
+# редирект http -> https и Secure-флаги для cookie сессии/CSRF. В локальной разработке
+# (DEBUG=True) и тестах выключаем, чтобы работа по http://localhost:8000 и тестовый
+# раннер не ломались.
+SECURE_SSL_REDIRECT = os.getenv("SECURE_SSL_REDIRECT", "False") == "True"
+SESSION_COOKIE_SECURE = os.getenv("SESSION_COOKIE_SECURE", "False") == "True"
+CSRF_COOKIE_SECURE = os.getenv("CSRF_COOKIE_SECURE", "False") == "True"
+
 SOCIALACCOUNT_PROVIDERS = {
     "google": {
         "SCOPE": ["profile", "email"],
