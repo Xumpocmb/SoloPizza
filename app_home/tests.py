@@ -13,7 +13,7 @@ from django.utils import timezone
 
 from app_home.context_processors import canonical_context, cookie_consent_context
 from app_home.forms import FeedbackForm, VacancyApplicationForm
-from app_home.models import CafeBranch, Feedback, Vacancy, VacancyApplication, InfoPage, SiteSettings, Announcement, WorkingHours
+from app_home.models import CafeBranch, Company, Feedback, Vacancy, VacancyApplication, InfoPage, SiteSettings, Announcement, WorkingHours
 from app_home.templatetags.static_version import static_v
 from app_home.working_hours import (
     get_current_shift,
@@ -554,6 +554,31 @@ class SeoCanonicalTests(TestCase):
         self.assertIn("Clean-param:", content)
         self.assertIn("utm_source", content)
         self.assertIn("size /catalog/item/", content)
+
+
+class ContactsViewTests(TestCase):
+    """Тесты страницы контактов: контакты филиала и реквизиты компании."""
+
+    def setUp(self):
+        self.client = Client()
+        self.url = reverse('app_home:contacts')
+        self.company = Company.objects.create(
+            legal_name='ООО «Соло Пицца»',
+            short_name='Solo Pizza',
+            unpp='291147343',
+            address='225409, Республика Беларусь, Брестская область, г. Барановичи, ул. Ленина 9/1',
+            bank_name='ОАО «Белинвестбанк»',
+            bank_bik='BLBBBY2X',
+            account_number='BY28BLBB30120291747343001001',
+        )
+
+    def test_contacts_view_get(self):
+        """GET /contacts/ отдает страницу с контактами и реквизитами компании."""
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'app_home/contacts.html')
+        self.assertContains(response, 'Реквизиты компании')
+        self.assertContains(response, 'ООО «Соло Пицца»')
 
 
 class InfoPageModelTests(TestCase):
