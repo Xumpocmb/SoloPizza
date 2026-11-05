@@ -122,7 +122,16 @@ class InfoPageAdmin(TabbedTranslationAdmin):
 class SiteSettingsAdmin(admin.ModelAdmin):
     fieldsets = (
         ("Логотип", {"fields": ("logo", "logo_alt")}),
-        ("Оформление заказов", {"fields": ("orders_available",)}),
+        (
+            "Оформление заказов",
+            {
+                "fields": ("orders_available",),
+                "description": (
+                    "Если выключено, заказы недоступны обычным пользователям. "
+                    "Сотрудники и суперпользователи могут оформлять заказы в любом случае."
+                ),
+            },
+        ),
         ("Снег", {"fields": ("snow_enabled",)}),
         ("Предпросмотр", {"fields": ("logo_preview", "updated_at"), "classes": ("collapse",)}),
     )

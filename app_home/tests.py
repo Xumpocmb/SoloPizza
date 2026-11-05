@@ -617,6 +617,18 @@ class SiteSettingsTests(TestCase):
 
         self.assertFalse(SiteSettings.is_orders_available())
 
+    def test_staff_and_superuser_can_order_when_orders_disabled(self):
+        settings_obj = SiteSettings.get_solo()
+        settings_obj.orders_available = False
+        settings_obj.save()
+        staff = User.objects.create_user(username="staff", password="Sup3r-secret", is_staff=True)
+        superuser = User.objects.create_superuser(username="admin", password="Sup3r-secret")
+        regular = User.objects.create_user(username="regular", password="Sup3r-secret")
+
+        self.assertTrue(SiteSettings.is_orders_available(staff))
+        self.assertTrue(SiteSettings.is_orders_available(superuser))
+        self.assertFalse(SiteSettings.is_orders_available(regular))
+
     def test_cart_blocks_checkout_when_orders_disabled(self):
         settings_obj = SiteSettings.get_solo()
         settings_obj.orders_available = False
@@ -629,6 +641,18 @@ class SiteSettingsTests(TestCase):
 
     def test_cart_allows_checkout_when_orders_enabled(self):
         SiteSettings.get_solo()
+
+        response = self.client.get(reverse("app_cart:view_cart"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "В настоящий момент оформление новых заказов недоступно")
+
+    def test_cart_does_not_block_staff_when_orders_disabled(self):
+        settings_obj = SiteSettings.get_solo()
+        settings_obj.orders_available = False
+        settings_obj.save()
+        staff = User.objects.create_user(username="staff", password="Sup3r-secret", is_staff=True)
+        self.client.force_login(staff)
 
         response = self.client.get(reverse("app_cart:view_cart"))
 
@@ -821,3 +845,19 @@ class OrderAvailabilityTagTests(TestCase):
         staff = User.objects.create_user(username="staff", password="Sup3r-secret", is_staff=True)
 
         self.assertEqual(self.render_tag(self.at(23, 30), user=staff), "True")
+
+    def test_tag_allows_staff_when_site_orders_disabled(self):
+        settings_obj = SiteSettings.get_solo()
+        settings_obj.orders_available = False
+        settings_obj.save()
+        staff = User.objects.create_user(username="staff", password="Sup3r-secret", is_staff=True)
+
+        self.assertEqual(self.render_tag(self.at(12, 0), user=staff), "True")
+
+    def test_tag_blocks_regular_user_when_site_orders_disabled(self):
+        settings_obj = SiteSettings.get_solo()
+        settings_obj.orders_available = False
+        settings_obj.save()
+        regular = User.objects.create_user(username="regular", password="Sup3r-secret")
+
+        self.assertEqual(self.render_tag(self.at(12, 0), user=regular), "False")

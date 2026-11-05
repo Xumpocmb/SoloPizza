@@ -37,7 +37,7 @@ def get_recipient_emails():
 
 def checkout(request):
     # Проверяем, доступно ли оформление заказов
-    if not SiteSettings.is_orders_available():
+    if not SiteSettings.is_orders_available(request.user):
         messages.error(request, "В настоящий момент оформление новых заказов недоступно. Приносим свои извинения за доставленные неудобства.")
         return redirect("app_cart:view_cart")
 

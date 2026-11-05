@@ -16,7 +16,7 @@ from datetime import date, datetime, time, timedelta
 
 from django.utils import timezone
 
-from app_home.models import CafeBranch, WorkingHours
+from app_home.models import CafeBranch, WorkingHours, is_staff_user
 
 ORDER_CUTOFF = timedelta(minutes=30)
 
@@ -80,15 +80,6 @@ def get_current_shift(branch: CafeBranch, at: datetime | None = None) -> Shift |
     if not candidates:
         return None
     return max(candidates, key=lambda shift: shift.opens_at)
-
-
-def is_staff_user(user) -> bool:
-    """Сотрудники и суперпользователи не ограничены графиком работы."""
-    return bool(
-        user is not None
-        and user.is_authenticated
-        and (user.is_staff or user.is_superuser)
-    )
 
 
 def is_order_time_allowed(

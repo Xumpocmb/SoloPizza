@@ -5,6 +5,15 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
 
 
+def is_staff_user(user) -> bool:
+    """Сотрудники и суперпользователи не ограничены правилами приёма заказов."""
+    return bool(
+        user is not None
+        and user.is_authenticated
+        and (user.is_staff or user.is_superuser)
+    )
+
+
 class Discount(models.Model):
     name = models.CharField(max_length=100, verbose_name="Название скидки")
     slug = models.SlugField(max_length=100, unique=True, verbose_name="Идентификатор скидки", blank=True, null=True)
@@ -216,8 +225,14 @@ class SiteSettings(models.Model):
         return obj
 
     @classmethod
-    def is_orders_available(cls):
-        """Проверить, доступно ли оформление заказов."""
+    def is_orders_available(cls, user=None):
+        """Проверить, доступно ли оформление заказов.
+
+        Сотрудники и суперпользователи могут оформлять заказы даже при
+        выключенном общесайтовом переключателе.
+        """
+        if is_staff_user(user):
+            return True
         return cls.get_solo().orders_available
 
 

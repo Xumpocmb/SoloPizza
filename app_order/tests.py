@@ -10,7 +10,7 @@ from django.test import Client, TestCase, SimpleTestCase
 from django.urls import reverse
 from django.utils import timezone
 
-from app_home.models import CafeBranch, WorkingHours
+from app_home.models import CafeBranch, SiteSettings, WorkingHours
 from app_catalog.models import Category, PizzaSizes, Product, ProductVariant
 from app_order import statistics
 from app_order.models import DailyOrderNumber, Order, OrderItem
@@ -407,3 +407,25 @@ class CheckoutWorkingHoursTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "app_order/checkout.html")
+
+    def test_staff_can_checkout_when_site_orders_disabled(self):
+        settings_obj = SiteSettings.get_solo()
+        settings_obj.orders_available = False
+        settings_obj.save()
+        staff = User.objects.create_user(username="staff", password="Sup3r-secret", is_staff=True)
+        self.client.force_login(staff)
+
+        response = self.get_checkout(12, 0)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "app_order/checkout.html")
+
+    def test_regular_user_is_blocked_when_site_orders_disabled(self):
+        settings_obj = SiteSettings.get_solo()
+        settings_obj.orders_available = False
+        settings_obj.save()
+
+        response = self.get_checkout(12, 0)
+
+        self.assertRedirects(response, reverse("app_cart:view_cart"))
+        self.assertContains(response, "В настоящий момент оформление новых заказов недоступно")

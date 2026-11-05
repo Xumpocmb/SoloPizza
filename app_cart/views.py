@@ -88,7 +88,7 @@ def add_to_cart(request, slug):
 
 def view_cart(request):
     # Проверяем, доступно ли оформление заказов
-    orders_available = SiteSettings.is_orders_available()
+    orders_available = SiteSettings.is_orders_available(request.user)
     if not orders_available:
         messages.warning(request, "В настоящий момент оформление новых заказов недоступно. Приносим свои извинения за доставленные неудобства.")
 
