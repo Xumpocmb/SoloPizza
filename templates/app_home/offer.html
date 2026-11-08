@@ -8,65 +8,89 @@
 {% block og_description %}{% trans "Публичная оферта Solo Pizza - условия предложения о заказе пиццы, доставке, оплате и возврате." %}{% endblock %}
 {% block twitter_description %}{% trans "Публичная оферта Solo Pizza - условия предложения о заказе пиццы, доставке, оплате и возврате." %}{% endblock %}
 
-{% block body_class %}s-promo{% endblock %}
+{% block body_class %}s-offer{% endblock %}
 
 {% block main %}
-<main>
-    <section class="promo-section">
-        <div class="container">
-            {% include "app_home/_promo_header.html" %}
+<main class="offer-page">
+    <div class="offer-page__container">
 
-            <div class="promo-description">
-                <p>{% trans "Настоящая Публичная оферта Solo Pizza (далее - «Оферта») является публичной и распространяется на всех желающих." %}</p>
-                <p>{% trans "Организатор и исполнитель: публичная кафе-пиццерия Solo Pizza." %}</p>
-            </div>
+        <nav class="offer-breadcrumbs" aria-label="{% trans 'Хлебные крошки' %}">
+            {% for crumb in breadcrumbs %}
+                {% if forloop.last or crumb.url == "#" %}
+                    <span class="offer-breadcrumbs__current">{{ crumb.title }}</span>
+                {% else %}
+                    <a href="{{ crumb.url }}">{{ crumb.title }}</a>
+                {% endif %}
+                {% if not forloop.last %}<span class="offer-breadcrumbs__sep" aria-hidden="true">/</span>{% endif %}
+            {% endfor %}
+        </nav>
 
-            <div class="text-content">
-                <div class="delivery-info">
-                    <h2 class="text-title">{% trans "1. Предмет оферты" %}</h2>
-                    <p>{% trans "Исполнитель - публичная кафе-пиццерия Solo Pizza, реализующий пиццу, блюда и сопутствующие товары." %}</p>
+        <header class="offer-header">
+            <p class="offer-header__eyebrow">{% trans "Правовая информация" %}</p>
+            <h1 class="offer-header__title">{{ title }}</h1>
+            <p class="offer-header__meta">{% trans "Редакция от 8 ноября 2026 г." %}</p>
+        </header>
 
-                    <h2 class="text-title">{% trans "2. Условия оформления заказа" %}</h2>
-                    <ul>
-                        <li>{% trans "Заказ оформляется через информационную систему сайта (корзина, заявка о заказе) либо непосредственно в кафе." %}</li>
-                        <li>{% trans "После оформления заказа оператор связывается с вами для подтверждения. Если заказ не подтверждён, он отменяется." %}</li>
-                    </ul>
+        <p class="offer-lead">{% trans "Настоящая Публичная оферта Solo Pizza (далее - «Оферта») является публичной и распространяется на всех желающих." %}</p>
+        <p class="offer-lead">{% trans "Организатор и исполнитель: публичная кафе-пиццерия Solo Pizza." %}</p>
 
-                    <h2 class="text-title">{% trans "3. Цена и способ оплаты" %}</h2>
-                    <ul>
-                        <li>{% trans "Цена заказа формируется из стоимости блюд с учётом персональных и партнёрских скидок." %}</li>
-                        <li>{% trans "Способы оплаты, доступные при оформлении: наличные, карта, безналичный расчёт, раздельная оплата. Фактическая оплата производится непосредственно в кафе." %}</li>
-                    </ul>
+        <article class="offer-doc">
+            <section class="offer-doc__section">
+                <h2>{% trans "1. Предмет оферты" %}</h2>
+                <p>{% trans "Исполнитель - публичная кафе-пиццерия Solo Pizza, реализующий пиццу, блюда и сопутствующие товары." %}</p>
+            </section>
 
-                    <h2 class="text-title">{% trans "4. Условия доставки" %}</h2>
-                    <ul>
-                        <li>{% trans "Доставка по городу - 3 руб." %}</li>
-                        <li>{% blocktrans %}При стоимости заказа <strong>более 20 руб.</strong> - доставка <strong>бесплатная</strong>!{% endblocktrans %}</li>
-                    </ul>
+            <section class="offer-doc__section">
+                <h2>{% trans "2. Условия оформления заказа" %}</h2>
+                <ul>
+                    <li>{% trans "Заказ оформляется через информационную систему сайта (корзина, заявка о заказе) либо непосредственно в кафе." %}</li>
+                    <li>{% trans "После оформления заказа оператор связывается с вами для подтверждения. Если заказ не подтверждён, он отменяется." %}</li>
+                </ul>
+            </section>
 
-                    <h2 class="text-title">{% trans "5. Возврат и отказ от заказа" %}</h2>
-                    <p>{% trans "Возврат или замена продукции возможны в случае обнаружения недостатков. Условия рассматриваются в рамках законодательства Республики Беларусь о защите прав потребителей." %}</p>
+            <section class="offer-doc__section">
+                <h2>{% trans "3. Цена и способ оплаты" %}</h2>
+                <ul>
+                    <li>{% trans "Цена заказа формируется из стоимости блюд с учётом персональных и партнёрских скидок." %}</li>
+                    <li>{% trans "Способы оплаты, доступные при оформлении: наличные, карта, безналичный расчёт, раздельная оплата. Фактическая оплата производится непосредственно в кафе." %}</li>
+                </ul>
+            </section>
 
-                    {% if company %}
-                    <h2 class="text-title">{% trans "6. Реквизиты продавца" %}</h2>
-                    <ul>
-                        <li>{{ company.legal_name }}</li>
-                        {% if company.unpp %}<li>{% trans "УНП" %}: {{ company.unpp }}</li>{% endif %}
-                        {% if company.address %}<li>{{ company.address }}</li>{% endif %}
-                        {% if company.bank_name %}
-                        <li>
-                            {% trans "Банк" %}: {{ company.bank_name }}{% if company.bank_bik %} (БИК: {{ company.bank_bik }}){% endif %}{% if company.account_number %} / Р/с: {{ company.account_number }}{% endif %}
-                        </li>
-                        {% endif %}
-                    </ul>
+            <section class="offer-doc__section">
+                <h2>{% trans "4. Условия доставки" %}</h2>
+                <ul>
+                    <li>{% trans "Доставка по городу - 3 руб." %}</li>
+                    <li>{% blocktrans %}При стоимости заказа <strong>более 20 руб.</strong> - доставка <strong>бесплатная</strong>!{% endblocktrans %}</li>
+                </ul>
+            </section>
+
+            <section class="offer-doc__section">
+                <h2>{% trans "5. Возврат и отказ от заказа" %}</h2>
+                <p>{% trans "Возврат или замена продукции возможны в случае обнаружения недостатков. Условия рассматриваются в рамках законодательства Республики Беларусь о защите прав потребителей." %}</p>
+            </section>
+
+            {% if company %}
+            <section class="offer-doc__section">
+                <h2>{% trans "6. Реквизиты продавца" %}</h2>
+                <ul class="offer-requisites">
+                    <li>{{ company.legal_name }}</li>
+                    {% if company.unpp %}<li>{% trans "УНП" %}: {{ company.unpp }}</li>{% endif %}
+                    {% if company.address %}<li>{{ company.address }}</li>{% endif %}
+                    {% if company.bank_name %}
+                    <li>
+                        {% trans "Банк" %}: {{ company.bank_name }}{% if company.bank_bik %} (БИК: {{ company.bank_bik }}){% endif %}{% if company.account_number %} / Р/с: {{ company.account_number }}{% endif %}
+                    </li>
                     {% endif %}
-                </div>
+                </ul>
+            </section>
+            {% endif %}
+        </article>
 
-                <div class="action-buttons">
-                    <a href="{% url 'app_home:home' %}" class="btn btn-primary">{% trans "Заказать пиццу" %}</a>
-                </div>
-            </div>
-        </div>
-    </section>
+        <footer class="offer-footer">
+            <p class="offer-footer__note">{% trans "Оформляя заказ, вы принимаете условия настоящей оферты." %}</p>
+            <a href="{% url 'app_home:home' %}" class="offer-footer__cta">{% trans "Заказать пиццу" %}</a>
+        </footer>
+
+    </div>
 </main>
 {% endblock %}

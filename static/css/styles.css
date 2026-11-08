@@ -8928,3 +8928,189 @@ body.params-modal-active {
     padding: 0;
     accent-color: var(--accent-color, #079b59);
 }
+
+
+/* ==== Страница публичной оферты: лаконичный юридический документ ====
+   Узкая читаемая колонка, спокойная типографика, без крупных цветных
+   заголовков и декоративных разделителей. Стили скоупированы классом
+   .s-offer, поэтому другие страницы не затрагиваются. */
+:where(.s-offer) .offer-page {
+    padding: 32px 0 64px;
+    background-color: var(--bg-color);
+}
+
+:where(.s-offer) .offer-page__container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+:where(.s-offer) .offer-breadcrumbs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 24px;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+:where(.s-offer) .offer-breadcrumbs a {
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+:where(.s-offer) .offer-breadcrumbs a:hover {
+    color: var(--accent-color);
+}
+
+:where(.s-offer) .offer-breadcrumbs__sep {
+    opacity: 0.5;
+}
+
+:where(.s-offer) .offer-header {
+    margin-bottom: 28px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--divider-color);
+}
+
+:where(.s-offer) .offer-header__eyebrow {
+    margin-bottom: 8px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent-color);
+}
+
+:where(.s-offer) .offer-header__title {
+    margin-bottom: 10px;
+    font-size: 1.9rem;
+    font-weight: 700;
+    line-height: 1.25;
+    color: var(--text-color);
+}
+
+:where(.s-offer) .offer-header__meta {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+}
+
+:where(.s-offer) .offer-lead {
+    font-size: 1.02rem;
+    line-height: 1.7;
+    color: var(--text-muted);
+}
+
+:where(.s-offer) .offer-lead + .offer-lead {
+    margin-top: 8px;
+}
+
+:where(.s-offer) .offer-doc {
+    margin-top: 28px;
+}
+
+:where(.s-offer) .offer-doc__section + .offer-doc__section {
+    margin-top: 28px;
+}
+
+:where(.s-offer) .offer-doc__section h2 {
+    margin-bottom: 10px;
+    font-size: 1.12rem;
+    font-weight: 700;
+    line-height: 1.4;
+    color: var(--text-color);
+}
+
+:where(.s-offer) .offer-doc__section p {
+    font-size: 0.97rem;
+    line-height: 1.75;
+    color: var(--text-muted);
+}
+
+:where(.s-offer) .offer-doc__section p + p {
+    margin-top: 10px;
+}
+
+:where(.s-offer) .offer-doc__section ul {
+    margin-top: 10px;
+    padding-left: 20px;
+    font-size: 0.97rem;
+    line-height: 1.75;
+    color: var(--text-muted);
+}
+
+:where(.s-offer) .offer-doc__section li + li {
+    margin-top: 6px;
+}
+
+:where(.s-offer) .offer-doc__section strong {
+    color: var(--text-color);
+    font-weight: 700;
+}
+
+:where(.s-offer) .offer-requisites {
+    margin-top: 12px;
+    padding: 18px 20px;
+    list-style: none;
+    background-color: var(--hover-bg);
+    border-radius: 12px;
+    line-height: 1.65;
+}
+
+:where(.s-offer) .offer-requisites li + li {
+    margin-top: 4px;
+}
+
+:where(.s-offer) .offer-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 40px;
+    padding-top: 24px;
+    border-top: 1px solid var(--divider-color);
+}
+
+:where(.s-offer) .offer-footer__note {
+    flex: 1 1 280px;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+:where(.s-offer) .offer-footer__cta {
+    display: inline-block;
+    padding: 11px 22px;
+    background-color: var(--accent-color);
+    color: var(--button-text);
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: opacity 0.2s, transform 0.2s;
+}
+
+:where(.s-offer) .offer-footer__cta:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+@media (max-width: 600px) {
+    :where(.s-offer) .offer-page {
+        padding: 24px 0 48px;
+    }
+
+    :where(.s-offer) .offer-header__title {
+        font-size: 1.5rem;
+    }
+
+    :where(.s-offer) .offer-footer {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    :where(.s-offer) .offer-footer__cta {
+        text-align: center;
+    }
+}
