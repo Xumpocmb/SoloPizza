@@ -9096,6 +9096,111 @@ body.params-modal-active {
     transform: translateY(-1px);
 }
 
+/* Форма обратной связи в том же лаконичном стиле */
+:where(.s-legal) .legal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    max-width: 560px;
+    margin-top: 28px;
+}
+
+:where(.s-legal) .legal-form .form-group {
+    margin-bottom: 0;
+}
+
+:where(.s-legal) .legal-form label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+:where(.s-legal) .legal-form input[type="text"],
+:where(.s-legal) .legal-form input[type="tel"],
+:where(.s-legal) .legal-form input[type="email"],
+:where(.s-legal) .legal-form textarea {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1px solid var(--divider-color);
+    border-radius: 10px;
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    font-family: inherit;
+    font-size: 0.97rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+:where(.s-legal) .legal-form input[type="text"]:focus,
+:where(.s-legal) .legal-form input[type="tel"]:focus,
+:where(.s-legal) .legal-form input[type="email"]:focus,
+:where(.s-legal) .legal-form textarea:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px var(--accent-color-rgba);
+    outline: none;
+}
+
+:where(.s-legal) .legal-form textarea {
+    min-height: 140px;
+    resize: vertical;
+}
+
+:where(.s-legal) .legal-form input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+    margin: 2px 0 0;
+    padding: 0;
+    accent-color: var(--accent-color);
+    cursor: pointer;
+}
+
+:where(.s-legal) .legal-form__consent label {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-weight: 400;
+    line-height: 1.5;
+    color: var(--text-muted);
+    cursor: pointer;
+}
+
+:where(.s-legal) .legal-form__actions {
+    display: flex;
+}
+
+:where(.s-legal) .legal-form__submit {
+    padding: 11px 24px;
+    background-color: var(--accent-color);
+    color: var(--button-text);
+    border: none;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.2s;
+}
+
+:where(.s-legal) .legal-form__submit:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+:where(.s-legal) .legal-form__note {
+    max-width: 560px;
+    margin-top: 14px;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: var(--text-muted);
+}
+
+:where(.s-legal) .legal-form__note a {
+    color: var(--accent-color);
+    text-decoration: underline;
+}
+
 @media (max-width: 600px) {
     :where(.s-legal) .legal-page {
         padding: 24px 0 48px;
