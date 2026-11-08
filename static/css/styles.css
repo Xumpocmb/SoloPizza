@@ -9132,6 +9132,141 @@ body.params-modal-active {
     opacity: 0.9;
 }
 
+/* Отзывы */
+:where(.s-reviews-page) .legal-block__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+:where(.s-reviews-page) .legal-block__head .legal-block__title {
+    margin-bottom: 0;
+}
+
+:where(.s-reviews-page) .reviews-feed {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+:where(.s-reviews-page) .review-item {
+    padding: 18px 20px;
+    background-color: var(--hover-bg);
+    border-radius: 12px;
+}
+
+:where(.s-reviews-page) .review-item--own {
+    border: 1px solid var(--accent-color);
+}
+
+:where(.s-reviews-page) .review-item__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+:where(.s-reviews-page) .review-item__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px;
+}
+
+:where(.s-reviews-page) .review-item__author {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-color);
+}
+
+:where(.s-reviews-page) .review-item__date {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+:where(.s-reviews-page) .review-item__rating {
+    display: inline-flex;
+    gap: 2px;
+    font-size: 1rem;
+    line-height: 1;
+}
+
+:where(.s-reviews-page) .review-item__star {
+    color: var(--divider-color);
+}
+
+:where(.s-reviews-page) .review-item__star.is-filled {
+    color: #f5b301;
+}
+
+:where(.s-reviews-page) .review-item__text {
+    font-size: 0.95rem;
+    line-height: 1.65;
+    color: var(--text-muted);
+}
+
+:where(.s-reviews-page) .review-item__text p + p {
+    margin-top: 10px;
+}
+
+:where(.s-reviews-page) .review-item__link {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--accent-color);
+    text-decoration: none;
+}
+
+:where(.s-reviews-page) .review-item__link:hover {
+    text-decoration: underline;
+}
+
+:where(.s-reviews-page) .review-item__status {
+    margin-top: 10px;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+}
+
+:where(.s-reviews-page) .review-item--detail .review-item__text {
+    font-size: 1rem;
+}
+
+:where(.s-reviews-page) .rating-input {
+    display: inline-flex;
+    flex-direction: row-reverse;
+    gap: 2px;
+}
+
+:where(.s-reviews-page) .rating-input input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+}
+
+:where(.s-reviews-page) .rating-input label {
+    font-size: 1.55rem;
+    line-height: 1;
+    color: var(--divider-color);
+    cursor: pointer;
+}
+
+:where(.s-reviews-page) .rating-input input:checked ~ label,
+:where(.s-reviews-page) .rating-input label:hover ~ label {
+    color: #f5b301;
+}
+
+:where(.s-reviews-page) .rating-input input:focus-visible ~ label {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
+}
+
 /* Форма обратной связи в том же лаконичном стиле */
 :where(.s-legal) .legal-form {
     display: flex;
@@ -9866,5 +10001,10 @@ body.params-modal-active {
 
     :where(.s-legal) .legal-footer__actions .legal-footer__cta {
         text-align: center;
+    }
+
+    :where(.s-reviews-page) .review-item__head {
+        flex-direction: column;
+        align-items: flex-start;
     }
 }

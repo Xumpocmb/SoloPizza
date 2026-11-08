@@ -1,5 +1,5 @@
-{% extends 'base.html' %}
-{% load static %}
+{% extends 'app_home/legal_base.html' %}
+{% load static i18n %}
 
 {% block title %}Отзыв от {{ review.user.username }} - Solo Pizza{% endblock %}
 {% block meta_description %}Отзыв от {{ review.user.username }} о Solo Pizza - {{ review.text|truncatechars:100 }}{% endblock %}
@@ -7,29 +7,42 @@
 {% block og_description %}Отзыв от {{ review.user.username }} о Solo Pizza - {{ review.text|truncatechars:100 }}{% endblock %}
 {% block twitter_description %}Отзыв от {{ review.user.username }} о Solo Pizza - {{ review.text|truncatechars:100 }}{% endblock %}
 
+{% block body_class %}s-legal s-reviews-page{% endblock %}
 
-{% block body_class %}s-reviews{% endblock %}
+{% block eyebrow %}<p class="legal-header__eyebrow">{% trans "Отзывы" %}</p>{% endblock %}
 
-{% block main %}
-<main>
-    <div class="review-detail">
-        <div class="review-card">
-            <div class="review-header">
-                <span class="review-author">{{ review.user.username }}</span>
-                <span class="review-date">{{ review.created_at|date:"d.m.Y H:i" }}</span>
-                    <div class="review-rating">
-                        {% for i in "12345" %}
-                            <span class="star{% if forloop.counter <= review.rating %} filled{% endif %}">★</span>
-                        {% endfor %}
-                    </div>
-            </div>
-            <div class="review-text">{{ review.text|linebreaks }}</div>
-        </div>
-        
-        <a href="{% url 'app_reviews:review_list' %}" class="btn btn-secondary">
-            Вернуться к списку отзывов
-        </a>
+{% block page_title %}Отзыв от {{ review.user.username }}{% endblock %}
+
+{% block lead %}
+<p class="legal-lead">{% trans "Ваш отзыв о пицце, обслуживании и доставке." %}</p>
+{% endblock %}
+
+{% block content %}
+<div class="legal-blocks">
+    <section class="legal-block">
+        <article class="review-item review-item--detail">
+            <header class="review-item__head">
+                <div class="review-item__meta">
+                    <span class="review-item__author">{{ review.user.username }}</span>
+                    <time class="review-item__date" datetime="{{ review.created_at|date:'Y-m-d H:i' }}">{{ review.created_at|date:"d.m.Y H:i" }}</time>
+                </div>
+                <div class="review-item__rating" role="img" aria-label="{% blocktrans with rating=review.rating %}Оценка: {{ rating }} из 5{% endblocktrans %}">
+                    {% for i in "12345" %}
+                        <span class="review-item__star{% if forloop.counter <= review.rating %} is-filled{% endif %}">★</span>
+                    {% endfor %}
+                </div>
+            </header>
+            <div class="review-item__text">{{ review.text|linebreaks }}</div>
+        </article>
+    </section>
+</div>
+{% endblock %}
+
+{% block page_footer %}
+<footer class="legal-footer">
+    <p class="legal-footer__note">{% trans "Мы внимательно читаем каждый отзыв." %}</p>
+    <div class="legal-footer__actions">
+        <a href="{% url 'app_reviews:review_list' %}" class="legal-footer__cta legal-footer__cta--secondary">{% trans "Вернуться к списку отзывов" %}</a>
     </div>
-</main>
-
+</footer>
 {% endblock %}

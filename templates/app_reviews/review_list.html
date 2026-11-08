@@ -1,5 +1,5 @@
-{% extends 'base.html' %}
-{% load static %}
+{% extends 'app_home/legal_base.html' %}
+{% load static i18n %}
 
 {% block title %}Отзывы клиентов - Solo Pizza{% endblock %}
 {% block meta_description %}Отзывы клиентов о Solo Pizza - узнайте мнения наших посетителей о качестве блюд и обслуживании.{% endblock %}
@@ -7,58 +7,68 @@
 {% block og_description %}Отзывы клиентов о Solo Pizza - узнайте мнения наших посетителей о качестве блюд и обслуживании.{% endblock %}
 {% block twitter_description %}Отзывы клиентов о Solo Pizza - узнайте мнения наших посетителей о качестве блюд и обслуживании.{% endblock %}
 
+{% block body_class %}s-legal s-reviews-page{% endblock %}
 
-{% block body_class %}s-reviews{% endblock %}
+{% block eyebrow %}<p class="legal-header__eyebrow">{% trans "Отзывы" %}</p>{% endblock %}
 
-{% block main %}
+{% block page_title %}Отзывы наших клиентов{% endblock %}
 
-<main>
-    <div class="reviews-container">
+{% block lead %}
+<p class="legal-lead">{% trans "Мнения наших посетителей о качестве блюд и обслуживании." %}</p>
+{% endblock %}
 
-        <div class="reviews-header">
-            <h1 class="review-title">Отзывы наших клиентов</h1>
+{% block content %}
+<div class="legal-blocks">
+
+    <section class="legal-block">
+        <div class="legal-block__head">
+            <h2 class="legal-block__title">{% trans "Опубликованные отзывы" %}</h2>
             {% if request.user.is_authenticated %}
-            <a href="{% url 'app_reviews:add_review' %}" class="btn btn-primary">
-                Оставить отзыв
-            </a>
+            <a class="legal-footer__cta" href="{% url 'app_reviews:add_review' %}">{% trans "Оставить отзыв" %}</a>
             {% endif %}
         </div>
-        
-    
-        <div class="reviews-list">
+
+        <div class="reviews-feed">
             {% for review in reviews %}
-                {% if review.status == 'approved' or review.user == request.user %}
-                <div class="review-card {% if review.user == request.user %}your-review{% endif %}">
-                    <div class="review-card">
-                        <div class="review-header">
-                            <span class="review-author">{{ review.user.username }}</span>
-                            <span class="review-date">{{ review.created_at|date:"d.m.Y" }}</span>
-                            <div class="review-rating">
-                                {% for i in "12345" %}
-                                    <span class="star{% if forloop.counter <= review.rating %} filled{% endif %}">★</span>
-                                {% endfor %}
-                            </div>
-                        </div>
-                        <div class="review-text">{{ review.text }}</div>
-                        <a href="{% url 'app_reviews:review_detail' review.pk %}" class="read-more">
-                            Подробнее
-                        </a>
+            {% if review.status == 'approved' or review.user == request.user %}
+            <article class="review-item{% if review.user == request.user %} review-item--own{% endif %}">
+                <header class="review-item__head">
+                    <div class="review-item__meta">
+                        <span class="review-item__author">{{ review.user.username }}</span>
+                        <time class="review-item__date" datetime="{{ review.created_at|date:'Y-m-d' }}">{{ review.created_at|date:"d.m.Y" }}</time>
                     </div>
-                    {% if review.user == request.user %}
-                        <div class="review-status">
-                            Статус: {{ review.get_status_display }}
-                            {% if review.status == 'rejected' and review.moderation_comment %}
-                                ({{ review.moderation_comment }})
-                            {% endif %}
-                        </div>
-                    {% endif %}
-                </div>
+                    <div class="review-item__rating" role="img" aria-label="{% blocktrans with rating=review.rating %}Оценка: {{ rating }} из 5{% endblocktrans %}">
+                        {% for i in "12345" %}
+                            <span class="review-item__star{% if forloop.counter <= review.rating %} is-filled{% endif %}">★</span>
+                        {% endfor %}
+                    </div>
+                </header>
+                <p class="review-item__text">{{ review.text }}</p>
+                <a class="review-item__link" href="{% url 'app_reviews:review_detail' review.pk %}">{% trans "Подробнее" %}</a>
+                {% if review.user == request.user %}
+                <p class="review-item__status">{% trans "Статус:" %} {{ review.get_status_display }}{% if review.status == 'rejected' and review.moderation_comment %} ({{ review.moderation_comment }}){% endif %}</p>
                 {% endif %}
+            </article>
+            {% endif %}
             {% empty %}
-            <p>Пока нет отзывов. Будьте первым!</p>
+            <p class="legal-empty">{% trans "Пока нет отзывов. Будьте первым!" %}</p>
             {% endfor %}
         </div>
-    </div>
-</main>
+    </section>
 
+    <section class="legal-block">
+        <h2 class="legal-block__title">{% trans "Оставить отзыв" %}</h2>
+        <p>{% trans "Ваш отзыв будет опубликован после проверки модератором." %}</p>
+
+        <div class="legal-actions">
+            {% if request.user.is_authenticated %}
+            <a class="legal-footer__cta" href="{% url 'app_reviews:add_review' %}">{% trans "Оставить отзыв" %}</a>
+            {% else %}
+            <a class="legal-footer__cta" href="{% url 'app_user:login' %}">{% trans "Войти и оставить отзыв" %}</a>
+            {% endif %}
+            <a class="legal-footer__cta legal-footer__cta--secondary" href="{% url 'app_reviews:book' %}">{% trans "Книга замечаний и предложений" %}</a>
+        </div>
+    </section>
+
+</div>
 {% endblock %}

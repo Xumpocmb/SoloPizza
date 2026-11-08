@@ -46,3 +46,56 @@ class BookViewTests(TestCase):
         response = self.client.get(self.url)
 
         self.assertContains(response, "Пока нет замечаний")
+
+
+class ReviewsLegalLayoutTests(TestCase):
+    """Единый лаконичный каркас публичных страниц отзывов."""
+
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(username="client2", password="Sup3r-secret")
+        self.review = Review.objects.create(
+            user=self.user,
+            text="Проверка дизайна отзывов",
+            rating=4,
+            status="approved",
+            is_published=True,
+        )
+
+    def test_review_list_uses_legal_layout(self):
+        """GET /reviews/ отдает страницу в едином каркасе."""
+        response = self.client.get(reverse("app_reviews:review_list"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "app_reviews/review_list.html")
+        self.assertTemplateUsed(response, "app_home/legal_base.html")
+        self.assertContains(response, "legal-blocks")
+        self.assertContains(response, "Отзывы наших клиентов")
+        self.assertContains(response, "Проверка дизайна отзывов")
+
+    def test_review_book_uses_legal_layout(self):
+        """GET /reviews/book/ отдает книгу замечаний в единообразном каркасе."""
+        response = self.client.get(reverse("app_reviews:book"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "app_reviews/book.html")
+        self.assertTemplateUsed(response, "app_home/legal_base.html")
+        self.assertContains(response, "legal-blocks")
+        self.assertContains(response, "Книга замечаний и предложений")
+        self.assertContains(response, "Проверка дизайна отзывов")
+
+    def test_review_detail_uses_legal_layout(self):
+        """GET /reviews/<id>/ отдает отзыв в единообразном каркасе."""
+        response = self.client.get(reverse("app_reviews:review_detail", args=[self.review.pk]))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "app_reviews/review_detail.html")
+        self.assertTemplateUsed(response, "app_home/legal_base.html")
+        self.assertContains(response, "legal-blocks")
+        self.assertContains(response, "Проверка дизайна отзывов")
+
+    def test_add_review_requires_authentication(self):
+        """Форма отзыва доступна только авторизованным пользователям."""
+        response = self.client.get(reverse("app_reviews:add_review"))
+
+        self.assertEqual(response.status_code, 302)

@@ -1,6 +1,5 @@
-{% extends 'base.html' %}
-{% load static %}
-{% load i18n %}
+{% extends 'app_home/legal_base.html' %}
+{% load static i18n %}
 
 {% block title %}Книга замечаний и предложений - Solo Pizza{% endblock %}
 {% block meta_description %}Книга замечаний и предложений Solo Pizza - публичная книга наших клиентов: отзывы, вопросы и предложения.{% endblock %}
@@ -8,52 +7,57 @@
 {% block og_description %}Книга замечаний и предложений Solo Pizza - публичная книга наших клиентов: отзывы, вопросы и предложения.{% endblock %}
 {% block twitter_description %}Книга замечаний и предложений Solo Pizza - публичная книга наших клиентов: отзывы, вопросы и предложения.{% endblock %}
 
+{% block body_class %}s-legal s-reviews-page{% endblock %}
 
-{% block body_class %}s-reviews{% endblock %}
+{% block eyebrow %}<p class="legal-header__eyebrow">{% trans "Книга замечаний" %}</p>{% endblock %}
 
-{% block main %}
+{% block page_title %}Книга замечаний и предложений{% endblock %}
 
-<main>
-    <div class="reviews-container">
-        <div class="reviews-header">
-            <h1 class="review-title">{% trans "Книга замечаний и предложений" %}</h1>
-            <p>{% trans "Опубликованные нами отзывы, вопросы и предложения наших клиентов. Если у вас есть замечания или предложения — оставьте их через страницу обратной связи." %}</p>
-            <a href="{% url 'app_home:feedback' %}" class="btn btn-primary">
-                {% trans "Оставить замечание" %}
-            </a>
+{% block lead %}
+<p class="legal-lead">{% trans "Опубликованные нами отзывы, вопросы и предложения наших клиентов. Если у вас есть замечания или предложения — оставьте их через страницу обратной связи." %}</p>
+{% endblock %}
+
+{% block content %}
+<div class="legal-blocks">
+
+    <section class="legal-block">
+        <div class="legal-block__head">
+            <h2 class="legal-block__title">{% trans "Записи книги" %}</h2>
         </div>
-        
-        <div class="reviews-list">
+
+        <div class="reviews-feed">
             {% for comment in comments %}
-                <div class="review-card {% if comment.user == request.user %}your-review{% endif %}">
-                    <div class="review-card">
-                        <div class="review-header">
-                            <span class="review-author">{{ comment.user.username }}</span>
-                            <span class="review-date">{{ comment.created_at|date:"d.m.Y" }}</span>
-                            <div class="review-rating">
-                                {% for i in "12345" %}
-                                    <span class="star{% if forloop.counter <= comment.rating %} filled{% endif %}">★</span>
-                                {% endfor %}
-                            </div>
-                        </div>
-                        <div class="review-text">{{ comment.text }}</div>
-                        <a href="{% url 'app_reviews:review_detail' comment.pk %}" class="read-more">
-                            {% trans "Подробнее" %}
-                        </a>
+            <article class="review-item{% if comment.user == request.user %} review-item--own{% endif %}">
+                <header class="review-item__head">
+                    <div class="review-item__meta">
+                        <span class="review-item__author">{{ comment.user.username }}</span>
+                        <time class="review-item__date" datetime="{{ comment.created_at|date:'Y-m-d' }}">{{ comment.created_at|date:"d.m.Y" }}</time>
                     </div>
-                    {% if comment.user == request.user %}
-                        <div class="review-status">
-                            {% trans "Статус:" %} {{ comment.get_status_display }}
-                            {% if comment.status == 'rejected' and comment.moderation_comment %}
-                                ({{ comment.moderation_comment }})
-                            {% endif %}
-                        </div>
-                    {% endif %}
-                </div>
+                    <div class="review-item__rating" role="img" aria-label="{% blocktrans with rating=comment.rating %}Оценка: {{ rating }} из 5{% endblocktrans %}">
+                        {% for i in "12345" %}
+                            <span class="review-item__star{% if forloop.counter <= comment.rating %} is-filled{% endif %}">★</span>
+                        {% endfor %}
+                    </div>
+                </header>
+                <p class="review-item__text">{{ comment.text }}</p>
+                <a class="review-item__link" href="{% url 'app_reviews:review_detail' comment.pk %}">{% trans "Подробнее" %}</a>
+                {% if comment.user == request.user %}
+                <p class="review-item__status">{% trans "Статус:" %} {{ comment.get_status_display }}{% if comment.status == 'rejected' and comment.moderation_comment %} ({{ comment.moderation_comment }}){% endif %}</p>
+                {% endif %}
+            </article>
             {% empty %}
-            <p>{% trans "Пока нет замечаний. Будьте первым!" %}</p>
+            <p class="legal-empty">{% trans "Пока нет замечаний. Будьте первым!" %}</p>
             {% endfor %}
         </div>
-    </div>
-</main>
+    </section>
+
+    <section class="legal-block">
+        <h2 class="legal-block__title">{% trans "Оставить замечание" %}</h2>
+        <p>{% trans "Если у вас есть замечания или предложения — оставьте их через страницу обратной связи." %}</p>
+        <div class="legal-actions">
+            <a class="legal-footer__cta" href="{% url 'app_home:feedback' %}">{% trans "Написать нам" %}</a>
+        </div>
+    </section>
+
+</div>
 {% endblock %}
