@@ -32,10 +32,10 @@
 
         <p class="legal-lead">{% trans "Адреса, телефоны и время работы наших пиццерий. Свяжитесь с нами для заказа или с вопросами." %}</p>
 
-        <div class="contacts-blocks">
+        <div class="legal-blocks">
 
-            <section class="contacts-block">
-                <h2 class="contacts-block__title">{% trans "Наши пиццерии" %}</h2>
+            <section class="legal-block">
+                <h2 class="legal-block__title">{% trans "Наши пиццерии" %}</h2>
 
                 <div class="contacts-branches">
                     {% for branch in branches %}
@@ -80,8 +80,8 @@
                 </div>
             </section>
 
-            <section class="contacts-block">
-                <h2 class="contacts-block__title">{% trans "Мы в соцсетях" %}</h2>
+            <section class="legal-block">
+                <h2 class="legal-block__title">{% trans "Мы в соцсетях" %}</h2>
                 <div class="contacts-social">
                     <a class="contacts-social__link"
                        href="https://www.instagram.com/solo_pizza_bar/"
@@ -93,14 +93,14 @@
                 </div>
             </section>
 
-            <section class="contacts-block">
-                <h2 class="contacts-block__title">{% trans "Написать нам" %}</h2>
+            <section class="legal-block">
+                <h2 class="legal-block__title">{% trans "Написать нам" %}</h2>
                 {% include "app_home/_feedback_form.html" %}
             </section>
 
             {% if company %}
-            <section class="contacts-block">
-                <h2 class="contacts-block__title">{% trans "Реквизиты компании" %}</h2>
+            <section class="legal-block">
+                <h2 class="legal-block__title">{% trans "Реквизиты компании" %}</h2>
                 <ul class="legal-requisites">
                     <li>{{ company.legal_name }}</li>
                     {% if company.unpp %}<li>{% trans "УНП" %}: {{ company.unpp }}</li>{% endif %}

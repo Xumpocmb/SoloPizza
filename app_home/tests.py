@@ -13,7 +13,7 @@ from django.utils import timezone
 
 from app_home.context_processors import canonical_context, cookie_consent_context
 from app_home.forms import FeedbackForm, VacancyApplicationForm
-from app_home.models import CafeBranch, CafeBranchPhone, Company, Feedback, Vacancy, VacancyApplication, InfoPage, SiteSettings, Announcement, WorkingHours
+from app_home.models import CafeBranch, CafeBranchPhone, Company, Feedback, Partner, Vacancy, VacancyApplication, InfoPage, SiteSettings, Announcement, WorkingHours
 from app_home.templatetags.static_version import static_v
 from app_home.working_hours import (
     get_current_shift,
@@ -638,6 +638,44 @@ class ContactsViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Feedback.objects.count(), 0)
         self.assertFalse(response.context['form'].is_valid())
+
+
+class PartnersViewTests(TestCase):
+    """Тесты страницы партнёров."""
+
+    def setUp(self):
+        self.client = Client()
+        self.url = reverse('app_home:partners')
+
+    def test_partners_view_get(self):
+        """Страница показывает условия скидки и карточку партнёра со ссылкой."""
+        Partner.objects.create(name='Кофейня «Ритм»', link='https://example.com/ritm')
+
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'app_home/partners.html')
+        self.assertContains(response, 'Скидка 10%')
+        self.assertContains(response, 'Кофейня «Ритм»')
+        self.assertContains(response, 'href="https://example.com/ritm"')
+        self.assertContains(response, 'target="_blank"')
+        self.assertContains(response, 'rel="noopener noreferrer"')
+
+    def test_partners_view_without_link(self):
+        """Партнёр без ссылки выводится карточкой без перехода."""
+        Partner.objects.create(name='Партнёр без сайта')
+
+        response = self.client.get(self.url)
+
+        self.assertContains(response, 'Партнёр без сайта')
+        self.assertContains(response, 'Ссылка недоступна')
+
+    def test_partners_view_empty_state(self):
+        """При отсутствии партнёров выводится понятное сообщение."""
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'нет активных партнёров')
 
 
 class InfoPageModelTests(TestCase):

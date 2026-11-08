@@ -9201,22 +9201,22 @@ body.params-modal-active {
     text-decoration: underline;
 }
 
-/* Контакты: отдельные логические блоки-карточки */
-:where(.s-contacts) .contacts-blocks {
+/* Общие блоки-карточки информационных страниц (контакты, партнёры) */
+:where(.s-legal) .legal-blocks {
     display: flex;
     flex-direction: column;
     gap: 20px;
     margin-top: 28px;
 }
 
-:where(.s-contacts) .contacts-block {
+:where(.s-legal) .legal-block {
     padding: 22px 24px;
     background-color: var(--card-bg);
     border: 1px solid var(--divider-color);
     border-radius: 14px;
 }
 
-:where(.s-contacts) .contacts-block__title {
+:where(.s-legal) .legal-block__title {
     margin-bottom: 18px;
     font-size: 1.05rem;
     font-weight: 700;
@@ -9321,12 +9321,68 @@ body.params-modal-active {
 }
 
 /* Форма и реквизиты внутри карточки не нуждаются в верхнем отступе */
-:where(.s-contacts) .contacts-block .legal-form {
+:where(.s-legal) .legal-block .legal-form {
     margin-top: 0;
 }
 
-:where(.s-contacts) .contacts-block .legal-requisites {
+:where(.s-legal) .legal-block .legal-requisites {
     margin-top: 0;
+}
+
+/* Партнёры */
+:where(.s-partners) .partners-offer {
+    font-size: 0.97rem;
+    line-height: 1.75;
+    color: var(--text-muted);
+}
+
+:where(.s-partners) .partners-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+:where(.s-partners) .partner-card {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 18px 20px;
+    background-color: var(--hover-bg);
+    border: 1px solid transparent;
+    border-radius: 12px;
+    text-decoration: none;
+    transition: border-color 0.2s, transform 0.2s;
+}
+
+:where(.s-partners) a.partner-card:hover {
+    border-color: var(--accent-color);
+    transform: translateY(-1px);
+}
+
+:where(.s-partners) .partner-card__name {
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.4;
+    color: var(--text-color);
+}
+
+:where(.s-partners) .partner-card__note {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: var(--text-muted);
+}
+
+:where(.s-partners) a.partner-card:hover .partner-card__note {
+    color: var(--accent-color);
+}
+
+:where(.s-legal) .legal-empty {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--text-muted);
 }
 
 @media (max-width: 600px) {
@@ -9347,11 +9403,15 @@ body.params-modal-active {
         text-align: center;
     }
 
-    :where(.s-contacts) .contacts-block {
+    :where(.s-legal) .legal-block {
         padding: 18px 16px;
     }
 
     :where(.s-contacts) .contacts-branches {
+        grid-template-columns: 1fr;
+    }
+
+    :where(.s-partners) .partners-grid {
         grid-template-columns: 1fr;
     }
 }

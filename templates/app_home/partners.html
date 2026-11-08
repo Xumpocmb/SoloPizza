@@ -8,39 +8,74 @@
 {% block og_description %}{% trans "Наши партнеры - список организаций и компаний, с которыми мы сотрудничаем." %}{% endblock %}
 {% block twitter_description %}{% trans "Наши партнеры - список организаций и компаний, с которыми мы сотрудничаем." %}{% endblock %}
 
-{% block body_class %}s-promo{% endblock %}
+{% block body_class %}s-legal s-partners{% endblock %}
 
 {% block main %}
-<main>
-    <section class="promo-section">
-        <div class="container">
-            {% include "app_home/_promo_header.html" %}
+<main class="legal-page">
+    <div class="legal-page__container">
 
-            <div class="promo-description">
-                <p>{% trans "Посетителям, которые проводят время у наших партнеров и заказывают пиццу в Solo Pizza, предоставляется скидка 10% на все виды пиццы!" %}</p>
-            </div>
+        <nav class="legal-breadcrumbs" aria-label="{% trans 'Хлебные крошки' %}">
+            {% for crumb in breadcrumbs %}
+                {% if forloop.last or crumb.url == "#" %}
+                    <span class="legal-breadcrumbs__current">{{ crumb.title }}</span>
+                {% else %}
+                    <a href="{{ crumb.url }}">{{ crumb.title }}</a>
+                {% endif %}
+                {% if not forloop.last %}<span class="legal-breadcrumbs__sep" aria-hidden="true">/</span>{% endif %}
+            {% endfor %}
+        </nav>
 
-            {% if partners %}
-            <ul class="promo-list">
-                {% for partner in partners %}
-                <li class="promo-list-item">
-                    <h3 class="promo-list-title">{{ partner.name }}</h3>
-                    {% if partner.link %}
-                        <a href="{{ partner.link }}" target="_blank" rel="noopener noreferrer">{% trans "Перейти к партнеру" %}</a>
-                    {% else %}
-                        <span>{% trans "Ссылка недоступна" %}</span>
-                    {% endif %}
-                </li>
-                {% endfor %}
-            </ul>
-            {% else %}
-            <div class="promo-card">
-                <div class="promo-card-content">
-                    <p>{% trans "В настоящее время у нас нет активных партнеров." %}</p>
+        <header class="legal-header">
+            <p class="legal-header__eyebrow">{% trans "Партнёры" %}</p>
+            <h1 class="legal-header__title">{{ title }}</h1>
+        </header>
+
+        <p class="legal-lead">{% trans "Организации и компании, с которыми мы сотрудничаем." %}</p>
+
+        <div class="legal-blocks">
+
+            <section class="legal-block">
+                <h2 class="legal-block__title">{% trans "Скидка 10%" %}</h2>
+                <p class="partners-offer">{% trans "Посетителям, которые проводят время у наших партнеров и заказывают пиццу в Solo Pizza, предоставляется скидка 10% на все виды пиццы!" %}</p>
+            </section>
+
+            <section class="legal-block">
+                <h2 class="legal-block__title">{% trans "Наши партнёры" %}</h2>
+
+                {% if partners %}
+                <div class="partners-grid">
+                    {% for partner in partners %}
+                        {% if partner.link %}
+                        <a class="partner-card"
+                           href="{{ partner.link }}"
+                           target="_blank"
+                           rel="noopener noreferrer">
+                            <span class="partner-card__name">{{ partner.name }}</span>
+                            <span class="partner-card__note">
+                                {% trans "Перейти к партнёру" %}
+                                <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i>
+                            </span>
+                        </a>
+                        {% else %}
+                        <div class="partner-card partner-card--static">
+                            <span class="partner-card__name">{{ partner.name }}</span>
+                            <span class="partner-card__note">{% trans "Ссылка недоступна" %}</span>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
                 </div>
-            </div>
-            {% endif %}
+                {% else %}
+                <p class="legal-empty">{% trans "В настоящее время у нас нет активных партнёров." %}</p>
+                {% endif %}
+            </section>
+
         </div>
-    </section>
+
+        <footer class="legal-footer">
+            <p class="legal-footer__note">{% trans "Хотите стать нашим партнёром?" %}</p>
+            <a href="{% url 'app_home:contacts' %}" class="legal-footer__cta">{% trans "Связаться с нами" %}</a>
+        </footer>
+
+    </div>
 </main>
 {% endblock %}
