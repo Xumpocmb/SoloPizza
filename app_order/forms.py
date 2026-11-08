@@ -89,12 +89,13 @@ class CheckoutForm(DeliveryValidationMixin, forms.ModelForm):
         self.fields["phone_number"].widget = self.fields["phone"].widget
         del self.fields["name"]
         del self.fields["phone"]
+        self.skip_consent_validation = False
 
     def clean(self):
         cleaned_data = super().clean()
         validate_delivery_requirements(self)
 
-        if not cleaned_data.get("consent"):
+        if not cleaned_data.get("consent") and not self.skip_consent_validation:
             self.add_error("consent", "Необходимо дать согласие на обработку персональных данных")
 
         return cleaned_data

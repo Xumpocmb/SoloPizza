@@ -65,6 +65,10 @@ def checkout(request):
 
     if request.method == "POST":
         form = CheckoutForm(request.POST)
+        if request.user.is_staff or request.user.is_superuser:
+            # Сотрудникам и суперпользователям согласие на обработку персональных данных не требуется
+            form.fields["consent"].required = False
+            form.skip_consent_validation = True
         if form.is_valid():
             # Проверяем товары перед созданием заказа
             unavailable_items = validate_cart_items_for_branch(cart_items, selected_branch)
@@ -153,6 +157,10 @@ def checkout(request):
                 "phone_number": getattr(request.user, "phone", ""),
             }
         form = CheckoutForm(initial=initial)
+        if request.user.is_staff or request.user.is_superuser:
+            # Сотрудникам и суперпользователям согласие на обработку персональных данных не требуется
+            form.fields["consent"].required = False
+            form.skip_consent_validation = True
 
     context = {
         "form": form,

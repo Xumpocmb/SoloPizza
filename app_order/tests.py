@@ -338,6 +338,22 @@ class OrderFormValidationTests(TestCase):
         self.assertFalse(form.is_valid())
         self.assertIn("consent", form.errors)
 
+    def test_checkout_consent_not_required_for_staff(self):
+        """Согласие на обработку персональных данных не требуется сотруднику."""
+        form = CheckoutForm({"customer_name": "Иван", "phone_number": "", "delivery_type": "cafe", "payment_method": "cash"})
+        form.fields["consent"].required = False
+        form.skip_consent_validation = True
+
+        self.assertTrue(form.is_valid(), form.errors)
+
+    def test_checkout_consent_not_required_for_superuser(self):
+        """Согласие на обработку персональных данных не требуется суперпользователю."""
+        form = CheckoutForm({"customer_name": "Иван", "phone_number": "", "delivery_type": "cafe", "payment_method": "cash"})
+        form.fields["consent"].required = False
+        form.skip_consent_validation = True
+
+        self.assertTrue(form.is_valid(), form.errors)
+
 
 
 class CheckoutWorkingHoursTests(TestCase):
