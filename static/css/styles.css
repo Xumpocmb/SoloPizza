@@ -8930,22 +8930,22 @@ body.params-modal-active {
 }
 
 
-/* ==== Страница публичной оферты: лаконичный юридический документ ====
+/* ==== Юридические страницы (оферта, политика ПД): лаконичный документ ====
    Узкая читаемая колонка, спокойная типографика, без крупных цветных
    заголовков и декоративных разделителей. Стили скоупированы классом
-   .s-offer, поэтому другие страницы не затрагиваются. */
-:where(.s-offer) .offer-page {
+   .s-legal, поэтому другие страницы не затрагиваются. */
+:where(.s-legal) .legal-page {
     padding: 32px 0 64px;
     background-color: var(--bg-color);
 }
 
-:where(.s-offer) .offer-page__container {
+:where(.s-legal) .legal-page__container {
     max-width: 800px;
     margin: 0 auto;
     padding: 0 20px;
 }
 
-:where(.s-offer) .offer-breadcrumbs {
+:where(.s-legal) .legal-breadcrumbs {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
@@ -8954,27 +8954,27 @@ body.params-modal-active {
     color: var(--text-muted);
 }
 
-:where(.s-offer) .offer-breadcrumbs a {
+:where(.s-legal) .legal-breadcrumbs a {
     color: var(--text-muted);
     text-decoration: none;
     transition: color 0.2s;
 }
 
-:where(.s-offer) .offer-breadcrumbs a:hover {
+:where(.s-legal) .legal-breadcrumbs a:hover {
     color: var(--accent-color);
 }
 
-:where(.s-offer) .offer-breadcrumbs__sep {
+:where(.s-legal) .legal-breadcrumbs__sep {
     opacity: 0.5;
 }
 
-:where(.s-offer) .offer-header {
+:where(.s-legal) .legal-header {
     margin-bottom: 28px;
     padding-bottom: 24px;
     border-bottom: 1px solid var(--divider-color);
 }
 
-:where(.s-offer) .offer-header__eyebrow {
+:where(.s-legal) .legal-header__eyebrow {
     margin-bottom: 8px;
     font-size: 0.72rem;
     font-weight: 700;
@@ -8983,7 +8983,7 @@ body.params-modal-active {
     color: var(--accent-color);
 }
 
-:where(.s-offer) .offer-header__title {
+:where(.s-legal) .legal-header__title {
     margin-bottom: 10px;
     font-size: 1.9rem;
     font-weight: 700;
@@ -8991,30 +8991,30 @@ body.params-modal-active {
     color: var(--text-color);
 }
 
-:where(.s-offer) .offer-header__meta {
+:where(.s-legal) .legal-header__meta {
     font-size: 0.88rem;
     color: var(--text-muted);
 }
 
-:where(.s-offer) .offer-lead {
+:where(.s-legal) .legal-lead {
     font-size: 1.02rem;
     line-height: 1.7;
     color: var(--text-muted);
 }
 
-:where(.s-offer) .offer-lead + .offer-lead {
+:where(.s-legal) .legal-lead + .legal-lead {
     margin-top: 8px;
 }
 
-:where(.s-offer) .offer-doc {
+:where(.s-legal) .legal-doc {
     margin-top: 28px;
 }
 
-:where(.s-offer) .offer-doc__section + .offer-doc__section {
+:where(.s-legal) .legal-doc__section + .legal-doc__section {
     margin-top: 28px;
 }
 
-:where(.s-offer) .offer-doc__section h2 {
+:where(.s-legal) .legal-doc__section h2 {
     margin-bottom: 10px;
     font-size: 1.12rem;
     font-weight: 700;
@@ -9022,17 +9022,17 @@ body.params-modal-active {
     color: var(--text-color);
 }
 
-:where(.s-offer) .offer-doc__section p {
+:where(.s-legal) .legal-doc__section p {
     font-size: 0.97rem;
     line-height: 1.75;
     color: var(--text-muted);
 }
 
-:where(.s-offer) .offer-doc__section p + p {
+:where(.s-legal) .legal-doc__section p + p {
     margin-top: 10px;
 }
 
-:where(.s-offer) .offer-doc__section ul {
+:where(.s-legal) .legal-doc__section ul {
     margin-top: 10px;
     padding-left: 20px;
     font-size: 0.97rem;
@@ -9040,16 +9040,16 @@ body.params-modal-active {
     color: var(--text-muted);
 }
 
-:where(.s-offer) .offer-doc__section li + li {
+:where(.s-legal) .legal-doc__section li + li {
     margin-top: 6px;
 }
 
-:where(.s-offer) .offer-doc__section strong {
+:where(.s-legal) .legal-doc__section strong {
     color: var(--text-color);
     font-weight: 700;
 }
 
-:where(.s-offer) .offer-requisites {
+:where(.s-legal) .legal-requisites {
     margin-top: 12px;
     padding: 18px 20px;
     list-style: none;
@@ -9058,11 +9058,11 @@ body.params-modal-active {
     line-height: 1.65;
 }
 
-:where(.s-offer) .offer-requisites li + li {
+:where(.s-legal) .legal-requisites li + li {
     margin-top: 4px;
 }
 
-:where(.s-offer) .offer-footer {
+:where(.s-legal) .legal-footer {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -9073,13 +9073,13 @@ body.params-modal-active {
     border-top: 1px solid var(--divider-color);
 }
 
-:where(.s-offer) .offer-footer__note {
+:where(.s-legal) .legal-footer__note {
     flex: 1 1 280px;
     font-size: 0.9rem;
     color: var(--text-muted);
 }
 
-:where(.s-offer) .offer-footer__cta {
+:where(.s-legal) .legal-footer__cta {
     display: inline-block;
     padding: 11px 22px;
     background-color: var(--accent-color);
@@ -9091,26 +9091,26 @@ body.params-modal-active {
     transition: opacity 0.2s, transform 0.2s;
 }
 
-:where(.s-offer) .offer-footer__cta:hover {
+:where(.s-legal) .legal-footer__cta:hover {
     opacity: 0.9;
     transform: translateY(-1px);
 }
 
 @media (max-width: 600px) {
-    :where(.s-offer) .offer-page {
+    :where(.s-legal) .legal-page {
         padding: 24px 0 48px;
     }
 
-    :where(.s-offer) .offer-header__title {
+    :where(.s-legal) .legal-header__title {
         font-size: 1.5rem;
     }
 
-    :where(.s-offer) .offer-footer {
+    :where(.s-legal) .legal-footer {
         flex-direction: column;
         align-items: stretch;
     }
 
-    :where(.s-offer) .offer-footer__cta {
+    :where(.s-legal) .legal-footer__cta {
         text-align: center;
     }
 }

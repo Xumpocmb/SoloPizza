@@ -8,39 +8,39 @@
 {% block og_description %}{% trans "Публичная оферта Solo Pizza - условия предложения о заказе пиццы, доставке, оплате и возврате." %}{% endblock %}
 {% block twitter_description %}{% trans "Публичная оферта Solo Pizza - условия предложения о заказе пиццы, доставке, оплате и возврате." %}{% endblock %}
 
-{% block body_class %}s-offer{% endblock %}
+{% block body_class %}s-legal{% endblock %}
 
 {% block main %}
-<main class="offer-page">
-    <div class="offer-page__container">
+<main class="legal-page">
+    <div class="legal-page__container">
 
-        <nav class="offer-breadcrumbs" aria-label="{% trans 'Хлебные крошки' %}">
+        <nav class="legal-breadcrumbs" aria-label="{% trans 'Хлебные крошки' %}">
             {% for crumb in breadcrumbs %}
                 {% if forloop.last or crumb.url == "#" %}
-                    <span class="offer-breadcrumbs__current">{{ crumb.title }}</span>
+                    <span class="legal-breadcrumbs__current">{{ crumb.title }}</span>
                 {% else %}
                     <a href="{{ crumb.url }}">{{ crumb.title }}</a>
                 {% endif %}
-                {% if not forloop.last %}<span class="offer-breadcrumbs__sep" aria-hidden="true">/</span>{% endif %}
+                {% if not forloop.last %}<span class="legal-breadcrumbs__sep" aria-hidden="true">/</span>{% endif %}
             {% endfor %}
         </nav>
 
-        <header class="offer-header">
-            <p class="offer-header__eyebrow">{% trans "Правовая информация" %}</p>
-            <h1 class="offer-header__title">{{ title }}</h1>
-            <p class="offer-header__meta">{% trans "Редакция от 8 ноября 2026 г." %}</p>
+        <header class="legal-header">
+            <p class="legal-header__eyebrow">{% trans "Правовая информация" %}</p>
+            <h1 class="legal-header__title">{{ title }}</h1>
+            <p class="legal-header__meta">{% trans "Редакция от 8 ноября 2026 г." %}</p>
         </header>
 
-        <p class="offer-lead">{% trans "Настоящая Публичная оферта Solo Pizza (далее - «Оферта») является публичной и распространяется на всех желающих." %}</p>
-        <p class="offer-lead">{% trans "Организатор и исполнитель: публичная кафе-пиццерия Solo Pizza." %}</p>
+        <p class="legal-lead">{% trans "Настоящая Публичная оферта Solo Pizza (далее - «Оферта») является публичной и распространяется на всех желающих." %}</p>
+        <p class="legal-lead">{% trans "Организатор и исполнитель: публичная кафе-пиццерия Solo Pizza." %}</p>
 
-        <article class="offer-doc">
-            <section class="offer-doc__section">
+        <article class="legal-doc">
+            <section class="legal-doc__section">
                 <h2>{% trans "1. Предмет оферты" %}</h2>
                 <p>{% trans "Исполнитель - публичная кафе-пиццерия Solo Pizza, реализующий пиццу, блюда и сопутствующие товары." %}</p>
             </section>
 
-            <section class="offer-doc__section">
+            <section class="legal-doc__section">
                 <h2>{% trans "2. Условия оформления заказа" %}</h2>
                 <ul>
                     <li>{% trans "Заказ оформляется через информационную систему сайта (корзина, заявка о заказе) либо непосредственно в кафе." %}</li>
@@ -48,7 +48,7 @@
                 </ul>
             </section>
 
-            <section class="offer-doc__section">
+            <section class="legal-doc__section">
                 <h2>{% trans "3. Цена и способ оплаты" %}</h2>
                 <ul>
                     <li>{% trans "Цена заказа формируется из стоимости блюд с учётом персональных и партнёрских скидок." %}</li>
@@ -56,7 +56,7 @@
                 </ul>
             </section>
 
-            <section class="offer-doc__section">
+            <section class="legal-doc__section">
                 <h2>{% trans "4. Условия доставки" %}</h2>
                 <ul>
                     <li>{% trans "Доставка по городу - 3 руб." %}</li>
@@ -64,15 +64,15 @@
                 </ul>
             </section>
 
-            <section class="offer-doc__section">
+            <section class="legal-doc__section">
                 <h2>{% trans "5. Возврат и отказ от заказа" %}</h2>
                 <p>{% trans "Возврат или замена продукции возможны в случае обнаружения недостатков. Условия рассматриваются в рамках законодательства Республики Беларусь о защите прав потребителей." %}</p>
             </section>
 
             {% if company %}
-            <section class="offer-doc__section">
+            <section class="legal-doc__section">
                 <h2>{% trans "6. Реквизиты продавца" %}</h2>
-                <ul class="offer-requisites">
+                <ul class="legal-requisites">
                     <li>{{ company.legal_name }}</li>
                     {% if company.unpp %}<li>{% trans "УНП" %}: {{ company.unpp }}</li>{% endif %}
                     {% if company.address %}<li>{{ company.address }}</li>{% endif %}
@@ -86,9 +86,9 @@
             {% endif %}
         </article>
 
-        <footer class="offer-footer">
-            <p class="offer-footer__note">{% trans "Оформляя заказ, вы принимаете условия настоящей оферты." %}</p>
-            <a href="{% url 'app_home:home' %}" class="offer-footer__cta">{% trans "Заказать пиццу" %}</a>
+        <footer class="legal-footer">
+            <p class="legal-footer__note">{% trans "Оформляя заказ, вы принимаете условия настоящей оферты." %}</p>
+            <a href="{% url 'app_home:home' %}" class="legal-footer__cta">{% trans "Заказать пиццу" %}</a>
         </footer>
 
     </div>
