@@ -10,7 +10,7 @@ class BookViewTests(TestCase):
 
     def setUp(self):
         self.client = Client()
-        self.url = reverse("app_reviews:book")
+        self.url = reverse("app_reviews:review_list")
         self.user = User.objects.create_user(username="client1", password="Sup3r-secret")
         self.review = Review.objects.create(
             user=self.user,
@@ -21,7 +21,7 @@ class BookViewTests(TestCase):
         )
 
     def test_book_view_get(self):
-        """GET /reviews/book/ отдает страницу книги замечаний и предложений."""
+        """GET /reviews/ отдает страницу книги замечаний и предложений."""
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "app_reviews/book.html")
@@ -63,19 +63,8 @@ class ReviewsLegalLayoutTests(TestCase):
         )
 
     def test_review_list_uses_legal_layout(self):
-        """GET /reviews/ отдает страницу в едином каркасе."""
+        """GET /reviews/ отдает книгу замечаний в едином каркасе."""
         response = self.client.get(reverse("app_reviews:review_list"))
-
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "app_reviews/review_list.html")
-        self.assertTemplateUsed(response, "app_home/legal_base.html")
-        self.assertContains(response, "legal-blocks")
-        self.assertContains(response, "Отзывы наших клиентов")
-        self.assertContains(response, "Проверка дизайна отзывов")
-
-    def test_review_book_uses_legal_layout(self):
-        """GET /reviews/book/ отдает книгу замечаний в единообразном каркасе."""
-        response = self.client.get(reverse("app_reviews:book"))
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "app_reviews/book.html")
