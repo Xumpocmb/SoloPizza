@@ -13,7 +13,7 @@ from django.utils import timezone
 
 from app_home.context_processors import canonical_context, cookie_consent_context
 from app_home.forms import FeedbackForm, VacancyApplicationForm
-from app_home.models import CafeBranch, Company, Feedback, Vacancy, VacancyApplication, InfoPage, SiteSettings, Announcement, WorkingHours
+from app_home.models import CafeBranch, CafeBranchPhone, Company, Feedback, Vacancy, VacancyApplication, InfoPage, SiteSettings, Announcement, WorkingHours
 from app_home.templatetags.static_version import static_v
 from app_home.working_hours import (
     get_current_shift,
@@ -587,6 +587,33 @@ class ContactsViewTests(TestCase):
         self.assertContains(response, 'name="consent"')
         self.assertContains(response, 'Написать нам')
 
+    def test_contacts_view_shows_all_branches(self):
+        """Страница контактов показывает адреса и телефоны всех филиалов."""
+        first = CafeBranch.objects.create(name='Ленина', address='ул. Ленина 9/1')
+        second = CafeBranch.objects.create(name='Тексер', address='ул. Тексер, 4а')
+        CafeBranchPhone.objects.create(branch=first, phone='+375 (29) 5555-84-9')
+        CafeBranchPhone.objects.create(branch=first, phone='+375 (44) 5555-84-6')
+        CafeBranchPhone.objects.create(branch=second, phone='+375 (29) 5555-268')
+
+        response = self.client.get(self.url)
+
+        self.assertContains(response, 'Ленина')
+        self.assertContains(response, 'ул. Ленина 9/1')
+        self.assertContains(response, '+375 (29) 5555-84-9')
+        self.assertContains(response, '+375 (44) 5555-84-6')
+        self.assertContains(response, 'Тексер')
+        self.assertContains(response, 'ул. Тексер, 4а')
+        self.assertContains(response, '+375 (29) 5555-268')
+        self.assertContains(response, 'href="tel:+375295555849"')
+
+    def test_contacts_view_hides_inactive_branches(self):
+        """Неактивный филиал не попадает на страницу контактов."""
+        CafeBranch.objects.create(name='Скрытый', address='ул. Скрытая, 1', is_active=False)
+
+        response = self.client.get(self.url)
+
+        self.assertNotContains(response, 'Скрытый')
+
     def test_contacts_view_post_feedback(self):
         """POST на /contacts/ сохраняет обращение и возвращает на контакты."""
         response = self.client.post(
@@ -926,6 +953,28 @@ class WorkingHoursTests(TestCase):
         self.assertIn("11:00", message)
         self.assertIn("23:00", message)
         self.assertIn("за 30 минут", message)
+
+    def test_working_hours_summary_uniform_week(self):
+        """Одинаковый график на все семь дней сводится к одной строке."""
+        for day_of_week in range(1, 8):
+            self.add_schedule(self.branch, time(11), time(23), day_of_week=day_of_week)
+
+        self.assertEqual(self.branch.working_hours_summary, "Ежедневно 11:00–23:00")
+
+    def test_working_hours_summary_without_schedule(self):
+        """Без графика краткое описание не формируется."""
+        self.assertIsNone(self.branch.working_hours_summary)
+
+    def test_working_hours_summary_lists_closed_day(self):
+        """При неполной неделе график расписывается по дням, включая выходной."""
+        for day_of_week in range(1, 7):
+            self.add_schedule(self.branch, time(11), time(23), day_of_week=day_of_week)
+        self.add_schedule(self.branch, time(11), time(23), day_of_week=7, is_closed=True)
+
+        summary = self.branch.working_hours_summary
+
+        self.assertIn("Понедельник: 11:00–23:00", summary)
+        self.assertIn("Воскресенье: выходной", summary)
 
 
 class OrderAvailabilityTagTests(TestCase):

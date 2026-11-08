@@ -116,6 +116,33 @@ class CafeBranch(models.Model):
         phones = self.branch_phones.all()
         return phones[0] if phones else None
 
+    @property
+    def working_hours_summary(self):
+        """Краткий график работы для страницы контактов.
+
+        Если все семь дней имеют одинаковые часы и нет выходных, возвращает
+        «Ежедневно 11:00–23:00». Иначе — перечень по дням недели.
+        None, если график для филиала не задан.
+        """
+        hours = list(self.working_hours.all())
+        if not hours:
+            return None
+
+        if len(hours) == 7 and all(not item.is_closed for item in hours):
+            unique_slots = {(item.opening_time, item.closing_time) for item in hours}
+            if len(unique_slots) == 1:
+                sample = hours[0]
+                return f"Ежедневно {sample.opening_time:%H:%M}–{sample.closing_time:%H:%M}"
+
+        parts = []
+        for item in sorted(hours, key=lambda record: record.day_of_week):
+            if item.is_closed:
+                value = "выходной"
+            else:
+                value = f"{item.opening_time:%H:%M}–{item.closing_time:%H:%M}"
+            parts.append(f"{item.get_day_of_week_display()}: {value}")
+        return "; ".join(parts)
+
 
 class CafeBranchPhone(models.Model):
     branch = models.ForeignKey(CafeBranch, on_delete=models.CASCADE, related_name="branch_phones", verbose_name="Филиал")

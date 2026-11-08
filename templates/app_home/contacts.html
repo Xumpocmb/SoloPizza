@@ -8,7 +8,7 @@
 {% block og_description %}{% trans "Контакты Solo Pizza - адреса, телефоны и время работы наших пиццерий. Свяжитесь с нами для заказа или с вопросами." %}{% endblock %}
 {% block twitter_description %}{% trans "Контакты Solo Pizza - адреса, телефоны и время работы наших пиццерий. Свяжитесь с нами для заказа или с вопросами." %}{% endblock %}
 
-{% block body_class %}s-legal{% endblock %}
+{% block body_class %}s-legal s-contacts{% endblock %}
 
 {% block main %}
 <main class="legal-page">
@@ -32,54 +32,75 @@
 
         <p class="legal-lead">{% trans "Адреса, телефоны и время работы наших пиццерий. Свяжитесь с нами для заказа или с вопросами." %}</p>
 
-        <article class="legal-doc">
-            {% if selected_branch %}
-            <section class="legal-doc__section">
-                <h2>{{ selected_branch.name }}</h2>
+        <div class="contacts-blocks">
 
-                <dl class="legal-contacts">
-                    <div class="legal-contacts__row">
-                        <dt>{% trans "Адрес" %}</dt>
-                        <dd>{{ selected_branch.address }}</dd>
-                    </div>
+            <section class="contacts-block">
+                <h2 class="contacts-block__title">{% trans "Наши пиццерии" %}</h2>
 
-                    <div class="legal-contacts__row">
-                        <dt>{% trans "Телефоны" %}</dt>
-                        <dd>
-                            <ul class="legal-contacts__phones">
-                                {% for phone in selected_branch.branch_phones.all %}
+                <div class="contacts-branches">
+                    {% for branch in branches %}
+                    <article class="branch-card">
+                        <h3 class="branch-card__title">{{ branch.name }}</h3>
+
+                        <div class="branch-card__row">
+                            <p class="branch-card__label">
+                                <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
+                                {% trans "Адрес" %}
+                            </p>
+                            <p class="branch-card__value">{{ branch.address }}</p>
+                        </div>
+
+                        <div class="branch-card__row">
+                            <p class="branch-card__label">
+                                <i class="fas fa-phone" aria-hidden="true"></i>
+                                {% trans "Телефоны" %}
+                            </p>
+                            <ul class="branch-card__phones">
+                                {% for phone in branch.branch_phones.all %}
                                     <li><a href="tel:{{ phone.dial }}">{{ phone.phone }}</a></li>
                                 {% empty %}
                                     <li>{% trans "Телефоны не указаны" %}</li>
                                 {% endfor %}
                             </ul>
-                        </dd>
-                    </div>
+                        </div>
 
-                    <div class="legal-contacts__row">
-                        <dt>{% trans "Мы в соцсетях" %}</dt>
-                        <dd>
-                            <a class="legal-contacts__link"
-                               href="https://www.instagram.com/solo_pizza_bar/"
-                               target="_blank"
-                               rel="noopener noreferrer">
-                                <i class="fab fa-instagram" aria-hidden="true"></i>
-                                Instagram
-                            </a>
-                        </dd>
-                    </div>
-                </dl>
+                        {% if branch.working_hours_summary %}
+                        <div class="branch-card__row">
+                            <p class="branch-card__label">
+                                <i class="far fa-clock" aria-hidden="true"></i>
+                                {% trans "Время работы" %}
+                            </p>
+                            <p class="branch-card__value">{{ branch.working_hours_summary }}</p>
+                        </div>
+                        {% endif %}
+                    </article>
+                    {% empty %}
+                    <p class="contacts-empty">{% trans "Контакты пиццерий временно недоступны." %}</p>
+                    {% endfor %}
+                </div>
             </section>
-            {% endif %}
 
-            <section class="legal-doc__section">
-                <h2>{% trans "Написать нам" %}</h2>
+            <section class="contacts-block">
+                <h2 class="contacts-block__title">{% trans "Мы в соцсетях" %}</h2>
+                <div class="contacts-social">
+                    <a class="contacts-social__link"
+                       href="https://www.instagram.com/solo_pizza_bar/"
+                       target="_blank"
+                       rel="noopener noreferrer">
+                        <i class="fab fa-instagram" aria-hidden="true"></i>
+                        Instagram
+                    </a>
+                </div>
+            </section>
+
+            <section class="contacts-block">
+                <h2 class="contacts-block__title">{% trans "Написать нам" %}</h2>
                 {% include "app_home/_feedback_form.html" %}
             </section>
 
             {% if company %}
-            <section class="legal-doc__section">
-                <h2>{% trans "Реквизиты компании" %}</h2>
+            <section class="contacts-block">
+                <h2 class="contacts-block__title">{% trans "Реквизиты компании" %}</h2>
                 <ul class="legal-requisites">
                     <li>{{ company.legal_name }}</li>
                     {% if company.unpp %}<li>{% trans "УНП" %}: {{ company.unpp }}</li>{% endif %}
@@ -92,7 +113,8 @@
                 </ul>
             </section>
             {% endif %}
-        </article>
+
+        </div>
 
         <footer class="legal-footer">
             <p class="legal-footer__note">{% trans "Узнайте подробнее о нашей доставке." %}</p>
