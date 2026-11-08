@@ -8,75 +8,92 @@
 {% block og_description %}{% trans "Контакты Solo Pizza - адреса, телефоны и время работы наших пиццерий. Свяжитесь с нами для заказа или с вопросами." %}{% endblock %}
 {% block twitter_description %}{% trans "Контакты Solo Pizza - адреса, телефоны и время работы наших пиццерий. Свяжитесь с нами для заказа или с вопросами." %}{% endblock %}
 
-{% block body_class %}s-promo{% endblock %}
+{% block body_class %}s-legal{% endblock %}
 
 {% block main %}
-<main>
-    <section class="promo-section">
-        <div class="container">
-            {% include "app_home/_promo_header.html" %}
+<main class="legal-page">
+    <div class="legal-page__container">
 
-            <div class="promo-description">
-                <p>{% trans "Адреса, телефоны и время работы наших пиццерий. Свяжитесь с нами для заказа или с вопросами." %}</p>
-            </div>
-
-            <div class="text-content">
-                <h2 class="text-title">{{ selected_branch.name }}</h2>
-
-                <div class="branch-info">
-                    <div class="contact-section">
-                        <h3>{% trans "Адрес" %}</h3>
-                        <p>{{ selected_branch.address }}</p>
-                    </div>
-
-                    <div class="contact-section">
-                        <h3>{% trans "Телефоны" %}</h3>
-                        <ul class="phone-list">
-                            {% for phone in selected_branch.branch_phones.all %}
-                                <li>{{ phone.phone }}</li>
-                            {% empty %}
-                                <li>{% trans "Телефоны не указаны" %}</li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-
-                    <div class="contact-section">
-                        <h3>{% trans "Мы в соцсетях" %}</h3>
-                        <ul class="phone-list social-list">
-                            <li>
-                                <a href="https://www.instagram.com/solo_pizza_bar/"
-                                   target="_blank"
-                                   rel="noopener noreferrer">
-                                    <i class="fab fa-instagram" aria-hidden="true"></i>
-                                    Instagram
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="delivery-link-section">
-                    <p>{% trans "Узнайте подробнее о нашей доставке:" %}</p>
-                    <a href="{% url 'app_home:delivery' %}">{% trans "Доставка" %}</a>
-                </div>
-
-                {% if company %}
-                <div class="branch-info">
-                    <h2 class="text-title">{% trans "Реквизиты компании" %}</h2>
-                    <ul>
-                        <li>{{ company.legal_name }}</li>
-                        {% if company.unpp %}<li>{% trans "УНП" %}: {{ company.unpp }}</li>{% endif %}
-                        {% if company.address %}<li>{{ company.address }}</li>{% endif %}
-                        {% if company.bank_name %}
-                        <li>
-                            {% trans "Банк" %}: {{ company.bank_name }}{% if company.bank_bik %} (БИК: {{ company.bank_bik }}){% endif %}{% if company.account_number %} / Р/с: {{ company.account_number }}{% endif %}
-                        </li>
-                        {% endif %}
-                    </ul>
-                </div>
+        <nav class="legal-breadcrumbs" aria-label="{% trans 'Хлебные крошки' %}">
+            {% for crumb in breadcrumbs %}
+                {% if forloop.last or crumb.url == "#" %}
+                    <span class="legal-breadcrumbs__current">{{ crumb.title }}</span>
+                {% else %}
+                    <a href="{{ crumb.url }}">{{ crumb.title }}</a>
                 {% endif %}
-            </div>
-        </div>
-    </section>
+                {% if not forloop.last %}<span class="legal-breadcrumbs__sep" aria-hidden="true">/</span>{% endif %}
+            {% endfor %}
+        </nav>
+
+        <header class="legal-header">
+            <p class="legal-header__eyebrow">{% trans "Контакты" %}</p>
+            <h1 class="legal-header__title">{{ title }}</h1>
+        </header>
+
+        <p class="legal-lead">{% trans "Адреса, телефоны и время работы наших пиццерий. Свяжитесь с нами для заказа или с вопросами." %}</p>
+
+        <article class="legal-doc">
+            {% if selected_branch %}
+            <section class="legal-doc__section">
+                <h2>{{ selected_branch.name }}</h2>
+
+                <dl class="legal-contacts">
+                    <div class="legal-contacts__row">
+                        <dt>{% trans "Адрес" %}</dt>
+                        <dd>{{ selected_branch.address }}</dd>
+                    </div>
+
+                    <div class="legal-contacts__row">
+                        <dt>{% trans "Телефоны" %}</dt>
+                        <dd>
+                            <ul class="legal-contacts__phones">
+                                {% for phone in selected_branch.branch_phones.all %}
+                                    <li><a href="tel:{{ phone.dial }}">{{ phone.phone }}</a></li>
+                                {% empty %}
+                                    <li>{% trans "Телефоны не указаны" %}</li>
+                                {% endfor %}
+                            </ul>
+                        </dd>
+                    </div>
+
+                    <div class="legal-contacts__row">
+                        <dt>{% trans "Мы в соцсетях" %}</dt>
+                        <dd>
+                            <a class="legal-contacts__link"
+                               href="https://www.instagram.com/solo_pizza_bar/"
+                               target="_blank"
+                               rel="noopener noreferrer">
+                                <i class="fab fa-instagram" aria-hidden="true"></i>
+                                Instagram
+                            </a>
+                        </dd>
+                    </div>
+                </dl>
+            </section>
+            {% endif %}
+
+            {% if company %}
+            <section class="legal-doc__section">
+                <h2>{% trans "Реквизиты компании" %}</h2>
+                <ul class="legal-requisites">
+                    <li>{{ company.legal_name }}</li>
+                    {% if company.unpp %}<li>{% trans "УНП" %}: {{ company.unpp }}</li>{% endif %}
+                    {% if company.address %}<li>{{ company.address }}</li>{% endif %}
+                    {% if company.bank_name %}
+                    <li>
+                        {% trans "Банк" %}: {{ company.bank_name }}{% if company.bank_bik %} (БИК: {{ company.bank_bik }}){% endif %}{% if company.account_number %} / Р/с: {{ company.account_number }}{% endif %}
+                    </li>
+                    {% endif %}
+                </ul>
+            </section>
+            {% endif %}
+        </article>
+
+        <footer class="legal-footer">
+            <p class="legal-footer__note">{% trans "Узнайте подробнее о нашей доставке." %}</p>
+            <a href="{% url 'app_home:delivery' %}" class="legal-footer__cta">{% trans "Доставка" %}</a>
+        </footer>
+
+    </div>
 </main>
 {% endblock %}

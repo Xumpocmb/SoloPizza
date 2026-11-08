@@ -9201,6 +9201,69 @@ body.params-modal-active {
     text-decoration: underline;
 }
 
+/* Контакты: сетка «подпись — значение» */
+:where(.s-legal) .legal-contacts {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 18px;
+}
+
+:where(.s-legal) .legal-contacts__row {
+    display: grid;
+    grid-template-columns: 150px 1fr;
+    gap: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--divider-color);
+}
+
+:where(.s-legal) .legal-contacts__row:last-child {
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+:where(.s-legal) .legal-contacts__row dt {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+:where(.s-legal) .legal-contacts__row dd {
+    font-size: 0.97rem;
+    line-height: 1.7;
+    color: var(--text-muted);
+}
+
+:where(.s-legal) .legal-contacts__phones {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    list-style: none;
+}
+
+:where(.s-legal) .legal-contacts__phones a {
+    color: var(--text-color);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+:where(.s-legal) .legal-contacts__phones a:hover {
+    color: var(--accent-color);
+}
+
+:where(.s-legal) .legal-contacts__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--accent-color);
+    font-weight: 500;
+    text-decoration: none;
+}
+
+:where(.s-legal) .legal-contacts__link:hover {
+    text-decoration: underline;
+}
+
 @media (max-width: 600px) {
     :where(.s-legal) .legal-page {
         padding: 24px 0 48px;
@@ -9217,5 +9280,10 @@ body.params-modal-active {
 
     :where(.s-legal) .legal-footer__cta {
         text-align: center;
+    }
+
+    :where(.s-legal) .legal-contacts__row {
+        grid-template-columns: 1fr;
+        gap: 4px;
     }
 }
