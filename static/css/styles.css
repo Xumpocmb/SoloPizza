@@ -9096,6 +9096,42 @@ body.params-modal-active {
     transform: translateY(-1px);
 }
 
+:where(.s-legal) .legal-footer__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+}
+
+:where(.s-legal) .legal-footer__link {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+:where(.s-legal) .legal-footer__link:hover {
+    color: var(--accent-color);
+}
+
+:where(.s-legal) .legal-footer__cta--secondary {
+    background-color: transparent;
+    color: var(--accent-color);
+    border: 1px solid var(--accent-color);
+}
+
+:where(.s-legal) .legal-footer__cta--secondary:hover {
+    background-color: var(--hover-bg);
+}
+
+:where(.s-legal) .legal-footer__cta--danger {
+    background-color: var(--error-color);
+}
+
+:where(.s-legal) .legal-footer__cta--danger:hover {
+    opacity: 0.9;
+}
+
 /* Форма обратной связи в том же лаконичном стиле */
 :where(.s-legal) .legal-form {
     display: flex;
@@ -9120,6 +9156,8 @@ body.params-modal-active {
 :where(.s-legal) .legal-form input[type="text"],
 :where(.s-legal) .legal-form input[type="tel"],
 :where(.s-legal) .legal-form input[type="email"],
+:where(.s-legal) .legal-form input[type="number"],
+:where(.s-legal) .legal-form select,
 :where(.s-legal) .legal-form textarea {
     width: 100%;
     padding: 11px 14px;
@@ -9135,6 +9173,8 @@ body.params-modal-active {
 :where(.s-legal) .legal-form input[type="text"]:focus,
 :where(.s-legal) .legal-form input[type="tel"]:focus,
 :where(.s-legal) .legal-form input[type="email"]:focus,
+:where(.s-legal) .legal-form input[type="number"]:focus,
+:where(.s-legal) .legal-form select:focus,
 :where(.s-legal) .legal-form textarea:focus {
     border-color: var(--accent-color);
     box-shadow: 0 0 0 3px var(--accent-color-rgba);
@@ -9168,6 +9208,9 @@ body.params-modal-active {
 
 :where(.s-legal) .legal-form__actions {
     display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
 }
 
 :where(.s-legal) .legal-form__submit {
@@ -9222,6 +9265,43 @@ body.params-modal-active {
     font-weight: 700;
     line-height: 1.4;
     color: var(--text-color);
+}
+
+/* Типографика содержимого блоков: как в юридических документах */
+:where(.s-legal) .legal-block > p {
+    font-size: 0.97rem;
+    line-height: 1.75;
+    color: var(--text-muted);
+}
+
+:where(.s-legal) .legal-block > p + p {
+    margin-top: 10px;
+}
+
+:where(.s-legal) .legal-block > ul,
+:where(.s-legal) .legal-block > ol {
+    margin-top: 10px;
+    padding-left: 20px;
+    font-size: 0.97rem;
+    line-height: 1.75;
+    color: var(--text-muted);
+}
+
+:where(.s-legal) .legal-block > ul li + li,
+:where(.s-legal) .legal-block > ol li + li {
+    margin-top: 6px;
+}
+
+:where(.s-legal) .legal-block strong {
+    color: var(--text-color);
+    font-weight: 700;
+}
+
+/* Сетка равных карточек внутри блока */
+:where(.s-legal) .legal-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
 }
 
 /* Филиалы: две карточки рядом */
@@ -9385,6 +9465,356 @@ body.params-modal-active {
     color: var(--text-muted);
 }
 
+/* Общие действия внутри блока */
+:where(.s-legal) .legal-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 18px;
+}
+
+/* Доставка */
+:where(.s-delivery) .delivery-addresses {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+:where(.s-delivery) .delivery-address {
+    padding: 10px 14px;
+    background-color: var(--hover-bg);
+    border-radius: 10px;
+    font-size: 0.95rem;
+    line-height: 1.55;
+    color: var(--text-color);
+}
+
+/* Акции */
+:where(.s-discounts) .offers-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+:where(.s-discounts) .offer-card {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 18px 20px;
+    background-color: var(--hover-bg);
+    border-radius: 12px;
+}
+
+:where(.s-discounts) .offer-card__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+:where(.s-discounts) .offer-card__title {
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.4;
+    color: var(--text-color);
+}
+
+:where(.s-discounts) .offer-card__badge {
+    flex: none;
+    padding: 2px 9px;
+    background-color: var(--accent-color);
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--button-text);
+}
+
+:where(.s-discounts) .offer-card__text {
+    font-size: 0.92rem;
+    line-height: 1.6;
+    color: var(--text-muted);
+}
+
+:where(.s-discounts) .offer-card__text i {
+    margin-right: 4px;
+    color: var(--accent-color);
+}
+
+:where(.s-discounts) .offer-card__alert {
+    display: flex;
+    gap: 8px;
+    padding: 10px 12px;
+    background-color: rgba(255, 193, 7, 0.12);
+    border-left: 3px solid #ffc107;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: var(--text-color);
+}
+
+:where(.s-discounts) .offer-card__alert i {
+    margin-top: 2px;
+    color: #d39e00;
+}
+
+:where(.s-discounts) .offer-card__link {
+    margin-top: auto;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--accent-color);
+    text-decoration: none;
+}
+
+:where(.s-discounts) .offer-card__link:hover {
+    text-decoration: underline;
+}
+
+/* Информация о компании */
+:where(.s-info) .info-card {
+    padding: 16px 18px;
+    background-color: var(--hover-bg);
+    border-radius: 12px;
+}
+
+:where(.s-info) .info-card__title {
+    margin-bottom: 8px;
+    font-size: 0.98rem;
+    font-weight: 700;
+    line-height: 1.4;
+    color: var(--text-color);
+}
+
+:where(.s-info) .info-card p {
+    font-size: 0.92rem;
+    line-height: 1.65;
+    color: var(--text-muted);
+}
+
+:where(.s-info) .info-card p + p {
+    margin-top: 8px;
+}
+
+:where(.s-info) .info-card__address {
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+:where(.s-info) .info-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    list-style: none;
+}
+
+:where(.s-info) .info-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+:where(.s-info) .info-step__num {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background-color: var(--accent-color);
+    border-radius: 50%;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--button-text);
+}
+
+:where(.s-info) .info-step p {
+    font-size: 0.95rem;
+    line-height: 1.65;
+    color: var(--text-muted);
+}
+
+/* Вакансии */
+:where(.s-legal) .vacancies-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+:where(.s-legal) .vacancy-card {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background-color: var(--hover-bg);
+    border-radius: 12px;
+}
+
+:where(.s-legal) .vacancy-card__image {
+    width: 100%;
+    height: 170px;
+    object-fit: cover;
+}
+
+:where(.s-legal) .vacancy-card__body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 10px;
+    padding: 16px 18px 18px;
+}
+
+:where(.s-legal) .vacancy-card__title {
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.4;
+    color: var(--text-color);
+}
+
+:where(.s-legal) .vacancy-card__description {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: var(--text-muted);
+}
+
+:where(.s-legal) .vacancy-card__salary {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+:where(.s-legal) .vacancy-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+:where(.s-legal) .vacancy-tag {
+    padding: 3px 9px;
+    background-color: var(--card-bg);
+    border: 1px solid var(--divider-color);
+    border-radius: 999px;
+    font-size: 0.75rem;
+    line-height: 1.4;
+    color: var(--text-muted);
+}
+
+:where(.s-legal) .vacancy-card__link {
+    align-self: flex-start;
+    margin-top: auto;
+    padding: 8px 16px;
+    background-color: var(--accent-color);
+    border-radius: 9px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--button-text);
+    text-decoration: none;
+    transition: opacity 0.2s;
+}
+
+:where(.s-legal) .vacancy-card__link:hover {
+    opacity: 0.9;
+}
+
+/* Детальная страница вакансии */
+:where(.s-legal) .vacancy-hero {
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr);
+    gap: 20px;
+    align-items: start;
+}
+
+:where(.s-legal) .vacancy-hero__image {
+    width: 100%;
+    border-radius: 12px;
+    object-fit: cover;
+}
+
+:where(.s-legal) .vacancy-hero__description p {
+    font-size: 0.97rem;
+    line-height: 1.75;
+    color: var(--text-muted);
+}
+
+:where(.s-legal) .vacancy-hero__description p + p {
+    margin-top: 10px;
+}
+
+:where(.s-legal) .vacancy-salary {
+    display: inline-block;
+    margin-bottom: 12px;
+    padding: 4px 10px;
+    background-color: var(--hover-bg);
+    border-radius: 999px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+/* Сертификаты (служебные страницы) */
+:where(.s-certificates) .certificate-display {
+    margin-bottom: 18px;
+    padding: 18px;
+    background-color: var(--hover-bg);
+    border: 2px dashed var(--divider-color);
+    border-radius: 12px;
+    text-align: center;
+}
+
+:where(.s-certificates) .certificate-code {
+    margin: 6px 0;
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--accent-color);
+}
+
+:where(.s-certificates) .certificate-date {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+:where(.s-certificates) .certificate-result {
+    margin-top: 18px;
+    padding: 16px 18px;
+    background-color: var(--hover-bg);
+    border: 1px solid var(--divider-color);
+    border-left-width: 4px;
+    border-radius: 10px;
+}
+
+:where(.s-certificates) .certificate-result--valid {
+    border-left-color: var(--success-color);
+}
+
+:where(.s-certificates) .certificate-result--invalid {
+    border-left-color: var(--error-color);
+}
+
+:where(.s-certificates) .certificate-result--used {
+    border-left-color: #ffc107;
+}
+
+:where(.s-certificates) .certificate-result p {
+    font-size: 0.95rem;
+    line-height: 1.65;
+    color: var(--text-color);
+}
+
+:where(.s-certificates) .certificate-result h3 {
+    margin-bottom: 8px;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.4;
+    color: var(--text-color);
+}
+
+:where(.s-certificates) .certificate-result p + p {
+    margin-top: 6px;
+}
+
+:where(.s-certificates) .certificate-result strong {
+    color: var(--text-color);
+}
+
 @media (max-width: 600px) {
     :where(.s-legal) .legal-page {
         padding: 24px 0 48px;
@@ -9413,5 +9843,28 @@ body.params-modal-active {
 
     :where(.s-partners) .partners-grid {
         grid-template-columns: 1fr;
+    }
+
+    :where(.s-legal) .legal-grid,
+    :where(.s-discounts) .offers-grid,
+    :where(.s-legal) .vacancies-grid {
+        grid-template-columns: 1fr;
+    }
+
+    :where(.s-legal) .vacancy-hero {
+        grid-template-columns: 1fr;
+    }
+
+    :where(.s-legal) .vacancy-hero__image {
+        max-height: 240px;
+    }
+
+    :where(.s-legal) .legal-footer__actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    :where(.s-legal) .legal-footer__actions .legal-footer__cta {
+        text-align: center;
     }
 }

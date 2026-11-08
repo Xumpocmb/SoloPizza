@@ -275,6 +275,11 @@ def certificate_sell(request):
     context = {
         'certificate_code': certificate_code,
         'expiration_date': expiration_date,
+        'title': _('Продажа сертификатов'),
+        'breadcrumbs': [
+            {'title': _('Главная'), 'url': '/'},
+            {'title': _('Продажа сертификатов'), 'url': reverse('app_home:certificate_sell')},
+        ],
     }
     return render(request, 'app_home/certificates/sell_certificate.html', context)
 
@@ -300,6 +305,11 @@ def certificate_check(request):
         'certificate': certificate,
         'searched': searched,
         'now': now,
+        'title': _('Проверка сертификата'),
+        'breadcrumbs': [
+            {'title': _('Главная'), 'url': '/'},
+            {'title': _('Проверка сертификата'), 'url': reverse('app_home:certificate_check')},
+        ],
     }
     return render(request, 'app_home/certificates/check_certificate.html', context)
 

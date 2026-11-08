@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% comment %}
+Общий каркас информационных страниц app_home: хлебные крошки, шапка,
+вводный текст, блоки-карточки и футер с действиями.
+
+Дочерний шаблон заполняет блоки eyebrow, page_title, lead, content и
+page_footer, а мета-блоки (title, meta_description, og_description и т.д.)
+наследуются напрямую из base.html — SEO-разметка не меняется.
+{% endcomment %}
+
+{% block body_class %}s-legal{% endblock %}
+
+{% block main %}
+<main class="legal-page">
+    <div class="legal-page__container">
+
+        {% block breadcrumbs %}
+        {% if breadcrumbs %}
+        <nav class="legal-breadcrumbs" aria-label="{% trans 'Хлебные крошки' %}">
+            {% for crumb in breadcrumbs %}
+                {% if forloop.last or crumb.url == "#" %}
+                    <span class="legal-breadcrumbs__current">{{ crumb.title }}</span>
+                {% else %}
+                    <a href="{{ crumb.url }}">{{ crumb.title }}</a>
+                {% endif %}
+                {% if not forloop.last %}<span class="legal-breadcrumbs__sep" aria-hidden="true">/</span>{% endif %}
+            {% endfor %}
+        </nav>
+        {% endif %}
+        {% endblock %}
+
+        <header class="legal-header">
+            {% block eyebrow %}{% endblock %}
+            <h1 class="legal-header__title">{% block page_title %}{{ title }}{% endblock %}</h1>
+        </header>
+
+        {% block lead %}{% endblock %}
+
+        {% block content %}{% endblock %}
+
+        {% block page_footer %}{% endblock %}
+
+    </div>
+</main>
+{% endblock %}

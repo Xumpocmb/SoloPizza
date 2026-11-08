@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'app_home/legal_base.html' %}
 {% load static i18n %}
 {% load tag_split %}
 
@@ -9,27 +9,65 @@
 {% block og_description %}{% trans "Вакансии в Solo Pizza - присоединяйтесь к нашей команде! Мы ищем классных людей, которые любят пиццу, еду и хорошую атмосферу." %}{% endblock %}
 {% block twitter_description %}{% trans "Вакансии в Solo Pizza - присоединяйтесь к нашей команде! Мы ищем классных людей, которые любят пиццу, еду и хорошую атмосферу." %}{% endblock %}
 
-{% block body_class %}s-promo{% endblock %}
+{% block body_class %}s-legal s-vacancies-page{% endblock %}
 
-{% block main %}
-<main>
-    <section class="promo-section">
-        <div class="container">
-            <div class="breadcrumbs">
-                    {% for crumb in breadcrumbs %}
-                        {% if crumb.url != "#" %}
-                            <a href="{{ crumb.url }}" class="breadcrumb-link">{{ crumb.title }}</a>
-                        {% else %}
-                            <span class="current-page">{{ crumb.title }}</span>
-                        {% endif %}
-                        {% if not forloop.last %}<span class="breadcrumb-separator">></span>{% endif %}
-                    {% endfor %}
+{% block eyebrow %}<p class="legal-header__eyebrow">{% trans "Карьера" %}</p>{% endblock %}
+
+{% block lead %}
+<p class="legal-lead">{% trans "Присоединяйся к нашей команде! Мы ищем классных людей, которые любят пиццу, еду и хорошую атмосферу." %}</p>
+{% endblock %}
+
+{% block content %}
+<div class="legal-blocks">
+    <section class="legal-block">
+        <h2 class="legal-block__title">{% trans "Вакансии Solo Pizza" %}</h2>
+
+        {% if vacancies %}
+        <div class="vacancies-grid">
+            {% for vacancy in vacancies %}
+            <article class="vacancy-card">
+                {% if vacancy.image %}
+                    <img src="{{ vacancy.image.url }}"
+                         alt="{{ vacancy.title }}"
+                         class="vacancy-card__image"
+                         loading="lazy">
+                {% else %}
+                    <img src="{% static 'img/No-Image-Placeholder.svg' %}"
+                         alt="{{ vacancy.title }}"
+                         class="vacancy-card__image"
+                         loading="lazy">
+                {% endif %}
+
+                <div class="vacancy-card__body">
+                    <h3 class="vacancy-card__title">{{ vacancy.title }}</h3>
+                    {% if vacancy.description %}
+                    <p class="vacancy-card__description">{{ vacancy.description|truncatewords:20 }}</p>
+                    {% endif %}
+                    {% if vacancy.salary %}
+                    <p class="vacancy-card__salary">💰 {{ vacancy.salary }}</p>
+                    {% endif %}
+                    {% if vacancy.benefits %}
+                    <div class="vacancy-tags">
+                        {% for benefit in vacancy.benefits|split:"," %}
+                        <span class="vacancy-tag">{{ benefit|strip }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    <a href="{% url 'app_home:vacancy_detail' vacancy.id %}" class="vacancy-card__link">{% trans "Подробнее" %}</a>
                 </div>
-
-            <div class="text-content">
-                {% include "app_home/includes/vacancy.html" %}
-            </div>
+            </article>
+            {% endfor %}
         </div>
+        {% else %}
+        <p class="legal-empty">{% trans "Сейчас нет активных вакансий, но загляните позже!" %}</p>
+        {% endif %}
     </section>
-</main>
+</div>
+{% endblock %}
+
+{% block page_footer %}
+<footer class="legal-footer">
+    <p class="legal-footer__note">{% trans "Не нашли подходящую вакансию?" %}</p>
+    <a href="{% url 'app_home:feedback' %}" class="legal-footer__cta">{% trans "Написать нам" %}</a>
+</footer>
 {% endblock %}

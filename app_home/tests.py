@@ -751,6 +751,78 @@ class InfoViewTests(TestCase):
         self.assertContains(response, "Дополнительный текст связи из базы")
 
 
+class InfoPagesLayoutTests(TestCase):
+    """Единый лаконичный каркас информационных страниц app_home.
+
+    Проверяем не только вёрстку, но и сохранение SEO-разметки: заголовков,
+    мета-описаний, canonical и ссылок на контент.
+    """
+
+    def setUp(self):
+        self.client = Client()
+        self.branch = CafeBranch.objects.create(name='Тестовый филиал', address='ул. Тестовая, 1')
+        self.vacancy = Vacancy.objects.create(
+            title='Тестовая вакансия',
+            description='Описание тестовой вакансии',
+            salary='от 1000 BYN',
+            benefits='Питание,Обучение',
+            is_active=True,
+        )
+
+    def assert_legal_page(self, url, template):
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, template)
+        self.assertTemplateUsed(response, 'app_home/legal_base.html')
+        self.assertContains(response, 'legal-page')
+        self.assertContains(response, 'legal-blocks')
+        self.assertContains(response, '<link rel="canonical"')
+        return response
+
+    def test_delivery_page_uses_legal_layout(self):
+        response = self.assert_legal_page(reverse('app_home:delivery'), 'app_home/delivery.html')
+
+        self.assertContains(response, 'Доставка пиццы в Барановичах - Solo Pizza')
+        self.assertContains(response, 'Стоимость доставки')
+        self.assertContains(response, 'ул. Тестовая, 1')
+
+    def test_discounts_page_uses_legal_layout(self):
+        response = self.assert_legal_page(reverse('app_home:discounts'), 'app_home/discounts.html')
+
+        self.assertContains(response, 'Пицца недели')
+        self.assertContains(response, 'Выгодные КОМБО')
+        self.assertContains(response, 'Скидка на День Рождения')
+        self.assertContains(response, 'Скидка на самовывоз')
+
+    def test_info_page_uses_legal_layout(self):
+        response = self.assert_legal_page(reverse('app_home:info'), 'app_home/info.html')
+
+        self.assertContains(response, 'О компании Solo Pizza')
+        self.assertContains(response, 'Оформление заказа')
+
+    def test_vacancy_list_uses_legal_layout(self):
+        response = self.assert_legal_page(reverse('app_home:vacancy_list'), 'app_home/vacancy_list.html')
+
+        self.assertContains(response, 'Тестовая вакансия')
+        self.assertContains(response, reverse('app_home:vacancy_detail', args=[self.vacancy.id]))
+
+    def test_vacancy_detail_uses_legal_layout(self):
+        url = reverse('app_home:vacancy_detail', args=[self.vacancy.id])
+        response = self.assert_legal_page(url, 'app_home/vacancy_detail.html')
+
+        self.assertContains(response, 'от 1000 BYN')
+        self.assertContains(response, 'Преимущества работы у нас:')
+        self.assertContains(response, reverse('app_home:vacancy_apply', args=[self.vacancy.id]))
+
+    def test_vacancy_apply_uses_legal_layout(self):
+        url = reverse('app_home:vacancy_apply', args=[self.vacancy.id])
+        response = self.assert_legal_page(url, 'app_home/vacancy_apply.html')
+
+        self.assertContains(response, 'name="consent"')
+        self.assertContains(response, reverse('app_home:privacy'))
+
+
 class SiteSettingsTests(TestCase):
     """Тесты настроек сайта: логотип в шапке и доступность заказов."""
 

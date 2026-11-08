@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'app_home/legal_base.html' %}
 {% load static i18n %}
 
 {% block title %}{{ title }} - Solo Pizza{% endblock %}
@@ -8,100 +8,88 @@
 {% block og_description %}{% trans "Информация о Solo Pizza в Барановичах - наша философия, история, традиции итальянской кухни и контроль качества." %}{% endblock %}
 {% block twitter_description %}{% trans "Информация о Solo Pizza в Барановичах - наша философия, история, традиции итальянской кухни и контроль качества." %}{% endblock %}
 
-{% block body_class %}s-about s-promo{% endblock %}
+{% block body_class %}s-legal s-info{% endblock %}
 
-{% block main %}
-<main>
-    <section class="promo-section">
-        <div class="container">
-            {% trans "О компании Solo Pizza" as promo_heading %}
-            {% include "app_home/_promo_header.html" with heading=info.promo_heading %}
+{% block eyebrow %}<p class="legal-header__eyebrow">{% trans "Информация" %}</p>{% endblock %}
 
-            <div class="promo-description">
-                <p>{{ info.promo_description }}</p>
-            </div>
+{% block page_title %}{{ info.promo_heading }}{% endblock %}
 
-            <div class="about-cards">
-                <article class="about-card">
-                    <span class="about-card__icon" aria-hidden="true">
-                        <i class="fas fa-heart"></i>
-                    </span>
-                    <h2 class="about-card__title">{{ info.philosophy_title }}</h2>
-                    <p>{{ info.philosophy_text }}</p>
-                </article>
+{% block lead %}
+<p class="legal-lead">{{ info.promo_description }}</p>
+{% endblock %}
 
-                <article class="about-card">
-                    <span class="about-card__icon" aria-hidden="true">
-                        <i class="fas fa-award"></i>
-                    </span>
-                    <h2 class="about-card__title">{{ info.quality_title }}</h2>
-                    <p>{{ info.quality_text }}</p>
-                    <p>{{ info.quality_training_text }}</p>
-                </article>
+{% block content %}
+<div class="legal-blocks">
 
-                <article class="about-card">
-                    <span class="about-card__icon" aria-hidden="true">
-                        <i class="fas fa-truck"></i>
-                    </span>
-                    <h2 class="about-card__title">{{ info.delivery_title }}</h2>
-                    <p>{{ info.delivery_text }}</p>
-                    <p>{{ info.delivery_app_text }}</p>
-                </article>
+    <section class="legal-block">
+        <div class="legal-grid">
+            <article class="info-card">
+                <h2 class="info-card__title">{{ info.philosophy_title }}</h2>
+                <p>{{ info.philosophy_text }}</p>
+            </article>
 
-                <article class="about-card">
-                    <span class="about-card__icon" aria-hidden="true">
-                        <i class="fas fa-map-marker-alt"></i>
-                    </span>
-                    <h2 class="about-card__title">{{ info.address_title }}</h2>
-                    {% if selected_branch %}
-                        <p class="about-card__address">{{ selected_branch.address }}</p>
-                        <p>{{ info.address_text }}</p>
-                    {% else %}
-                        <p>{% trans "Сейчас нет доступных филиалов." %}</p>
-                    {% endif %}
-                </article>
-            </div>
+            <article class="info-card">
+                <h2 class="info-card__title">{{ info.quality_title }}</h2>
+                <p>{{ info.quality_text }}</p>
+                <p>{{ info.quality_training_text }}</p>
+            </article>
 
-            <div class="about-steps">
-                <h2 class="about-steps__title">{{ info.steps_title }}</h2>
-                <ol class="about-steps__list">
-                    <li class="about-step">
-                        <span class="about-step__num" aria-hidden="true">1</span>
-                        <p>{{ info.step_1_text }}</p>
-                    </li>
-                    <li class="about-step">
-                        <span class="about-step__num" aria-hidden="true">2</span>
-                        <p>{{ info.step_2_text }}</p>
-                    </li>
-                    <li class="about-step">
-                        <span class="about-step__num" aria-hidden="true">3</span>
-                        <p>{{ info.step_3_text }}</p>
-                    </li>
-                </ol>
-            </div>
+            <article class="info-card">
+                <h2 class="info-card__title">{{ info.delivery_title }}</h2>
+                <p>{{ info.delivery_text }}</p>
+                <p>{{ info.delivery_app_text }}</p>
+            </article>
 
-            <div class="about-cta">
-                <div class="about-cta__text">
-                    <h2 class="about-cta__title">{{ info.contacts_title }}</h2>
-                    <p>{{ info.contacts_text }}</p>
-                    <p>{{ info.contacts_text_2 }}</p>
-                </div>
-                <div class="about-cta__actions">
-                    {% if selected_branch %}
-                        {% with phone=selected_branch.first_phone %}
-                            {% if phone.dial %}
-                                <a class="btn btn-primary" href="tel:{{ phone.dial }}">
-                                    <i class="fas fa-phone-alt" aria-hidden="true"></i>
-                                    {{ phone.phone }}
-                                </a>
-                            {% endif %}
-                        {% endwith %}
-                    {% endif %}
-                    <a class="btn btn-outline" href="{% url 'app_home:contacts' %}">{% trans "Наши контакты" %}</a>
-                    <a class="btn btn-outline" href="{% url 'app_home:feedback' %}">{% trans "Вопросы и предложения" %}</a>
-                </div>
-            </div>
+            <article class="info-card">
+                <h2 class="info-card__title">{{ info.address_title }}</h2>
+                {% if selected_branch %}
+                    <p class="info-card__address">{{ selected_branch.address }}</p>
+                    <p>{{ info.address_text }}</p>
+                {% else %}
+                    <p>{% trans "Сейчас нет доступных филиалов." %}</p>
+                {% endif %}
+            </article>
         </div>
     </section>
-</main>
+
+    <section class="legal-block">
+        <h2 class="legal-block__title">{{ info.steps_title }}</h2>
+        <ol class="info-steps">
+            <li class="info-step">
+                <span class="info-step__num" aria-hidden="true">1</span>
+                <p>{{ info.step_1_text }}</p>
+            </li>
+            <li class="info-step">
+                <span class="info-step__num" aria-hidden="true">2</span>
+                <p>{{ info.step_2_text }}</p>
+            </li>
+            <li class="info-step">
+                <span class="info-step__num" aria-hidden="true">3</span>
+                <p>{{ info.step_3_text }}</p>
+            </li>
+        </ol>
+    </section>
+
+    <section class="legal-block">
+        <h2 class="legal-block__title">{{ info.contacts_title }}</h2>
+        <p>{{ info.contacts_text }}</p>
+        <p>{{ info.contacts_text_2 }}</p>
+
+        <div class="legal-actions">
+            {% if selected_branch %}
+                {% with phone=selected_branch.first_phone %}
+                    {% if phone.dial %}
+                    <a class="legal-footer__cta" href="tel:{{ phone.dial }}">
+                        <i class="fas fa-phone-alt" aria-hidden="true"></i>
+                        {{ phone.phone }}
+                    </a>
+                    {% endif %}
+                {% endwith %}
+            {% endif %}
+            <a class="legal-footer__cta legal-footer__cta--secondary" href="{% url 'app_home:contacts' %}">{% trans "Наши контакты" %}</a>
+            <a class="legal-footer__cta legal-footer__cta--secondary" href="{% url 'app_home:feedback' %}">{% trans "Вопросы и предложения" %}</a>
+        </div>
+    </section>
+
+</div>
 {% endblock %}

@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'app_home/legal_base.html' %}
 {% load static i18n %}
 
 {% block title %}{% trans "Доставка пиццы в Барановичах - Solo Pizza" %}{% endblock %}
@@ -8,44 +8,51 @@
 {% block og_description %}{% trans "Узнайте о доставке пиццы и других блюд Solo Pizza по Барановичам. Стоимость доставки 3 руб., при заказе от 20 руб. - доставка бесплатно!" %}{% endblock %}
 {% block twitter_description %}{% trans "Узнайте о доставке пиццы и других блюд Solo Pizza по Барановичам. Стоимость доставки 3 руб., при заказе от 20 руб. - доставка бесплатно!" %}{% endblock %}
 
-{% block body_class %}s-promo{% endblock %}
+{% block body_class %}s-legal s-delivery{% endblock %}
 
-{% block main %}
-<main>
-    <section class="promo-section">
-        <div class="container">
-            {% include "app_home/_promo_header.html" %}
+{% block eyebrow %}<p class="legal-header__eyebrow">{% trans "Доставка" %}</p>{% endblock %}
 
-            <div class="promo-description">
-                <p>{% trans "Мы осуществляем доставку пиццы и других блюд по всему городу Барановичи." %}</p>
-            </div>
+{% block lead %}
+<p class="legal-lead">{% trans "Мы осуществляем доставку пиццы и других блюд по всему городу Барановичи." %}</p>
+{% endblock %}
 
-            <div class="text-content">
-                <div class="delivery-info">
-                    <h2 class="text-title">{% trans "Стоимость доставки" %}</h2>
-                    <ul>
-                        <li>{% blocktrans %}Доставка по городу - <strong>3 руб.</strong>{% endblocktrans %}</li>
-                        <li>{% blocktrans %}При стоимости заказа <strong>более 20 руб.</strong> - доставка <strong>бесплатная</strong>!{% endblocktrans %}</li>
-                        <li>{% blocktrans %}При стоимости заказа <strong>менее 25 руб.</strong> если в заказе блюда из категории "Фастфуд", "Бургеры", "Сковородки", "Напитки", "Соусы"- доставка <strong>платная</strong>!{% endblocktrans %}</li>
-                    </ul>
+{% block content %}
+<div class="legal-blocks">
 
-                    <h2 class="text-title">{% trans "Адреса заведений" %}</h2>
-                    <ul>
-                        {% for branch in branches %}
-                        <li>{{ branch.address }}</li>
-                        {% endfor %}
-                    </ul>
+    <section class="legal-block">
+        <h2 class="legal-block__title">{% trans "Стоимость доставки" %}</h2>
+        <ul>
+            <li>{% blocktrans %}Доставка по городу - <strong>3 руб.</strong>{% endblocktrans %}</li>
+            <li>{% blocktrans %}При стоимости заказа <strong>более 20 руб.</strong> - доставка <strong>бесплатная</strong>!{% endblocktrans %}</li>
+            <li>{% blocktrans %}При стоимости заказа <strong>менее 25 руб.</strong> если в заказе блюда из категории "Фастфуд", "Бургеры", "Сковородки", "Напитки", "Соусы"- доставка <strong>платная</strong>!{% endblocktrans %}</li>
+        </ul>
+    </section>
 
-                    <h2 class="text-title">{% trans "Время доставки" %}</h2>
-                    <p>{% trans "Уточняйте у операторов." %}</p>
-                </div>
-
-                <div class="action-buttons">
-                    <a href="{% url 'app_home:home' %}" class="btn btn-primary">{% trans "Заказать пиццу" %}</a>
-                    <a href="{% url 'app_home:contacts' %}" class="btn btn-outline">{% trans "Наши контакты" %}</a>
-                </div>
-            </div>
+    <section class="legal-block">
+        <h2 class="legal-block__title">{% trans "Адреса заведений" %}</h2>
+        <div class="delivery-addresses">
+            {% for branch in branches %}
+            <p class="delivery-address">{{ branch.address }}</p>
+            {% empty %}
+            <p class="legal-empty">{% trans "Адреса уточняйте у операторов." %}</p>
+            {% endfor %}
         </div>
     </section>
-</main>
+
+    <section class="legal-block">
+        <h2 class="legal-block__title">{% trans "Время доставки" %}</h2>
+        <p>{% trans "Уточняйте у операторов." %}</p>
+    </section>
+
+</div>
+{% endblock %}
+
+{% block page_footer %}
+<footer class="legal-footer">
+    <p class="legal-footer__note">{% trans "Остались вопросы по доставке?" %}</p>
+    <div class="legal-footer__actions">
+        <a href="{% url 'app_home:home' %}" class="legal-footer__cta">{% trans "Заказать пиццу" %}</a>
+        <a href="{% url 'app_home:contacts' %}" class="legal-footer__cta legal-footer__cta--secondary">{% trans "Наши контакты" %}</a>
+    </div>
+</footer>
 {% endblock %}
