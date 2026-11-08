@@ -72,6 +72,11 @@
             </section>
             {% endif %}
 
+            <section class="legal-doc__section">
+                <h2>{% trans "Написать нам" %}</h2>
+                {% include "app_home/_feedback_form.html" %}
+            </section>
+
             {% if company %}
             <section class="legal-doc__section">
                 <h2>{% trans "Реквизиты компании" %}</h2>

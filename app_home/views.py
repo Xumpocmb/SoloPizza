@@ -137,12 +137,44 @@ def vacancy_apply(request, vacancy_id):
     return render(request, "app_home/vacancy_apply.html", context=context)
 
 
+def _submit_feedback(request):
+    """Обрабатывает POST формы обратной связи.
+
+    Возвращает None при успешной отправке (запись создана, уведомление
+    отправлено) и форму с ошибками, если данные не прошли валидацию.
+    Используется и на странице вопросов, и на странице контактов.
+    """
+    form = FeedbackForm(request.POST)
+    if form.is_valid():
+        feedback = form.save()
+        from app_home.tasks import send_feedback_notification
+
+        send_feedback_notification.delay(feedback.id)
+        messages.success(
+            request,
+            _("Ваш вопрос/предложение успешно отправлено! Мы свяжемся с вами в ближайшее время."),
+            extra_tags="success",
+        )
+        return None
+
+    messages.error(request, _("Пожалуйста, исправьте ошибки в форме."), extra_tags="error")
+    return form
+
+
+@csrf_protect
 def contacts_view(request):
-    """Отображает страницу контактов с информацией о выбранном филиале"""
+    """Контакты выбранного филиала, реквизиты и форма обратной связи."""
 
     breadcrumbs = [{"title": _("Главная"), "url": "/"}, {"title": _("Контакты"), "url": reverse("app_home:contacts")}]
 
-    context = {"breadcrumbs": breadcrumbs, "title": _("Контакты")}
+    if request.method == "POST":
+        form = _submit_feedback(request)
+        if form is None:
+            return redirect(reverse("app_home:contacts"))
+    else:
+        form = FeedbackForm()
+
+    context = {"breadcrumbs": breadcrumbs, "title": _("Контакты"), "form": form}
 
     return render(request, "app_home/contacts.html", context=context)
 
@@ -154,19 +186,9 @@ def feedback_view(request):
     breadcrumbs = [{"title": _("Главная"), "url": "/"}, {"title": _("Вопросы и предложения"), "url": reverse("app_home:feedback")}]
 
     if request.method == "POST":
-        form = FeedbackForm(request.POST)
-        if form.is_valid():
-            feedback = form.save()
-            # Отправляем уведомление о новом вопросе/предложении
-            # if not settings.DEBUG:
-            from app_home.tasks import send_feedback_notification
-
-            send_feedback_notification.delay(feedback.id)
-            messages.success(request, _("Ваш вопрос/предложение успешно отправлено! Мы свяжемся с вами в ближайшее время."), extra_tags="success")
+        form = _submit_feedback(request)
+        if form is None:
             return redirect(reverse("app_home:feedback"))
-        else:
-            # Добавляем сообщение об ошибке, если форма не валидна
-            messages.error(request, _("Пожалуйста, исправьте ошибки в форме."), extra_tags="error")
     else:
         form = FeedbackForm()
 

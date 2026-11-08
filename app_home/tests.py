@@ -580,6 +580,38 @@ class ContactsViewTests(TestCase):
         self.assertContains(response, 'Реквизиты компании')
         self.assertContains(response, 'ООО «Соло Пицца»')
 
+    def test_contacts_view_contains_feedback_form(self):
+        """На странице контактов есть та же форма обратной связи."""
+        response = self.client.get(self.url)
+        self.assertContains(response, 'legal-form')
+        self.assertContains(response, 'name="consent"')
+        self.assertContains(response, 'Написать нам')
+
+    def test_contacts_view_post_feedback(self):
+        """POST на /contacts/ сохраняет обращение и возвращает на контакты."""
+        response = self.client.post(
+            self.url,
+            {
+                'name': 'Тестовый Пользователь',
+                'phone': '375291234567',
+                'message': 'Вопрос со страницы контактов',
+                'consent': 'on',
+            },
+        )
+
+        self.assertRedirects(response, self.url)
+        self.assertEqual(Feedback.objects.count(), 1)
+        feedback = Feedback.objects.first()
+        self.assertEqual(feedback.message, 'Вопрос со страницы контактов')
+
+    def test_contacts_view_post_feedback_invalid(self):
+        """Невалидная форма на /contacts/ не создаёт обращение и показывает ошибки."""
+        response = self.client.post(self.url, {'name': '', 'phone': '', 'message': ''})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Feedback.objects.count(), 0)
+        self.assertFalse(response.context['form'].is_valid())
+
 
 class InfoPageModelTests(TestCase):
     """Тесты модели контента страницы «Информация»."""
