@@ -178,10 +178,19 @@ class Order(models.Model):
     
     PARTNER_DISCOUNT_PERCENT = 15  # Процент скидки для партнеров
 
+    SOURCE_CHOICES = [
+        ("site", _("Сайт")),
+        ("app", _("Приложение")),
+    ]
+
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Пользователь")
     session_key = models.CharField(max_length=40, verbose_name="Ключ сессии", db_index=True, null=True, blank=True)
     guest_token = models.CharField(max_length=40, verbose_name="Гостевой токен", db_index=True, null=True, blank=True)
     branch = models.ForeignKey(CafeBranch, on_delete=models.SET_NULL, verbose_name="Филиал", null=True)
+    source = models.CharField(max_length=10, choices=SOURCE_CHOICES, default="site", verbose_name="Источник")
+    # UUID, который приложение генерирует перед отправкой: повтор запроса не создаёт второй заказ
+    client_order_id = models.UUIDField(null=True, blank=True, editable=False, verbose_name="Id заказа в приложении")
+    consent_at = models.DateTimeField(null=True, blank=True, verbose_name="Согласие на обработку ПД")
     daily_number = models.PositiveIntegerField(verbose_name="Порядковый номер за день")
     number_date = models.DateField(verbose_name="Дата номера")
     customer_name = models.CharField(max_length=255, verbose_name="Имя заказчика")
@@ -222,6 +231,11 @@ class Order(models.Model):
         ordering = ["-created_at"]
         constraints = [
             models.UniqueConstraint(fields=["number_date", "daily_number"], name="unique_order_number_per_day"),
+            models.UniqueConstraint(
+                fields=["user", "client_order_id"],
+                condition=models.Q(client_order_id__isnull=False),
+                name="unique_app_order_per_user",
+            ),
         ]
 
     def save(self, *args, **kwargs):

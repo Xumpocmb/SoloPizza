@@ -163,7 +163,7 @@ REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     # Публичные POST-эндпоинты ограничиваются по IP: read-only каталог не троттлится.
     # cart: корзину приложения меняют часто (каждое «добавить»/«+»), поэтому свой лимит по IP
-    "DEFAULT_THROTTLE_RATES": {"anon": "10/min", "cart": "120/min", "auth": "20/min"},
+    "DEFAULT_THROTTLE_RATES": {"anon": "10/min", "cart": "120/min", "auth": "20/min", "orders": "60/min"},
 }
 
 # Вход в мобильном приложении: JWT (access короткий, refresh с ротацией и чёрным списком)
@@ -181,7 +181,7 @@ APPLE_BUNDLE_ID = os.getenv("APPLE_BUNDLE_ID", "by.solopizza.app")
 
 SPECTACULAR_SETTINGS = {
     "TITLE": "SoloPizza mobile API",
-    "DESCRIPTION": "API мобильного приложения: каталог, корзина, вход, вакансии, объявления и контакты",
+    "DESCRIPTION": "API мобильного приложения: каталог, корзина, вход, заказы, вакансии, объявления и контакты",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
 }
