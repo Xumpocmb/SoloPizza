@@ -46,7 +46,7 @@ python-dotenv==1.2.1
 redis==7.1.0
 requests==2.32.5
 referencing==0.37.0
-rpds-py==2026.9.1
+rpds-py==0.30.0
 six==1.17.0
 sqlparse==0.5.4
 typing_extensions==4.15.0

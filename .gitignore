@@ -127,6 +127,8 @@ db.sqlite3
 
 /fixtures/
 /static/admin/
+/static/account/
+/static/modeltranslation/
 /secrets
 
 
