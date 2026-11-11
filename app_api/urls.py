@@ -18,6 +18,10 @@ urlpatterns = [
     path("products/featured/", views.FeaturedProductListView.as_view(), name="featured-products"),
     path("products/weekly-special/", views.WeeklySpecialProductView.as_view(), name="weekly-special-product"),
     path("products/<slug:slug>/", views.ProductDetailView.as_view(), name="product-detail"),
+    path("cart/", views.CartView.as_view(), name="cart"),
+    path("cart/items/", views.CartItemsView.as_view(), name="cart-items"),
+    path("cart/items/<int:pk>/", views.CartItemDetailView.as_view(), name="cart-item"),
+    path("cart/branch/", views.CartBranchView.as_view(), name="cart-branch"),
     path("vacancies/", views.VacancyListView.as_view(), name="vacancies"),
     path("vacancies/<int:pk>/", views.VacancyDetailView.as_view(), name="vacancy-detail"),
     path(

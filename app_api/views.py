@@ -1,3 +1,5 @@
+import uuid
+
 from django.conf import settings
 from django.shortcuts import get_object_or_404
 from drf_spectacular.types import OpenApiTypes
@@ -6,12 +8,13 @@ from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework.throttling import AnonRateThrottle
+from rest_framework.throttling import AnonRateThrottle, ScopedRateThrottle
 from rest_framework.views import APIView
 
 from app_api import serializers as api_serializers
 from app_api.filters import branch_or_none, catalog_products, visible_categories
 from app_home.context_processors import DEFAULT_BRANCH_ID
+from app_cart.models import Cart
 from app_home.models import Announcement, CafeBranch, Vacancy
 
 BRANCH_ID_PARAM = OpenApiParameter(
@@ -195,3 +198,104 @@ class VacancyApplicationView(PublicViewMixin, APIView):
             send_vacancy_application_notification.delay(application.pk)
 
         return Response(serializer.data, status=201)
+
+
+# ─── Корзина приложения ─────────────────────────────────────────────────────
+
+CART_TOKEN_HEADER = "X-Cart-Token"
+CART_TOKEN_PARAM = OpenApiParameter(
+    CART_TOKEN_HEADER,
+    OpenApiTypes.UUID,
+    OpenApiParameter.HEADER,
+    required=True,
+    description="token из ответа POST /cart/",
+)
+
+
+class CartViewMixin(PublicViewMixin):
+    """Гостевая корзина по токену из заголовка X-Cart-Token (UUID4 — не подобрать перебором)."""
+
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "cart"
+
+    def get_cart(self):
+        try:
+            token = uuid.UUID(str(self.request.headers.get(CART_TOKEN_HEADER)))
+        except ValueError:
+            raise NotFound("Корзина не найдена")
+        # shortcut: только гостевые корзины; корзины пользователей появятся вместе со входом по JWT
+        cart = Cart.objects.filter(token=token, user__isnull=True).first()
+        if cart is None:
+            raise NotFound("Корзина не найдена")
+        return cart
+
+    def cart_response(self, cart, status=200):
+        cart.refresh_from_db()
+        return Response(api_serializers.CartSerializer(api_serializers.cart_data(cart, self.request)).data, status=status)
+
+
+class CartView(CartViewMixin, APIView):
+    @extend_schema(parameters=[CART_TOKEN_PARAM], responses=api_serializers.CartSerializer)
+    def get(self, request):
+        return self.cart_response(self.get_cart())
+
+    @extend_schema(request=api_serializers.CartBranchSerializer, responses={201: api_serializers.CartSerializer})
+    def post(self, request):
+        """Новая пустая гостевая корзина для филиала; token из ответа клиент шлёт в X-Cart-Token."""
+        serializer = api_serializers.CartBranchSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        cart = Cart.objects.create(branch=serializer.validated_data["branch_id"])
+        return self.cart_response(cart, status=201)
+
+
+class CartItemsView(CartViewMixin, APIView):
+    @extend_schema(
+        parameters=[CART_TOKEN_PARAM],
+        request=api_serializers.CartItemAddSerializer,
+        responses=api_serializers.CartSerializer,
+    )
+    def post(self, request):
+        cart = self.get_cart()
+        serializer = api_serializers.CartItemAddSerializer(data=request.data, context={"cart": cart})
+        serializer.is_valid(raise_exception=True)
+        cart.add_item(**serializer.validated_data)
+        return self.cart_response(cart)
+
+
+class CartItemDetailView(CartViewMixin, APIView):
+    @extend_schema(
+        parameters=[CART_TOKEN_PARAM],
+        request=api_serializers.CartQuantitySerializer,
+        responses=api_serializers.CartSerializer,
+    )
+    def patch(self, request, pk):
+        cart = self.get_cart()
+        item = get_object_or_404(cart.items, pk=pk)
+        serializer = api_serializers.CartQuantitySerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        item.quantity = serializer.validated_data["quantity"]
+        item.save(update_fields=["quantity"])
+        cart.touch()
+        return self.cart_response(cart)
+
+    @extend_schema(parameters=[CART_TOKEN_PARAM], responses=api_serializers.CartSerializer)
+    def delete(self, request, pk):
+        cart = self.get_cart()
+        get_object_or_404(cart.items, pk=pk).delete()
+        cart.touch()
+        return self.cart_response(cart)
+
+
+class CartBranchView(CartViewMixin, APIView):
+    @extend_schema(
+        parameters=[CART_TOKEN_PARAM],
+        request=api_serializers.CartBranchSerializer,
+        responses=api_serializers.CartSerializer,
+    )
+    def put(self, request):
+        """Смена филиала очищает корзину, как на сайте."""
+        cart = self.get_cart()
+        serializer = api_serializers.CartBranchSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        cart.change_branch(serializer.validated_data["branch_id"])
+        return self.cart_response(cart)

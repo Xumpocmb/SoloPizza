@@ -160,12 +160,13 @@ CURRENCY = "BYN"
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     # Публичные POST-эндпоинты ограничиваются по IP: read-only каталог не троттлится.
-    "DEFAULT_THROTTLE_RATES": {"anon": "10/min"},
+    # cart: корзину приложения меняют часто (каждое «добавить»/«+»), поэтому свой лимит по IP
+    "DEFAULT_THROTTLE_RATES": {"anon": "10/min", "cart": "120/min"},
 }
 
 SPECTACULAR_SETTINGS = {
     "TITLE": "SoloPizza mobile API",
-    "DESCRIPTION": "Публичный API каталога, вакансий, объявлений и контактов для мобильного приложения",
+    "DESCRIPTION": "API мобильного приложения: каталог, корзина, вакансии, объявления и контакты",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
 }
