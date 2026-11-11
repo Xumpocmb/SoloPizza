@@ -289,7 +289,7 @@ class CartItemAddSerializer(serializers.Serializer):
         if variant is None:
             raise serializers.ValidationError({"variant_id": "У товара нет такого варианта"})
 
-        # Борты и добавки — только своего размера: иначе можно взять дешёвый борт маленькой пиццы
+        # Борты и добавки — только своего размера: у каждого размера своя цена
         allowed_boards = variant_boards(product, variant, combo_board_size(product))
         boards = []
         for field in ("board1_id", "board2_id"):
