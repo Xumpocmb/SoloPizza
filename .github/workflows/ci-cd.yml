@@ -1,0 +1,77 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Тесты (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # 3.10 — как на проде, 3.14 — как в локальной разработке.
+        # Матрица ловит расхождения зависимостей между окружениями
+        # (кейс: rpds-py 2026.9.1 ставился только на 3.11+).
+        python-version: ["3.10", "3.14"]
+    services:
+      # Кэш и брокер celery: django_redis смотрит на 127.0.0.1:6379
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      SECRET_KEY: только-для-ci
+      DEBUG: "True"
+      REDIS_HOST: 127.0.0.1
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Установить зависимости
+        run: pip install -r requirements.txt
+
+      # Миграции не хранятся в git (см. .gitignore), генерируем как на проде
+      - name: Сгенерировать миграции
+        run: python manage.py makemigrations
+
+      - name: Тесты
+        run: python manage.py test
+
+  deploy:
+    name: Деплой на прод
+    needs: test
+    # Деплоим только пуши в main (не PR и не ручной запуск тестов)
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Настроить SSH-ключ
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Запустить деплой на сервере
+        run: ssh -i ~/.ssh/deploy_key "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" "bash -s" < scripts/deploy.sh
