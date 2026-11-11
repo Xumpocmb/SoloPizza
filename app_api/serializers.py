@@ -419,3 +419,50 @@ def cart_data(cart, request):
         subtotal += total
         count += item.quantity
     return {"token": cart.token, "branch_id": cart.branch_id, "items": lines, "items_count": count, "subtotal": subtotal}
+
+
+# ─── Вход и профиль ─────────────────────────────────────────────────────────
+
+
+class GoogleLoginSerializer(serializers.Serializer):
+    id_token = serializers.CharField()
+
+
+class AppleLoginSerializer(serializers.Serializer):
+    identity_token = serializers.CharField()
+    # Apple отдаёт имя приложению только при первом входе и не кладёт его в токен
+    first_name = serializers.CharField(required=False, allow_blank=True, max_length=150)
+    last_name = serializers.CharField(required=False, allow_blank=True, max_length=150)
+
+
+class MeSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
+    first_name = serializers.CharField(max_length=150, allow_blank=True, required=False)
+    last_name = serializers.CharField(max_length=150, allow_blank=True, required=False)
+    email = serializers.EmailField(read_only=True)
+    phone = serializers.CharField(read_only=True, allow_null=True)
+
+    def update(self, instance, validated_data):
+        for field in ("first_name", "last_name"):
+            if field in validated_data:
+                setattr(instance, field, validated_data[field])
+        instance.save(update_fields=["first_name", "last_name"])
+        return instance
+
+
+class AuthResponseSerializer(serializers.Serializer):
+    access = serializers.CharField()
+    refresh = serializers.CharField()
+    user = MeSerializer()
+
+
+def me_data(user):
+    """Профиль; телефон — из последнего заказа (у User телефона нет, сайт хранит его в заказе)."""
+    phone = user.order_set.exclude(phone_number__isnull=True).exclude(phone_number="").order_by("-created_at")
+    return {
+        "id": user.pk,
+        "first_name": user.first_name,
+        "last_name": user.last_name,
+        "email": user.email,
+        "phone": phone.values_list("phone_number", flat=True).first(),
+    }
