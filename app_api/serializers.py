@@ -4,7 +4,9 @@ from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from app_api.filters import branch_or_none, catalog_products
+from app_api.orders import DELIVERY_TYPES, PAYMENT_METHODS
 from app_cart.models import MAX_CART_ITEM_QUANTITY
+from app_order.models import Order
 from app_catalog.models import (
     AddonParams,
     BoardParams,
@@ -465,4 +467,169 @@ def me_data(user):
         "last_name": user.last_name,
         "email": user.email,
         "phone": phone.values_list("phone_number", flat=True).first(),
+    }
+
+
+
+# ─── Оформление и заказы ────────────────────────────────────────────────────
+
+ORDER_DELIVERY_CHOICES = [(code, label) for code, label in Order.DELIVERY_CHOICES if code in DELIVERY_TYPES]
+ORDER_PAYMENT_CHOICES = [(code, label) for code, label in Order.PAYMENT_CHOICES if code in PAYMENT_METHODS]
+
+
+class ChoiceOptionSerializer(serializers.Serializer):
+    id = serializers.CharField()
+    name = serializers.CharField()
+
+
+class CheckoutOptionsSerializer(serializers.Serializer):
+    delivery_types = ChoiceOptionSerializer(many=True)
+    payment_methods = ChoiceOptionSerializer(many=True)
+    available = serializers.BooleanField()
+    reason = serializers.CharField(allow_blank=True)
+
+
+def checkout_options_data(available, reason):
+    return {
+        "delivery_types": [{"id": code, "name": str(label)} for code, label in ORDER_DELIVERY_CHOICES],
+        "payment_methods": [{"id": code, "name": str(label)} for code, label in ORDER_PAYMENT_CHOICES],
+        "available": available,
+        "reason": reason,
+    }
+
+
+class QuoteRequestSerializer(serializers.Serializer):
+    delivery_type = serializers.ChoiceField(choices=ORDER_DELIVERY_CHOICES)
+
+
+class QuoteLineSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    name = serializers.CharField()
+    quantity = serializers.IntegerField()
+    original_total = serializers.DecimalField(max_digits=10, decimal_places=2)
+    discount_amount = serializers.DecimalField(max_digits=10, decimal_places=2)
+    total = serializers.DecimalField(max_digits=10, decimal_places=2)
+
+
+class QuoteSerializer(serializers.Serializer):
+    lines = QuoteLineSerializer(many=True)
+    subtotal = serializers.DecimalField(max_digits=10, decimal_places=2)
+    discount_amount = serializers.DecimalField(max_digits=10, decimal_places=2)
+    delivery_cost = serializers.DecimalField(max_digits=10, decimal_places=2)
+    total_price = serializers.DecimalField(max_digits=10, decimal_places=2)
+    available = serializers.BooleanField()
+    reason = serializers.CharField(allow_blank=True)
+
+
+def quote_data(result, available, reason):
+    return {
+        "lines": [
+            {
+                "id": item.pk,
+                "name": item.item.name,
+                "quantity": item.quantity,
+                "original_total": calc["original_total"],
+                "discount_amount": calc["discount_amount"],
+                "total": calc["final_total"],
+            }
+            for item, calc in result["lines"]
+        ],
+        **{key: result[key] for key in ("subtotal", "discount_amount", "delivery_cost", "total_price")},
+        "available": available,
+        "reason": reason,
+    }
+
+
+class OrderCreateSerializer(serializers.Serializer):
+    """Только данные клиента: состав — из корзины, суммы, скидки, филиал и статус — от сервера."""
+
+    client_order_id = serializers.UUIDField()
+    delivery_type = serializers.ChoiceField(choices=ORDER_DELIVERY_CHOICES)
+    payment_method = serializers.ChoiceField(choices=ORDER_PAYMENT_CHOICES)
+    customer_name = serializers.CharField(max_length=100)
+    phone = serializers.CharField(max_length=32)
+    address = serializers.CharField(max_length=500, required=False, allow_blank=True)
+    comment = serializers.CharField(max_length=1000, required=False, allow_blank=True)
+    consent = serializers.BooleanField()
+
+    def validate_phone(self, value):
+        # как у формы отклика: «+375 (29) 123-45-67» → 375291234567 (в Order.phone_number до 20 символов)
+        digits = "".join(char for char in value if char.isdigit())
+        if not 9 <= len(digits) <= 15:
+            raise serializers.ValidationError("Проверьте номер телефона")
+        return f"+{digits}"
+
+    def validate_consent(self, value):
+        if not value:
+            raise serializers.ValidationError("Нужно согласие на обработку персональных данных")
+        return value
+
+    def validate(self, data):
+        if data["delivery_type"] == "delivery" and not data.get("address", "").strip():
+            raise serializers.ValidationError({"address": "Укажите адрес для доставки"})
+        return data
+
+
+class OrderLineSerializer(serializers.Serializer):
+    name = serializers.CharField()
+    options = serializers.CharField(allow_blank=True)
+    quantity = serializers.IntegerField()
+    total = serializers.DecimalField(max_digits=10, decimal_places=2)
+
+
+class OrderSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    number = serializers.CharField()
+    status = serializers.CharField()
+    status_display = serializers.CharField()
+    created_at = serializers.DateTimeField()
+    branch_id = serializers.IntegerField(allow_null=True)
+    delivery_type = serializers.CharField()
+    payment_method = serializers.CharField()
+    customer_name = serializers.CharField()
+    phone = serializers.CharField(allow_null=True)
+    address = serializers.CharField(allow_null=True)
+    comment = serializers.CharField(allow_blank=True)
+    items = OrderLineSerializer(many=True)
+    subtotal = serializers.DecimalField(max_digits=10, decimal_places=2)
+    discount_amount = serializers.DecimalField(max_digits=10, decimal_places=2)
+    delivery_cost = serializers.DecimalField(max_digits=10, decimal_places=2)
+    total_price = serializers.DecimalField(max_digits=10, decimal_places=2)
+
+
+def order_data(order):
+    lines = []
+    for item in order.items.select_related(
+        "product__category", "variant__size", "board1__board", "board2__board", "sauce"
+    ).prefetch_related("addons__addon"):
+        size = item.variant.size.name if item.variant.size else f"{item.variant.value} {item.variant.get_unit_display()}"
+        options = [size]
+        options += [f"Борт: {board.board.name}" for board in (item.board1, item.board2) if board]
+        options += [item.sauce.name] if item.sauce else []
+        options += [addon.addon.name for addon in item.addons.all()]
+        options += [item.drink] if item.drink else []
+        lines.append({
+            "name": item.product.name,
+            "options": " · ".join(option for option in options if option),
+            "quantity": item.quantity,
+            "total": item.calculate_item_total()["final_total"],
+        })
+    return {
+        "id": order.pk,
+        "number": order.print_number,
+        "status": order.status,
+        "status_display": str(order.get_status_display()),
+        "created_at": order.created_at,
+        "branch_id": order.branch_id,
+        "delivery_type": order.delivery_type,
+        "payment_method": order.payment_method,
+        "customer_name": order.customer_name,
+        "phone": order.phone_number,
+        "address": order.address,
+        "comment": order.comment,
+        "items": lines,
+        "subtotal": order.subtotal,
+        "discount_amount": order.discount_amount,
+        "delivery_cost": order.delivery_cost,
+        "total_price": order.total_price,
     }

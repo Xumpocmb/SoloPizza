@@ -13,10 +13,12 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from app_api import auth as api_auth
+from app_api import orders as api_orders
 from app_api import serializers as api_serializers
 from app_api.filters import branch_or_none, catalog_products, visible_categories
 from app_home.context_processors import DEFAULT_BRANCH_ID
 from app_cart.models import Cart
+from app_order.models import Order
 from app_home.models import Announcement, CafeBranch, Vacancy
 
 BRANCH_ID_PARAM = OpenApiParameter(
@@ -400,3 +402,67 @@ class MeView(APIView):
         # добавить вызов appleid.apple.com/auth/revoke, когда ключ появится — до публикации в App Store
         request.user.delete()
         return Response(status=204)
+
+
+# ─── Оформление и заказы ────────────────────────────────────────────────────
+
+
+class UserApiMixin:
+    """Эндпоинты только для вошедших: JWT из POST /auth/google/ или /auth/apple/."""
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "orders"
+
+    def user_cart(self):
+        cart = Cart.objects.select_related("branch").filter(user=self.request.user).first()
+        if cart is None:
+            raise NotFound("Корзина не найдена")
+        return cart
+
+
+class CheckoutOptionsView(UserApiMixin, APIView):
+    @extend_schema(responses=api_serializers.CheckoutOptionsSerializer)
+    def get(self, request):
+        """Способы получения и оплаты; можно ли оформить заказ в филиале корзины прямо сейчас."""
+        available, reason = api_orders.availability(self.user_cart(), request.user)
+        return Response(api_serializers.CheckoutOptionsSerializer(api_serializers.checkout_options_data(available, reason)).data)
+
+
+class CheckoutQuoteView(UserApiMixin, APIView):
+    @extend_schema(request=api_serializers.QuoteRequestSerializer, responses=api_serializers.QuoteSerializer)
+    def post(self, request):
+        """Итог корзины для способа получения: скидки самовывоза и «Пиццы недели», доставка."""
+        serializer = api_serializers.QuoteRequestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        cart = self.user_cart()
+        available, reason = api_orders.availability(cart, request.user)
+        result = api_orders.quote(cart, serializer.validated_data["delivery_type"])
+        return Response(api_serializers.QuoteSerializer(api_serializers.quote_data(result, available, reason)).data)
+
+
+class OrderListView(UserApiMixin, APIView):
+    @extend_schema(responses=api_serializers.OrderSerializer(many=True))
+    def get(self, request):
+        """Последние 50 заказов пользователя — и с сайта, и из приложения."""
+        orders = Order.objects.filter(user=request.user).select_related("branch").order_by("-created_at")[:50]
+        return Response(api_serializers.OrderSerializer([api_serializers.order_data(order) for order in orders], many=True).data)
+
+    @extend_schema(
+        request=api_serializers.OrderCreateSerializer,
+        responses={201: api_serializers.OrderSerializer, 200: api_serializers.OrderSerializer},
+    )
+    def post(self, request):
+        """Заказ из корзины пользователя; повтор с тем же client_order_id возвращает тот же заказ (200)."""
+        serializer = api_serializers.OrderCreateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        order, created = api_orders.create_order(request.user, self.user_cart(), serializer.validated_data)
+        return Response(api_serializers.OrderSerializer(api_serializers.order_data(order)).data, status=201 if created else 200)
+
+
+class OrderDetailView(UserApiMixin, APIView):
+    @extend_schema(responses=api_serializers.OrderSerializer)
+    def get(self, request, pk):
+        order = get_object_or_404(Order, pk=pk, user=request.user)
+        return Response(api_serializers.OrderSerializer(api_serializers.order_data(order)).data)
