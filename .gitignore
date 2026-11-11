@@ -129,6 +129,7 @@ db.sqlite3
 /static/admin/
 /static/account/
 /static/modeltranslation/
+/AGENTS.md
 /secrets
 
 
