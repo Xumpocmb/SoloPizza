@@ -44,7 +44,7 @@ def create_test_data():
 
     # Добавки
     addon_olives = PizzaAddon.objects.create(name="Маслины", slug="olives")
-    AddonParams.objects.create(addon=addon_olives, size=size_large, price=30)
+    addon_params_olives = AddonParams.objects.create(addon=addon_olives, size=size_large, price=30)
 
     return {
         "user": user,
@@ -56,6 +56,7 @@ def create_test_data():
         "board_cheese": board_cheese,
         "board_regular": board_regular,
         "addon_olives": addon_olives,
+        "addon_params_olives": addon_params_olives,
     }
 
 
@@ -73,7 +74,7 @@ class AddToCartViewTest(TestCase):
         sauce = data["sauce_tomato"]
         board_cheese = data["board_cheese"]
         board_regular = data["board_regular"]
-        addon_olives = data["addon_olives"]
+        addon_params_olives = data["addon_params_olives"]
 
         board_params_cheese = BoardParams.objects.get(board=board_cheese, size=variant.size)
         board_params_regular = BoardParams.objects.get(board=board_regular, size=variant.size)
@@ -86,19 +87,19 @@ class AddToCartViewTest(TestCase):
                 "board1_id": board_params_cheese.id,
                 "board2_id": board_params_regular.id,
                 "sauce_id": sauce.id,
-                "addon_ids": [addon_olives.id],
+                "addons": [addon_params_olives.id],
             },
         )
 
         self.assertEqual(response.status_code, 302)  # Редирект после POST
 
-        cart_item = self.user.cart_items.get(item=pizza)
+        cart_item = next(c for c in self.client.session["cart"].values() if c["product_id"] == pizza.id)
 
-        self.assertEqual(cart_item.quantity, 2)
-        self.assertEqual(cart_item.board1, board_params_cheese)
-        self.assertEqual(cart_item.board2, board_params_regular)
-        self.assertEqual(cart_item.sauce, sauce)
-        self.assertIn(addon_olives, cart_item.addons.all())
+        self.assertEqual(cart_item["quantity"], 2)
+        self.assertEqual(cart_item["board1_id"], board_params_cheese.id)
+        self.assertEqual(cart_item["board2_id"], board_params_regular.id)
+        self.assertEqual(cart_item["sauce_id"], sauce.id)
+        self.assertEqual(cart_item["addons_ids"], [addon_params_olives.id])
 
     def test_cannot_add_same_board_twice(self):
         data = self.data
@@ -136,8 +137,11 @@ class AddToCartViewTest(TestCase):
         # Второй раз
         self.client.post(reverse("app_cart:add_to_cart", args=[pizza.slug]), {"variant_id": variant.id, "quantity": 2})
 
-        cart_item = self.user.cart_items.get(item=pizza)
-        self.assertEqual(cart_item.quantity, 3)
+        cart = self.client.session["cart"]
+        self.assertEqual(len(cart), 1)
+        cart_item = next(iter(cart.values()))
+        self.assertEqual(cart_item["product_id"], pizza.id)
+        self.assertEqual(cart_item["quantity"], 3)
 
     def test_add_drink_without_options(self):
         data = self.data
@@ -147,12 +151,13 @@ class AddToCartViewTest(TestCase):
         response = self.client.post(reverse("app_cart:add_to_cart", args=[drink.slug]), {"variant_id": variant.id, "quantity": 2})
 
         self.assertEqual(response.status_code, 302)
-        cart_item = self.user.cart_items.get(item=drink)
-        self.assertEqual(cart_item.quantity, 2)
-        self.assertIsNone(cart_item.board1)
-        self.assertIsNone(cart_item.board2)
-        self.assertIsNone(cart_item.sauce)
-        self.assertEqual(cart_item.addons.count(), 0)
+        cart_item = next(c for c in self.client.session["cart"].values() if c["product_id"] == drink.id)
+
+        self.assertEqual(cart_item["quantity"], 2)
+        self.assertIsNone(cart_item["board1_id"])
+        self.assertIsNone(cart_item["board2_id"])
+        self.assertIsNone(cart_item["sauce_id"])
+        self.assertEqual(cart_item["addons_ids"], [])
 
 
 class CartTotalsTests(TestCase):
