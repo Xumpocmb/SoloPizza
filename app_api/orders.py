@@ -20,6 +20,12 @@ from app_order.pricing import calculate_line_total
 
 DELIVERY_TYPES = ("pickup", "delivery")  # «Зал» — только для сотрудников
 PAYMENT_METHODS = ("cash", "card")  # оплата при получении; безнал и раздельная — у сотрудников
+# Проверочные заказы на боевом сервере: сразу отменены и не оплачены, чтобы не попасть сотрудникам в работу
+TEST_CUSTOMER_NAME = "ТЕСТ"
+
+
+def is_test_order(customer_name):
+    return customer_name.strip().upper() == TEST_CUSTOMER_NAME
 
 
 def availability(cart, user):
@@ -113,7 +119,7 @@ def _create(user, cart, items, data):
             delivery_type=data["delivery_type"],
             payment_method=data["payment_method"],
             comment=data.get("comment", ""),
-            status="new",
+            status="canceled" if is_test_order(data["customer_name"]) else "new",
             payment_status=False,
         )
         with suspended_order_totals():

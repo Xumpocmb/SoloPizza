@@ -102,6 +102,12 @@ class OrderApiTests(TestCase):
         self.assertIsNotNone(order.consent_at)
         self.assertEqual(self.client.get("/api/v1/cart/").json()["items"], [])
 
+    def test_test_order_is_created_canceled_and_unpaid(self, _):
+        self.add_pizza()
+        data = self.client.post("/api/v1/orders/", self.order_payload(customer_name=" тест "), format="json").json()
+        order = Order.objects.get(pk=data["id"])
+        self.assertEqual((order.status, order.payment_status), ("canceled", False))
+
     def test_repeated_submit_returns_the_same_order(self, _):
         self.add_pizza()
         payload = self.order_payload()
