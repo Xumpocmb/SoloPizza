@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from datetime import timedelta
 
 from dotenv import load_dotenv
 
@@ -47,6 +48,7 @@ INSTALLED_APPS = [
     "django_celery_beat",
     "debug_toolbar",
     "rest_framework",
+    "rest_framework_simplejwt.token_blacklist",
     "drf_spectacular",
     "app_home.apps.AppHomeConfig",
     "app_catalog.apps.AppCatalogConfig",
@@ -160,12 +162,26 @@ CURRENCY = "BYN"
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     # Публичные POST-эндпоинты ограничиваются по IP: read-only каталог не троттлится.
-    "DEFAULT_THROTTLE_RATES": {"anon": "10/min"},
+    # cart: корзину приложения меняют часто (каждое «добавить»/«+»), поэтому свой лимит по IP
+    "DEFAULT_THROTTLE_RATES": {"anon": "10/min", "cart": "120/min", "auth": "20/min"},
 }
+
+# Вход в мобильном приложении: JWT (access короткий, refresh с ротацией и чёрным списком)
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "UPDATE_LAST_LOGIN": True,
+}
+# Client ID из Google Cloud, которыми приложение получает id_token (через запятую: web, android, ios)
+GOOGLE_OAUTH_CLIENT_IDS = [cid.strip() for cid in os.getenv("GOOGLE_OAUTH_CLIENT_IDS", "").split(",") if cid.strip()]
+# aud в identity_token от Sign in with Apple = bundle id приложения
+APPLE_BUNDLE_ID = os.getenv("APPLE_BUNDLE_ID", "by.solopizza.app")
 
 SPECTACULAR_SETTINGS = {
     "TITLE": "SoloPizza mobile API",
-    "DESCRIPTION": "Публичный API каталога, вакансий, объявлений и контактов для мобильного приложения",
+    "DESCRIPTION": "API мобильного приложения: каталог, корзина, вход, вакансии, объявления и контакты",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
 }

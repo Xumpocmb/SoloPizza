@@ -1,10 +1,65 @@
+import uuid
 from decimal import Decimal
-from django.db import models
+from django.db import models, transaction
 from django.conf import settings
 from django.utils import timezone
 from django.db.models import Sum
 from app_catalog.models import Product, ProductVariant, BoardParams, AddonParams, PizzaSauce
+from app_home.models import CafeBranch
 from app_order.pricing import line_totals
+
+MAX_CART_ITEM_QUANTITY = 10  # как в AddToCartForm сайта
+
+
+class Cart(models.Model):
+    """Корзина мобильного приложения. Сайт по-прежнему держит корзину в сессии (SessionCart)."""
+
+    token = models.UUIDField(default=uuid.uuid4, unique=True, editable=False, verbose_name="Токен")
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True, related_name="app_cart", verbose_name="Пользователь"
+    )
+    branch = models.ForeignKey(CafeBranch, on_delete=models.PROTECT, verbose_name="Филиал")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Создана")
+    updated_at = models.DateTimeField(auto_now=True, db_index=True, verbose_name="Обновлена")
+
+    class Meta:
+        db_table = "app_carts"
+        verbose_name = "Корзина приложения"
+        verbose_name_plural = "Корзины приложения"
+
+    def __str__(self):
+        return f"Корзина приложения {self.token}"
+
+    def touch(self):
+        self.save(update_fields=["updated_at"])
+
+    def add_item(self, product, variant, board1, board2, sauce, addons, drink, quantity):
+        """Тот же набор опций увеличивает количество, а не заводит новую строку (как ключ SessionCart)."""
+        addon_ids = sorted(addon.pk for addon in addons)
+        with transaction.atomic():
+            candidates = self.items.select_for_update().filter(
+                item=product, item_variant=variant, board1=board1, board2=board2, sauce=sauce, drink=drink
+            )
+            same = next((c for c in candidates if sorted(c.addons.values_list("pk", flat=True)) == addon_ids), None)
+            if same is not None:
+                same.quantity = min(same.quantity + quantity, MAX_CART_ITEM_QUANTITY)
+                same.updated_at = timezone.now()
+                same.save(update_fields=["quantity", "updated_at"])
+            else:
+                same = CartItem.objects.create(
+                    cart=self, item=product, item_variant=variant, board1=board1, board2=board2,
+                    sauce=sauce, drink=drink, quantity=quantity,
+                )
+                same.addons.set(addons)
+            self.touch()
+        return same
+
+    def change_branch(self, branch):
+        """Меню и наличие у филиалов разные, поэтому корзина очищается — как select_branch на сайте."""
+        with transaction.atomic():
+            self.items.all().delete()
+            self.branch = branch
+            self.save(update_fields=["branch", "updated_at"])
 
 
 class CartItemManager(models.Manager):
@@ -27,7 +82,11 @@ class CartItemManager(models.Manager):
 
 
 class CartItem(models.Model):
-    session_key = models.CharField(max_length=40, verbose_name="Ключ сессии", db_index=True)
+    cart = models.ForeignKey(
+        Cart, on_delete=models.CASCADE, null=True, blank=True, related_name="items", verbose_name="Корзина приложения"
+    )
+    # legacy: строки старой серверной корзины сайта; позиции приложения его не заполняют
+    session_key = models.CharField(max_length=40, blank=True, default="", verbose_name="Ключ сессии", db_index=True)
     item = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name="Товар")
     item_variant = models.ForeignKey(
         ProductVariant, on_delete=models.CASCADE, verbose_name="Вариант товара", help_text="Выбранный размер/вариант товара", null=True, blank=True
@@ -52,9 +111,8 @@ class CartItem(models.Model):
         verbose_name = "Товар в корзине"
         verbose_name_plural = "Товары в корзине"
         ordering = ["-created_at"]
-        unique_together = [
-            ["session_key", "item", "item_variant", "board1", "board2", "sauce"],
-        ]
+        # unique_together убран: он не учитывал добавки и напиток, и две одинаковые пиццы
+        # с разными добавками не помещались в одну корзину. Дубли объединяет Cart.add_item.
 
     def __str__(self):
         size_info = ""

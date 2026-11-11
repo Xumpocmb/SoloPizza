@@ -1,17 +1,22 @@
+import uuid
+
 from django.conf import settings
 from django.shortcuts import get_object_or_404
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema
-from rest_framework.exceptions import NotFound, ValidationError
+from rest_framework.exceptions import APIException, NotFound, PermissionDenied, ValidationError
 from rest_framework.generics import ListAPIView, RetrieveAPIView
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.throttling import AnonRateThrottle
+from rest_framework.throttling import AnonRateThrottle, ScopedRateThrottle
 from rest_framework.views import APIView
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
+from app_api import auth as api_auth
 from app_api import serializers as api_serializers
 from app_api.filters import branch_or_none, catalog_products, visible_categories
 from app_home.context_processors import DEFAULT_BRANCH_ID
+from app_cart.models import Cart
 from app_home.models import Announcement, CafeBranch, Vacancy
 
 BRANCH_ID_PARAM = OpenApiParameter(
@@ -195,3 +200,203 @@ class VacancyApplicationView(PublicViewMixin, APIView):
             send_vacancy_application_notification.delay(application.pk)
 
         return Response(serializer.data, status=201)
+
+
+# ─── Корзина приложения ─────────────────────────────────────────────────────
+
+CART_TOKEN_HEADER = "X-Cart-Token"
+CART_TOKEN_PARAM = OpenApiParameter(
+    CART_TOKEN_HEADER,
+    OpenApiTypes.UUID,
+    OpenApiParameter.HEADER,
+    required=False,
+    description="token гостевой корзины из ответа POST /cart/; после входа не нужен — корзина по JWT",
+)
+
+
+class CartViewMixin(PublicViewMixin):
+    """Корзина пользователя по JWT; без входа — гостевая по X-Cart-Token (UUID4 — не подобрать перебором)."""
+
+    authentication_classes = [JWTAuthentication]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "cart"
+
+    def get_cart(self):
+        if self.request.user.is_authenticated:
+            cart = Cart.objects.filter(user=self.request.user).first()
+        else:
+            try:
+                token = uuid.UUID(str(self.request.headers.get(CART_TOKEN_HEADER)))
+            except ValueError:
+                raise NotFound("Корзина не найдена")
+            cart = Cart.objects.filter(token=token, user__isnull=True).first()
+        if cart is None:
+            raise NotFound("Корзина не найдена")
+        return cart
+
+    def cart_response(self, cart, status=200):
+        cart.refresh_from_db()
+        return Response(api_serializers.CartSerializer(api_serializers.cart_data(cart, self.request)).data, status=status)
+
+
+class CartView(CartViewMixin, APIView):
+    @extend_schema(parameters=[CART_TOKEN_PARAM], responses=api_serializers.CartSerializer)
+    def get(self, request):
+        return self.cart_response(self.get_cart())
+
+    @extend_schema(
+        request=api_serializers.CartBranchSerializer,
+        responses={200: api_serializers.CartSerializer, 201: api_serializers.CartSerializer},
+    )
+    def post(self, request):
+        """Новая пустая корзина для филиала. Гостю — token для X-Cart-Token; у пользователя корзина одна (200)."""
+        serializer = api_serializers.CartBranchSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        if request.user.is_authenticated:
+            cart, created = Cart.objects.get_or_create(
+                user=request.user, defaults={"branch": serializer.validated_data["branch_id"]}
+            )
+            return self.cart_response(cart, status=201 if created else 200)
+        cart = Cart.objects.create(branch=serializer.validated_data["branch_id"])
+        return self.cart_response(cart, status=201)
+
+
+class CartItemsView(CartViewMixin, APIView):
+    @extend_schema(
+        parameters=[CART_TOKEN_PARAM],
+        request=api_serializers.CartItemAddSerializer,
+        responses=api_serializers.CartSerializer,
+    )
+    def post(self, request):
+        cart = self.get_cart()
+        serializer = api_serializers.CartItemAddSerializer(data=request.data, context={"cart": cart})
+        serializer.is_valid(raise_exception=True)
+        cart.add_item(**serializer.validated_data)
+        return self.cart_response(cart)
+
+
+class CartItemDetailView(CartViewMixin, APIView):
+    @extend_schema(
+        parameters=[CART_TOKEN_PARAM],
+        request=api_serializers.CartQuantitySerializer,
+        responses=api_serializers.CartSerializer,
+    )
+    def patch(self, request, pk):
+        cart = self.get_cart()
+        item = get_object_or_404(cart.items, pk=pk)
+        serializer = api_serializers.CartQuantitySerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        item.quantity = serializer.validated_data["quantity"]
+        item.save(update_fields=["quantity"])
+        cart.touch()
+        return self.cart_response(cart)
+
+    @extend_schema(parameters=[CART_TOKEN_PARAM], responses=api_serializers.CartSerializer)
+    def delete(self, request, pk):
+        cart = self.get_cart()
+        get_object_or_404(cart.items, pk=pk).delete()
+        cart.touch()
+        return self.cart_response(cart)
+
+
+class CartBranchView(CartViewMixin, APIView):
+    @extend_schema(
+        parameters=[CART_TOKEN_PARAM],
+        request=api_serializers.CartBranchSerializer,
+        responses=api_serializers.CartSerializer,
+    )
+    def put(self, request):
+        """Смена филиала очищает корзину, как на сайте."""
+        cart = self.get_cart()
+        serializer = api_serializers.CartBranchSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        cart.change_branch(serializer.validated_data["branch_id"])
+        return self.cart_response(cart)
+
+
+# ─── Вход и профиль ─────────────────────────────────────────────────────────
+
+
+class ProviderUnavailable(APIException):
+    status_code = 503
+    default_detail = "Вход через этого провайдера ещё не настроен на сервере"
+
+
+class SocialLoginView(PublicViewMixin, APIView):
+    """Общий вход: проверка токена провайдера → пользователь → перенос гостевой корзины → JWT."""
+
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "auth"
+    provider = None
+    serializer_class = None
+
+    def verify(self, data):
+        raise NotImplementedError
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        try:
+            claims = self.verify(serializer.validated_data)
+        except api_auth.ProviderNotConfigured:
+            raise ProviderUnavailable()
+        user = api_auth.resolve_user(
+            self.provider,
+            claims,
+            first_name=serializer.validated_data.get("first_name", ""),
+            last_name=serializer.validated_data.get("last_name", ""),
+        )
+        if not user.is_active:
+            raise PermissionDenied("Аккаунт заблокирован")
+        api_auth.merge_guest_cart(user, request.headers.get(CART_TOKEN_HEADER))
+        return Response({**api_auth.issue_tokens(user), "user": api_serializers.me_data(user)})
+
+
+@extend_schema(
+    parameters=[CART_TOKEN_PARAM],
+    request=api_serializers.GoogleLoginSerializer,
+    responses=api_serializers.AuthResponseSerializer,
+)
+class GoogleLoginView(SocialLoginView):
+    provider = "google"
+    serializer_class = api_serializers.GoogleLoginSerializer
+
+    def verify(self, data):
+        return api_auth.verify_google(data["id_token"])
+
+
+@extend_schema(
+    parameters=[CART_TOKEN_PARAM],
+    request=api_serializers.AppleLoginSerializer,
+    responses=api_serializers.AuthResponseSerializer,
+)
+class AppleLoginView(SocialLoginView):
+    provider = "apple"
+    serializer_class = api_serializers.AppleLoginSerializer
+
+    def verify(self, data):
+        return api_auth.verify_apple(data["identity_token"])
+
+
+class MeView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(responses=api_serializers.MeSerializer)
+    def get(self, request):
+        return Response(api_serializers.me_data(request.user))
+
+    @extend_schema(request=api_serializers.MeSerializer, responses=api_serializers.MeSerializer)
+    def patch(self, request):
+        serializer = api_serializers.MeSerializer(request.user, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(api_serializers.me_data(request.user))
+
+    @extend_schema(responses={204: None})
+    def delete(self, request):
+        """Удаление аккаунта (требование App Store): заказы остаются без привязки к пользователю."""
+        # shortcut: токен Sign in with Apple не отзывается (нужен ключ .p8 из Apple Developer);
+        # добавить вызов appleid.apple.com/auth/revoke, когда ключ появится — до публикации в App Store
+        request.user.delete()
+        return Response(status=204)
