@@ -23,12 +23,6 @@
                     <div class="vacancy-content">
                         <h3 class="vacancy-title">{{ vacancy.title }}</h3>
                         {% if vacancy.description %}<p class="vacancy-description">{{ vacancy.description|truncatewords:20 }}</p>{% endif %}
-                        {% if vacancy.salary %}<div class="vacancy-salary">💰 {{ vacancy.salary }}</div>{% endif %}
-                        {% if vacancy.benefits %}
-                            <div class="vacancy-benefits">
-                                {% for benefit in vacancy.benefits|split:"," %}<span class="benefit-tag">{{ benefit|strip }}</span>{% endfor %}
-                            </div>
-                        {% endif %}
                         <a href="{% url 'app_home:vacancy_detail' vacancy.id %}"
                            class="vacancy-details-btn">{% trans "Подробнее" %}</a>
                     </div>

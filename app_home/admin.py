@@ -53,7 +53,7 @@ admin.site.register(CafeBranch, CafeBranchAdmin)
 
 @admin.register(Vacancy)
 class VacancyAdmin(TabbedTranslationAdmin):
-    list_display = ("title", "salary", "is_active", "created_at")
+    list_display = ("title", "is_active", "created_at")
     list_editable = ("is_active",)
     list_filter = ("is_active", "created_at")
     search_fields = ("title", "description")

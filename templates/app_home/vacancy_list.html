@@ -43,16 +43,6 @@
                     {% if vacancy.description %}
                     <p class="vacancy-card__description">{{ vacancy.description|truncatewords:20 }}</p>
                     {% endif %}
-                    {% if vacancy.salary %}
-                    <p class="vacancy-card__salary">💰 {{ vacancy.salary }}</p>
-                    {% endif %}
-                    {% if vacancy.benefits %}
-                    <div class="vacancy-tags">
-                        {% for benefit in vacancy.benefits|split:"," %}
-                        <span class="vacancy-tag">{{ benefit|strip }}</span>
-                        {% endfor %}
-                    </div>
-                    {% endif %}
                     <a href="{% url 'app_home:vacancy_detail' vacancy.id %}" class="vacancy-card__link">{% trans "Подробнее" %}</a>
                 </div>
             </article>

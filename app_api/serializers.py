@@ -220,20 +220,14 @@ class ProductDetailSerializer(ProductListItemSerializer):
 
 class VacancyListItemSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
-    benefits = serializers.SerializerMethodField()
 
     class Meta:
         model = Vacancy
-        fields = ["id", "title", "salary", "benefits", "image"]
+        fields = ["id", "title", "image"]
 
     @extend_schema_field(IMAGE_SCHEMA)
     def get_image(self, obj):
         return _media_url(self.context.get("request"), obj.image)
-
-    @extend_schema_field(list[str])
-    def get_benefits(self, obj):
-        # Преимущества хранятся одной строкой через запятую — режем их, как в web-шаблоне.
-        return [benefit.strip() for benefit in (obj.benefits or "").split(",") if benefit.strip()]
 
 
 class VacancyDetailSerializer(VacancyListItemSerializer):

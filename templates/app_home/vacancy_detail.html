@@ -31,24 +31,10 @@
             {% endif %}
 
             <div class="vacancy-hero__description">
-                {% if vacancy.salary %}
-                <p class="vacancy-salary">💰 {{ vacancy.salary }}</p>
-                {% endif %}
                 {{ vacancy.description|linebreaks }}
             </div>
         </div>
     </section>
-
-    {% if vacancy.benefits %}
-    <section class="legal-block">
-        <h2 class="legal-block__title">{% trans "Преимущества работы у нас:" %}</h2>
-        <div class="vacancy-tags">
-            {% for benefit in vacancy.benefits|split:"," %}
-            <span class="vacancy-tag">{{ benefit|strip }}</span>
-            {% endfor %}
-        </div>
-    </section>
-    {% endif %}
 
 </div>
 {% endblock %}

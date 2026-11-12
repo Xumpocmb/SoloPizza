@@ -206,8 +206,6 @@ class VacancyApiTests(TestCase):
         self.courier = Vacancy.objects.create(
             title="Курьер",
             description="Доставка заказов",
-            salary="от 1200 руб",
-            benefits="Гибкий график, компенсация связи",
             is_active=True,
         )
         self.closed = Vacancy.objects.create(title="Повар", description="Горячий цех", is_active=False)
@@ -218,12 +216,13 @@ class VacancyApiTests(TestCase):
         titles = [v["title"] for v in response.json()]
         self.assertEqual(titles, ["Курьер"])
 
-    def test_vacancy_detail_splits_benefits(self):
+    def test_vacancy_detail(self):
         response = self.client.get(f"/api/v1/vacancies/{self.courier.pk}/")
         self.assertEqual(response.status_code, 200)
         data = response.json()
         self.assertEqual(data["description"], "Доставка заказов")
-        self.assertEqual(data["benefits"], ["Гибкий график", "компенсация связи"])
+        self.assertNotIn("salary", data)
+        self.assertNotIn("benefits", data)
 
     def test_inactive_vacancy_is_404(self):
         self.assertEqual(self.client.get(f"/api/v1/vacancies/{self.closed.pk}/").status_code, 404)

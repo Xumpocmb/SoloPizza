@@ -31,7 +31,6 @@ class VacancyApplyViewTests(TestCase):
         self.vacancy = Vacancy.objects.create(
             title="Тестовая вакансия",
             description="Описание тестовой вакансии",
-            salary="от 1000 BYN",
             is_active=True
         )
         self.url = reverse('app_home:vacancy_apply', args=[self.vacancy.id])
@@ -261,7 +260,6 @@ class VacancyApplicationFormTests(TestCase):
         self.vacancy = Vacancy.objects.create(
             title="Тестовая вакансия",
             description="Описание тестовой вакансии",
-            salary="от 1000 BYN",
             is_active=True
         )
     
@@ -764,8 +762,6 @@ class InfoPagesLayoutTests(TestCase):
         self.vacancy = Vacancy.objects.create(
             title='Тестовая вакансия',
             description='Описание тестовой вакансии',
-            salary='от 1000 BYN',
-            benefits='Питание,Обучение',
             is_active=True,
         )
 
@@ -811,8 +807,7 @@ class InfoPagesLayoutTests(TestCase):
         url = reverse('app_home:vacancy_detail', args=[self.vacancy.id])
         response = self.assert_legal_page(url, 'app_home/vacancy_detail.html')
 
-        self.assertContains(response, 'от 1000 BYN')
-        self.assertContains(response, 'Преимущества работы у нас:')
+        self.assertContains(response, 'Описание тестовой вакансии')
         self.assertContains(response, reverse('app_home:vacancy_apply', args=[self.vacancy.id]))
 
     def test_vacancy_apply_uses_legal_layout(self):

@@ -5,7 +5,7 @@ from .models import CafeBranch, Discount, InfoPage, Partner, Vacancy
 
 @register(Vacancy)
 class VacancyTranslationOptions(TranslationOptions):
-    fields = ("title", "description", "salary", "benefits")
+    fields = ("title", "description")
 
 
 @register(CafeBranch)
