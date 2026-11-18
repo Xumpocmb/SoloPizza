@@ -1,0 +1,59 @@
+{% extends 'app_home/legal_base.html' %}
+{% load i18n %}
+
+{% block title %}{{ title }} - Solo Pizza{% endblock %}
+
+{% block meta_description %}{% trans "Как удалить аккаунт Solo Pizza и связанные с ним данные: в приложении или на сайте." %}{% endblock %}
+{% block og_description %}{% trans "Как удалить аккаунт Solo Pizza и связанные с ним данные: в приложении или на сайте." %}{% endblock %}
+{% block twitter_description %}{% trans "Как удалить аккаунт Solo Pizza и связанные с ним данные: в приложении или на сайте." %}{% endblock %}
+
+{% block body_class %}s-legal{% endblock %}
+
+{% block eyebrow %}<p class="legal-header__eyebrow">{% trans "Правовая информация" %}</p>{% endblock %}
+
+{% block lead %}
+<p class="legal-lead">{% trans "Аккаунт Solo Pizza можно удалить в любой момент — в мобильном приложении или на этой странице. Удаление необратимо." %}</p>
+{% endblock %}
+
+{% block content %}
+<article class="legal-doc">
+    <section class="legal-doc__section">
+        <h2>{% trans "1. В приложении Solo Pizza" %}</h2>
+        <p>{% trans "Откройте вкладку «Профиль», нажмите «Удалить аккаунт» внизу экрана и подтвердите удаление." %}</p>
+    </section>
+
+    <section class="legal-doc__section">
+        <h2>{% trans "2. На сайте" %}</h2>
+        {% if user.is_authenticated %}
+            {% if user.is_staff %}
+                <p>{% trans "Это аккаунт сотрудника — его удаляет администратор." %}</p>
+            {% else %}
+                <p>{% blocktrans with email=user.email %}Вы вошли как {{ email }}.{% endblocktrans %}</p>
+                <form method="post" action="{% url 'app_home:account_delete' %}">
+                    {% csrf_token %}
+                    <p>
+                        <label>
+                            <input type="checkbox" name="confirm" value="yes" required>
+                            {% trans "Понимаю, что аккаунт и его данные будут удалены без возможности восстановления" %}
+                        </label>
+                    </p>
+                    <p><button type="submit" class="legal-footer__cta legal-danger-btn">{% trans "Удалить аккаунт" %}</button></p>
+                </form>
+            {% endif %}
+        {% else %}
+            <p>
+                {% trans "Войдите на сайт тем же способом, что и в приложении (например, через Google), и вернитесь на эту страницу." %}
+                <a href="{% url 'app_user:login' %}?next={% url 'app_home:account_delete' %}">{% trans "Войти" %}</a>
+            </p>
+        {% endif %}
+    </section>
+
+    <section class="legal-doc__section">
+        <h2>{% trans "3. Что удаляется" %}</h2>
+        <p>{% trans "Имя, адрес электронной почты, вход через Google или Apple, корзина и ваши отзывы. Удаление происходит сразу." %}</p>
+        <h2>{% trans "4. Что сохраняется" %}</h2>
+        <p>{% trans "Оформленные заказы остаются в учёте пиццерии без привязки к вам — этого требует бухгалтерский учёт." %}</p>
+        <p>{% trans "Вопросы об удалении данных — через страницу контактов:" %} <a href="{% url 'app_home:contacts' %}">{% trans "Контакты" %}</a></p>
+    </section>
+</article>
+{% endblock %}

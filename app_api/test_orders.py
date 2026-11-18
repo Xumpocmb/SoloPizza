@@ -95,6 +95,9 @@ class OrderApiTests(TestCase):
         self.assertEqual(response.status_code, 201, response.json())
         data = response.json()
         self.assertEqual((data["total_price"], data["status"]), (quote["total_price"], "new"))
+        # строка: без скидки (пицца 13.50 + борт 2.50) и итог; −10% только с базовой цены пиццы
+        line = data["items"][0]
+        self.assertEqual((line["original_total"], line["total"]), ("16.00", "14.65"))
         order = Order.objects.get(pk=data["id"])
         self.assertEqual((order.source, order.user, order.branch, order.is_partner, order.payment_status),
                          ("app", self.user, self.branch, False, False))

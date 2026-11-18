@@ -8,6 +8,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Count, Min
 from django.http import JsonResponse
+from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from app_cart.models import CartItem
@@ -404,3 +405,29 @@ def handler404(request, exception):
     Custom 404 handler to serve a styled 404 page.
     """
     return render(request, "404.html", status=404)
+
+
+def account_delete(request):
+    """Удаление аккаунта: инструкция для приложения и удаление на сайте (ссылка для Google Play)."""
+    if request.method == "POST":
+        if not request.user.is_authenticated:
+            return redirect("app_home:account_delete")
+        if request.user.is_staff:
+            # сотрудник может случайно удалить себе доступ к админке — только через администратора
+            messages.error(request, _("Аккаунт сотрудника удаляется через администратора."))
+            return redirect("app_home:account_delete")
+        if request.POST.get("confirm") != "yes":
+            messages.error(request, _("Подтвердите, что понимаете: удаление необратимо."))
+            return redirect("app_home:account_delete")
+        user = request.user
+        logout(request)
+        # как DELETE /api/v1/me/: заказы остаются без привязки к пользователю (SET_NULL)
+        user.delete()
+        messages.success(request, _("Аккаунт удалён."))
+        return redirect("app_home:home")
+
+    breadcrumbs = [
+        {"title": _("Главная"), "url": "/"},
+        {"title": _("Удаление аккаунта"), "url": reverse("app_home:account_delete")},
+    ]
+    return render(request, "app_home/account_delete.html", {"title": _("Удаление аккаунта"), "breadcrumbs": breadcrumbs})
