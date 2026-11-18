@@ -2,6 +2,7 @@ import uuid
 
 from django.conf import settings
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework.exceptions import APIException, NotFound, PermissionDenied, ValidationError
@@ -446,8 +447,13 @@ class CheckoutQuoteView(UserApiMixin, APIView):
 class OrderListView(UserApiMixin, APIView):
     @extend_schema(responses=api_serializers.OrderSerializer(many=True))
     def get(self, request):
-        """Последние 50 заказов пользователя — и с сайта, и из приложения."""
-        orders = Order.objects.filter(user=request.user).select_related("branch").order_by("-created_at")[:50]
+        """Заказы пользователя за сегодня (по Минску) — и с сайта, и из приложения."""
+        # прошлые дни в приложении не показываем (решение владельца); заказ по id — OrderDetailView
+        orders = (
+            Order.objects.filter(user=request.user, created_at__date=timezone.localdate())
+            .select_related("branch")
+            .order_by("-created_at")
+        )
         return Response(api_serializers.OrderSerializer([api_serializers.order_data(order) for order in orders], many=True).data)
 
     @extend_schema(
