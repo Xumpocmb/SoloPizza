@@ -20,6 +20,7 @@ from app_home.context_processors import DEFAULT_BRANCH_ID
 from app_cart.models import Cart
 from app_order.models import Order
 from app_home.models import Announcement, CafeBranch, Vacancy
+from app_reviews.models import Review
 
 BRANCH_ID_PARAM = OpenApiParameter(
     "branch_id",
@@ -466,3 +467,32 @@ class OrderDetailView(UserApiMixin, APIView):
     def get(self, request, pk):
         order = get_object_or_404(Order, pk=pk, user=request.user)
         return Response(api_serializers.OrderSerializer(api_serializers.order_data(order)).data)
+
+
+# ─── Книга замечаний и предложений ────────────────────────────────────────────
+
+REVIEWS_LIMIT = 50
+
+
+class ReviewListView(APIView):
+    """Одобренные модератором отзывы (публично) и новый отзыв (после входа) — как /reviews/ на сайте."""
+
+    authentication_classes = [JWTAuthentication]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "reviews"
+
+    def get_permissions(self):
+        return [IsAuthenticated()] if self.request.method == "POST" else [AllowAny()]
+
+    @extend_schema(responses=api_serializers.ReviewSerializer(many=True))
+    def get(self, request):
+        reviews = Review.objects.filter(is_published=True, status="approved").select_related("user")[:REVIEWS_LIMIT]
+        return Response(api_serializers.ReviewSerializer(reviews, many=True).data)
+
+    @extend_schema(request=api_serializers.ReviewSerializer, responses={201: api_serializers.ReviewSerializer})
+    def post(self, request):
+        serializer = api_serializers.ReviewSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        # статус по умолчанию «На модерации»: в ленту попадёт после одобрения на сайте
+        review = Review.objects.create(user=request.user, **serializer.validated_data)
+        return Response(api_serializers.ReviewSerializer(review).data, status=201)

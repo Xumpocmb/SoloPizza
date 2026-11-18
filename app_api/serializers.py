@@ -637,3 +637,24 @@ def order_data(order):
         "delivery_cost": order.delivery_cost,
         "total_price": order.total_price,
     }
+
+
+# ─── Книга замечаний и предложений ────────────────────────────────────────────
+
+def review_author(user):
+    """«Анна П.»: логин в приложении не показываем — у входа через Google он бывает почтой."""
+    first, last = (user.first_name or "").strip(), (user.last_name or "").strip()
+    if not first:
+        return "Гость"
+    return f"{first} {last[0]}." if last else first
+
+
+class ReviewSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
+    author = serializers.SerializerMethodField()
+    rating = serializers.IntegerField(min_value=1, max_value=5)
+    text = serializers.CharField(max_length=2000)
+    created_at = serializers.DateTimeField(read_only=True)
+
+    def get_author(self, review):
+        return review_author(review.user)

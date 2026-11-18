@@ -163,7 +163,7 @@ REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     # Публичные POST-эндпоинты ограничиваются по IP: read-only каталог не троттлится.
     # cart: корзину приложения меняют часто (каждое «добавить»/«+»), поэтому свой лимит по IP
-    "DEFAULT_THROTTLE_RATES": {"anon": "10/min", "cart": "120/min", "auth": "20/min", "orders": "60/min"},
+    "DEFAULT_THROTTLE_RATES": {"anon": "10/min", "cart": "120/min", "auth": "20/min", "orders": "60/min", "reviews": "10/min"},
 }
 
 # Вход в мобильном приложении: JWT (access короткий, refresh с ротацией и чёрным списком)
