@@ -19,7 +19,7 @@ from app_catalog.models import (
     Product,
     ProductVariant,
 )
-from app_home.models import Announcement, CafeBranch, CafeBranchPhone, Vacancy, VacancyApplication
+from app_home.models import Announcement, CafeBranch, CafeBranchPhone, Company, Vacancy, VacancyApplication
 
 
 class CatalogApiTests(TestCase):
@@ -311,6 +311,19 @@ class ContactsApiTests(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(response.json()["instagram_url"], settings.INSTAGRAM_URL)
+
+    def test_company_requisites_from_footer(self):
+        self.assertIsNone(self.client.get(self.url).json()["company"])  # реквизиты не заведены
+        Company.objects.create(legal_name="Старое ООО", is_active=False)
+        Company.objects.create(
+            legal_name="ООО «Соло Пицца»", unpp="123456789", address="г. Барановичи, ул. Ленина, 9/1",
+            bank_name="Банк", bank_bik="BIKBY2X", account_number="BY00TEST",
+        )
+
+        company = self.client.get(self.url).json()["company"]
+
+        self.assertEqual(company["legal_name"], "ООО «Соло Пицца»")
+        self.assertEqual((company["unpp"], company["bank_bik"]), ("123456789", "BIKBY2X"))
 
     @override_settings(INSTAGRAM_URL="https://www.instagram.com/other_profile/")
     def test_instagram_url_is_configurable(self):

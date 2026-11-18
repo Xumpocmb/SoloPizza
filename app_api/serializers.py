@@ -83,9 +83,21 @@ class ContactBranchSerializer(serializers.ModelSerializer):
         return ContactPhoneSerializer(phones, many=True).data
 
 
+class CompanySerializer(serializers.Serializer):
+    """Реквизиты из футера сайта (app_home.Company)."""
+
+    legal_name = serializers.CharField()
+    unpp = serializers.CharField()
+    address = serializers.CharField()
+    bank_name = serializers.CharField()
+    bank_bik = serializers.CharField()
+    account_number = serializers.CharField()
+
+
 class ContactsSerializer(serializers.Serializer):
     instagram_url = serializers.URLField()
     branches = ContactBranchSerializer(many=True)
+    company = CompanySerializer(allow_null=True)
 
 
 class CategorySerializer(serializers.ModelSerializer):

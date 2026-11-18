@@ -20,7 +20,7 @@ from app_api.filters import branch_or_none, catalog_products, visible_categories
 from app_home.context_processors import DEFAULT_BRANCH_ID
 from app_cart.models import Cart
 from app_order.models import Order
-from app_home.models import Announcement, CafeBranch, Vacancy
+from app_home.models import Announcement, CafeBranch, Company, Vacancy
 from app_reviews.models import Review
 
 BRANCH_ID_PARAM = OpenApiParameter(
@@ -61,7 +61,7 @@ class BranchListView(PublicViewMixin, ListAPIView):
 
 @extend_schema(responses=api_serializers.ContactsSerializer)
 class ContactsView(PublicViewMixin, APIView):
-    """Контакты для мобильного приложения: филиалы, телефоны, адреса и Instagram."""
+    """Контакты для мобильного приложения: филиалы, телефоны, адреса, Instagram и реквизиты из футера сайта."""
 
     def get(self, request):
         branches = (
@@ -70,7 +70,12 @@ class ContactsView(PublicViewMixin, APIView):
             .order_by("id")
         )
         serializer = api_serializers.ContactsSerializer(
-            {"instagram_url": settings.INSTAGRAM_URL, "branches": branches},
+            {
+                "instagram_url": settings.INSTAGRAM_URL,
+                "branches": branches,
+                # та же выборка, что у футера сайта (app_home.context_processors.get_company)
+                "company": Company.objects.filter(is_active=True).order_by("pk").first(),
+            },
             context={"request": request},
         )
         return Response(serializer.data)
