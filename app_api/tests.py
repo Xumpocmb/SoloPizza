@@ -84,6 +84,10 @@ class CatalogApiTests(TestCase):
         slugs = [p["slug"] for p in response.json()]
         self.assertEqual(slugs, ["pepperoni"])
 
+    def test_product_list_carries_category_slug(self):
+        response = self.client.get(f"/api/v1/products/?branch_id={self.branch_a.pk}&category=pizza")
+        self.assertEqual(response.json()[0]["category"], "pizza")
+
     def test_product_detail_min_price_and_variants(self):
         response = self.client.get(f"/api/v1/products/pepperoni/?branch_id={self.branch_a.pk}")
         self.assertEqual(response.status_code, 200)

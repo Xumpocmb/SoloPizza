@@ -116,6 +116,8 @@ class CategorySerializer(serializers.ModelSerializer):
 class ProductListItemSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     min_price = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True, allow_null=True)
+    # slug категории: приложение делит общий список на разделы с заголовками (якоря в каталоге)
+    category = serializers.SlugRelatedField(slug_field="slug", read_only=True)
 
     class Meta:
         model = Product
@@ -126,6 +128,7 @@ class ProductListItemSerializer(serializers.ModelSerializer):
             "description",
             "image",
             "min_price",
+            "category",
             "is_weekly_special",
             "is_spicy",
             "is_sweet",
