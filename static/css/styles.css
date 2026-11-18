@@ -9096,6 +9096,13 @@ body.params-modal-active {
     transform: translateY(-1px);
 }
 
+/* Кнопка удаления аккаунта (/account/delete/): как CTA, но красная */
+:where(.s-legal) .legal-danger-btn {
+    border: 0;
+    cursor: pointer;
+    background-color: var(--error-color);
+}
+
 :where(.s-legal) .legal-footer__actions {
     display: flex;
     flex-wrap: wrap;

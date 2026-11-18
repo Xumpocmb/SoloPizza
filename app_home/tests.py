@@ -1139,3 +1139,46 @@ class OrderAvailabilityTagTests(TestCase):
         regular = User.objects.create_user(username="regular", password="Sup3r-secret")
 
         self.assertEqual(self.render_tag(self.at(12, 0), user=regular), "False")
+
+
+class AccountDeleteViewTests(TestCase):
+    """Страница удаления аккаунта (ссылка для анкеты «Безопасность данных» Google Play)."""
+
+    def setUp(self):
+        self.url = reverse("app_home:account_delete")
+        self.user = User.objects.create_user(username="del", email="del@example.com", password="x")
+
+    def test_guest_sees_instructions_and_login_link(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Удалить аккаунт")
+        self.assertContains(response, reverse("app_user:login"))
+        self.assertNotContains(response, 'name="confirm"')
+
+    def test_logged_in_user_sees_form(self):
+        self.client.force_login(self.user)
+        self.assertContains(self.client.get(self.url), 'name="confirm"')
+
+    def test_delete_requires_confirmation(self):
+        self.client.force_login(self.user)
+        self.client.post(self.url, {})
+        self.assertTrue(User.objects.filter(pk=self.user.pk).exists())
+
+    def test_confirmed_delete_removes_user_and_logs_out(self):
+        self.client.force_login(self.user)
+        response = self.client.post(self.url, {"confirm": "yes"})
+        self.assertRedirects(response, reverse("app_home:home"), fetch_redirect_response=False)
+        self.assertFalse(User.objects.filter(pk=self.user.pk).exists())
+        self.assertNotIn("_auth_user_id", self.client.session)
+
+    def test_staff_cannot_delete_themselves_here(self):
+        self.user.is_staff = True
+        self.user.save()
+        self.client.force_login(self.user)
+        self.client.post(self.url, {"confirm": "yes"})
+        self.assertTrue(User.objects.filter(pk=self.user.pk).exists())
+
+    def test_guest_post_deletes_nothing(self):
+        response = self.client.post(self.url, {"confirm": "yes"})
+        self.assertRedirects(response, self.url, fetch_redirect_response=False)
+        self.assertEqual(User.objects.count(), 1)
