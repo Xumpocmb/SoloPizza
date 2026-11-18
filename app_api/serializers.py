@@ -83,9 +83,21 @@ class ContactBranchSerializer(serializers.ModelSerializer):
         return ContactPhoneSerializer(phones, many=True).data
 
 
+class CompanySerializer(serializers.Serializer):
+    """Реквизиты из футера сайта (app_home.Company)."""
+
+    legal_name = serializers.CharField()
+    unpp = serializers.CharField()
+    address = serializers.CharField()
+    bank_name = serializers.CharField()
+    bank_bik = serializers.CharField()
+    account_number = serializers.CharField()
+
+
 class ContactsSerializer(serializers.Serializer):
     instagram_url = serializers.URLField()
     branches = ContactBranchSerializer(many=True)
+    company = CompanySerializer(allow_null=True)
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -104,6 +116,8 @@ class CategorySerializer(serializers.ModelSerializer):
 class ProductListItemSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     min_price = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True, allow_null=True)
+    # slug категории: приложение делит общий список на разделы с заголовками (якоря в каталоге)
+    category = serializers.SlugRelatedField(slug_field="slug", read_only=True)
 
     class Meta:
         model = Product
@@ -114,6 +128,7 @@ class ProductListItemSerializer(serializers.ModelSerializer):
             "description",
             "image",
             "min_price",
+            "category",
             "is_weekly_special",
             "is_spicy",
             "is_sweet",

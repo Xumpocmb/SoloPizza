@@ -1,10 +1,12 @@
 import uuid
+from datetime import timedelta
 from decimal import Decimal
 from unittest import mock
 
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.test import TestCase, override_settings
+from django.utils import timezone
 from rest_framework.test import APIClient
 
 from app_api.auth import issue_tokens
@@ -159,6 +161,22 @@ class OrderApiTests(TestCase):
         self.assertEqual([o["id"] for o in self.client.get("/api/v1/orders/").json()], [site_order.pk])
         self.assertEqual(self.client.get(f"/api/v1/orders/{foreign.pk}/").status_code, 404)
         self.assertEqual(self.client.get(f"/api/v1/orders/{site_order.pk}/").json()["number"], site_order.print_number)
+
+    def test_order_list_shows_only_today(self, _):
+        def make(**extra):
+            return Order.objects.create(
+                user=self.user, branch=self.branch, customer_name="Иван", phone_number="+375291112233",
+                delivery_type="pickup", payment_method="cash", **extra,
+            )
+
+        today = make()
+        yesterday = make()
+        # created_at — auto_now_add, сдвигаем вчерашний через update
+        Order.objects.filter(pk=yesterday.pk).update(created_at=timezone.now() - timedelta(days=1))
+
+        self.assertEqual([o["id"] for o in self.client.get("/api/v1/orders/").json()], [today.pk])
+        # вчерашний заказ по-прежнему открывается по id
+        self.assertEqual(self.client.get(f"/api/v1/orders/{yesterday.pk}/").status_code, 200)
 
     def test_requires_login(self, _):
         anonymous = APIClient()
