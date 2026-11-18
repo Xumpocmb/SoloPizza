@@ -574,6 +574,7 @@ class OrderLineSerializer(serializers.Serializer):
     name = serializers.CharField()
     options = serializers.CharField(allow_blank=True)
     quantity = serializers.IntegerField()
+    original_total = serializers.DecimalField(max_digits=10, decimal_places=2)
     total = serializers.DecimalField(max_digits=10, decimal_places=2)
 
 
@@ -608,11 +609,14 @@ def order_data(order):
         options += [item.sauce.name] if item.sauce else []
         options += [addon.addon.name for addon in item.addons.all()]
         options += [item.drink] if item.drink else []
+        calculation = item.calculate_item_total()
         lines.append({
             "name": item.product.name,
             "options": " · ".join(option for option in options if option),
             "quantity": item.quantity,
-            "total": item.calculate_item_total()["final_total"],
+            # без скидки: приложение показывает строку, ниже скидку и итог — как при оформлении
+            "original_total": calculation["original_total"],
+            "total": calculation["final_total"],
         })
     return {
         "id": order.pk,
