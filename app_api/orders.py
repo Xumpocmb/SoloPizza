@@ -5,6 +5,7 @@ app_order.pricing (скидки самовывоза и «Пиццы недел�
 (доставка). Партнёрская скидка — только у сотрудников на сайте, приложению недоступна.
 """
 
+from datetime import timedelta
 from decimal import Decimal
 from types import SimpleNamespace
 
@@ -22,6 +23,8 @@ DELIVERY_TYPES = ("pickup", "delivery")  # «Зал» — только для с
 PAYMENT_METHODS = ("cash", "card")  # оплата при получении; безнал и раздельная — у сотрудников
 # Проверочные заказы на боевом сервере: сразу отменены и не оплачены, чтобы не попасть сотрудникам в работу
 TEST_CUSTOMER_NAME = "ТЕСТ"
+# как у формы сайта: «Доставка к» пустая → «Готов к» + 20 минут
+PREORDER_DELIVERY_GAP = timedelta(minutes=20)
 
 
 def is_test_order(customer_name):
@@ -105,6 +108,14 @@ def create_order(user, cart, data):
         return existing, False
 
 
+def _preorder_fields(data):
+    """«Готов к» / «Доставка к» — как блок «ПРЕДЗАКАЗ» формы сайта, с тем же автозаполнением доставки."""
+    ready_by, delivery_by = data.get("ready_by"), data.get("delivery_by")
+    if ready_by and not delivery_by:
+        delivery_by = ready_by + PREORDER_DELIVERY_GAP
+    return {"ready_by": ready_by, "delivery_by": delivery_by}
+
+
 def _create(user, cart, items, data):
     with transaction.atomic():
         order = Order.objects.create(
@@ -119,6 +130,7 @@ def _create(user, cart, items, data):
             delivery_type=data["delivery_type"],
             payment_method=data["payment_method"],
             comment=data.get("comment", ""),
+            **_preorder_fields(data),
             status="canceled" if is_test_order(data["customer_name"]) else "new",
             payment_status=False,
         )

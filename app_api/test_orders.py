@@ -178,6 +178,36 @@ class OrderApiTests(TestCase):
         # вчерашний заказ по-прежнему открывается по id
         self.assertEqual(self.client.get(f"/api/v1/orders/{yesterday.pk}/").status_code, 200)
 
+    def test_preorder_fields_like_site_form(self, _):
+        ready = timezone.localtime().replace(second=0, microsecond=0) + timedelta(days=1)
+        delivery = ready + timedelta(minutes=45)
+
+        self.add_pizza()
+        only_ready = self.client.post("/api/v1/orders/", self.order_payload(ready_by=ready.isoformat()), format="json")
+        self.assertEqual(only_ready.status_code, 201, only_ready.json())
+        order = Order.objects.get(pk=only_ready.json()["id"])
+        # как форма сайта: «Доставка к» не указана → «Готов к» + 20 минут
+        self.assertEqual((order.ready_by, order.delivery_by), (ready, ready + timedelta(minutes=20)))
+
+        self.add_pizza()
+        both = self.client.post(
+            "/api/v1/orders/",
+            self.order_payload(ready_by=ready.isoformat(), delivery_by=delivery.isoformat()),
+            format="json",
+        )
+        order = Order.objects.get(pk=both.json()["id"])
+        self.assertEqual((order.ready_by, order.delivery_by), (ready, delivery))
+
+        self.add_pizza()
+        only_delivery = self.client.post("/api/v1/orders/", self.order_payload(delivery_by=delivery.isoformat()), format="json")
+        order = Order.objects.get(pk=only_delivery.json()["id"])
+        self.assertEqual((order.ready_by, order.delivery_by), (None, delivery))
+
+    def test_without_preorder_fields_stay_empty(self, _):
+        self.add_pizza()
+        data = self.client.post("/api/v1/orders/", self.order_payload(), format="json").json()
+        self.assertEqual((data["ready_by"], data["delivery_by"]), (None, None))
+
     def test_requires_login(self, _):
         anonymous = APIClient()
         self.assertEqual(anonymous.get("/api/v1/orders/").status_code, 401)
