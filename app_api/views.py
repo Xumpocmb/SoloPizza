@@ -342,6 +342,9 @@ class SocialLoginView(PublicViewMixin, APIView):
     def verify(self, data):
         raise NotImplementedError
 
+    def after_login(self, claims, data):
+        """Доп. шаг провайдера после входа (Apple сохраняет токен для отзыва)."""
+
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -357,6 +360,7 @@ class SocialLoginView(PublicViewMixin, APIView):
         )
         if not user.is_active:
             raise PermissionDenied("Аккаунт заблокирован")
+        self.after_login(claims, serializer.validated_data)
         api_auth.merge_guest_cart(user, request.headers.get(CART_TOKEN_HEADER))
         return Response({**api_auth.issue_tokens(user), "user": api_serializers.me_data(user)})
 
@@ -386,6 +390,9 @@ class AppleLoginView(SocialLoginView):
     def verify(self, data):
         return api_auth.verify_apple(data["identity_token"])
 
+    def after_login(self, claims, data):
+        api_auth.store_apple_refresh_token(claims, data.get("authorization_code"))
+
 
 class MeView(APIView):
     authentication_classes = [JWTAuthentication]
@@ -405,8 +412,7 @@ class MeView(APIView):
     @extend_schema(responses={204: None})
     def delete(self, request):
         """Удаление аккаунта (требование App Store): заказы остаются без привязки к пользователю."""
-        # shortcut: токен Sign in with Apple не отзывается (нужен ключ .p8 из Apple Developer);
-        # добавить вызов appleid.apple.com/auth/revoke, когда ключ появится — до публикации в App Store
+        api_auth.revoke_apple(request.user)
         request.user.delete()
         return Response(status=204)
 

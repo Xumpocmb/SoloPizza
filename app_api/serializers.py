@@ -447,6 +447,8 @@ class GoogleLoginSerializer(serializers.Serializer):
 
 class AppleLoginSerializer(serializers.Serializer):
     identity_token = serializers.CharField()
+    # одноразовый код: сервер меняет его на refresh_token Apple, чтобы отозвать вход при удалении аккаунта
+    authorization_code = serializers.CharField(required=False, allow_blank=True)
     # Apple отдаёт имя приложению только при первом входе и не кладёт его в токен
     first_name = serializers.CharField(required=False, allow_blank=True, max_length=150)
     last_name = serializers.CharField(required=False, allow_blank=True, max_length=150)

@@ -5,9 +5,12 @@
 Аккаунт общий с сайтом: тот же Google-аккаунт (SocialAccount allauth) — тот же User.
 """
 
+import logging
+import time
 import uuid
 
 import jwt
+import requests
 from allauth.account.models import EmailAddress
 from allauth.socialaccount.models import SocialAccount
 from django.conf import settings
@@ -23,6 +26,10 @@ from app_cart.models import Cart
 APPLE_ISSUER = "https://appleid.apple.com"
 APPLE_KEYS_URL = "https://appleid.apple.com/auth/keys"
 _apple_keys = jwt.PyJWKClient(APPLE_KEYS_URL)  # кэширует ключи Apple между запросами
+APPLE_TOKEN_URL = "https://appleid.apple.com/auth/token"
+APPLE_REVOKE_URL = "https://appleid.apple.com/auth/revoke"
+
+logger = logging.getLogger(__name__)
 
 
 class InvalidProviderToken(APIException):
@@ -59,6 +66,50 @@ def verify_apple(token):
         return jwt.decode(token, key, algorithms=["RS256"], audience=settings.APPLE_BUNDLE_ID, issuer=APPLE_ISSUER)
     except jwt.PyJWTError as error:
         raise InvalidProviderToken("Недействительный токен Apple") from error
+
+
+def _apple_client_secret():
+    """Подписанный ключом .p8 client_secret для REST API Apple; None — ключ не настроен."""
+    if not (settings.APPLE_KEY_ID and settings.APPLE_PRIVATE_KEY):
+        return None
+    now = int(time.time())
+    claims = {"iss": settings.APPLE_TEAM_ID, "iat": now, "exp": now + 300, "aud": APPLE_ISSUER, "sub": settings.APPLE_BUNDLE_ID}
+    return jwt.encode(claims, settings.APPLE_PRIVATE_KEY, algorithm="ES256", headers={"kid": settings.APPLE_KEY_ID})
+
+
+def store_apple_refresh_token(claims, code):
+    """authorization_code из приложения → refresh_token Apple: без него вход нельзя отозвать при удалении аккаунта."""
+    secret = _apple_client_secret()
+    if not (secret and code):
+        return
+    data = {"client_id": settings.APPLE_BUNDLE_ID, "client_secret": secret, "code": code, "grant_type": "authorization_code"}
+    try:
+        response = requests.post(APPLE_TOKEN_URL, data=data, timeout=10)
+        response.raise_for_status()
+        token = response.json().get("refresh_token")
+    except (requests.RequestException, ValueError):
+        logger.warning("Apple: не удалось обменять authorization_code на refresh_token", exc_info=True)
+        return
+    if token:
+        account = SocialAccount.objects.get(provider="apple", uid=str(claims["sub"]))
+        account.extra_data = {**account.extra_data, "apple_refresh_token": token}
+        account.save(update_fields=["extra_data"])
+
+
+def revoke_apple(user):
+    """Отзыв входа через Apple при удалении аккаунта (требование App Store 5.1.1(v)); сбой не мешает удалению."""
+    secret = _apple_client_secret()
+    if not secret:
+        return
+    for account in SocialAccount.objects.filter(user=user, provider="apple"):
+        token = (account.extra_data or {}).get("apple_refresh_token")
+        if not token:
+            continue  # вошёл до появления ключа .p8 — отзывать нечем
+        data = {"client_id": settings.APPLE_BUNDLE_ID, "client_secret": secret, "token": token, "token_type_hint": "refresh_token"}
+        try:
+            requests.post(APPLE_REVOKE_URL, data=data, timeout=10).raise_for_status()
+        except requests.RequestException:
+            logger.warning("Apple: не удалось отозвать токен пользователя %s", user.pk, exc_info=True)
 
 
 def _verified(claims):

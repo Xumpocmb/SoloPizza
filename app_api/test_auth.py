@@ -4,9 +4,11 @@ from types import SimpleNamespace
 from unittest import mock
 
 import jwt
+import requests
 from allauth.account.models import EmailAddress
 from allauth.socialaccount.models import SocialAccount
-from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import ec, rsa
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.test import TestCase, override_settings
@@ -18,6 +20,10 @@ from app_order.models import Order
 
 User = get_user_model()
 APPLE_KEY = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+# ключ .p8 разработчика (ES256) — им сервер подписывает client_secret для REST API Apple
+APPLE_P8 = ec.generate_private_key(ec.SECP256R1()).private_bytes(
+    serialization.Encoding.PEM, serialization.PrivateFormat.PKCS8, serialization.NoEncryption()
+).decode()
 
 
 def apple_token(sub="apple-sub-1", aud="by.solopizza.app", email="user@privaterelay.appleid.com", iss="https://appleid.apple.com"):
@@ -113,6 +119,44 @@ class AuthApiTests(TestCase):
             self.assertEqual(response.status_code, 401)
         forged = jwt.encode({"sub": "x", "aud": "by.solopizza.app"}, rsa.generate_private_key(65537, 2048), algorithm="RS256")
         self.assertEqual(self.client.post("/api/v1/auth/apple/", {"identity_token": forged}, format="json").status_code, 401)
+
+    def apple_login_with_code(self):
+        body = {"identity_token": apple_token(), "authorization_code": "code-1"}
+        return self.client.post("/api/v1/auth/apple/", body, format="json").json()
+
+    @override_settings(APPLE_KEY_ID="KEY123", APPLE_PRIVATE_KEY=APPLE_P8)
+    def test_apple_token_saved_at_login_and_revoked_on_delete(self):
+        reply = mock.Mock()
+        reply.json.return_value = {"refresh_token": "apple-refresh"}
+        with mock.patch("app_api.auth.requests.post", return_value=reply) as post:
+            data = self.apple_login_with_code()
+        self.assertEqual(post.call_args.args[0], "https://appleid.apple.com/auth/token")
+        sent = post.call_args.kwargs["data"]
+        self.assertEqual(sent["code"], "code-1")
+        secret = jwt.decode(sent["client_secret"], serialization.load_pem_private_key(APPLE_P8.encode(), None).public_key(),
+                            algorithms=["ES256"], audience="https://appleid.apple.com")
+        self.assertEqual((secret["iss"], secret["sub"]), ("5Z7ZV4C96F", "by.solopizza.app"))
+        self.assertEqual(jwt.get_unverified_header(sent["client_secret"])["kid"], "KEY123")
+
+        self.auth(data["access"])
+        with mock.patch("app_api.auth.requests.post") as post:
+            self.assertEqual(self.client.delete("/api/v1/me/").status_code, 204)
+        self.assertEqual(post.call_args.args[0], "https://appleid.apple.com/auth/revoke")
+        self.assertEqual(post.call_args.kwargs["data"]["token"], "apple-refresh")
+
+    @override_settings(APPLE_KEY_ID="KEY123", APPLE_PRIVATE_KEY=APPLE_P8)
+    def test_apple_errors_do_not_block_login_or_delete(self):
+        with mock.patch("app_api.auth.requests.post", side_effect=requests.ConnectionError):
+            data = self.apple_login_with_code()
+            self.auth(data["access"])
+            self.assertEqual(self.client.delete("/api/v1/me/").status_code, 204)
+        self.assertFalse(User.objects.filter(pk=data["user"]["id"]).exists())
+
+    def test_apple_without_key_makes_no_calls(self):
+        with mock.patch("app_api.auth.requests.post") as post:
+            self.auth(self.apple_login_with_code()["access"])
+            self.assertEqual(self.client.delete("/api/v1/me/").status_code, 204)
+        post.assert_not_called()
 
     # ── Токены и профиль ────────────────────────────────────────────────
 
