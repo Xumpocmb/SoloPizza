@@ -152,6 +152,13 @@ class AuthApiTests(TestCase):
             self.assertEqual(self.client.delete("/api/v1/me/").status_code, 204)
         self.assertFalse(User.objects.filter(pk=data["user"]["id"]).exists())
 
+    @override_settings(APPLE_KEY_ID="KEY123", APPLE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----")
+    def test_apple_broken_key_does_not_block_login(self):
+        with mock.patch("app_api.auth.requests.post") as post:
+            self.auth(self.apple_login_with_code()["access"])
+            self.assertEqual(self.client.delete("/api/v1/me/").status_code, 204)
+        post.assert_not_called()
+
     def test_apple_without_key_makes_no_calls(self):
         with mock.patch("app_api.auth.requests.post") as post:
             self.auth(self.apple_login_with_code()["access"])
