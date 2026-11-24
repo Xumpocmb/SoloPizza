@@ -74,7 +74,12 @@ def _apple_client_secret():
         return None
     now = int(time.time())
     claims = {"iss": settings.APPLE_TEAM_ID, "iat": now, "exp": now + 300, "aud": APPLE_ISSUER, "sub": settings.APPLE_BUNDLE_ID}
-    return jwt.encode(claims, settings.APPLE_PRIVATE_KEY, algorithm="ES256", headers={"kid": settings.APPLE_KEY_ID})
+    try:
+        return jwt.encode(claims, settings.APPLE_PRIVATE_KEY, algorithm="ES256", headers={"kid": settings.APPLE_KEY_ID})
+    except (ValueError, TypeError, jwt.PyJWTError):
+        # кривой APPLE_PRIVATE_KEY не должен ломать вход (раньше давал HTTP 500)
+        logger.error("Apple: не читается ключ APPLE_PRIVATE_KEY — отзыв входа выключен", exc_info=True)
+        return None
 
 
 def store_apple_refresh_token(claims, code):
