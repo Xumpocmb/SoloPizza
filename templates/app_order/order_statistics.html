@@ -48,6 +48,7 @@
             </form>
         </div>
 
+        {% if perms.app_order.can_view_statistics %}
         <div class="order-controls" style="justify-content: flex-end; margin-bottom: 20px;">
             <button type="button" class="filter-button" id="openEmailModalBtn" style="background-color: #28a745; color: white;">
                 📧 Отправить по email
@@ -73,6 +74,7 @@
                 </form>
             </div>
         </div>
+        {% endif %}
 
         <div class="statistics-table">
             <div class="table-header">

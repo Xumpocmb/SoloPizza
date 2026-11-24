@@ -4,7 +4,7 @@ from datetime import date, datetime, time, timedelta
 from decimal import Decimal
 from unittest.mock import patch
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Group, User
 from django.db import IntegrityError, transaction
 from django.test import Client, TestCase, SimpleTestCase
 from django.urls import reverse
@@ -489,6 +489,91 @@ class DashboardAccessTests(TestCase):
         # Символ белорусского рубля берётся из подключённого шрифта nbrb.
         self.assertContains(response, "nbrb-icon")
         self.assertNotContains(response, "fa-ruble-sign")
+
+
+class EmployeeAccessTests(TestCase):
+    """СММ видит только дашборд, бухгалтер — статистику и отчёты."""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.dashboard_url = reverse("app_order:dashboard")
+        cls.statistics_url = reverse("app_order:order_statistics")
+        cls.detail_url = reverse("app_order:detail_statistics", args=[timezone.localdate().isoformat()])
+        cls.reports_url = reverse("app_order:reports")
+        cls.send_detail_url = reverse("app_order:send_detail_statistics_email")
+        cls.send_order_url = reverse("app_order:send_order_statistics_email")
+
+    def login(self, username, group_name=None, **user_kwargs):
+        user = User.objects.create_user(username=username, password="Sup3r-secret", **user_kwargs)
+        if group_name:
+            user.groups.add(Group.objects.get(name=group_name))
+        self.client.force_login(user)
+        return user
+
+    def test_groups_are_created_with_expected_permissions(self):
+        smm = Group.objects.get(name="СММ")
+        accountant = Group.objects.get(name="Бухгалтер")
+
+        self.assertEqual(
+            set(smm.permissions.values_list("codename", flat=True)),
+            {"can_view_dashboard"},
+        )
+        self.assertEqual(
+            set(accountant.permissions.values_list("codename", flat=True)),
+            {"can_view_statistics", "can_view_reports"},
+        )
+
+    def test_smm_sees_dashboard_only(self):
+        self.login("smm", "СММ")
+
+        self.assertEqual(self.client.get(self.dashboard_url).status_code, 200)
+        self.assertEqual(self.client.get(self.statistics_url).status_code, 403)
+        self.assertEqual(self.client.get(self.detail_url).status_code, 403)
+        self.assertEqual(self.client.get(self.reports_url).status_code, 302)
+        self.assertEqual(self.client.post(self.send_detail_url, {"date": "2026-01-01"}).status_code, 403)
+        self.assertEqual(self.client.post(self.send_order_url).status_code, 403)
+
+    def test_accountant_sees_statistics_and_reports_but_not_dashboard(self):
+        self.login("accountant", "Бухгалтер")
+
+        self.assertEqual(self.client.get(self.dashboard_url).status_code, 403)
+        self.assertEqual(self.client.get(self.statistics_url).status_code, 200)
+        self.assertEqual(self.client.get(self.detail_url).status_code, 200)
+        self.assertEqual(self.client.get(self.reports_url).status_code, 200)
+
+    def test_accountant_can_send_statistics_by_email(self):
+        self.login("accountant", "Бухгалтер")
+
+        response = self.client.post(self.send_detail_url, {"date": timezone.localdate().isoformat()})
+        self.assertEqual(response.status_code, 302)
+
+        response = self.client.post(
+            self.send_order_url,
+            {"start_date": "2026-01-01", "end_date": "2026-01-31"},
+        )
+        self.assertEqual(response.status_code, 302)
+
+    def test_superuser_keeps_full_access(self):
+        self.login("admin", is_superuser=True, is_staff=True)
+
+        self.assertEqual(self.client.get(self.dashboard_url).status_code, 200)
+        self.assertEqual(self.client.get(self.statistics_url).status_code, 200)
+        self.assertEqual(self.client.get(self.reports_url).status_code, 200)
+
+    def test_menu_links_follow_permissions(self):
+        self.login("smm", "СММ")
+        response = self.client.get(self.dashboard_url)
+
+        self.assertContains(response, f'href="{self.dashboard_url}"')
+        self.assertNotContains(response, f'href="{self.statistics_url}"')
+        self.assertNotContains(response, f'href="{self.reports_url}"')
+
+        self.login("accountant", "Бухгалтер")
+        response = self.client.get(self.reports_url)
+
+        self.assertNotContains(response, f'href="{self.dashboard_url}"')
+        self.assertContains(response, f'href="{self.statistics_url}"')
+        self.assertContains(response, f'href="{self.reports_url}"')
 
 
 class DashboardDataTests(TestCase):

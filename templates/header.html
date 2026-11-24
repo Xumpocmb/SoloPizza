@@ -124,12 +124,17 @@
                         <a href="{% url 'admin:index' %}" target="_blank">{% trans "Админ-панель" %}</a>
                         <a href="{% url 'socialaccount_connections' %}">{% trans "Управление социальными аккаунтами" %}</a>
                         <a href="{% url 'app_reviews:moderation_list' %}">{% trans "Модерация" %}</a>
+                    {% endif %}
+                    {% if perms.app_order.can_view_dashboard %}
                         <a href="{% url 'app_order:dashboard' %}">{% trans "Дашборд" %}</a>
+                    {% endif %}
+                    {% if perms.app_order.can_view_statistics %}
                         <a href="{% url 'app_order:order_statistics' %}">{% trans "Статистика" %}</a>
+                    {% endif %}
+                    {% if user.is_staff or perms.app_order.can_view_reports %}
                         <a href="{% url 'app_order:reports' %}">{% trans "Отчеты" %}</a>
-                        <a href="{% url 'app_home:certificate_sell' %}">{% trans "Продажа сертификатов" %}</a>
-                    {% elif user.is_staff %}
-                        <a href="{% url 'app_order:reports' %}">{% trans "Отчеты" %}</a>
+                    {% endif %}
+                    {% if user.is_staff or user.is_superuser %}
                         <a href="{% url 'app_home:certificate_sell' %}">{% trans "Продажа сертификатов" %}</a>
                     {% endif %}
                     <a href="{% url 'app_cart:view_cart' %}">{% trans "Корзина" %}</a>

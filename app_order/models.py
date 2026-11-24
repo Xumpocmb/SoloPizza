@@ -229,6 +229,11 @@ class Order(models.Model):
         verbose_name = "Заказ"
         verbose_name_plural = "Заказы"
         ordering = ["-created_at"]
+        permissions = [
+            ("can_view_dashboard", "Может просматривать дашборд"),
+            ("can_view_statistics", "Может просматривать статистику"),
+            ("can_view_reports", "Может просматривать отчёты"),
+        ]
         constraints = [
             models.UniqueConstraint(fields=["number_date", "daily_number"], name="unique_order_number_per_day"),
             models.UniqueConstraint(

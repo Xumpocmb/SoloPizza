@@ -633,8 +633,8 @@ def _parse_date(value):
 
 @login_required
 def dashboard_view(request):
-    """Отдельная страница-дашборд для суперпользователя."""
-    if not request.user.is_superuser:
+    """Дашборд доступен суперпользователю и сотрудникам с соответствующим правом."""
+    if not request.user.has_perm("app_order.can_view_dashboard"):
         return HttpResponseForbidden("Доступ запрещен")
 
     dashboard = build_dashboard(request.GET.get("period"))
@@ -655,7 +655,7 @@ STATISTICS_SORT_FIELDS = {"date", "orders_count", "total_cash", "total_card", "t
 
 @login_required
 def order_statistics_view(request):
-    if not request.user.is_superuser:
+    if not request.user.has_perm("app_order.can_view_statistics"):
         return HttpResponseForbidden("Доступ запрещен")
 
     start_date = request.GET.get("start_date", "")
@@ -689,7 +689,7 @@ def order_statistics_view(request):
 
 @login_required
 def detail_statistics_view(request, date):
-    if not request.user.is_superuser:
+    if not request.user.has_perm("app_order.can_view_statistics"):
         return HttpResponseForbidden("Доступ запрещен")
 
     selected_date = _parse_date(date)
@@ -717,9 +717,9 @@ def detail_statistics_view(request, date):
 def reports_view(request):
     """
     Отображает статистику по заказам за текущий день.
-    Доступна сотрудникам и суперпользователю.
+    Доступна сотрудникам (is_staff), суперпользователю и обладателям права.
     """
-    if not (request.user.is_staff or request.user.is_superuser):
+    if not (request.user.is_staff or request.user.has_perm("app_order.can_view_reports")):
         return redirect("app_order:order_list")
 
     # Дата за сегодня по местному времени — как в нумерации заказов
@@ -776,7 +776,7 @@ def send_detail_statistics_email(request):
     Отправляет детальную статистику по филиалам за выбранный день на email.
     Считает данные по заказам в реальном времени.
     """
-    if not request.user.is_superuser:
+    if not request.user.has_perm("app_order.can_view_statistics"):
         return HttpResponseForbidden("Доступ запрещен")
 
     from django.core.mail import send_mail
@@ -825,12 +825,13 @@ def send_detail_statistics_email(request):
 
 
 @login_required
+@require_POST
 def send_order_statistics_email(request):
     """
     Отправляет статистику заказов за выбранный период на email.
     Считает данные по заказам в реальном времени.
     """
-    if not request.user.is_superuser:
+    if not request.user.has_perm("app_order.can_view_statistics"):
         return HttpResponseForbidden("Доступ запрещен")
 
     from django.core.mail import send_mail
