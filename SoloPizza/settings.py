@@ -178,6 +178,11 @@ SIMPLE_JWT = {
 GOOGLE_OAUTH_CLIENT_IDS = [cid.strip() for cid in os.getenv("GOOGLE_OAUTH_CLIENT_IDS", "").split(",") if cid.strip()]
 # aud в identity_token от Sign in with Apple = bundle id приложения
 APPLE_BUNDLE_ID = os.getenv("APPLE_BUNDLE_ID", "by.solopizza.app")
+# Ключ Sign in with Apple (.p8 из developer.apple.com → Keys): отзыв входа при удалении аккаунта.
+# APPLE_PRIVATE_KEY — содержимое .p8 в одну строку, переводы строк как \n. Без ключа отзыв выключен.
+APPLE_TEAM_ID = os.getenv("APPLE_TEAM_ID", "5Z7ZV4C96F")
+APPLE_KEY_ID = os.getenv("APPLE_KEY_ID", "")
+APPLE_PRIVATE_KEY = os.getenv("APPLE_PRIVATE_KEY", "").replace("\\n", "\n")
 
 SPECTACULAR_SETTINGS = {
     "TITLE": "SoloPizza mobile API",

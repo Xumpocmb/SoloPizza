@@ -441,6 +441,8 @@ class GoogleLoginSerializer(serializers.Serializer):
 
 class AppleLoginSerializer(serializers.Serializer):
     identity_token = serializers.CharField()
+    # одноразовый код: сервер меняет его на refresh_token Apple, чтобы отозвать вход при удалении аккаунта
+    authorization_code = serializers.CharField(required=False, allow_blank=True)
     # Apple отдаёт имя приложению только при первом входе и не кладёт его в токен
     first_name = serializers.CharField(required=False, allow_blank=True, max_length=150)
     last_name = serializers.CharField(required=False, allow_blank=True, max_length=150)
@@ -560,6 +562,9 @@ class OrderCreateSerializer(serializers.Serializer):
     address = serializers.CharField(max_length=500, required=False, allow_blank=True)
     comment = serializers.CharField(max_length=1000, required=False, allow_blank=True)
     consent = serializers.BooleanField()
+    # предзаказ — поля блока «ПРЕДЗАКАЗ» формы сайта; можно не заполнять
+    ready_by = serializers.DateTimeField(required=False, allow_null=True)
+    delivery_by = serializers.DateTimeField(required=False, allow_null=True)
 
     def validate_phone(self, value):
         # как у формы отклика: «+375 (29) 123-45-67» → 375291234567 (в Order.phone_number до 20 символов)
@@ -600,6 +605,8 @@ class OrderSerializer(serializers.Serializer):
     phone = serializers.CharField(allow_null=True)
     address = serializers.CharField(allow_null=True)
     comment = serializers.CharField(allow_blank=True)
+    ready_by = serializers.DateTimeField(allow_null=True)
+    delivery_by = serializers.DateTimeField(allow_null=True)
     items = OrderLineSerializer(many=True)
     subtotal = serializers.DecimalField(max_digits=10, decimal_places=2)
     discount_amount = serializers.DecimalField(max_digits=10, decimal_places=2)
@@ -640,6 +647,8 @@ def order_data(order):
         "phone": order.phone_number,
         "address": order.address,
         "comment": order.comment,
+        "ready_by": order.ready_by,
+        "delivery_by": order.delivery_by,
         "items": lines,
         "subtotal": order.subtotal,
         "discount_amount": order.discount_amount,
